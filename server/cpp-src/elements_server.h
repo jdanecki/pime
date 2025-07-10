@@ -32,7 +32,7 @@ class AnimalServer : public Animal
     void move();
     bool tick() override;
     AnimalServer();
-    AnimalServer(int id);
+    AnimalServer(BaseAnimal* base);
 };
 
 class PlantServer : public Plant
@@ -44,11 +44,11 @@ class PlantServer : public Plant
     bool grow() override;
     // bool tick() override;
     PlantServer();
-    PlantServer(int id);
+    PlantServer(BasePlant* base);
 };
 
-AnimalServer* create_animal(int id);
-PlantServer* create_plant(int id);
-Element* create_element(int id);
+AnimalServer* create_animal(BaseAnimal* base);
+PlantServer* create_plant(BasePlant* base);
+Element* create_element(BaseElement* base);
 
 #endif

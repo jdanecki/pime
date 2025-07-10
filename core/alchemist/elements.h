@@ -525,14 +525,7 @@ class BaseAnimal : public Base
     bool swimming;
     bool flying;
 
-    BaseAnimal(int index) : Base(index, Class_BaseAnimal)
-    {
-        id = index;
-        carnivorous = rand() % 2;
-        swimming = rand() % 2;
-        flying = rand() % 2;
-        name = create_name(10);
-    }
+    BaseAnimal(int index);
     void show(bool details = true)
     {
         printf("BaseAnimal:\n");
@@ -600,12 +593,7 @@ class BasePlant : public Base
   public:
     bool flowers;
     bool leaves;
-    BasePlant(int index) : Base(index, Class_BasePlant)
-    {
-        flowers = rand() % 2;
-        leaves = rand() % 2;
-        name = create_name(15);
-    }
+    BasePlant(int index);
     void show(bool details = true)
     {
         printf("BasePlant:\n");

@@ -16,6 +16,8 @@ add_definitions(-DCORE_FOR_CLIENT)
 
 add_subdirectory(../core core)
 
+set(MULTI_USER 1)
+
 if(NOT MULTI_USER)
     set(NETWORK_STUB network_stub.cpp)
 endif()

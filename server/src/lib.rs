@@ -153,12 +153,12 @@ fn add_player(
     //peer.set_data(Some(players.len()));
     server.clients.insert(peer, players.len());
 
-    let mut response = [0 as u8; 17];
-    response[0] = core::PACKET_PLAYER_ID as u8;
-    response[1..9].copy_from_slice(&players.len().to_le_bytes());
+    let mut response = vec![core::PACKET_PLAYER_ID as u8];
+    response.extend_from_slice(&players.len().to_le_bytes());
     unsafe {
-        response[9..17].copy_from_slice(&SEED.to_le_bytes());
+        response.extend_from_slice(&SEED.to_le_bytes());
     }
+
     server.socket.send_to(&response, peer).unwrap();
 
     unsafe {

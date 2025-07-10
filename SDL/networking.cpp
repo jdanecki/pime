@@ -142,6 +142,7 @@ extern "C"
 
     void update_chunk(int32_t x, int32_t y, const chunk_table * data)
     {
+        data = (chunk_table*)((char*)(data) + 3);
         if (!world_table[y][x])
         {
             // world_table[y][x] = (chunk*)calloc(1, sizeof(chunk));

@@ -3,6 +3,7 @@ use std::net::UdpSocket;
 
 mod core;
 mod events;
+mod generator;
 mod send_packets;
 mod types;
 
@@ -92,7 +93,7 @@ pub extern "C" fn network_tick(client: &NetClient) {
                                 //i32::from_le_bytes(value[5..9].try_into().unwrap()),
                                 i32::from(value[1]),
                                 i32::from(value[2]),
-                                &mut *(&mut value[3] as *mut u8 as *mut core::chunk_table),
+                                &mut *(&mut value[0] as *mut u8 as *mut core::chunk_table),
                             )
                         }
                     } else {
