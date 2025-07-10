@@ -21,7 +21,7 @@ AnimalServer::AnimalServer()
     dst_loc_y = rand() % CHUNK_SIZE;
 }
 
-AnimalServer::AnimalServer(int id) : Animal(id % BASE_ANIMALS)
+AnimalServer::AnimalServer(BaseAnimal* base) : Animal(base)
 {
     delay_for_move = max_delay_move; // 600 * 100ms -> 1min
     dst_loc_x = rand() % CHUNK_SIZE;
@@ -91,7 +91,7 @@ PlantServer::PlantServer()
     delay_for_grow = max_delay_grow;
 }
 
-PlantServer::PlantServer(int id) : Plant(id % BASE_PLANTS)
+PlantServer::PlantServer(BasePlant* base) : Plant(base)
 {
     delay_for_grow = max_delay_grow;
 }
@@ -164,17 +164,17 @@ bool PlantServer::tick()
     Plant::tick();
     return true;
 }*/
-AnimalServer* create_animal(int id)
+AnimalServer* create_animal(BaseAnimal* base)
 {
-    return new AnimalServer(id);
+    return new AnimalServer(base);
 }
 
-PlantServer* create_plant(int id)
+PlantServer* create_plant(BasePlant* base)
 {
-    return new PlantServer(id);
+    return new PlantServer(base);
 }
 
-Element* create_element(int id)
+Element* create_element(BaseElement* base)
 {
-    return new Element(id);
+    return new Element(base);
 }

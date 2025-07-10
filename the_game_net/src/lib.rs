@@ -3,6 +3,7 @@ use std::net::UdpSocket;
 
 mod core;
 mod events;
+mod generator;
 mod send_packets;
 mod types;
 

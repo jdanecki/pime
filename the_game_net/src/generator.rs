@@ -4,7 +4,7 @@ use std::hash::Hash;
 use std::rc::Rc;
 
 use crate::core;
-use crate::SEED;
+// use crate::SEED;
 use rand::prelude::*;
 
 const REGIONS_NUM: u32 = 1000;
@@ -42,7 +42,7 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
                     };
                 }
             }
-            for (rock, num) in region.rocks_types.iter() {
+            /*            for (rock, num) in region.rocks_types.iter() {
                 // TODO remove +1 for each object
                 let prob = num * 10.0 + 1.0;
                 do_times(prob, || {
@@ -68,7 +68,7 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
                         &animal.base as *const core::BaseAnimal as *mut core::BaseAnimal,
                     ) as *mut core::InventoryElement);
                 })
-            }
+            }*/
             core::world_table[map_y as usize][map_x as usize] = Box::into_raw(chunk);
         }
     });
@@ -116,10 +116,10 @@ impl World {
 
 pub fn generate() {
     unsafe {
-        SEED = core::time(std::ptr::null_mut());
-        println!("{}", SEED);
-        core::srand(SEED as u32);
-        println!("{}", core::rand());
+        // SEED = core::time(std::ptr::null_mut());
+        // println!("{}", SEED);
+        // core::srand(SEED as u32);
+        // println!("{}", core::rand());
         // core::init_elements();
         //core::generator();
     }
