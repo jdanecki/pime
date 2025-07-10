@@ -50,7 +50,7 @@ bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement 
 {
     Product * i = (Product *)item;
 
-    printf("used %d on %ld", i->get_id(), object->uid);
+    printf("%s: using %s on %s\n", get_name(), i->get_name(), object->get_name());
     return i->use(object);
 }
 
@@ -115,6 +115,11 @@ bool PlayerServer::plant_with_seed(InventoryElement * el, int map_x, int map_y, 
 
 bool PlayerServer::pickup(InventoryElement * item)
 {
+    if (!item->pickable)
+    {
+        printf("can't pickup %s\n", item->get_name());
+        return false;
+    }
     ItemLocation old_location = item->location;
     remove_from_chunks(item);
     Player::pickup(item);

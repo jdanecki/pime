@@ -53,11 +53,13 @@ void add_items_texture(int id, const char * file)
 
 void add_ing_texture(int id, const char * file)
 {
+    printf("adding ing texture: %s\n", file);
     ing_textures[id] = load_texture(file);
 }
 
 void add_prod_texture(int id, const char * file)
 {
+    printf("adding product texture: %s\n", file);
     prod_textures[id] = load_texture(file);
 }
 
@@ -120,10 +122,12 @@ void load_textures()
     add_ing_texture(ING_KNIFE_HANDLE, "textures/items/ingredients/knife_handle.png");
     add_ing_texture(ING_PICKAXE_BLADE, "textures/items/ingredients/pickaxe_blade.png");
     add_ing_texture(ING_PICKAXE_HANDLE, "textures/items/ingredients/pickaxe_handle.png");
+    add_ing_texture(ING_WALL, "textures/items/ingredients/wall.png");
 
     add_prod_texture(PROD_AXE, "textures/items/products/axe.png");
     add_prod_texture(PROD_KNIFE, "textures/items/products/knife.png");
     add_prod_texture(PROD_PICKAXE, "textures/items/products/pickaxe.png");
+    add_prod_texture(PROD_HUT, "textures/objects/hut.png");
 
     i = 0;
     i = add_textures_from_dir(plant_textures, i, "textures/plants");

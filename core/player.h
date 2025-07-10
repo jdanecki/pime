@@ -73,6 +73,7 @@ class Player : public Being
         }
     }
     bool say(Sentence * s);
+    Sentence *get_answer(Sentence * s);
     void ask(Sentence * s, InventoryElement * el);
     void ask(enum Npc_say s, InventoryElement * el);
     char * get_el_description(InventoryElement * el);

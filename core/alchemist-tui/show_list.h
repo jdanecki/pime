@@ -46,6 +46,6 @@ int kbhit();
 char wait_key(char prompt);
 ListElement * select_list_element(ElementsList * list);
 InventoryElement * select_element(InvList * list);
-bool select_inventory2(InventoryElement ** el1, InventoryElement ** el2);
+bool select_inventory2(int count, InventoryElement ** el2);
 
 #endif // SHOW_LIST_H

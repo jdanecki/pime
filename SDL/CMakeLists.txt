@@ -45,7 +45,7 @@ if (MULTI_USER)
         the_game_networking
         DOWNLOAD_COMMAND ""
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND cargo build COMMAND cargo build --release
+        BUILD_COMMAND cargo build
         BINARY_DIR "${CMAKE_SOURCE_DIR}/../the_game_net/"
         BUILD_ALWAYS 1
         INSTALL_COMMAND ""

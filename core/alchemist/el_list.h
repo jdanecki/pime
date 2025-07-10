@@ -38,6 +38,7 @@ class ListElement
     {
         return what == this;
     }
+    virtual ~ListElement() {}
 };
 
 class ElementsTable : public ListElement

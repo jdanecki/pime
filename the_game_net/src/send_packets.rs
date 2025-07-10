@@ -4,6 +4,7 @@ use crate::NetClient;
 #[no_mangle]
 pub extern "C" fn send_packet_move(client: &NetClient, x: i32, y: i32) {
     let buf = [core::PACKET_PLAYER_MOVE, x as u8, y as u8];
+//    println!("player_move {} {}", x, y);
     client.send(&buf);
 }
 

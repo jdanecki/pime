@@ -173,7 +173,7 @@ extern "C"
 
     void update_object(ObjectData data)
     {
-        size_t uid = data.inv_element.data.uid;
+//        size_t uid = data.inv_element.data.uid;
         Class_id c_id = data.inv_element.data.el_type;
 
         InventoryElement * el = find_by_uid(data.inv_element.data.uid, data.inv_element.data.location.chunk.map_x, data.inv_element.data.location.chunk.map_y);

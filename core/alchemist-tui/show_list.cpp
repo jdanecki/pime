@@ -151,7 +151,7 @@ InventoryElement * select_element(InvList * list)
     return nullptr;
 }
 
-bool select_inventory2(InventoryElement ** el1, InventoryElement ** el2)
+bool select_inventory2(int count, InventoryElement ** el2)
 {
     ListElement * inv = player->inventory->head;
     Show_list * show_cat = new Show_list('i');
@@ -171,22 +171,19 @@ bool select_inventory2(InventoryElement ** el1, InventoryElement ** el2)
 
     printf("%swybrane zasoby: ", colorGreen);
     Show_el * el = (Show_el *)show_cat->head;
-    int count = 0;
+    int i = 0;
 
     while (el)
     {
         if (el->selected)
         {
             printf("%s ", el->l_el->el->get_name());
-            count++;
-            if (!*el1)
-                *el1 = el->l_el->el;
-            else
-                *el2 = el->l_el->el;
+            el2[i]=el->l_el->el;
+            i++;
         }
         el = (Show_el *)el->next;
     }
-    if (count == 2)
+    if (i == 2)
     {
         puts("");
         return true;

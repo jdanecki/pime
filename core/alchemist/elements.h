@@ -5,59 +5,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <stdint.h>
-
-class Property
-{
-  public:
-    const char * name;
-    unsigned int value;
-    Property(const char * n, unsigned int v)
-    {
-        name = n;
-        value = v;
-    }
-    void show()
-    {
-        printf("%s = %u\n", name, value);
-    }
-};
-
-class Edible
-{ // FIXME should be changed to being property
-    // when more npc's are added
-    // can be eaten by humans or animals
-  public:
-    Property * irrigation;
-    Property * poison;
-    Property * caloric;
-
-    Edible();
-    ~Edible();
-    void show();
-};
-
-class Solid
-{
-  public:
-    Property * stretching; // <-->
-    Property * squeezing;  //  >--<
-    Property * bending;
-    Property * fragility;  // kruchosc
-    Property * solubility; // rozpuszczalnosc
-    Solid();
-    ~Solid();
-    void show();
-};
-
-enum Form
-{
-    Form_unknown = 0,
-    Form_solid = 1,
-    Form_liquid,
-    Form_gas,
-};
-
-extern const char * Form_name[];
+#include "properties.h"
 
 enum Class_id
 {
@@ -101,8 +49,8 @@ class BaseElement : public Base
 {
   public:
     Property * density;
-    Edible * edible; // not known by default
-    Form form;
+    Edible * edible; // not known by default, it should depend on player/animal/npc
+    Form form; //solid, liquid, gas
     Solid * solid;
     struct {int r; int g; int b;} color;
 
@@ -149,6 +97,7 @@ class InventoryElement
 
   public:
     bool crafted;
+    bool pickable;
     ItemLocation location;
     size_t uid;
     Class_id c_id;
@@ -160,6 +109,7 @@ class InventoryElement
         uid = (size_t)this;
         name = nullptr;
         crafted = false;
+        pickable=true;
     }
     virtual bool use(int map_x, int map_y, int x, int y)
     {
@@ -167,6 +117,7 @@ class InventoryElement
     }
     virtual bool use(InventoryElement * object)
     {
+        printf("I don't know how to use %s on %s\n", object->get_name(), get_name());
         return false;
     }
     virtual void show(bool details = true)
@@ -364,6 +315,8 @@ enum Ingredient_id
     ING_PICKAXE_BLADE,
     ING_PICKAXE_HANDLE,
 
+    ING_WALL,
+
     ING_NUM,
 
 };
@@ -373,6 +326,7 @@ enum Product_id
     PROD_AXE,
     PROD_KNIFE,
     PROD_PICKAXE,
+    PROD_HUT,
 };
 
 extern const char * Ingredient_name[];
@@ -446,7 +400,7 @@ class Product : public InventoryElement
     Property * usage;      // [0..100] łatwy..trudny
 
     Product_id id;
-    int get_id()
+    int get_id() override
     {
         return id;
     }
@@ -465,7 +419,7 @@ class Product : public InventoryElement
 #else
     int ing_count;
     InventoryElement ** ings;
-    bool craft();
+    bool craft() override;
 
     Product(InventoryElement * el1, InventoryElement * el2, Product_id i, Form f);
     Product(InventoryElement ** from, int count, Product_id i, Form f);
@@ -480,13 +434,18 @@ class Product : public InventoryElement
     {
         return false;
     }
-    void show(bool details = true);
+    void show(bool details = true) override;
 
-    char * get_description()
+    char * get_description() override
     {
         char * buf = new char[128];
         sprintf(buf, "%s: (%s)", get_class_name(), get_name());
         return buf;
+    }
+    bool use(InventoryElement * object) override
+    {
+        printf("%s: use %s\n", get_name(), object->get_name());
+        return object->use(this);
     }
 };
 
@@ -590,7 +549,7 @@ class Animal : public Being
     Animal(BaseAnimal * b);
     Animal();
     Animal(int i);
-    void show(bool details = true)
+    void show(bool details = true) override
     {
         printf("Animal %s alive=%d uid=%lx\n", name, alive, uid);
         age->show();
@@ -607,9 +566,14 @@ class Animal : public Being
         return base->id;
     }
 
-    Class_id get_base_cid()
+    Class_id get_base_cid() override
     {
         return base->c_id;
+    }
+    bool use(InventoryElement * object) override
+    {
+        printf("using %s on %s, do you want to kill it?\n", object->get_name(), get_name());
+        return false;
     }
 };
 
@@ -663,7 +627,7 @@ class Plant : public Being
     Plant(BasePlant * b);
     Plant();
     Plant(int i);
-    void show(bool details = true)
+    void show(bool details = true) override
     {
         printf("Plant -> %d name=%s grown=%d uid=%lx\n", c_id, name, grown, uid);
         age->show();
@@ -699,9 +663,14 @@ class Plant : public Being
     {
         return base->id;
     }
-    Class_id get_base_cid()
+    Class_id get_base_cid() override
     {
         return base->c_id;
+    }
+    bool use(InventoryElement * object) override
+    {
+        printf("using %s on %s, are you sure?\n", object->get_name(), get_name());
+        return false;
     }
 };
 
@@ -709,8 +678,8 @@ class Plant : public Being
 #define LIQUID_ELEMENTS 1
 #define GAS_ELEMENTS 1
 #define BASE_ELEMENTS (SOLID_ELEMENTS + LIQUID_ELEMENTS + GAS_ELEMENTS)
-#define ING_ELEMENTS 6
-#define PROD_ELEMENTS 3
+#define ING_ELEMENTS 7
+#define PROD_ELEMENTS 4
 
 #define BASE_ANIMALS 40
 #define BASE_PLANTS 30

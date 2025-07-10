@@ -6,7 +6,7 @@
 Knife::Knife(InventoryElement * el1, InventoryElement * el2) : Product(el1, el2, PROD_KNIFE, Form_solid)
 {
 }
-
+#if 0
 bool Knife::use(int map_x, int map_y, int x, int y)
 {
     /*for (int i = 0; i < CHUNK_SIZE*CHUNK_SIZE; i++) {
@@ -50,6 +50,7 @@ bool Knife::use(int map_x, int map_y, int x, int y)
     }*/
     return false;
 }
+#endif
 
 bool Knife::check_ing()
 {

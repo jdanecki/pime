@@ -277,7 +277,9 @@ fn handle_packet(
                 let item = (*core::world_table[player._base.map_y as usize]
                     [player._base.map_x as usize])
                     .find_by_id(id);
-                player.pickup(item);
+                if item != std::ptr::null_mut() {
+                    player.pickup(item);
+                }
                 //let mut buf = vec![core::PACKET_PLAYER_ACTION_PICKUP];
                 //buf.extend_from_slice(&id.to_le_bytes());
                 //buf.extend_from_slice(&player_id.to_le_bytes());

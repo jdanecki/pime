@@ -52,8 +52,8 @@ unsigned long get_time_usec()
 int init_window()
 {
     Uint32 flags;
-    flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
-    // flags = SDL_WINDOW_HIDDEN;
+    //flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
+     flags = SDL_WINDOW_HIDDEN;
     unsigned long t1 = get_time_usec();
     if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) < 0)
     {

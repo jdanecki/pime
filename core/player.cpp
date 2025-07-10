@@ -76,20 +76,28 @@ bool Player::say(Sentence * s)
     }
     switch (s->id)
     {
-        case NPC_Say_hello:
-        case NPC_Say_how_are_you:
-            sentences->enable(NPC_Say_bye);
+        case NPC_Say_Hello:
+        case NPC_Ask_how_are_you:
+            sentences->enable(NPC_Say_Bye);
             talking_to->welcomed = true;
-
-        case NPC_Say_bye:
+        // pass through
+        default:
         {
-            Sentence * answer = s->get_answer();
+            Sentence * answer = talking_to->get_answer(s);
 
-            print_status(0, "%s says: %s", talking_to->get_name(), answer->question);
-            s->disable();
             switch (answer->id)
             {
-                case NPC_Say_nothing:
+                default:
+                    print_status(0, "%s answers: %s", talking_to->get_name(), answer->text);
+                    break;
+                case NPC_Say_Im:
+                    print_status(0, "%s answers: %s %s", talking_to->get_name(), answer->text, talking_to->get_name());
+                    break;
+            }
+           // s->disable();
+            switch (answer->id)
+            {
+                case NPC_Say_Nothing:
                     break;
                 case NPC_Ask_do_we_know_each_other:
                     print_status(1, "%s: Don't you remember me? I'm..., we've met some time ago.", get_name());
@@ -102,9 +110,22 @@ bool Player::say(Sentence * s)
                     break;
                 case NPC_Ask_do_you_really_care:
                     print_status(1, "%s: Not really... Hmm, I was kidding.", get_name());
+                    break;
+                case NPC_Ask_why_do_you_ask:
+                    print_status(1, "%s: I'm interrested.", get_name());
+                    break;
+                case NPC_Ask_whos_asking:
+                    print_status(1, "%s: It's me.", get_name());
+                    break;
+                case NPC_Ask_have_you_lost:
+                    print_status(1, "%s: Yes", get_name());
+                    break;
+                case NPC_Ask_dont_you_remember:
+                    print_status(1, "%s: No, I don't remember", get_name());
+                    break;
             }
 
-            if (s->id == NPC_Say_bye)
+            if (s->id == NPC_Say_Bye)
             {
 
                 stop_conversation();
@@ -114,6 +135,13 @@ bool Player::say(Sentence * s)
         }
     }
     return false;
+}
+
+Sentence * Player::get_answer(Sentence *s)
+{
+    Npc_say sid=NPC_Say_Nothing;
+    Sentence * a=dynamic_cast<Sentence *>(sentences->find(&sid));
+    return a;
 }
 
 void Player::ask(Sentence * s, InventoryElement * el)

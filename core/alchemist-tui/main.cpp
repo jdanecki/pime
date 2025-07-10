@@ -4,7 +4,10 @@
 #include "game_time.h"
 #include "plants.h"
 #include "show_list.h"
+
 #include "test_axe.h"
+#include "../../server/cpp-src/tools/wall.h"
+
 #include <cstdio>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -50,17 +53,24 @@ void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc)
 void help()
 {
     printf("%sESC/e/?- clear screen/Exit/Help\n", colorWhite);
-    printf("t - Test\n");
+
     printf("c - Craft\n");
-    printf("s - Show\n");
     printf("h - Harvest plant\n");
     printf("o - sOw plant\n");
     printf("u - hUnt animal\n");
-    printf("@ - change clock\n");
+    printf("1 - use item from inventory\n");
+
+    printf("s - Show\n");
+    printf("& - change clock\n");
+
     printf("f - Find\n");
     printf("p - Pickup up element\n");
     printf("d - Drop element\n");
+
     printf("# - conversation\n");
+    printf("@ - ask questions\n");
+
+    printf("t - Test\n");
 }
 
 void show_description()
@@ -73,7 +83,8 @@ void show_description()
     if (des)
         printf("%s\n", des);
     else
-        printf("It looks like %s, but I don't know what it's exactly\n", el->get_class_name());
+        printf("It looks like %s, it has %s form, but I don't know what it's exactly\n",
+            el->get_class_name(), el->get_form_name());
 }
 
 void show()
@@ -277,6 +288,7 @@ void craft()
     printf("%sa - craft axe\n", colorCyan);
     printf("b - craft axe blade\n");
     printf("h - craft axe handle\n");
+    printf("w - craft wall\n");
 
     printf("%s%s", colorNormal, colorGreenBold);
 
@@ -285,49 +297,49 @@ void craft()
     {
         case 'a':
         {
-            InventoryElement *el1 = nullptr, *el2 = nullptr;
-            if (!select_inventory2(&el1, &el2))
+            InventoryElement *el2[2];
+            el2[0]= nullptr;
+            el2[1] = nullptr;
+            if (!select_inventory2(2, el2))
                 return;
-            Axe * axe = new Axe(el1, el2);
+            Axe * axe = new Axe(el2[0], el2[1]);
             if (!axe->craft())
                 return;
             player->inventory->add(axe);
-            player->inventory->remove(el1);
-            player->inventory->remove(el2);
+            player->inventory->remove(el2[0]);
+            player->inventory->remove(el2[1]);
             printf("axe added to inventory\n");
         }
         break;
         case 'b':
-        {
-            InventoryElement * el = select_element(player->inventory);
-            if (!el)
-                return;
-            AxeBlade * axe_blade = new AxeBlade(el);
-            if (!axe_blade->craft())
-            {
-                delete axe_blade;
-                return;
-            }
-            player->inventory->add(axe_blade);
-            player->inventory->remove(el);
-            printf("axe blade added to inventory\n");
-        }
-        break;
         case 'h':
+        case 'w':
         {
             InventoryElement * el = select_element(player->inventory);
             if (!el)
                 return;
-            AxeHandle * axe_handle = new AxeHandle(el);
-            if (!axe_handle->craft())
+            InventoryElement * target;
+            switch (c)
             {
-                delete axe_handle;
+                case 'b':
+                    target = new AxeBlade(el);
+                    break;
+                case 'h':
+                    target = new AxeHandle(el);
+                    break;
+                case 'w':
+                    target = new Wall(el);
+                    break;
+            }
+            if (!target->craft())
+            {
+                delete target;
                 return;
             }
-            player->inventory->add(axe_handle);
+            player->inventory->add(target);
             player->inventory->remove(el);
-            printf("axe handle added to inventory\n");
-        }
+            printf("%s added to inventory\n", target->get_name());
+        }        
         break;
     }
 }
@@ -354,27 +366,79 @@ void drop()
     player->inventory->remove(el);
 }
 
-void talk()
+void use()
+{
+    printf("Which item do you want to use?\n");
+    InventoryElement * el = select_element(player->inventory);
+    if (!el)
+        return;
+    Product * product = dynamic_cast<Product *>(el);
+    if (!product)
+    {
+        printf("You can't use %s, make product from it\n", el->get_name());
+        return;
+    }
+    printf("On what do you want to use %s\n", el->get_name());
+
+    printf("%se/E - elements (details off/on)\n", colorCyan);
+    printf("p/P - plants (details off/on)\n");
+    printf("a/A - animals (details off/on)\n");
+    printf("n/N - npcs/player (details off/on)\n");
+    printf("%s%s", colorNormal, colorGreenBold);
+
+    InventoryElement * obj;
+    char c = wait_key('s');
+    switch (c)
+    {
+        case 'e':
+        case 'E':
+            obj = select_element(elements);
+            break;
+
+        case 'a':
+        case 'A':
+            obj = select_element(animals);
+            break;
+
+        case 'p':
+        case 'P':
+            obj = select_element(plants);
+            break;
+
+        case 'n':
+        case 'N':
+            obj = select_element(npcs);
+            break;
+    }
+    if (!obj)
+        return;
+
+    product->use(obj);
+
+  //  player->inventory->remove(el);
+}
+
+void ask()
 {
     if (!current_npc)
     {
         printf("Who do you want to talk to?\n");
         current_npc = dynamic_cast<Npc *>(select_element(npcs));
-        sentences->enable_all();
+        questions->enable_all();
         player->start_conversation(current_npc);
     }
     if (current_npc)
     {
         if (!player->inventory->nr_elements)
-            sentences->disable(NPC_Ask_do_you_know_item);
+            questions->disable(NPC_Ask_do_you_know_item);
         else
         {
-            sentences->enable(NPC_Ask_do_you_know_item);
+            questions->enable(NPC_Ask_do_you_know_item);
         }
-        Sentence * s = dynamic_cast<Sentence *>(select_list_element(sentences));
+        Sentence * s = dynamic_cast<Sentence *>(select_list_element(questions));
 
         printf("%s%s", colorNormal, colorRedBold);
-        printf("%s: %s\n", player->get_name(), s->question);
+        printf("%s says: %s\n", player->get_name(), s->text);
 
         if (s->id == NPC_Ask_do_you_know_item)
         {
@@ -390,6 +454,31 @@ void talk()
             {
                 current_npc = nullptr;
             }
+        }
+
+        printf("%s%s", colorNormal, colorGreenBold);
+    }
+}
+
+void talk()
+{
+    if (!current_npc)
+    {
+        printf("Who do you want to talk to?\n");
+        current_npc = dynamic_cast<Npc *>(select_element(npcs));
+        sentences->enable_all();
+        player->start_conversation(current_npc);
+    }
+    if (current_npc)
+    {
+        Sentence * s = dynamic_cast<Sentence *>(select_list_element(sentences));
+
+        printf("%s%s", colorNormal, colorRedBold);
+        printf("%s says: %s\n", player->get_name(), s->text);
+
+        if (player->say(s))
+        {
+            current_npc = nullptr;
         }
 
         printf("%s%s", colorNormal, colorGreenBold);
@@ -433,7 +522,7 @@ void play()
             case '?':
                 help();
                 break;
-            case '@':
+            case '&':
                 change_clock();
                 break;
             case 'h':
@@ -451,11 +540,17 @@ void play()
             case '#':
                 talk();
                 break;
+            case '@':
+                ask();
+                break;
             case 'p':
                 pickup();
                 break;
             case 'd':
                 drop();
+                break;
+            case '1':
+                use();
                 break;
         }
         game_time->update_time(1);
@@ -514,6 +609,7 @@ int main()
     player = new Player(0);
 
     init_sentences();
+    init_questions();
 
     callback_daily = daily_call;
     play();
