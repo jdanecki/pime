@@ -11,21 +11,25 @@ int npc()
     {
         delete menu_dialog;
     }
-    int menu_entries = sentences->nr_elements;
+   /* int menu_entries = sentences->nr_elements;
 
     sentences->enable_all();
 
     if (player->hotbar[active_hotbar])
     {
-        sentences->enable(NPC_Ask_do_you_know_item);
+        questions->enable(NPC_Ask_do_you_know_item);
     }
     else
     {
-        sentences->disable(NPC_Ask_do_you_know_item);
+        questions->disable(NPC_Ask_do_you_know_item);
         menu_entries--;
-    }
-    menu_dialog = new Menu("Talk to NPC", menu_entries);
-    Sentence * sentence = (Sentence *)sentences->head;
+    }*/
+
+    menu_dialog = new Menu("NPC", 3);
+
+    menu_dialog->add("Cancel", MENU_CANCEL);
+
+    /*Sentence * sentence = (Sentence *)sentences->head;
     while (sentence)
     {
         if (sentence->is_enabled())
@@ -37,9 +41,9 @@ int npc()
         }
         sentence = (Sentence *)sentence->next;
     }
-
+*/
     current_menu = menu_dialog;
-    player->start_conversation(current_npc);
+  //  player->start_conversation(current_npc);
 
     return 0;
 }

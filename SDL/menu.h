@@ -37,8 +37,8 @@ enum menu_actions
 
     MENU_CATEGORIES,
 
-    MENU_NPC,
     MENU_NPC_SAY,
+    MENU_NPC_ASK,
 
     // must be the last
     MENU_ITEM = 0x1000,

@@ -50,7 +50,7 @@ bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement 
 {
     Product * i = (Product *)item;
 
-    printf("using %s on %s\n", i->get_name(), object->get_name());
+    printf("%s: using %s on %s\n", get_name(), i->get_name(), object->get_name());
     return i->use(object);
 }
 

@@ -330,8 +330,9 @@ void create_menus()
 
     menu_crafting->add("Cancel", MENU_CANCEL);
 
-    menu_npc = new Menu("NPC", 2);
-    menu_npc->add("Talk to NPC", MENU_NPC);
+    menu_npc = new Menu("NPC", 3);
+    menu_npc->add("Talk to NPC", MENU_NPC_SAY);
+    menu_npc->add("Ask NPC", MENU_NPC_ASK);
     menu_npc->add("Cancel", MENU_CANCEL);
 }
 
@@ -659,6 +660,7 @@ int Menu::interact()
             Mix_Volume(1, Mix_Volume(1, -1) + 5);
             printf("%d\n%d\n", Mix_Volume(1, -1), Mix_Volume(0, -1));
             return 0;
+
         case MENU_QUIETER:
             Mix_Volume(0, Mix_Volume(0, -1) - 5);
             Mix_Volume(1, Mix_Volume(1, -1) - 5);
@@ -681,14 +683,18 @@ int Menu::interact()
         case MENU_CRAFT_HUT:
             return craft(a);
 
-        case MENU_NPC:
-            return npc();
-
         case MENU_NPC_SAY:
-            return npc_say(menu_dialog->get_sentence());
+            printf("talking to NPC\n");
+            return 1;
+
+        case MENU_NPC_ASK:
+            printf("asking NPC\n");
+            return 1;
+
+         //   return npc_say(menu_dialog->get_sentence());
 
         default:
-            return 0;
+            return 1;
     }
     return 1;
 }
