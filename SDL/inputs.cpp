@@ -9,6 +9,7 @@
 
 #include "../core/player.h"
 #include "../core/tiles.h"
+#include "dialog/d_hotbar.h"
 #include "menu.h"
 #include "networking.h"
 #include "player_actions.h"
@@ -18,6 +19,7 @@ extern Player * player;
 extern const NetClient * client;
 extern int active_hotbar;
 extern int auto_explore;
+extern DHotbar hotbar;
 
 int last_frame_press = 0;
 Uint64 last_time = 0;
@@ -223,6 +225,7 @@ void mouse_pressed(SDL_MouseButtonEvent & event)
     int y = 0;
 
     SDL_GetMouseState(&x, &y);
+    hotbar.press(x, y);
 
     int tile_dungeon_size;
     int width = window_width - PANEL_WINDOW;

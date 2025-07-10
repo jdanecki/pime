@@ -38,5 +38,6 @@ extern SDL_Texture * down_mask;
 extern struct textures Texture;
 
 void load_textures();
+SDL_Texture * load_texture(const char * texture_name);
 
 #endif
