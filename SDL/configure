@@ -5,6 +5,10 @@ if [ ! -d build ]
 then
     mkdir build
 fi
+pushd ../core/alchemist
+./generate_files.sh
+popd
+
 cd build
 cmake -DMULTI_USER=${MULTI_USER} ..
 
