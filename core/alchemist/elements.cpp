@@ -373,6 +373,15 @@ void Animal::init(BaseAnimal * b)
     can_talk = false;
 }
 
+BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal)
+{
+    id = index;
+    carnivorous = rand() % 2;
+    swimming = rand() % 2;
+    flying = rand() % 2;
+    name = create_name(10);
+}
+
 Animal::Animal(BaseAnimal * b)
 {
     init(b);
@@ -390,6 +399,13 @@ Animal::Animal(int i)
     Class_id id = Class_BaseAnimal;
     BaseTable * table = dynamic_cast<BaseTable *>(base_list->find(&id));
     init(dynamic_cast<BaseAnimal *>(table->get(i)));
+}
+
+BasePlant::BasePlant(int index) : Base(index, Class_BasePlant)
+{
+    flowers = rand() % 2;
+    leaves = rand() % 2;
+    name = create_name(15);
 }
 
 Plant::Plant()
