@@ -132,6 +132,7 @@ class ElementsList
     }
     void show(bool details = true);
     void enable_all();
+    void disable_all();
     ListElement * add(ListElement * el);
     void remove(ListElement * el);
     void tick();

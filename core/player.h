@@ -4,12 +4,33 @@
 #include "alchemist/npc_talk.h"
 #include <stdint.h>
 
-enum class direction
+/*enum class direction
 {
     up,
     right,
     down,
     left,
+};
+*/
+class Player;
+
+enum Relations
+{
+    REL_unknown,
+    REL_known,
+};
+
+struct PlayerRelation
+{
+    Player * who;
+    enum Relations rel;
+    struct PlayerRelation * next;
+    PlayerRelation(Player *p, enum Relations r)
+    {
+        who=p;
+        rel=r;
+        next=nullptr;
+    }
 };
 
 class Player : public Being
@@ -30,7 +51,7 @@ class Player : public Being
     char running;
     char sneaking;
     char going_right;
-    enum direction direction;
+    //enum direction direction;
     int thirst;
     int hunger; // hungry, very hungry, full
     int nutrition;
@@ -40,6 +61,7 @@ class Player : public Being
     bool conversation;
     bool welcomed;
     Player * talking_to;
+    PlayerRelation * relations;
 
     void pickup(InventoryElement * item);
     void drop(InventoryElement * item);
@@ -78,6 +100,11 @@ class Player : public Being
     void ask(enum Npc_say s, InventoryElement * el);
     char * get_el_description(InventoryElement * el);
     void set_known(InventoryElement * el);
+    bool conversation_started() { return conversation;}   
+    enum  Relations find_relation(Player *who);
+    void set_relation(Player *who, enum Relations rel);
+
 };
+
 
 #endif

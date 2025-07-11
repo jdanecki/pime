@@ -47,6 +47,8 @@ Menu::~Menu()
 {
     delete[] entries;
 }
+
+
 void Menu::add(const char * e, enum menu_actions a)
 {
     entries[added] = new Menu_entry(e, a, 0, nullptr, nullptr);
@@ -66,11 +68,13 @@ void Menu::add(const char * e, enum menu_actions a, SDL_Texture * t, int index, 
     added++;
 }
 
-void Menu::add(const char * e, enum menu_actions a, Sentence * s, InventoryElement * p_el)
-{
-    entries[added] = new Menu_entry(e, a, s, p_el);
+void Menu::add(const char * e, enum Npc_say a, Sentence * s, InventoryElement * p_el)
+{    
+    enum menu_actions conv=(enum menu_actions)((int)MENU_NPC_CONV + (int) a);
+    entries[added] = new Menu_entry(e, conv, s, p_el);
     added++;
 }
+
 void Menu::add(const char * e, enum menu_actions a, int val, InventoryElement * p_el)
 {
     entries[added] = new Menu_entry(e, a, val, p_el, nullptr);
@@ -122,14 +126,15 @@ void Menu::show()
     else
         game_size = window_height;
 
-    int menu_opt_size = game_size / 10;
+    int menu_opt_size = game_size / 30;
     int mody;
     int mody2;
+   // printf("options = %d\n", options);
 
     if (options % 2)
     {
-        mody = (game_size / 2) - (menu_opt_size * (options / 2) + menu_opt_size / 2);
-        mody2 = (game_size / 2) + (menu_opt_size * (options / 2) + menu_opt_size / 2);
+        mody = (game_size / 2) - ((menu_opt_size * (options / 2) + menu_opt_size / 2));
+        mody2 = (game_size / 2) + ((menu_opt_size * (options / 2) + menu_opt_size / 2));
     }
     else
     {
@@ -141,8 +146,6 @@ void Menu::show()
     int modx2 = int((game_size / 2)) + (0.4 * game_size);
 
     SDL_Rect rect = {modx, mody, modx2 - modx, mody2 - mody};
-    if (!(options < 10))
-        rect = (SDL_Rect){modx, mody + (-menu_pos + options / 2) * menu_opt_size, modx2 - modx, menu_opt_size * options};
     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 100);
     SDL_RenderFillRect(renderer, &rect);
 
@@ -150,12 +153,12 @@ void Menu::show()
     int mody4 = mody + ((menu_pos + 1) * menu_opt_size);
 
     // THIS IS THE SELECT
-    if (options < 10)
+    //if (options < 10)
     {
         draw_rectangle(modx, mody3, modx2 - modx, mody4 - mody3, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255}, SDL_Color{}, SDL_Color{});
         draw_rectangle(modx, mody3, modx2 - modx, mody4 - mody3, SDL_Color{}, SDL_Color{}, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255});
     }
-    else
+   /* else
     {
         if (options % 2)
         {
@@ -168,40 +171,40 @@ void Menu::show()
             draw_rectangle(modx, game_size / 2, modx2 - modx, menu_opt_size, SDL_Color{}, SDL_Color{}, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255});
         }
     }
-
-    if (options < 10)
+*/
+  //  if (options < 10)
     {
         SDL_Rect rect3 = {modx, mody - menu_opt_size, modx2 - modx, mody4 - mody3};
         SDL_SetRenderDrawColor(renderer, 150, 0, 150, 100);
         SDL_RenderFillRect(renderer, &rect3);
         write_text(modx, mody - menu_opt_size, name, Yellow, game_size / 27, menu_opt_size);
     }
-    else
+    /*else
     {
         SDL_Rect rect3 = {modx, mody + (-menu_pos + options / 2) * menu_opt_size - menu_opt_size, modx2 - modx, menu_opt_size};
         SDL_SetRenderDrawColor(renderer, 150, 0, 150, 100);
         SDL_RenderFillRect(renderer, &rect3);
         write_text(modx, mody + (-menu_pos + options / 2) * menu_opt_size - menu_opt_size, name, Yellow, game_size / 27, menu_opt_size);
-    }
+    }*/
     for (i = 0; i < options; i++)
     {
         SDL_Rect rect;
         int text_y = mody + i * menu_opt_size;
         int text_x = modx;
-        if (options < 10)
+     //   if (options < 10)
         {
             rect.x = modx;
             rect.y = mody + i * menu_opt_size;
             rect.w = menu_opt_size;
             rect.h = menu_opt_size;
         }
-        else
+       /* else
         {
             rect.x = modx;
             rect.y = mody + (i - menu_pos + options / 2) * menu_opt_size;
             rect.w = menu_opt_size;
             rect.h = menu_opt_size;
-        }
+        }*/
         if (entries[i]->texture)
         {
             SDL_RenderCopy(renderer, entries[i]->texture, NULL, &rect);
@@ -214,8 +217,8 @@ void Menu::show()
             // SDL_RenderCopy(renderer, _texture, NULL, &rect);
             // text_x+=menu_opt_size;
         }
-        if (options >= 10)
-            text_y = mody + (i - menu_pos + options / 2) * menu_opt_size;
+      //  if (options >= 10)
+        //    text_y = mody + (i - menu_pos + options / 2) * menu_opt_size;
 
         if (entries[i])
             write_text(text_x, text_y, entries[i]->entry, White, game_size / 27, menu_opt_size);
@@ -247,13 +250,13 @@ Menu_entry::Menu_entry(const char * e, menu_actions a, Sentence * s, InventoryEl
     action = a;
     el = _el;
     sentence = s;
-    if (el)
+   /* if (el)
     {
         entry = new char[64];
-        sprintf(entry, "%s item?", e);
+        sprintf(entry, "%s", e);
         dynamic_entry = true;
     }
-    else
+    else*/
     {
         entry = (char *)e;
         dynamic_entry = false;
@@ -615,6 +618,9 @@ int Menu::interact()
 
     if (a & MENU_ITEM)
         return menu_inventory->handle_item(a & ~MENU_ITEM);
+    if (a & MENU_NPC_CONV)
+        return npc_say(menu_dialog->get_sentence());
+
     switch (a)
     {
             // FIXME - doesn't work for beings
@@ -684,14 +690,10 @@ int Menu::interact()
             return craft(a);
 
         case MENU_NPC_SAY:
-            printf("talking to NPC\n");
-            return 1;
-
         case MENU_NPC_ASK:
-            printf("asking NPC\n");
-            return 1;
+            return npc(a);
 
-         //   return npc_say(menu_dialog->get_sentence());
+
 
         default:
             return 1;
