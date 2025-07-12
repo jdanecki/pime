@@ -35,6 +35,11 @@ InventoryElement * Player::get_item_by_uid(size_t id)
     return NULL;
 }
 
+int Player::get_id()
+{
+    return id;
+}
+
 Player::Player(int id) : id(id)
 {
     c_id = Class_Player;
@@ -58,7 +63,7 @@ Player::Player(int id) : id(id)
     max_age = new Property("max age", 1 + rand() % 180000);
     age = new Property("age", rand() % max_age->value);
     can_talk = true;
-    conversation = false;
+    in_conversation = false;
     talking_to = nullptr;
     welcomed = false;
     delete name;
@@ -69,6 +74,43 @@ Player::Player(int id) : id(id)
     known_elements->add(new ElementsTable(BASE_ELEMENTS, Class_BaseElement));
     known_elements->add(new ElementsTable(BASE_ANIMALS, Class_BaseAnimal));
     known_elements->add(new ElementsTable(BASE_PLANTS, Class_BasePlant));
+}
+
+int Player::conversation(Player *who, Sentence *s, InventoryElement *el)
+{
+    if (!in_conversation)
+    {
+        in_conversation = true;
+        printf("%s start talking to %s\n", get_name(), who->get_name());
+        talking_to = who;
+        who->talking_to = this;
+    }
+    if (s->id < NPC_Say_Nothing)
+    {
+        ask(s, el);
+        return 0;
+    }else {
+
+        return say(s) ? 1 : 0;
+    }
+
+}
+
+void Player::stop_conversation()
+{
+    in_conversation = false;
+    welcomed = false;
+    printf("%s stopped talking to %s\n", talking_to->get_name(), get_name());
+    talking_to = nullptr;
+}
+
+void Player::show(bool details)
+{
+    Being::show(true);
+    if (talking_to)
+    {
+        printf("%s is talking to %s\n", get_name(), talking_to->get_name());
+    }
 }
 
 bool Player::say(Sentence * s)
@@ -226,4 +268,11 @@ void Player::set_relation(Player *who, enum Relations rel)
         relations=new PlayerRelation(who, rel);
     }
 
+}
+
+PlayerRelation::PlayerRelation(Player *p, Relations r)
+{
+    who=p;
+    rel=r;
+    next=nullptr;
 }
