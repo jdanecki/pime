@@ -5,6 +5,6 @@
 #include "menu.h"
 
 extern int npc(menu_actions a);
-extern int npc_say(Sentence * s);
+extern int npc_say(Sentence * s, InventoryElement *el);
 extern Npc * current_npc;
 #endif // NPC_H

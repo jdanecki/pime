@@ -55,17 +55,3 @@ int npc(menu_actions a)
     current_menu = menu_dialog;   
     return 0;
 }
-
-int npc_say(Sentence * s)
-{ //entry point for sentences and questions
-    player->start_conversation(current_npc);
-    if (s->id < NPC_Say_Nothing)
-    {
-        InventoryElement * el = menu_dialog->get_el();
-        player->ask(s, el);
-        return 0;
-    }else {
-
-            return player->say(s) ? 1 : 0;
-    }
-}

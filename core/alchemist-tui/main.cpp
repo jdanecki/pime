@@ -418,69 +418,45 @@ void use()
   //  player->inventory->remove(el);
 }
 
-void ask()
-{
+void ask_say(char c)
+{// # say
+ // @ ask
     if (!current_npc)
     {
         printf("Who do you want to talk to?\n");
         current_npc = dynamic_cast<Npc *>(select_element(npcs));
-        questions->enable_all();
-        player->start_conversation(current_npc);
+        if (c=='#') questions->enable_all();
+        else  sentences->enable_all();
     }
     if (current_npc)
     {
-        if (!player->inventory->nr_elements)
-            questions->disable(NPC_Ask_do_you_know_item);
-        else
+        if (c=='@')
         {
-            questions->enable(NPC_Ask_do_you_know_item);
+            if (!player->inventory->nr_elements)
+                questions->disable(NPC_Ask_do_you_know_item);
+            else
+            {
+                questions->enable(NPC_Ask_do_you_know_item);
+            }
         }
-        Sentence * s = dynamic_cast<Sentence *>(select_list_element(questions));
+        Sentence * s;
+        if (c =='@')
+            s= dynamic_cast<Sentence *>(select_list_element(questions));
+        else
+            s = dynamic_cast<Sentence *>(select_list_element(sentences));
 
         printf("%s%s", colorNormal, colorRedBold);
         printf("%s says: %s\n", player->get_name(), s->text);
 
-        if (s->id == NPC_Ask_do_you_know_item)
+        InventoryElement * el = nullptr;
+        if (c=='@')
         {
-            InventoryElement * el = select_element(player->inventory);
-            if (el)
+            if (s->id == NPC_Ask_do_you_know_item)
             {
-                player->ask(s, el);
+                el = select_element(player->inventory);
             }
         }
-        else
-        {
-            if (player->say(s))
-            {
-                current_npc = nullptr;
-            }
-        }
-
-        printf("%s%s", colorNormal, colorGreenBold);
-    }
-}
-
-void talk()
-{
-    if (!current_npc)
-    {
-        printf("Who do you want to talk to?\n");
-        current_npc = dynamic_cast<Npc *>(select_element(npcs));
-        sentences->enable_all();
-        player->start_conversation(current_npc);
-    }
-    if (current_npc)
-    {
-        Sentence * s = dynamic_cast<Sentence *>(select_list_element(sentences));
-
-        printf("%s%s", colorNormal, colorRedBold);
-        printf("%s says: %s\n", player->get_name(), s->text);
-
-        if (player->say(s))
-        {
-            current_npc = nullptr;
-        }
-
+        player->conversation(current_npc, s, el);
         printf("%s%s", colorNormal, colorGreenBold);
     }
 }
@@ -538,10 +514,8 @@ void play()
                 find_new();
                 break;
             case '#':
-                talk();
-                break;
             case '@':
-                ask();
+                ask_say(c);
                 break;
             case 'p':
                 pickup();
@@ -610,6 +584,7 @@ int main()
 
     init_sentences();
     init_questions();
+    init_answers();
 
     callback_daily = daily_call;
     play();

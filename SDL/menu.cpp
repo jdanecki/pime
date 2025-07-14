@@ -618,8 +618,9 @@ int Menu::interact()
 
     if (a & MENU_ITEM)
         return menu_inventory->handle_item(a & ~MENU_ITEM);
-    if (a & MENU_NPC_CONV)
-        return npc_say(menu_dialog->get_sentence());
+    if (a & MENU_NPC_CONV) {
+        return player->conversation(current_npc, menu_dialog->get_sentence(), menu_dialog->get_el());
+    }
 
     switch (a)
     {
