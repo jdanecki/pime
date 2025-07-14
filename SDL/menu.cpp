@@ -339,7 +339,7 @@ void create_menus()
 Menu * create_inv_category_menu(enum Form f)
 {
     int count = 0;
-    InventoryElement ** elements_with_form = player->inventory->find_form(f, &count);
+    InventoryElement ** elements_with_form = NULL; //player->inventory->find_form(f, &count);
     if (!count)
         return nullptr;
 

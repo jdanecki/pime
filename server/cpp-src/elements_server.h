@@ -2,11 +2,16 @@
 #define ELEMENTS_SERVER_H
 
 #include "../../core/alchemist/elements.h"
-#include "../../core/tiles.h"
 
-class ToBytes
+class BaseElementServer : BaseElement
 {
-  public:
+    Property * density;
+    Solid * solid;
+    public:
+    BaseElementServer(Form f, int index);
+    ~BaseElementServer();
+    int foo(int a);
+    void show(bool details = true);
 };
 
 void to_bytes_binding(InventoryElement * el, unsigned char * buf);
@@ -23,6 +28,79 @@ void destroy(InventoryElement * el);
 const int max_delay_move = 10;  // 1 sec.
 const int max_delay_grow = 600; // 1 min.
 
+class ElementServer : public Element
+{
+
+  public:
+    Property sharpness;
+    Property smoothness;
+    Property length;
+    Property width;
+    Property height;
+    Property volume; // lenght*width*height
+    
+    Property ** get_properties(int * count)
+    {
+        Property ** props = new Property *[7];
+        props[0] = &sharpness;
+        props[1] = &smoothness;
+        // props[2] = &mass; FIXME
+        props[2] = &length;
+        props[3] = &width;
+        props[4] = &height;
+        props[5] = &volume;
+        *count = 6;
+        return props;
+    }
+};
+
+class BeingServer
+{
+  public:
+    Property * age;
+    Property * max_age;
+    bool alive;
+    BeingServer()
+    {
+        max_age = new Property("max age", 1 + rand() % 36000); // 100 years
+        age = new Property("age", rand() % max_age->value);
+    }
+    Property ** get_properties(int * count)
+    {
+        Property ** props = new Property *[2];
+        props[0] = age;
+        props[1] = max_age;
+
+        *count = 2;
+        return props;
+    }
+    ~BeingServer()
+    {
+        delete age;
+        delete max_age;
+    }
+    virtual bool grow()
+    {
+        if (!alive)
+        {
+            //  printf("%s is dead\n", get_name());
+            return false;
+        }
+        age->value++;
+        // printf("%s:%s growing\n", get_class_name(), get_name());
+        if (age->value >= max_age->value)
+        {
+            alive = false;
+            // printf("%s is dying\n", get_name()); // FIXME
+        }
+        return alive;
+    }
+    bool tick()
+    {
+        return grow();
+    }
+};
+
 class AnimalServer : public Animal
 {
     int delay_for_move;
@@ -31,11 +109,11 @@ class AnimalServer : public Animal
   public:
     void move();
     bool tick() override;
-    AnimalServer();
+    // AnimalServer();
     AnimalServer(BaseAnimal* base);
 };
 
-class PlantServer : public Plant
+class PlantServer : public Plant, public BeingServer
 {
     int * padding; // FIXME
     int delay_for_grow;
@@ -43,8 +121,55 @@ class PlantServer : public Plant
   public:
     bool grow() override;
     // bool tick() override;
-    PlantServer();
+    // PlantServer();
     PlantServer(BasePlant* base);
+
+    void sow()
+    {
+        planted = 1;
+        change_phase(Plant_seedling);
+    }
+    void change_phase(Plant_phase p)
+    {
+        if (phase != p)
+        {
+            switch (phase)
+            {
+                case Plant_seedling:
+                    age->value = 1;
+                    break;
+                case Plant_seed:
+                    age->value = 0;
+                    break;
+            }
+            printf("%s changing phase: %s -> %s age=%u/%u\n", name, Plant_phase_name[phase], Plant_phase_name[p], age->value, max_age->value);
+        }
+        phase = p;
+    }
+};
+
+class IngredientServer : public Ingredient
+{
+    
+public:
+
+    
+    InventoryElement * el; // available only in server , move to IngredientServer class
+    bool craft();
+    IngredientServer(InventoryElement * from, Ingredient_id i, Form f);
+};
+
+class ProductServer : public Product
+{
+public:
+        
+    int ing_count;
+    InventoryElement ** ings;
+    bool craft() override;
+
+    void init(Product_id i, int c, Form f);
+    ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id i, Form f);
+    ProductServer(InventoryElement ** from, int count, Product_id i, Form f);
 };
 
 AnimalServer* create_animal(BaseAnimal* base);

@@ -45,12 +45,12 @@ void update_hotbar()
     }
 }
 
-InventoryElement * remove_from_location(ItemLocationLol location, size_t id)
+InventoryElement * remove_from_location(ItemLocation location, size_t id)
 {
     InventoryElement * el;
     switch (location.tag)
     {
-        case ItemLocationLol::Tag::Chunk:
+        case ItemLocation::Tag::Chunk:
         {
             // printf("removed %ld from chunk %d %d\n", id, location.chunk.map_x, location.chunk.map_y);
             if (!world_table[location.chunk.map_y][location.chunk.map_x])
@@ -59,7 +59,7 @@ InventoryElement * remove_from_location(ItemLocationLol location, size_t id)
             world_table[location.chunk.map_y][location.chunk.map_x]->remove_object(el);
             break;
         }
-        case ItemLocationLol::Tag::Player:
+        case ItemLocation::Tag::Player:
         {
             // printf("removed %ld from player %ld\n", id, location.player.id);
             el = players[location.player.id]->get_item_by_uid(id);
@@ -73,40 +73,40 @@ InventoryElement * remove_from_location(ItemLocationLol location, size_t id)
     return el;
 }
 
-InventoryElement * el_from_data(ObjectData data)
+InventoryElement * el_from_data(const ObjectData* data)
 {
     InventoryElement * el = nullptr;
-    switch (data.tag)
+    switch (data->tag)
     {
         case ObjectData::Tag::InvElement:
             break;
         case ObjectData::Tag::Element:
-            el = new ElementSDL(&data.element.data);
+            el = new ElementSDL(data->element.data);
 
             break;
-        case ObjectData::Tag::Ingredient:
-            el = new IngredientSDL(&data.ingredient.data);
-            break;
-        case ObjectData::Tag::Product:
-            el = new ProductSDL(&data.product.data);
-            break;
+        // case ObjectData::Tag::Ingredient:
+        //     el = new IngredientSDL(data.ingredient.data);
+        //     break;
+        // case ObjectData::Tag::Product:
+        //     el = new ProductSDL(data.product.data);
+        //     break;
         case ObjectData::Tag::Plant:
         {
-            el = new PlantSDL(&data.plant.data);
+            el = new PlantSDL(data->plant.data);
             break;
         }
         case ObjectData::Tag::Animal:
-            el = new AnimalSDL(&data.animal.data);
+            el = new AnimalSDL(data->animal.data);
             break;
     }
     if (el)
     {
-        el->uid = data.inv_element.data.uid;
-        el->location.type = LOCATION_CHUNK; //(ItemLocationType)data.inv_element.data.location.tag;
-        el->location.data.chunk.map_x = data.inv_element.data.location.chunk.map_x;
-        el->location.data.chunk.map_y = data.inv_element.data.location.chunk.map_y;
-        el->location.data.chunk.x = data.inv_element.data.location.chunk.x;
-        el->location.data.chunk.y = data.inv_element.data.location.chunk.y;
+        el->uid = data->inv_element.data.uid;
+        el->location.tag = ItemLocation::Tag::Chunk; //(ItemLocationType)data.inv_element.data.location.tag;
+        el->location.chunk.map_x = data->inv_element.data.location.chunk.map_x;
+        el->location.chunk.map_y = data->inv_element.data.location.chunk.map_y;
+        el->location.chunk.x = data->inv_element.data.location.chunk.x;
+        el->location.chunk.y = data->inv_element.data.location.chunk.y;
     }
     return el;
 }
@@ -175,7 +175,7 @@ extern "C"
     void update_object(ObjectData data)
     {
 //        size_t uid = data.inv_element.data.uid;
-        Class_id c_id = data.inv_element.data.el_type;
+        Class_id c_id = data.inv_element.data.c_id;
 
         InventoryElement * el = find_by_uid(data.inv_element.data.uid, data.inv_element.data.location.chunk.map_x, data.inv_element.data.location.chunk.map_y);
 
@@ -194,15 +194,15 @@ extern "C"
                     Plant * p = dynamic_cast<Plant *>(el);
                     p->phase = data.plant.data.phase;
                     p->grown = data.plant.data.grown;
-                    p->age->value = data.plant.data.age;
-                    p->max_age->value = data.plant.data.max_age;
+                    // p->age->value = data.plant.data.age;
+                    // p->max_age->value = data.plant.data.max_age; FIXME
                     break;
                 }
                 case Class_Animal:
                 {
                     Animal * p = dynamic_cast<Animal *>(el);
-                    p->age->value = data.animal.data.age;
-                    p->max_age->value = data.animal.data.max_age;
+                    // p->age->value = data.animal.data.age;
+                    // p->max_age->value = data.animal.data.max_age;FIXME
                     break;
                 }
                 default:
@@ -222,8 +222,8 @@ extern "C"
     void update_item_location(LocationUpdateData data)
     {
         size_t id = data.id;
-        ItemLocationLol & old_loc = data.old;
-        ItemLocationLol & new_loc = data.new_;
+        ItemLocation & old_loc = data.old;
+        ItemLocation & new_loc = data.new_;
 
         InventoryElement * el = remove_from_location(old_loc, id);
         if (!el)
@@ -233,20 +233,20 @@ extern "C"
         }
         switch (new_loc.tag)
         {
-            case ItemLocationLol::Tag::Chunk:
+            case ItemLocation::Tag::Chunk:
             {
                 // printf("added %ld to chunk %d %d\n", id, new_loc.chunk.map_x, new_loc.chunk.map_y);
                 ItemLocation old_l;
                 ItemLocation new_l;
-                old_l.data.chunk.x = old_loc.chunk.x;
-                old_l.data.chunk.y = old_loc.chunk.y;
-                new_l.data.chunk.x = new_loc.chunk.x;
-                new_l.data.chunk.y = new_loc.chunk.y;
+                old_l.chunk.x = old_loc.chunk.x;
+                old_l.chunk.y = old_loc.chunk.y;
+                new_l.chunk.x = new_loc.chunk.x;
+                new_l.chunk.y = new_loc.chunk.y;
                 el->update_item_location(old_l, new_l);
                 world_table[new_loc.chunk.map_y][new_loc.chunk.map_x]->add_object(el, new_loc.chunk.x, new_loc.chunk.y);
                 break;
             }
-            case ItemLocationLol::Tag::Player:
+            case ItemLocation::Tag::Player:
             {
                 // printf("added %ld to player %ld\n", id, new_loc.player.id);
                 players[new_loc.player.id]->pickup(el);
@@ -258,17 +258,17 @@ extern "C"
         }
     }
 
-    void create_object(ObjectData data)
+    void create_object(const ObjectData* data)
     {
-        int x = data.inv_element.data.location.chunk.map_x;
-        int y = data.inv_element.data.location.chunk.map_y;
+        int x = data->inv_element.data.location.chunk.map_x;
+        int y = data->inv_element.data.location.chunk.map_y;
         if (world_table[y][x])
         {
             InventoryElement * el = el_from_data(data);
             if (el)
             {
-                int item_x = el->location.data.chunk.x;
-                int item_y = el->location.data.chunk.y;
+                int item_x = el->location.chunk.x;
+                int item_y = el->location.chunk.y;
                 world_table[y][x]->add_object(el, item_x, item_y);
 
                 print_status(1, "created object: %s", el->get_name());
@@ -280,7 +280,7 @@ extern "C"
         }
     }
 
-    void destroy_object(uintptr_t id, ItemLocationLol location)
+    void destroy_object(uintptr_t id, ItemLocation location)
     {
         InventoryElement * el = remove_from_location(location, id);
         if (el)

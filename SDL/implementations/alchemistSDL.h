@@ -33,14 +33,14 @@ class IngredientSDL : public Ingredient, public Renderable
 {
   public:
     SDL_Texture * get_texture();
-    IngredientSDL(IngredientData * data);
+    IngredientSDL(Ingredient data);
 };
 
 class ProductSDL : public Product, public Renderable
 {
   public:
     SDL_Texture * get_texture();
-    ProductSDL(ProductData * data);
+    ProductSDL(Product data);
 };
 
 class ObjectSDL : public Object, public Renderable
@@ -54,7 +54,7 @@ class ElementSDL : public Element, public Renderable
 {
   public:
     SDL_Texture * get_texture();
-    ElementSDL(ElementData * data);
+    ElementSDL(Element data);
 };
 
 #endif

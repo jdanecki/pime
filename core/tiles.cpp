@@ -12,11 +12,11 @@ void chunk::add_object(InventoryElement * object, int x, int y)
     }
 
     ItemLocation location;
-    location.type = LOCATION_CHUNK;
-    location.data.chunk.map_y = map_y;
-    location.data.chunk.map_x = map_x;
-    location.data.chunk.x = x;
-    location.data.chunk.y = y;
+    location.tag = ItemLocation::Tag::Chunk;
+    location.chunk.map_y = map_y;
+    location.chunk.map_x = map_x;
+    location.chunk.x = x;
+    location.chunk.y = y;
     object->location = location;
 }
 

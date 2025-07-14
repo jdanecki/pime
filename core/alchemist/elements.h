@@ -2,10 +2,12 @@
 #define __ELEMENTS__H
 
 #include "names.h"
+#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <stdint.h>
 #include "properties.h"
+#include "item_location.h"
 
 enum Class_id
 {
@@ -33,58 +35,24 @@ class Base
     const char * name;
     int id; // index in BaseTable
     Class_id c_id;
-    Base(int index, Class_id c)
-    {
-        id = index;
-        name = nullptr;
-        c_id = c;
-    }
-    virtual void show(bool details = true)
-    {
-        printf("Base name=%s id=%d \n", name, id);
-    }
+    Base(int index, Class_id c);
+    virtual void show(bool details = true);
+};
+
+struct Color
+{
+    int r;
+    int g;
+    int b;
 };
 
 class BaseElement : public Base
 {
   public:
-    Property * density;
-    Edible * edible; // not known by default, it should depend on player/animal/npc
     Form form; //solid, liquid, gas
-    Solid * solid;
-    struct {int r; int g; int b;} color;
+    Color color;
 
-    BaseElement(Form f, int index);
-    ~BaseElement()
-    {
-        delete density;
-    }
-    void show(bool details = true);
-};
-
-enum ItemLocationType
-{
-    LOCATION_CHUNK,
-    LOCATION_PLAYER_INV,
-};
-
-union ItemLocationData
-{
-    struct
-    {
-        int map_x, map_y, x, y;
-    } chunk;
-    struct
-    {
-        int id;
-    } player;
-};
-
-class ItemLocation
-{
-  public:
-    enum ItemLocationType type;
-    ItemLocationData data;
+    BaseElement(Form f, Color color, int index);
 };
 
 class chunk;
@@ -96,21 +64,14 @@ class InventoryElement
     const char * name;
 
   public:
-    bool crafted;
-    bool pickable;
+    // Property mass; // density*volume // FIXME maybe
+    unsigned int mass;
     ItemLocation location;
     size_t uid;
     Class_id c_id;
-    Form req_form;
 
-    InventoryElement()
-    {
-        req_form = Form_unknown;
-        uid = (size_t)this;
-        name = nullptr;
-        crafted = false;
-        pickable=true;
-    }
+    InventoryElement(); //: mass("unknown element", 0)
+    InventoryElement(Class_id c_id, size_t uid, unsigned int mass, ItemLocation location);
     virtual bool use(int map_x, int map_y, int x, int y)
     {
         return false;
@@ -127,10 +88,6 @@ class InventoryElement
     {
         return false;
     }
-    virtual Form get_form()
-    {
-        return req_form;
-    }
     virtual const char * get_name()
     {
         return name;
@@ -138,10 +95,6 @@ class InventoryElement
     const char * get_class_name()
     {
         return Class_names[c_id];
-    }
-    virtual const char * get_form_name()
-    {
-        return Form_name[req_form];
     }
     virtual int get_id()
     {
@@ -169,11 +122,11 @@ class InventoryElement
 #endif
     int get_x()
     {
-        return location.data.chunk.x;
+        return location.chunk.x;
     }
     int get_y()
     {
-        return location.data.chunk.y;
+        return location.chunk.y;
     }
     size_t get_uid()
     {
@@ -182,7 +135,7 @@ class InventoryElement
     virtual char * get_description()
     {
         char * buf = new char[128];
-        sprintf(buf, "%s: %s (%s)", get_class_name(), get_form_name(), get_name());
+        sprintf(buf, "%s: (%s)", get_class_name(), get_name());
         return buf;
     }
     virtual Property ** get_properties(int * count)
@@ -232,75 +185,50 @@ class Object : public InventoryElement
     }
 };
 
+template<typename T>
+class SerializablePointer
+{
+    T* ptr;
+    
+public:
+    SerializablePointer(T* p);
+    T* get()
+    {
+        return ptr;
+    }
+};
+
 class Element : public InventoryElement
 {
-    BaseElement * base;
-    void init(BaseElement * b);
+    SerializablePointer<BaseElement> base;
+    // void init(BaseElement * b);
 
-  public:
-    Property * sharpness;
-    Property * smoothness;
-    Property * mass; // density*volume
-    Property * length;
-    Property * width;
-    Property * height;
-    Property * volume; // lenght*width*height
-
-    Property ** get_properties(int * count)
+    public:
+    BaseElement * get_base() override
     {
-        Property ** props = new Property *[7];
-        props[0] = sharpness;
-        props[1] = smoothness;
-        props[2] = mass;
-        props[3] = length;
-        props[4] = width;
-        props[5] = height;
-        props[6] = volume;
-        *count = 7;
-        return props;
+        return base.get();
     }
-    BaseElement * get_base()
-    {
-        return base;
-    }
-    Edible * get_edible()
-    {
-        return base->edible;
-    }
-
-    void show(bool details = true);
-    Element();
+    // void show(bool details = true) override;
     Element(BaseElement * b);
-    Element(int i);
-    ~Element()
-    {
-        delete sharpness;
-        delete smoothness;
-        delete mass;
-        delete length;
-        delete width;
-        delete height;
-        delete volume;
-    }
     Form get_form()
     {
-        return base->form;
+        return base.get()->form;
     }
-    const char * get_name()
+    const char * get_name() override
     {
-        return base->name;
+        return base.get()->name;
     }
     const char * get_form_name()
     {
-        return Form_name[base->form];
+        return Form_name[base.get()->form];
     }
     int get_id() override
     {
-        return base->id;
+        return base.get()->id;
     }
-    Class_id get_base_cid()
+    Class_id get_base_cid() override
     {
-        return base->c_id;
+        return base.get()->c_id;
     }
 };
 
@@ -335,49 +263,38 @@ extern const char * items_name[];
 
 class Ingredient : public InventoryElement
 {
-    int * padding; // FIXME
+    size_t padding; // FIXME
 
   public:
-    Property * quality;    //[0..100] slaby..najlepszy
-    Property * resilience; // [0..100] wytrzymały..słaby
-    Property * usage;      // [0..100] łatwy..trudny
+    Property quality;    //[0..100] slaby..najlepszy
+    Property resilience; // [0..100] wytrzymały..słaby
+    Property usage;      // [0..100] łatwy..trudny
 
     Ingredient_id id;
+    Form req_form;
 
-    int get_id()
-    {
-        return id;
-    }
-#ifdef CORE_FOR_CLIENT
-    Ingredient(Ingredient_id i);
     Property ** get_properties(int * count)
     {
         Property ** props = new Property *[3];
-        props[0] = quality;
-        props[1] = resilience;
-        props[2] = usage;
+        props[0] = &quality;
+        props[1] = &resilience;
+        props[2] = &usage;
 
         *count = 3;
         return props;
     }
+    int get_id()
+    {
+        return id;
+    }
+    Ingredient(Ingredient_id i);
 
-#else
-    InventoryElement * el; // available only in server , move to IngredientServer class
-    bool craft();
-    Ingredient(InventoryElement * from, Ingredient_id i, Form f);
-#endif
     Edible * get_edible()
     { // FIXME
         return nullptr;
         // return el->get_edible();
     }
 
-    ~Ingredient()
-    {
-        delete quality;
-        delete resilience;
-        delete usage;
-    }
     void show(bool details = true);
 
     char * get_description()
@@ -390,45 +307,28 @@ class Ingredient : public InventoryElement
 
 class Product : public InventoryElement
 {
-    int * padding; // FIXME
-#ifndef CORE_FOR_CLIENT
-    void init(Product_id i, int c, Form f);
-#endif
+    size_t padding; // FIXME
   public:
-    Property * quality;    //[0..100] slaby..najlepszy
-    Property * resilience; // [0..100] wytrzymały..słaby
-    Property * usage;      // [0..100] łatwy..trudny
+    Property quality;    //[0..100] slaby..najlepszy
+    Property resilience; // [0..100] wytrzymały..słaby
+    Property usage;      // [0..100] łatwy..trudny
+    Form req_form;
 
     Product_id id;
     int get_id() override
     {
         return id;
     }
-#ifdef CORE_FOR_CLIENT
     Product(Product_id i);
     Property ** get_properties(int * count)
     {
         Property ** props = new Property *[3];
-        props[0] = quality;
-        props[1] = resilience;
-        props[2] = usage;
+        props[0] = &quality;
+        props[1] = &resilience;
+        props[2] = &usage;
 
         *count = 3;
         return props;
-    }
-#else
-    int ing_count;
-    InventoryElement ** ings;
-    bool craft() override;
-
-    Product(InventoryElement * el1, InventoryElement * el2, Product_id i, Form f);
-    Product(InventoryElement ** from, int count, Product_id i, Form f);
-#endif
-    ~Product()
-    {
-        delete quality;
-        delete resilience;
-        delete usage;
     }
     virtual bool check_ing()
     {
@@ -449,74 +349,34 @@ class Product : public InventoryElement
     }
 };
 
-class Being : public InventoryElement
-{
-    int * padding; // FIXME
+// FIXME is it even needed?
+// class Being : public InventoryElement
+// {
+//     size_t padding; // FIXME
 
-  public:
-    // shared with client
-    Property * age;
-    Property * max_age;
+//   public:
+//     // shared with client
 
-    bool alive;
-    bool can_talk;
+//     bool alive;
+//     bool can_talk;
 
-    virtual bool grow()
-    {
-        if (!alive)
-        {
-            //  printf("%s is dead\n", get_name());
-            return false;
-        }
-        age->value++;
-        // printf("%s:%s growing\n", get_class_name(), get_name());
-        if (age->value >= max_age->value)
-        {
-            alive = false;
-            printf("%s is dying\n", get_name());
-        }
-        return alive;
-    }
-    Being()
-    {
-        alive = true;
-        c_id = Class_Being;
-        max_age = new Property("max age", 1 + rand() % 36000); // 100 years
-        age = new Property("age", rand() % max_age->value);
+//     Being()
+//     {
+//         alive = true;
+//         c_id = Class_Being;
 
-        name = nullptr;
-        req_form = Form_solid;
-        can_talk = false;
-    }
-    Property ** get_properties(int * count)
-    {
-        Property ** props = new Property *[2];
-        props[0] = age;
-        props[1] = max_age;
-
-        *count = 2;
-        return props;
-    }
-    ~Being()
-    {
-        delete age;
-        delete max_age;
-    }
-    bool is_alive()
-    {
-        return alive;
-    }
-    void show(bool details = true)
-    {
-        printf("%s %s alive=%d uid=%lx\n", Class_names[c_id], name, alive, uid);
-        age->show();
-        max_age->show();
-    }
-    bool tick()
-    {
-        return grow();
-    }
-};
+//         name = nullptr;
+//         can_talk = false;
+//     }
+//     bool is_alive()
+//     {
+//         return alive;
+//     }
+//     void show(bool details = true)
+//     {
+//         printf("%s %s alive=%d uid=%lx\n", Class_names[c_id], name, alive, uid);
+//     }
+// };
 
 class BaseAnimal : public Base
 {
@@ -537,25 +397,21 @@ class BaseAnimal : public Base
     }
 };
 
-class Animal : public Being
+class Animal : public InventoryElement
 {
     // int padding; // FIXME
-    BaseAnimal * base;
+    SerializablePointer<BaseAnimal> base;
     void init(BaseAnimal * b);
 
   public:
-    // shared with client
-
     Animal(BaseAnimal * b);
-    Animal();
-    Animal(int i);
+    // Animal();
+    // Animal(int i);
     void show(bool details = true) override
     {
-        printf("Animal %s alive=%d uid=%lx\n", name, alive, uid);
-        age->show();
-        max_age->show();
+        printf("Animal %s uid=%lx\n", name, uid);
         if (details)
-            base->show(details);
+            base.get()->show(details);
     }
     /* bool tick()
      {
@@ -563,12 +419,12 @@ class Animal : public Being
      }*/
     int get_id() override
     {
-        return base->id;
+        return base.get()->id;
     }
 
     Class_id get_base_cid() override
     {
-        return base->c_id;
+        return base.get()->c_id;
     }
     bool use(InventoryElement * object) override
     {
@@ -604,10 +460,10 @@ class BasePlant : public Base
     }
 };
 
-class Plant : public Being
+class Plant : public InventoryElement
 {
     //   int padding; // FIXME
-    BasePlant * base;
+    SerializablePointer<BasePlant> base;
     void init(BasePlant * b);
 
   protected:
@@ -625,47 +481,23 @@ class Plant : public Being
     bool grown;
 
     Plant(BasePlant * b);
-    Plant();
-    Plant(int i);
+    // Plant();
+    // Plant(int i);
     void show(bool details = true) override
     {
         printf("Plant -> %d name=%s grown=%d uid=%lx\n", c_id, name, grown, uid);
-        age->show();
-        max_age->show();
         if (details)
         {
-            printf("phase=%s planted=%d times=%d/%d/%d/%d water=%d\n", Plant_phase_name[phase], planted, seedling_time, growing_time, flowers_time, max_age->value, water);
+            printf("phase=%s planted=%d times=%d/%d/%d/ water=%d\n", Plant_phase_name[phase], planted, seedling_time, growing_time, flowers_time, water);
         }
-    }
-    void sow()
-    {
-        planted = 1;
-        change_phase(Plant_seedling);
-    }
-    void change_phase(Plant_phase p)
-    {
-        if (phase != p)
-        {
-            switch (phase)
-            {
-                case Plant_seedling:
-                    age->value = 1;
-                    break;
-                case Plant_seed:
-                    age->value = 0;
-                    break;
-            }
-            printf("%s changing phase: %s -> %s age=%u/%u\n", name, Plant_phase_name[phase], Plant_phase_name[p], age->value, max_age->value);
-        }
-        phase = p;
     }
     int get_id() override
     {
-        return base->id;
+        return base.get()->id;
     }
     Class_id get_base_cid() override
     {
-        return base->c_id;
+        return base.get()->c_id;
     }
     bool use(InventoryElement * object) override
     {
@@ -687,6 +519,6 @@ class Plant : public Being
 void init_elements();
 void show_base_table(Class_id id, bool details);
 
-BaseElement* get_base_element(int id);
+// BaseElement* get_base_element(int id);
 
 #endif

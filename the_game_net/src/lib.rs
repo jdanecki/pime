@@ -1,9 +1,11 @@
+use std::borrow::{Borrow, BorrowMut};
+use std::cell::RefCell;
 use std::error::Error;
 use std::net::UdpSocket;
+use std::rc::Rc;
 
 mod core;
 mod events;
-mod generator;
 mod send_packets;
 mod types;
 
@@ -32,14 +34,19 @@ fn init_internal() -> Result<NetClient, Box<dyn Error>> {
     let mut buf = [0];
     buf[0] = core::PACKET_JOIN_REQUEST;
     socket.send(&buf)?;
-    let mut buf = [0; 17];
-    socket.recv(&mut buf)?;
+    let mut buf = [0; 4096];
+    let amt = socket.recv(&mut buf).unwrap();
     if buf[0] == core::PACKET_PLAYER_ID {
         unsafe {
             events::got_id(
                 usize::from_le_bytes(buf[1..9].try_into().unwrap()),
-                i64::from_le_bytes(buf[9..17].try_into().unwrap()),
+                0, //i64::from_le_bytes(buf[9..17].try_into().unwrap()),
             );
+            println!("RECEIVED {:?}", &buf[9..amt]);
+            WORLD.set(bincode::deserialize::<World>(&buf[9..amt]).expect("failed to create world"));
+            WORLD.with_borrow(|world| {
+                println!("{:#?}", world);
+            })
         };
     } else {
         println!("did not get id");
@@ -111,11 +118,15 @@ pub extern "C" fn network_tick(client: &NetClient) {
                     );
                 },
                 core::PACKET_OBJECT_CREATE => unsafe {
-                    //println!("value {:?}", &value[1..amt]);
-                    events::create_object(
-                        bincode::deserialize(&value[1..amt])
-                            .expect("Failed to create item from data"),
-                    );
+                    println!("value {:?}", &value[1..amt]);
+                    let obj = bincode::deserialize(&value[1..amt])
+                        .expect("Failed to create item from data");
+                    println!("{:?}", obj);
+                    events::create_object(&obj);
+                    // events::create_object(
+                    //     bincode::deserialize(&value[1..amt])
+                    //         .expect("Failed to create item from data"),
+                    // );
                 },
                 core::PACKET_OBJECT_DESTROY => unsafe {
                     events::destroy_object(
@@ -140,6 +151,43 @@ pub fn add(left: u64, right: u64) -> u64 {
     left + right
 }
 
+#[derive(Debug, serde::Deserialize)]
+struct World {
+    terrains: Vec<Rc<core::BaseElement>>,
+    plants: Vec<Rc<core::BasePlant>>,
+    animals: Vec<Rc<core::BaseAnimal>>,
+}
+
+thread_local! {
+static WORLD: RefCell<World> = panic!("world not created yet");
+}
+
+#[no_mangle]
+pub extern "C" fn get_base_element(id: i32) -> *mut core::BaseElement {
+    WORLD.with_borrow(|world| {
+        Rc::downgrade(&world.terrains[id as usize].clone())
+            .as_ptr()
+            .cast_mut()
+    })
+}
+
+#[no_mangle]
+pub extern "C" fn get_base_plant(id: i32) -> *mut core::BasePlant {
+    WORLD.with_borrow(|world| {
+        Rc::downgrade(&world.plants[id as usize].clone())
+            .as_ptr()
+            .cast_mut()
+    })
+}
+
+#[no_mangle]
+pub extern "C" fn get_base_animal(id: i32) -> *mut core::BaseAnimal {
+    WORLD.with_borrow(|world| {
+        Rc::downgrade(&world.animals[id as usize].clone())
+            .as_ptr()
+            .cast_mut()
+    })
+}
 #[cfg(test)]
 mod tests {
     use super::*;

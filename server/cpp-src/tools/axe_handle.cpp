@@ -1,6 +1,6 @@
 #include "axe_handle.h"
 #include <cstdlib>
 
-AxeHandle::AxeHandle(InventoryElement * from) : Ingredient(from, ING_AXE_HANDLE, Form_solid)
+AxeHandle::AxeHandle(InventoryElement * from) : IngredientServer(from, ING_AXE_HANDLE, Form_solid)
 {
 }

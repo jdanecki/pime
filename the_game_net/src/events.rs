@@ -7,7 +7,7 @@ extern "C" {
     pub fn got_id(id: usize, seed: i64);
     pub fn update_object(data: types::ObjectData);
     pub fn update_item_location(data: types::LocationUpdateData);
-    pub fn create_object(data: types::ObjectData);
-    pub fn destroy_object(id: usize, location: types::ItemLocationLol);
+    pub fn create_object(data: &types::ObjectData);
+    pub fn destroy_object(id: usize, location: core::ItemLocation);
     pub fn failed_craft();
 }

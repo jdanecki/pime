@@ -5,7 +5,7 @@
 #include "../texture.h"
 #include "alchemistSDL.h"
 
-class BeingSDL : public Being, public Renderable
+class BeingSDL : public InventoryElement, public Renderable
 {
   public:
     SDL_Texture * get_texture() override;
@@ -16,7 +16,7 @@ class PlantSDL : public Plant, public Renderable
     int * padding1; // FIXME
   public:
     SDL_Texture * get_texture() override;
-    PlantSDL(PlantData * data);
+    PlantSDL(Plant data);
 };
 
 class AnimalSDL : public Animal, public Renderable
@@ -24,7 +24,7 @@ class AnimalSDL : public Animal, public Renderable
   public:
     SDL_Texture * get_texture() override;
     bool going_right;
-    AnimalSDL(AnimalData * data);
+    AnimalSDL(Animal data);
     void render(SDL_Rect * rect)
     {
         flip = !going_right;

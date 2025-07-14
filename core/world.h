@@ -14,8 +14,8 @@ void remove_from_chunks(InventoryElement * object);
 int get_tile_at(int chunk_x, int chunk_y, int x, int y);
 enum game_tiles get_tile_at_ppos(Player * player);
 
-Being ** get_being_at_ppos(Player * player);
-Being ** get_being_at(int chunk_x, int chunk_y, int x, int y);
+// Being ** get_being_at_ppos(Player * player);
+// Being ** get_being_at(int chunk_x, int chunk_y, int x, int y);
 
 Object ** get_object_at(int chunk_x, int chunk_y, int x, int y);
 Object ** get_object_at_ppos(Player * player);

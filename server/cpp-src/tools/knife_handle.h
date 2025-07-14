@@ -3,7 +3,7 @@
 
 #include "../elements_server.h"
 
-class KnifeHandle : public Ingredient
+class KnifeHandle : public IngredientServer
 {
   public:
     KnifeHandle(InventoryElement * from);

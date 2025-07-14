@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-Knife::Knife(InventoryElement * el1, InventoryElement * el2) : Product(el1, el2, PROD_KNIFE, Form_solid)
+Knife::Knife(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_KNIFE, Form_solid)
 {
 }
 #if 0

@@ -4,9 +4,8 @@
 #include <cstddef>
 #include <cstdio>
 
-Hut::Hut(InventoryElement * el1, InventoryElement * el2) : Product(el1, el2, PROD_HUT, Form_solid)
+Hut::Hut(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_HUT, Form_solid)
 {
-    pickable=false;
 }
 
 bool Hut::check_ing()

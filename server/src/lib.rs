@@ -17,8 +17,8 @@ extern "C" fn update_location(
     unsafe {
         LOCATION_UPDATES.push(types::LocationUpdateData {
             id,
-            old: convert_types::convert_item_location(&old_location),
-            new: convert_types::convert_item_location(&location),
+            old: old_location,
+            new: location,
         });
     }
 }
@@ -155,9 +155,10 @@ fn add_player(
 
     let mut response = vec![core::PACKET_PLAYER_ID as u8];
     response.extend_from_slice(&players.len().to_le_bytes());
-    unsafe {
-        response.extend_from_slice(&SEED.to_le_bytes());
-    }
+    let data = generator::get_world_data();
+    response.extend_from_slice(&data);
+    println!("SEND {:?}", data.len());
+    generator::show_world();
 
     server.socket.send_to(&response, peer).unwrap();
 
@@ -448,8 +449,6 @@ fn send_destroy_updates(server: &Server) {
 fn destroy_object(server: &Server, id: usize, location: core::ItemLocation) {
     let mut buf = vec![core::PACKET_OBJECT_DESTROY];
     buf.extend_from_slice(&id.to_le_bytes());
-    buf.extend_from_slice(
-        &bincode::serialize(&convert_types::convert_item_location(&location)).unwrap()[..],
-    );
+    buf.extend_from_slice(&bincode::serialize(&location).unwrap()[..]);
     server.broadcast(&buf);
 }

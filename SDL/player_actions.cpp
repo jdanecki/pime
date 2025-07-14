@@ -44,9 +44,10 @@ void use_tile(int map_x, int map_y, int x, int y)
         return;
     }
     //FIXME pickable only on server side
-    if (object->pickable) send_packet_pickup(client, object->uid);
-    else
-        printf("Can't pickup %s\n", object->get_name());
+    send_packet_pickup(client, object->uid);
+    // if (object->pickable) send_packet_pickup(client, object->uid);
+    // else
+    //     printf("Can't pickup %s\n", object->get_name());
     /*
 
     for (int i = 0; i < CHUNK_SIZE*CHUNK_SIZE; i++)

@@ -3,7 +3,7 @@
 
 #include "../elements_server.h"
 
-class Wall : public Ingredient
+class Wall : public IngredientServer
 {
   public:
     Wall(InventoryElement * from);

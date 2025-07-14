@@ -6,20 +6,73 @@
 void destroy(InventoryElement * el)
 {
     notify_destroy(el->get_uid(), el->location);
-    if (el->location.type == LOCATION_CHUNK)
+    if (el->location.tag == ItemLocation::Tag::Chunk)
     {
-        world_table[el->location.data.chunk.map_y][el->location.data.chunk.map_x]->remove_object(el);
+        world_table[el->location.chunk.map_y][el->location.chunk.map_x]->remove_object(el);
     }
     delete el;
 }
 #endif
 
-AnimalServer::AnimalServer()
+BaseElementServer::BaseElementServer(Form f, int index) : BaseElement(f, {rand()%256, rand()%256, rand()%256},index)
 {
-    delay_for_move = max_delay_move; // 600 * 100ms -> 1min
-    dst_loc_x = rand() % CHUNK_SIZE;
-    dst_loc_y = rand() % CHUNK_SIZE;
+    solid = NULL;
+    
+    density = nullptr;
+    form = f;
+    switch (f)
+    {
+        case Form_solid:
+            solid = new Solid;
+            density = new Property("density", 50 + rand() % 2000);
+            break;
+        case Form_liquid:
+            density = new Property("density", 500 + rand() % 500);
+            break;
+        case Form_gas:
+            density = new Property("density", 1);
+            break;
+    }
+
+    name = create_name(5 - form);
 }
+
+BaseElementServer::~BaseElementServer() 
+{
+    delete density;
+    if (solid)
+        delete solid;
+}
+
+int BaseElementServer::foo(int a)
+{
+    return a+1;
+}
+
+void BaseElementServer::show(bool details)
+{
+    Base::show(details);
+    printf("BaseElement form=%s\n", Form_name[form]);
+    if (!details)
+        return;
+    density->show(); // gęstość
+    printf("   form = %s\n", Form_name[form]);
+    switch (form)
+    {
+        case Form_solid:
+            solid->show();
+            break;
+        default:
+            break;
+    }
+}
+
+// AnimalServer::AnimalServer()
+// {
+//     delay_for_move = max_delay_move; // 600 * 100ms -> 1min
+//     dst_loc_x = rand() % CHUNK_SIZE;
+//     dst_loc_y = rand() % CHUNK_SIZE;
+// }
 
 AnimalServer::AnimalServer(BaseAnimal* base) : Animal(base)
 {
@@ -36,8 +89,8 @@ void AnimalServer::move()
     delay_for_move = max_delay_move;
 
     ItemLocation l = location;
-    int _x = location.data.chunk.x;
-    int _y = location.data.chunk.y;
+    int _x = location.chunk.x;
+    int _y = location.chunk.y;
 
     if ((_x == dst_loc_x && _y == dst_loc_y) /*|| (rand() % 5 ==1)*/)
     {
@@ -74,8 +127,8 @@ void AnimalServer::move()
     if (_x < 0)
         _x = 0;
 
-    location.data.chunk.x = _x;
-    location.data.chunk.y = _y;
+    location.chunk.x = _x;
+    location.chunk.y = _y;
 
     update_location(uid, l, location);
 }
@@ -83,13 +136,14 @@ void AnimalServer::move()
 bool AnimalServer::tick()
 {
     move();
-    return Being::tick();
+    // return Being::tick();
+    return 1;
 }
 
-PlantServer::PlantServer()
-{
-    delay_for_grow = max_delay_grow;
-}
+// PlantServer::PlantServer()
+// {
+//     delay_for_grow = max_delay_grow;
+// }
 
 PlantServer::PlantServer(BasePlant* base) : Plant(base)
 {
@@ -164,6 +218,76 @@ bool PlantServer::tick()
     Plant::tick();
     return true;
 }*/
+
+
+IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id i, Form f) : Ingredient(i)
+{
+    c_id = Class_Ingredient;
+    el = from;
+    name = Ingredient_name[i];
+    id = i;
+    req_form = f;
+}
+bool IngredientServer::craft()
+{
+    // FIXME
+    // if (req_form != el->get_form())
+    // {
+    //     printf("form != %d\n", req_form);
+    //     return false;
+    // }
+
+    // quality = Property("quality", rand() % 100);
+    // resilience = Property("resilience", rand() % 100);
+    // usage = Property("usage", rand() % 100);
+    return true;
+}
+
+
+void ProductServer::init(Product_id i, int c, Form f)
+{
+    name = Product_name[i];
+    id = i;
+    ing_count = c;
+    req_form = f;
+}
+
+ProductServer::ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id i, Form f) : Product(i)
+{
+    c_id = Class_Product;
+    ings = (InventoryElement **)calloc(2, sizeof(InventoryElement));
+    ings[0] = el1;
+    ings[1] = el2;
+    init(i, 2, f);
+}
+
+ProductServer::ProductServer(InventoryElement ** from, int count, Product_id i, Form f) : Product(i)
+{
+    c_id = Class_Product;
+    ings = from;
+    init(i, count, f);
+}
+
+bool ProductServer::craft() // executed only on server
+{
+    for (int i = 0; i < ing_count; i++)
+    {
+        // TODO fixme
+        // if (req_form != ings[i]->get_form())
+        // {
+        //     printf("form != %d for inq[%d]\n", req_form, i);
+        //     return false;
+        // }
+    }
+    if (!check_ing())
+        return false;
+
+    quality = Property("quality", rand() % 100);
+    resilience = Property("resilience", rand() % 100);
+    usage = Property("usage", rand() % 100);
+    return true;
+}
+
 AnimalServer* create_animal(BaseAnimal* base)
 {
     return new AnimalServer(base);

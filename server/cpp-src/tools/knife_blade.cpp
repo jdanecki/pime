@@ -1,5 +1,5 @@
 #include "knife_blade.h"
 
-KnifeBlade::KnifeBlade(InventoryElement * from) : Ingredient(from, ING_KNIFE_BLADE, Form_solid)
+KnifeBlade::KnifeBlade(InventoryElement * from) : IngredientServer(from, ING_KNIFE_BLADE, Form_solid)
 {
 }

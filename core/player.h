@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "alchemist/elements.h"
 #include "alchemist/npc_talk.h"
 #include <stdint.h>
 
@@ -12,7 +13,7 @@ enum class direction
     left,
 };
 
-class Player : public Being
+class Player : public InventoryElement
 {
     int * padding; // FIXME
     int id;
@@ -66,7 +67,7 @@ class Player : public Being
 
     void show(bool details = true)
     {
-        Being::show(true);
+        // Being::show(true);
         if (talking_to)
         {
             printf("%s is talking to %s\n", get_name(), talking_to->get_name());
