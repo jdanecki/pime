@@ -2,28 +2,28 @@ use crate::core;
 use crate::NetClient;
 
 #[no_mangle]
-pub extern "C" fn send_packet_move(client: &NetClient, x: i32, y: i32) {
+pub extern "C" fn send_packet_move(client: &mut NetClient, x: i32, y: i32) {
     let buf = [core::PACKET_PLAYER_MOVE, x as u8, y as u8];
-//    println!("player_move {} {}", x, y);
+    //    println!("player_move {} {}", x, y);
     client.send(&buf);
 }
 
 #[no_mangle]
-pub extern "C" fn send_packet_pickup(client: &NetClient, id: usize) {
+pub extern "C" fn send_packet_pickup(client: &mut NetClient, id: usize) {
     let mut buf = vec![core::PACKET_PLAYER_ACTION_PICKUP];
     buf.extend_from_slice(&id.to_le_bytes());
     client.send(&buf);
 }
 
 #[no_mangle]
-pub extern "C" fn send_packet_drop(client: &NetClient, id: usize) {
+pub extern "C" fn send_packet_drop(client: &mut NetClient, id: usize) {
     let mut buf = vec![core::PACKET_PLAYER_ACTION_DROP];
     buf.extend_from_slice(&id.to_le_bytes());
     client.send(&buf);
 }
 
 #[no_mangle]
-pub extern "C" fn send_packet_item_used_on_object(client: &NetClient, iid: usize, oid: usize) {
+pub extern "C" fn send_packet_item_used_on_object(client: &mut NetClient, iid: usize, oid: usize) {
     let mut buf = vec![core::PACKET_PLAYER_ACTION_USE_ITEM_ON_OBJECT];
     buf.extend_from_slice(&iid.to_le_bytes());
     buf.extend_from_slice(&oid.to_le_bytes());
@@ -32,7 +32,7 @@ pub extern "C" fn send_packet_item_used_on_object(client: &NetClient, iid: usize
 
 #[no_mangle]
 pub extern "C" fn send_packet_item_used_on_tile(
-    client: &NetClient,
+    client: &mut NetClient,
     iid: usize,
     map_x: i32,
     map_y: i32,
@@ -50,7 +50,7 @@ pub extern "C" fn send_packet_item_used_on_tile(
 
 #[no_mangle]
 pub extern "C" fn send_packet_craft(
-    client: &NetClient,
+    client: &mut NetClient,
     prod_id: usize,
     ingredients_num: usize,
     iid: *const usize,
@@ -68,7 +68,7 @@ pub extern "C" fn send_packet_craft(
 }
 
 #[no_mangle]
-pub extern "C" fn send_packet_request_chunk(client: &NetClient, x: i32, y: i32) {
+pub extern "C" fn send_packet_request_chunk(client: &mut NetClient, x: i32, y: i32) {
     let mut buf = vec![core::PACKET_REQUEST_CHUNK];
     buf.extend_from_slice(&x.to_le_bytes());
     buf.extend_from_slice(&y.to_le_bytes());
