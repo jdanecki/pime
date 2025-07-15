@@ -24,7 +24,8 @@ struct textures
     SDL_Texture * sneak_icon;
 };
 
-extern SDL_Texture * tiles_textures[TILE_MAX_NUM];
+extern int tiles_textures_count;
+extern SDL_Texture ** tiles_textures;
 extern SDL_Texture * items_textures[BASE_ELEMENTS];
 extern SDL_Texture * ing_textures[ING_ELEMENTS];
 extern SDL_Texture * prod_textures[PROD_ELEMENTS];

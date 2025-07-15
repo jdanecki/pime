@@ -224,7 +224,6 @@ IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id i, For
 {
     c_id = Class_Ingredient;
     el = from;
-    name = Ingredient_name[i];
     id = i;
     req_form = f;
 }
@@ -246,7 +245,6 @@ bool IngredientServer::craft()
 
 void ProductServer::init(Product_id i, int c, Form f)
 {
-    name = Product_name[i];
     id = i;
     ing_count = c;
     req_form = f;

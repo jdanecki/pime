@@ -6,7 +6,16 @@
 #include "show_list.h"
 
 #include "test_axe.h"
+#include "../../server/cpp-src/tools/pickaxe.h"
+#include "../../server/cpp-src/tools/pickaxe_blade.h"
+#include "../../server/cpp-src/tools/pickaxe_handle.h"
+
+#include "../../server/cpp-src/tools/knife.h"
+#include "../../server/cpp-src/tools/knife_blade.h"
+#include "../../server/cpp-src/tools/knife_handle.h"
+
 #include "../../server/cpp-src/tools/wall.h"
+#include "../../server/cpp-src/tools/hut.h"
 
 #include <cstdio>
 #include <stdarg.h>
@@ -283,64 +292,104 @@ void test()
     }
 }
 
+InventoryElement * craft2_ing(char c)
+{
+    InventoryElement * target = nullptr;
+    InventoryElement *el2[2];
+    el2[0]= nullptr;
+    el2[1] = nullptr;
+    if (!select_inventory2(2, el2))
+        return nullptr;
+    switch (c)
+    {
+        case 'a': target = new Axe(el2[0], el2[1]); break;
+        case '1': target = new PickAxe(el2[0], el2[1]); break;
+        case '4': target = new Knife(el2[0], el2[1]); break;
+        case '7': target = new Hut(el2[0], el2[1]); break;
+    }
+    if (!target) return nullptr;
+    if (!target->craft())
+    {
+        delete target;
+        return nullptr;
+    }
+
+    player->inventory->remove(el2[0]);
+    player->inventory->remove(el2[1]);
+    return target;
+}
+
+InventoryElement * craft_ing(char c)
+{
+    InventoryElement * target = nullptr;
+    InventoryElement * el = select_element(player->inventory);
+    if (!el) return nullptr;
+
+    switch (c)
+    {
+        case 'b': target = new AxeBlade(el); break;
+        case 'h': target = new AxeHandle(el); break;
+        case '2': target = new PickAxeBlade(el); break;
+        case '3': target = new PickAxeHandle(el); break;
+        case '5': target = new KnifeBlade(el); break;
+        case '6': target = new KnifeHandle(el); break;
+
+        case 'w': target = new Wall(el);
+            break;
+    }
+    if (!target) return nullptr;
+    if (!target->craft())
+    {
+        delete target;
+        return nullptr;
+    }
+    player->inventory->remove(el);
+    return target;
+}
+
 void craft()
 {
     printf("%sa - craft axe\n", colorCyan);
     printf("b - craft axe blade\n");
     printf("h - craft axe handle\n");
+
+    printf("1 - craft pickaxe\n");
+    printf("2 - craft pickaxe blade\n");
+    printf("3 - craft pickaxe handle\n");
+
+    printf("4 - craft knife\n");
+    printf("5 - craft knife blade\n");
+    printf("6 - craft knife handle\n");
+
+    printf("7 - craft hut\n");
     printf("w - craft wall\n");
 
     printf("%s%s", colorNormal, colorGreenBold);
 
+    InventoryElement * target=nullptr;
     char c = wait_key('c');
     switch (c)
     {
         case 'a':
-        {
-            InventoryElement *el2[2];
-            el2[0]= nullptr;
-            el2[1] = nullptr;
-            if (!select_inventory2(2, el2))
-                return;
-            Axe * axe = new Axe(el2[0], el2[1]);
-            if (!axe->craft())
-                return;
-            player->inventory->add(axe);
-            player->inventory->remove(el2[0]);
-            player->inventory->remove(el2[1]);
-            printf("axe added to inventory\n");
-        }
+        case '1':
+        case '4':
+        case '7':
+            target = craft2_ing(c);
         break;
         case 'b':
         case 'h':
         case 'w':
-        {
-            InventoryElement * el = select_element(player->inventory);
-            if (!el)
-                return;
-            InventoryElement * target;
-            switch (c)
-            {
-                case 'b':
-                    target = new AxeBlade(el);
-                    break;
-                case 'h':
-                    target = new AxeHandle(el);
-                    break;
-                case 'w':
-                    target = new Wall(el);
-                    break;
-            }
-            if (!target->craft())
-            {
-                delete target;
-                return;
-            }
-            player->inventory->add(target);
-            player->inventory->remove(el);
-            printf("%s added to inventory\n", target->get_name());
-        }        
+        case '2':
+        case '3':
+        case '5':
+        case '6':
+            target = craft_ing(c);
         break;
+    }
+    if (target)
+    {
+        player->inventory->add(target);
+        printf("%s added to inventory\n", target->get_name());
     }
 }
 

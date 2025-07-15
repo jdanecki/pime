@@ -43,11 +43,13 @@ class Edible
 class Solid
 {
   public:
-    Property * stretching; // <-->
-    Property * squeezing;  //  >--<
-    Property * bending;
-    Property * fragility;  // kruchosc
+    Property * tooling; //obróbka
+    Property * stretching; // rozciągalność
+    Property * squeezing;  // ściskalność
+    Property * bending; //elastyczność
+  //  Property * fragility;  // kruchosc
     Property * solubility; // rozpuszczalnosc
+    Property * hardness; //twardość
     Solid();
     ~Solid();
     void show();

@@ -40,9 +40,8 @@ int Player::get_id()
     return id;
 }
 
-Player::Player(int id) : id(id)
-{
-    c_id = Class_Player;
+Player::Player(int id) : InventoryElement(Class_Player ),id(id)
+{    
     hunger = 500;
     thirst = 250;
     map_x = WORLD_CENTER;
@@ -61,8 +60,7 @@ Player::Player(int id) : id(id)
     }
     in_conversation = false;
     talking_to = nullptr;
-    welcomed = false;
-    delete name;
+    welcomed = false;    
     name = new char[16];
     sprintf((char *)name, "%s%d", "Player", id);
 
@@ -96,8 +94,12 @@ void Player::stop_conversation()
 {
     in_conversation = false;
     welcomed = false;
-    printf("%s stopped talking to %s\n", talking_to->get_name(), get_name());
-    talking_to = nullptr;
+    if (talking_to) {
+        printf("%s stopped talking to %s\n", talking_to->get_name(), get_name());
+        Player * p = talking_to;
+        talking_to = nullptr;
+        p->stop_conversation();
+    }
 }
 
 void Player::show(bool details)
@@ -181,7 +183,7 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
             }
             else
             {
-                print_status(1, "%s says: %s", n, a);
+                print_status(1, "%s says: %s", n, a->text);
             }
     }
     else {
@@ -208,25 +210,25 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
 
 char * Player::get_el_description(InventoryElement * el)
 {
-    // TODO jacek check if item known
-    // if (el->crafted)
-    //     return el->get_description();
-
     Class_id b = el->get_base_cid();
     ElementsTable * known_list = dynamic_cast<ElementsTable *>(known_elements->find(&b));
-    // bool known = known_list->is_known(el->get_id());
+    if (!known_list) return nullptr;
+    bool known = known_list->is_known(el->get_id());
 
-    // if (known)
+     if (known)
         return el->get_description();
-    // else
-    //     return nullptr;
+     else
+         return nullptr;
 }
 
 void Player::set_known(InventoryElement * el)
 {
+    //FIXME
+    // if (el->crafted) return; // crafted elements are known
+   
     Class_id b = el->get_base_cid();
     ElementsTable * known_list = dynamic_cast<ElementsTable *>(known_elements->find(&b));
-    known_list->set_known((el->get_id()));
+    if (known_list) known_list->set_known((el->get_id()));
 }
 
 Relations Player::find_relation(Player *who)

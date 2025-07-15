@@ -33,7 +33,8 @@ class Player : public InventoryElement
 {
     int * padding; // FIXME
     int id;
-
+  protected:
+    char * name;
   protected:
     ElementsList * known_elements;
 
@@ -77,6 +78,11 @@ class Player : public InventoryElement
     bool conversation_started() { return in_conversation;}
     enum  Relations find_relation(Player *who);
     void set_relation(Player *who, enum Relations rel);
+
+    const char * get_name()
+    {
+        return name;
+    }
 };
 
 

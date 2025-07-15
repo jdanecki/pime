@@ -41,7 +41,7 @@ Base::Base(int index, Class_id c, const char* name) : name(name)
 
 void Base::show(bool details)
 {
-    printf("Base name=%s id=%d \n", get_name(), id);
+    printf("Base name=%s class:%d id=%d \n", get_name(), c_id, id);
 }
 
 const char* Base::get_name() 
@@ -56,63 +56,34 @@ BaseElement::BaseElement(Form f, Color color, int index) : Base(index, Class_Bas
 template<typename T>
 SerializablePointer<T>::SerializablePointer(T* p) : ptr(p) {}
 
-Element::Element(BaseElement * b) : base(b)
+Element::Element(BaseElement * b) : InventoryElement(Class_Element), base(b)
 {
-    c_id = Class_Element;
-    // init(b);
-}
 
-InventoryElement::InventoryElement() //: mass("unknown element", 0)
-{
-    mass = 0;
-    uid = (size_t)this;
-    name = nullptr;
 }
-
 InventoryElement::InventoryElement(Class_id c_id, size_t uid, unsigned int mass, ItemLocation location) : c_id(c_id), uid(uid), mass(mass), location(location)
 {
     
 }
+void Element::show(bool details)
+ {
+    printf("%s: base=%s form=%s uid=%lx\n", Class_names[c_id], base.get()->get_name(), get_form_name(), uid);
+     if (!details)
+         return;
 
-// void Element::init(BaseElement * b)
-// {
-//     c_id = Class_Element;
-//     base = b;
-//     sharpness = new Property("sharpeness", rand() % 100);
-//     smoothness = new Property("smoothness", rand() % 100);
-//     length = new Property("length", 1 + rand() % 100);
-//     width = new Property("width", 1 + rand() % 100);
-//     height = new Property("height", 1 + rand() % 100);
-//     volume = new Property("volume", length->value * width->value * height->value);
-//     mass = new Property("mass", b->density->value * volume->value / 1000);
-// }
+     base.get()->show(details);
+ }
 
-// void Element::show(bool details)
-// {
-//     printf("%s: base=%s form=%s uid=%lx\n", Class_names[c_id], base->name, get_form_name(), uid);
-//     if (!details)
-//         return;
-//     sharpness->show();  // ostrość
-//     smoothness->show(); // gładkość
-//     length->show();
-//     width->show();
-//     height->show();
-//     volume->show();
-//     mass->show();
-
-//     base->show(details);
-// }
-
-Ingredient::Ingredient(Ingredient_id i) :quality("quality", 0), resilience("resilience", 0), usage("usage", 0)
+Ingredient::Ingredient(Ingredient_id i) : InventoryElement(Class_Ingredient),
+                                          quality("quality", 0),
+                                          resilience("resilience", 0),
+                                          usage("usage", 0)
 {
-    c_id = Class_Ingredient;
-    name = Ingredient_name[i];
     id = i;
 }
 
 void Ingredient::show(bool details)
 {
-    printf("%s ->%d\n", name, c_id);
+    printf("%s -> class:%d id=%d\n", Ingredient_name[id], c_id, id);
     if (!details)
         return;
     quality.show();
@@ -121,16 +92,16 @@ void Ingredient::show(bool details)
     printf("form = %s", Form_name[req_form]);
 }
 
-Product::Product(Product_id i) : quality("quality", 0), resilience("resilience", 0) , usage("usage", 0)
+Product::Product(Product_id i) : InventoryElement(Class_Product),
+      quality("quality", 0), resilience("resilience", 0) , usage("usage", 0)
 {
     id = i;
-    c_id = Class_Product;
-    name = Product_name[i];
+    c_id = Class_Product;    
 }
 
 void Product::show(bool details)
 {
-    printf("%s -> %d\n", name, c_id);
+    printf("%s -> class:%d id=%d\n", Product_name[id], c_id, id);
     if (!details)
         return;
     quality.show();
@@ -189,7 +160,6 @@ void Animal::init(BaseAnimal * b)
     // alive = true;
     // max_age = new Property("max age", 1 + rand() % 36000); // 100 years
     // age = new Property("age", rand() % max_age->value);
-    name = create_name(rand() % 2 + 2);
     // can_talk = false;
 }
 
@@ -201,7 +171,7 @@ BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(10
     flying = rand() % 2;
 }
 
-Animal::Animal(BaseAnimal * b) : base(b){
+Animal::Animal(BaseAnimal * b) : InventoryElement(Class_Animal),  base(b){
     init(b);
 }
 
@@ -241,8 +211,7 @@ BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(15))
 
 // FIXME split Plant to sertver/client side
 void Plant::init(BasePlant * b)
-{
-    c_id = Class_Plant;
+{    
     base = b;
     seedling_time = 7 + rand() % 14;
     growing_time = seedling_time + rand() % 150;
@@ -277,10 +246,9 @@ void Plant::init(BasePlant * b)
             planted = true;
             break;
     }
-    name = create_name(rand() % 3 + 5);
 }
 
-Plant::Plant(BasePlant * b) : base(b)
+Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)
 {
     init(b);
 }

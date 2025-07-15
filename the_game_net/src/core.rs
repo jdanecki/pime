@@ -174,7 +174,7 @@ impl<'de> serde::Deserialize<'de> for InventoryElement {
                 let location = seq
                     .next_element()?
                     .ok_or_else(|| serde::de::Error::invalid_length(3, &self))?;
-                Ok(unsafe { InventoryElement::new1(c_id, id, mass, location) })
+                Ok(unsafe { InventoryElement::new(c_id, id, mass, location) })
             }
         }
 

@@ -41,6 +41,7 @@ class ListElement
     virtual ~ListElement() {}
 };
 
+//FIXME - change this table to list
 class ElementsTable : public ListElement
 {
     int count;
@@ -77,6 +78,7 @@ class ElementsTable : public ListElement
     }
 };
 
+//FIXME - change this table to list
 class BaseTable : public ListElement
 {
     int count;
@@ -112,7 +114,8 @@ class BaseTable : public ListElement
     }
     Base * get(int i)
     {
-        return base[i];
+        //FIXME
+        return base[i % count];
     }
 };
 
