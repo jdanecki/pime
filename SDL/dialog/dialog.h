@@ -1,5 +1,5 @@
-#ifndef DIALOG_HPP
-#define DIALOG_HPP
+#ifndef DIALOG_H
+#define DIALOG_H
 
 #include <SDL2/SDL.h>
 #include <list>

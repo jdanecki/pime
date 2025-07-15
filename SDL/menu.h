@@ -20,28 +20,13 @@ enum menu_actions
     MENU_INV_LIGQUID,
     MENU_INV_GAS,
 
-    MENU_CRAFT_AXE_BLADE,
-    MENU_CRAFT_AXE_HANDLE,
-    MENU_CRAFT_AXE,
-
-    MENU_CRAFT_PICKAXE_BLADE,
-    MENU_CRAFT_PICKAXE_HANDLE,
-    MENU_CRAFT_PICKAXE,
-
-    MENU_CRAFT_KNIFE_BLADE,
-    MENU_CRAFT_KNIFE_HANDLE,
-    MENU_CRAFT_KNIFE,
-
-    MENU_CRAFT_WALL,
-    MENU_CRAFT_HUT,
-
     MENU_CATEGORIES,
 
     MENU_NPC_SAY,
     MENU_NPC_ASK,
 
     MENU_ITEM = 0x1000,
-    MENU_NPC_CONV  = 0x2000,
+    MENU_NPC_CONV = 0x2000,
 
 };
 
@@ -95,7 +80,6 @@ extern Menu * menu_main;
 extern Menu * menu_energy;
 extern Menu * menu_help;
 extern Menu * menu_help2;
-extern Menu * menu_crafting;
 extern Menu * current_menu;
 extern Menu * menu_npc;
 extern Menu * menu_dialog;

@@ -9,6 +9,7 @@
 
 #include "../core/player.h"
 #include "../core/tiles.h"
+#include "dialog/d_craft.h"
 #include "dialog/d_hotbar.h"
 #include "menu.h"
 #include "networking.h"
@@ -208,6 +209,8 @@ void key_pressed(int key)
         case SDLK_e:
             use_tile(player->map_x, player->map_y, player->x, player->y);
             break;
+        case SDLK_c:
+            d_craft.show ^= 1;
     }
 }
 
@@ -226,6 +229,11 @@ void mouse_pressed(SDL_MouseButtonEvent & event)
 
     SDL_GetMouseState(&x, &y);
     hotbar.press(x, y);
+    if (d_craft.show)
+    {
+        d_craft.press(x, y);
+        return;
+    }
 
     int tile_dungeon_size;
     int width = window_width - PANEL_WINDOW;

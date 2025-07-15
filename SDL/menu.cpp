@@ -24,7 +24,6 @@ Menu * current_menu;
 Menu * menu_inventory_categories;
 Menu * menu_inventory;
 Menu * menu_inventory_categories2;
-Menu * menu_crafting;
 Menu * menu_dev;
 Menu * menu_build;
 Menu * menu_npc;
@@ -48,7 +47,6 @@ Menu::~Menu()
     delete[] entries;
 }
 
-
 void Menu::add(const char * e, enum menu_actions a)
 {
     entries[added] = new Menu_entry(e, a, 0, nullptr, nullptr);
@@ -69,8 +67,8 @@ void Menu::add(const char * e, enum menu_actions a, SDL_Texture * t, int index, 
 }
 
 void Menu::add(const char * e, enum Npc_say a, Sentence * s, InventoryElement * p_el)
-{    
-    enum menu_actions conv=(enum menu_actions)((int)MENU_NPC_CONV + (int) a);
+{
+    enum menu_actions conv = (enum menu_actions)((int)MENU_NPC_CONV + (int)a);
     entries[added] = new Menu_entry(e, conv, s, p_el);
     added++;
 }
@@ -129,7 +127,7 @@ void Menu::show()
     int menu_opt_size = game_size / 30;
     int mody;
     int mody2;
-   // printf("options = %d\n", options);
+    // printf("options = %d\n", options);
 
     if (options % 2)
     {
@@ -153,26 +151,26 @@ void Menu::show()
     int mody4 = mody + ((menu_pos + 1) * menu_opt_size);
 
     // THIS IS THE SELECT
-    //if (options < 10)
+    // if (options < 10)
     {
         draw_rectangle(modx, mody3, modx2 - modx, mody4 - mody3, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255}, SDL_Color{}, SDL_Color{});
         draw_rectangle(modx, mody3, modx2 - modx, mody4 - mody3, SDL_Color{}, SDL_Color{}, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255});
     }
-   /* else
-    {
-        if (options % 2)
-        {
-            draw_rectangle(modx, game_size / 2 - menu_opt_size / 2, modx2 - modx, menu_opt_size, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255}, SDL_Color{}, SDL_Color{});
-            draw_rectangle(modx, game_size / 2 - menu_opt_size / 2, modx2 - modx, menu_opt_size, SDL_Color{}, SDL_Color{}, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255});
-        }
-        else
-        {
-            draw_rectangle(modx, game_size / 2, modx2 - modx, menu_opt_size, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255}, SDL_Color{}, SDL_Color{});
-            draw_rectangle(modx, game_size / 2, modx2 - modx, menu_opt_size, SDL_Color{}, SDL_Color{}, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255});
-        }
-    }
-*/
-  //  if (options < 10)
+    /* else
+     {
+         if (options % 2)
+         {
+             draw_rectangle(modx, game_size / 2 - menu_opt_size / 2, modx2 - modx, menu_opt_size, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255}, SDL_Color{}, SDL_Color{});
+             draw_rectangle(modx, game_size / 2 - menu_opt_size / 2, modx2 - modx, menu_opt_size, SDL_Color{}, SDL_Color{}, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255});
+         }
+         else
+         {
+             draw_rectangle(modx, game_size / 2, modx2 - modx, menu_opt_size, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255}, SDL_Color{}, SDL_Color{});
+             draw_rectangle(modx, game_size / 2, modx2 - modx, menu_opt_size, SDL_Color{}, SDL_Color{}, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255});
+         }
+     }
+ */
+    //  if (options < 10)
     {
         SDL_Rect rect3 = {modx, mody - menu_opt_size, modx2 - modx, mody4 - mody3};
         SDL_SetRenderDrawColor(renderer, 150, 0, 150, 100);
@@ -191,20 +189,20 @@ void Menu::show()
         SDL_Rect rect;
         int text_y = mody + i * menu_opt_size;
         int text_x = modx;
-     //   if (options < 10)
+        //   if (options < 10)
         {
             rect.x = modx;
             rect.y = mody + i * menu_opt_size;
             rect.w = menu_opt_size;
             rect.h = menu_opt_size;
         }
-       /* else
-        {
-            rect.x = modx;
-            rect.y = mody + (i - menu_pos + options / 2) * menu_opt_size;
-            rect.w = menu_opt_size;
-            rect.h = menu_opt_size;
-        }*/
+        /* else
+         {
+             rect.x = modx;
+             rect.y = mody + (i - menu_pos + options / 2) * menu_opt_size;
+             rect.w = menu_opt_size;
+             rect.h = menu_opt_size;
+         }*/
         if (entries[i]->texture)
         {
             SDL_RenderCopy(renderer, entries[i]->texture, NULL, &rect);
@@ -217,7 +215,7 @@ void Menu::show()
             // SDL_RenderCopy(renderer, _texture, NULL, &rect);
             // text_x+=menu_opt_size;
         }
-      //  if (options >= 10)
+        //  if (options >= 10)
         //    text_y = mody + (i - menu_pos + options / 2) * menu_opt_size;
 
         if (entries[i])
@@ -250,13 +248,13 @@ Menu_entry::Menu_entry(const char * e, menu_actions a, Sentence * s, InventoryEl
     action = a;
     el = _el;
     sentence = s;
-   /* if (el)
-    {
-        entry = new char[64];
-        sprintf(entry, "%s", e);
-        dynamic_entry = true;
-    }
-    else*/
+    /* if (el)
+     {
+         entry = new char[64];
+         sprintf(entry, "%s", e);
+         dynamic_entry = true;
+     }
+     else*/
     {
         entry = (char *)e;
         dynamic_entry = false;
@@ -290,7 +288,6 @@ void create_menus()
     //   menu_help->add("minus - deselect hotbar", MENU_CANCEL);
     menu_help->add("esc - main menu", MENU_CANCEL);
     //   menu_help->add("l - devmenu", MENU_CANCEL);
-    menu_help->add("c - crafting", MENU_CANCEL);
     menu_help->add("i - inventory", MENU_CANCEL);
     //  menu_help->add("v - clear statusline", MENU_CANCEL);
     //   menu_help->add("g - terrain break", MENU_CANCEL);
@@ -314,25 +311,6 @@ void create_menus()
     menu_inventory_categories->add("Gas form", MENU_INV_GAS, Form_gas);
     menu_inventory_categories->add("Cancel", MENU_CANCEL);
 
-    menu_crafting = new Menu("Crafting", 12);
-
-    menu_crafting->add("Axe blade (1 ing.)", MENU_CRAFT_AXE_BLADE);
-    menu_crafting->add("Axe handle (1 ing.)", MENU_CRAFT_AXE_HANDLE);
-    menu_crafting->add("Axe (2 ing.)", MENU_CRAFT_AXE);
-
-    menu_crafting->add("Pickaxe blade (1 ing.)", MENU_CRAFT_PICKAXE_BLADE);
-    menu_crafting->add("Pickaxe handle (1 ing.)", MENU_CRAFT_PICKAXE_HANDLE);
-    menu_crafting->add("Pickaxe (2 ing.)", MENU_CRAFT_PICKAXE);
-
-    menu_crafting->add("Wall (1 ing.)", MENU_CRAFT_WALL);
-    menu_crafting->add("Hut (2 ing.)", MENU_CRAFT_HUT);
-
-    menu_crafting->add("Knife blade (1 ing.)", MENU_CRAFT_KNIFE_BLADE);
-    menu_crafting->add("Knife handle (1 ing.)", MENU_CRAFT_KNIFE_HANDLE);
-    menu_crafting->add("Knife (2 ing.)", MENU_CRAFT_KNIFE);
-
-    menu_crafting->add("Cancel", MENU_CANCEL);
-
     menu_npc = new Menu("NPC", 3);
     menu_npc->add("Talk to NPC", MENU_NPC_SAY);
     menu_npc->add("Ask NPC", MENU_NPC_ASK);
@@ -342,7 +320,7 @@ void create_menus()
 Menu * create_inv_category_menu(enum Form f)
 {
     int count = 0;
-    InventoryElement ** elements_with_form = NULL; //player->inventory->find_form(f, &count);
+    InventoryElement ** elements_with_form = NULL; // player->inventory->find_form(f, &count);
     if (!count)
         return nullptr;
 
@@ -427,14 +405,6 @@ int menu_interact(int key)
 
             return 1;
         }
-        case SDLK_c:
-        {
-            if (!current_menu)
-                current_menu = menu_crafting;
-            else if (current_menu == menu_crafting)
-                current_menu = NULL;
-            return 1;
-        }
         case SDLK_RETURN:
         case SDLK_e:
         {
@@ -509,116 +479,14 @@ int Menu::handle_item(int i)
     return 1;
 }
 
-bool craft2elements(Product_id what)
-{
-    InventoryElement *el1 = nullptr, *el2 = nullptr;
-    int i1, i2;
-    for (int i = 0; i < 10; i++)
-    {
-        if (player->craftbar[i])
-        {
-            if (!el1)
-            {
-                el1 = player->hotbar[i];
-                i1 = i;
-            }
-            else
-            {
-                el2 = player->hotbar[i];
-                i2 = i;
-                break;
-            }
-        }
-    }
-    if (el1 && el2)
-    {
-        size_t ingredients[2] = {el1->uid, el2->uid};
-        send_packet_craft(client, ING_NUM + what, 2, ingredients);
-        player->craftbar[i1] = 0;
-        player->craftbar[i2] = 0;
-        return true;
-    }
-    return false;
-}
-
-int craft(menu_actions a)
-{
-    //    InventoryElement * el = NULL;
-
-    switch (a)
-    {
-            // FIXME
-            /*
-                    case MENU_CRAFT_KNIFE_BLADE: el = craft_knife_blade(); break;
-                    case MENU_CRAFT_KNIFE_HANDLE: el = craft_knife_handle(); break;
-                    case MENU_CRAFT_KNIFE: el = craft_knife(); break;
-            */
-        case MENU_CRAFT_AXE_BLADE:
-            send_packet_craft(client, ING_AXE_BLADE, 1, &player->hotbar[active_hotbar]->uid);
-            goto sent;
-
-        case MENU_CRAFT_AXE_HANDLE:
-            send_packet_craft(client, ING_AXE_HANDLE, 1, &player->hotbar[active_hotbar]->uid);
-            goto sent;
-
-        case MENU_CRAFT_AXE:
-            if (craft2elements(PROD_AXE))
-                goto sent;
-            break;
-
-        case MENU_CRAFT_PICKAXE_BLADE:
-            send_packet_craft(client, ING_PICKAXE_BLADE, 1, &player->hotbar[active_hotbar]->uid);
-            goto sent;
-
-        case MENU_CRAFT_PICKAXE_HANDLE:
-            send_packet_craft(client, ING_PICKAXE_HANDLE, 1, &player->hotbar[active_hotbar]->uid);
-            goto sent;
-
-        case MENU_CRAFT_PICKAXE:
-            if (craft2elements(PROD_PICKAXE))
-                goto sent;
-            break;
-
-        case MENU_CRAFT_KNIFE_BLADE:
-            send_packet_craft(client, ING_KNIFE_BLADE, 1, &player->hotbar[active_hotbar]->uid);
-            goto sent;
-
-        case MENU_CRAFT_KNIFE_HANDLE:
-            send_packet_craft(client, ING_KNIFE_HANDLE, 1, &player->hotbar[active_hotbar]->uid);
-            goto sent;
-
-        case MENU_CRAFT_KNIFE:
-            if (craft2elements(PROD_KNIFE))
-                goto sent;
-            break;
-
-
-        case MENU_CRAFT_HUT:
-            if (craft2elements(PROD_HUT))
-                goto sent;
-            break;
-
-        case MENU_CRAFT_WALL:
-            send_packet_craft(client, ING_WALL, 1, &player->hotbar[active_hotbar]->uid);
-            goto sent;
-
-        default:
-            break;
-    }
-    return 0;
-
-sent:
-    sprintf(status_line, "Starting crafting");
-    return 1;
-}
-
 int Menu::interact()
 {
     menu_actions a = entries[menu_pos]->action;
 
     if (a & MENU_ITEM)
         return menu_inventory->handle_item(a & ~MENU_ITEM);
-    if (a & MENU_NPC_CONV) {
+    if (a & MENU_NPC_CONV)
+    {
         return player->conversation(current_npc, menu_dialog->get_sentence(), menu_dialog->get_el());
     }
 
@@ -629,15 +497,15 @@ int Menu::interact()
         { // FIXME don't use elements'id but c_id and type
             // create_inv_menu((Item_id)(menu_inventory_categories2->get_val()));
             return 0;
-        }                       
-/*
-        case MENU_MUSIC:
-            current_menu=menu_music;
-            return 0;
-        case MENU_REGAIN:
-            player.hunger+=100;
-            player.thirst+=100;
-            return 0;*/
+        }
+            /*
+                    case MENU_MUSIC:
+                        current_menu=menu_music;
+                        return 0;
+                    case MENU_REGAIN:
+                        player.hunger+=100;
+                        player.thirst+=100;
+                        return 0;*/
         case MENU_SAVE:
             save(1);
             break;
@@ -674,27 +542,9 @@ int Menu::interact()
             printf("%d\n%d\n", Mix_Volume(1, -1), Mix_Volume(0, -1));
             return 0;
 
-        case MENU_CRAFT_AXE_BLADE:
-        case MENU_CRAFT_AXE_HANDLE:
-        case MENU_CRAFT_AXE:
-
-        case MENU_CRAFT_PICKAXE_BLADE:
-        case MENU_CRAFT_PICKAXE_HANDLE:
-        case MENU_CRAFT_PICKAXE:
-
-        case MENU_CRAFT_KNIFE:
-        case MENU_CRAFT_KNIFE_BLADE:
-        case MENU_CRAFT_KNIFE_HANDLE:
-
-        case MENU_CRAFT_WALL:
-        case MENU_CRAFT_HUT:
-            return craft(a);
-
         case MENU_NPC_SAY:
         case MENU_NPC_ASK:
             return npc(a);
-
-
 
         default:
             return 1;
