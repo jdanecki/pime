@@ -76,16 +76,18 @@ DCraft::DCraft() : Dialog(0, 0, 500, 500, {125, 125, 125, 125}), ingredients(140
 
     for (int i = 0; i < ING_NUM; i++)
     {
-        int x = i % 6 * 50;
-        int y = i / 6 * 50;
+        int x = i % 6 * 54;
+        int y = i / 6 * 54;
         this->ingredients.add_button(i, x, y, 50, 50, 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", &button_craft_ing);
-        this->ingredients.add_image(i, x, y, 50, 50);
+        this->ingredients.add_image(i, x + 2, y + 2, 46, 46);
     }
 
     for (int i = 0; i < PROD_ELEMENTS; i++)
     {
-        this->products.add_button(i, i * 50, 0, 50, 50, 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", &button_craft_prod);
-        this->products.add_image(i, i * 50, 0, 50, 50);
+        int x = i % 6 * 54;
+        int y = i / 6 * 54;
+        this->products.add_button(i, x, y, 50, 50, 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", &button_craft_prod);
+        this->products.add_image(i, x + 2, y + 2, 46, 46);
     }
 }
 
