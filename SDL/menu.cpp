@@ -124,7 +124,7 @@ void Menu::show()
     else
         game_size = window_height;
 
-    int menu_opt_size = game_size / 30;
+    int menu_opt_size = game_size / (options + 3);
     int mody;
     int mody2;
     // printf("options = %d\n", options);
@@ -278,7 +278,7 @@ void create_menus()
     menu_main->add("Change music volume", MENU_MUSIC);
     menu_main->add("Cancel", MENU_CANCEL);
 
-    menu_help = new Menu("Help 1", 12);
+    menu_help = new Menu("Help 1", 11);
     menu_help->add("; - show item info", MENU_CANCEL);
     menu_help->add("f11 - resize", MENU_CANCEL);
     menu_help->add("1-9,0 - hotbar", MENU_CANCEL);
