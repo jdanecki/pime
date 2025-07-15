@@ -118,10 +118,10 @@ pub extern "C" fn network_tick(client: &NetClient) {
                     );
                 },
                 core::PACKET_OBJECT_CREATE => unsafe {
-                    println!("value {:?}", &value[1..amt]);
+                    // println!("value {:?}", &value[1..amt]);
                     let obj = bincode::deserialize(&value[1..amt])
                         .expect("Failed to create item from data");
-                    println!("{:?}", obj);
+                    // println!("{:?}", obj);
                     events::create_object(&obj);
                     // events::create_object(
                     //     bincode::deserialize(&value[1..amt])

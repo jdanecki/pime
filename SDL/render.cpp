@@ -98,7 +98,7 @@ void draw_texts()
                 char buf[64];
                 for (int i = 0; i < count; i++)
                 {
-                    sprintf(buf, "%s: %u", props[i]->name, props[i]->value);
+                    sprintf(buf, "%s: %u", props[i]->name.str, props[i]->value);
                     write_text(tx, ty, buf, White, 15, 30);
                     ty += 25;
                 }

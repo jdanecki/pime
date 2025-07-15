@@ -1,6 +1,8 @@
 #include "properties.h"
 #include <stdlib.h>
 
+SerializableCString::SerializableCString(const char* ptr) : str(ptr) {}
+
 Edible::Edible()
 {
     caloric = new Property("caloric", rand() % 1000);

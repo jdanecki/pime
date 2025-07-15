@@ -169,18 +169,18 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
 
 char * Player::get_el_description(InventoryElement * el)
 {
-    // FIXME
+    // TODO jacek check if item known
     // if (el->crafted)
     //     return el->get_description();
 
     Class_id b = el->get_base_cid();
     ElementsTable * known_list = dynamic_cast<ElementsTable *>(known_elements->find(&b));
-    bool known = known_list->is_known(el->get_id());
+    // bool known = known_list->is_known(el->get_id());
 
-    if (known)
+    // if (known)
         return el->get_description();
-    else
-        return nullptr;
+    // else
+    //     return nullptr;
 }
 
 void Player::set_known(InventoryElement * el)

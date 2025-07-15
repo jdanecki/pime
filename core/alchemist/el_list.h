@@ -149,7 +149,7 @@ class InvList : public ElementsList
     //    bool virtual find_at_check(ListElement *el, void * pos) { return false; }
     // InventoryElement ** find_form(enum Form f, int * count);
 
-    // FIXME
+    // FIXME jacek
     // InventoryElement ** find_id(enum Item_id id, int * count);
 
     InventoryElement * add(InventoryElement * el);

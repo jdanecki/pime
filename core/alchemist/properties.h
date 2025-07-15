@@ -3,19 +3,26 @@
 
 #include <cstdio>
 
+/// <div rustbindgen nodebug></div>
+class SerializableCString
+{
+  public:
+      const char* str;
+      SerializableCString(const char* ptr);
+};
+
 class Property
 {
   public:
-    const char * name;
+    SerializableCString name;
     unsigned int value;
-    Property(const char * n, unsigned int v)
+    Property(const char * n, unsigned int v) : name(n)
     {
-        name = n;
         value = v;
     }
     void show()
     {
-        printf("%s = %u\n", name, value);
+        printf("%s = %u\n", name.str, value);
     }
 };
 

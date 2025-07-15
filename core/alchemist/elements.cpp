@@ -33,21 +33,24 @@ const char * object_names[] = {"wall"};
 const char * Plant_phase_name[] = {"Seed", "Seedling", "Growing", "Flowers", "Fruits"};
 const char * Class_names[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Being", "Plant", "Animal", "Player", "Npc"};
 
-Base::Base(int index, Class_id c)
+Base::Base(int index, Class_id c, const char* name) : name(name)
 {
     id = index;
-    name = nullptr;
     c_id = c;
 }
 
 void Base::show(bool details)
 {
-    printf("Base name=%s id=%d \n", name, id);
+    printf("Base name=%s id=%d \n", get_name(), id);
+}
+
+const char* Base::get_name() 
+{
+    return name.str;
 }
     
-BaseElement::BaseElement(Form f, Color color, int index) : Base(index, Class_BaseElement), form(f), color(color)
+BaseElement::BaseElement(Form f, Color color, int index) : Base(index, Class_BaseElement, create_name(5-f)), form(f), color(color)
 {
-    name = create_name(5 - form);
 }
 
 template<typename T>
@@ -190,13 +193,12 @@ void Animal::init(BaseAnimal * b)
     // can_talk = false;
 }
 
-BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal)
+BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(10))
 {
     id = index;
     carnivorous = rand() % 2;
     swimming = rand() % 2;
     flying = rand() % 2;
-    name = create_name(10);
 }
 
 Animal::Animal(BaseAnimal * b) : base(b){
@@ -217,11 +219,10 @@ Animal::Animal(BaseAnimal * b) : base(b){
 //     init(dynamic_cast<BaseAnimal *>(table->get(i)));
 // }
 
-BasePlant::BasePlant(int index) : Base(index, Class_BasePlant)
+BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(15))
 {
     flowers = rand() % 2;
     leaves = rand() % 2;
-    name = create_name(15);
 }
 
 // Plant::Plant()

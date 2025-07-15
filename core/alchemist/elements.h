@@ -32,11 +32,12 @@ extern const char * Class_names[];
 class Base
 {
   public:
-    const char * name;
-    int id; // index in BaseTable
     Class_id c_id;
-    Base(int index, Class_id c);
+    int id; // index in BaseTable
+    SerializableCString name;
+    Base(int index, Class_id c, const char* name);
     virtual void show(bool details = true);
+    const char* get_name();
 };
 
 struct Color
@@ -216,7 +217,7 @@ class Element : public InventoryElement
     }
     const char * get_name() override
     {
-        return base.get()->name;
+        return base.get()->get_name();
     }
     const char * get_form_name()
     {
@@ -300,7 +301,7 @@ class Ingredient : public InventoryElement
     char * get_description()
     {
         char * buf = new char[128];
-        sprintf(buf, "%s: (%s)", get_class_name(), get_name());
+        sprintf(buf, "%s: (%s)", get_class_name(), Ingredient_name[id]);
         return buf;
     }
 };
@@ -339,7 +340,7 @@ class Product : public InventoryElement
     char * get_description() override
     {
         char * buf = new char[128];
-        sprintf(buf, "%s: (%s)", get_class_name(), get_name());
+        sprintf(buf, "%s: (%s)", get_class_name(), Product_name[id]);
         return buf;
     }
     bool use(InventoryElement * object) override
@@ -431,6 +432,12 @@ class Animal : public InventoryElement
         printf("using %s on %s, do you want to kill it?\n", object->get_name(), get_name());
         return false;
     }
+    char * get_description() override
+    {
+        char * buf = new char[128];
+        sprintf(buf, "%s: (%s)", get_class_name(), base.get()->get_name());
+        return buf;
+    }
 };
 
 enum Plant_phase
@@ -503,6 +510,12 @@ class Plant : public InventoryElement
     {
         printf("using %s on %s, are you sure?\n", object->get_name(), get_name());
         return false;
+    }
+    char * get_description() override
+    {
+        char * buf = new char[128];
+        sprintf(buf, "%s: (%s)", get_class_name(), base.get()->get_name());
+        return buf;
     }
 };
 

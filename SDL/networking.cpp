@@ -84,12 +84,12 @@ InventoryElement * el_from_data(const ObjectData* data)
             el = new ElementSDL(data->element.data);
 
             break;
-        // case ObjectData::Tag::Ingredient:
-        //     el = new IngredientSDL(data.ingredient.data);
-        //     break;
-        // case ObjectData::Tag::Product:
-        //     el = new ProductSDL(data.product.data);
-        //     break;
+        case ObjectData::Tag::Ingredient:
+            el = new IngredientSDL(data->ingredient.data);
+            break;
+        case ObjectData::Tag::Product:
+            el = new ProductSDL(data->product.data);
+            break;
         case ObjectData::Tag::Plant:
         {
             el = new PlantSDL(data->plant.data);

@@ -19,6 +19,7 @@ impl ParseCallbacks for MacroCallback {
             "Animal",
             "Product",
             "Ingredient",
+            "Property",
         ];
         let co_cl = vec![
             "InventoryElement",

@@ -152,7 +152,7 @@ void ElementsList::remove(ListElement * el)
     }
 }
 
-//FIXME
+//FIXME jacek is this needed?
 // InventoryElement ** InvList::find_form(enum Form f, int * count)
 // {
 //     ListElement * cur = head;
@@ -178,7 +178,7 @@ void ElementsList::remove(ListElement * el)
 //         return a;
 //     }
 // }
-// FIXME
+// FIXME jacek
 #if 0
 InventoryElement ** InvList::find_id(enum Item_id id, int * count)
 {

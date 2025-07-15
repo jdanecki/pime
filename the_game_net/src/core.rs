@@ -3,7 +3,7 @@ include!(concat!(env!("OUT_DIR"), "/core_bindings.rs"));
 
 include!("../../core/alchemist/item_location.rs");
 
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
 use std::fmt;
 
 use serde::de::{SeqAccess, Visitor};
@@ -19,6 +19,12 @@ impl<T> SerializablePointer<T> {
             _phantom_0: std::marker::PhantomData,
             ptr: p,
         }
+    }
+}
+
+impl std::fmt::Debug for SerializableCString {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(unsafe { CStr::from_ptr(self.str_).to_str().unwrap() })
     }
 }
 
@@ -46,11 +52,62 @@ impl<'de> serde::Deserialize<'de> for Base {
                 let id = seq
                     .next_element()?
                     .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
-                Ok(unsafe { Base::new(id, c_id) })
+                let name: &[u8] = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(2, &self))?;
+                let name =
+                    CString::from_vec_with_nul(name.to_vec()).expect("BAD property name received");
+                Ok(unsafe { Base::new(id, c_id, name.into_raw()) })
             }
         }
 
-        deserializer.deserialize_tuple(2, BaseVisitor)
+        deserializer.deserialize_tuple(3, BaseVisitor)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for SerializableCString {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        // struct Vis;
+
+        // impl<'de> Visitor<'de> for Vis {
+        //     type Value = SerializableCString;
+
+        //     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        //         formatter.write_str("struct SerializableCString")
+        //     }
+
+        //     fn visit_seq<V>(self, mut seq: V) -> Result<SerializableCString, V::Error>
+        //     where
+        //         V: SeqAccess<'de>,
+        //     {
+        //         let c_id = seq
+        //             .next_element()?
+        //             .ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
+        //         let id = seq
+        //             .next_element()?
+        //             .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
+        //         let name: &[u8] = seq
+        //             .next_element()?
+        //             .ok_or_else(|| serde::de::Error::invalid_length(2, &self))?;
+        //         let name =
+        //             CString::from_vec_with_nul(name.to_vec()).expect("BAD property name received");
+        //         // Ok(unsafe { Base::new(id, c_id, name.into_raw()) })
+
+        //         serde::de::Error::invalid_length(2, &self)
+        //     }
+        // }
+        // deserializer.deserialize_byte_buf()
+        let name: &[u8] = Deserialize::deserialize(deserializer)?;
+        Ok(unsafe {
+            SerializableCString::new(
+                CString::from_vec_with_nul(name.to_vec())
+                    .unwrap()
+                    .into_raw(),
+            )
+        })
     }
 }
 
@@ -125,48 +182,48 @@ impl<'de> serde::Deserialize<'de> for InventoryElement {
     }
 }
 
-impl<'de> serde::Deserialize<'de> for Property {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        struct PropertyVisitor;
+// impl<'de> serde::Deserialize<'de> for Property {
+//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+//     where
+//         D: Deserializer<'de>,
+//     {
+//         struct PropertyVisitor;
 
-        impl<'de> Visitor<'de> for PropertyVisitor {
-            type Value = Property;
+//         impl<'de> Visitor<'de> for PropertyVisitor {
+//             type Value = Property;
 
-            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("struct Property")
-            }
+//             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+//                 formatter.write_str("struct Property")
+//             }
 
-            fn visit_seq<V>(self, mut seq: V) -> Result<Property, V::Error>
-            where
-                V: SeqAccess<'de>,
-            {
-                let name: &[u8] = seq
-                    .next_element()?
-                    .ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
-                let value = seq
-                    .next_element()?
-                    .ok_or_else(|| serde::de::Error::invalid_length(123, &self))?;
-                let name =
-                    CString::from_vec_with_nul(name.to_vec()).expect("BAD property name received");
+//             fn visit_seq<V>(self, mut seq: V) -> Result<Property, V::Error>
+//             where
+//                 V: SeqAccess<'de>,
+//             {
+//                 let name: &[u8] = seq
+//                     .next_element()?
+//                     .ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
+//                 let value = seq
+//                     .next_element()?
+//                     .ok_or_else(|| serde::de::Error::invalid_length(123, &self))?;
+//                 let name =
+//                     CString::from_vec_with_nul(name.to_vec()).expect("BAD property name received");
 
-                Ok(unsafe {
-                    Property {
-                        name: name.into_raw(),
-                        value,
-                    }
-                })
-            }
-        }
+//                 Ok(unsafe {
+//                     Property {
+//                         name: name.into_raw(),
+//                         value,
+//                     }
+//                 })
+//             }
+//         }
 
-        deserializer.deserialize_tuple(2, PropertyVisitor)
+//         deserializer.deserialize_tuple(2, PropertyVisitor)
 
-        // let value = u32::deserialize(deserializer)?;
-        // Ok(Property {
-        //     name: std::ptr::null(),
-        //     value,
-        // })
-    }
-}
+//         // let value = u32::deserialize(deserializer)?;
+//         // Ok(Property {
+//         //     name: std::ptr::null(),
+//         //     value,
+//         // })
+//     }
+// }
