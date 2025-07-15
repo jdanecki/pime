@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <cstdio>
 
-Axe::Axe(InventoryElement * el1, InventoryElement * el2) : Product(el1, el2, PROD_AXE, Form_solid)
+Axe::Axe(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_AXE, Form_solid)
 {
 }
 

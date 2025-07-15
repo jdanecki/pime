@@ -4,6 +4,7 @@ use std::hash::Hash;
 use std::rc::Rc;
 
 use crate::core;
+use crate::types::*;
 use crate::SEED;
 use rand::prelude::*;
 
@@ -17,6 +18,20 @@ pub fn get_world_data() -> Vec<u8> {
     WORLD
         .with_borrow(|world| bincode::serialize(world))
         .unwrap()
+}
+
+pub fn show_world() {
+    WORLD.with_borrow(|world| {
+        for t in &world.terrains {
+            println!("{:#?}", t.base._base);
+        }
+        for p in &world.plants {
+            println!("{:#?}", p.get_base());
+        }
+        for a in &world.animals {
+            println!("{:#?}", a.get_base());
+        }
+    });
 }
 
 #[no_mangle]
@@ -38,7 +53,7 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
             for y in 0..core::CHUNK_SIZE as usize {
                 for x in 0..core::CHUNK_SIZE as usize {
                     chunk.table[y][x] = core::tile {
-                        tile: region.terrain_type.id as i32,
+                        tile: region.terrain_type.get_id() as i32,
                     };
                 }
             }
@@ -46,9 +61,10 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
                 // TODO remove +1 for each object
                 let prob = num * 10.0 + 1.0;
                 do_times(prob, || {
-                    chunk.add_object1(core::create_element(
-                        &rock.base as *const core::BaseElement as *mut core::BaseElement,
-                    ) as *mut core::InventoryElement);
+                    chunk.add_object1(core::create_element(rock.get_base()
+                        as *const core::BaseElementServer
+                        as *mut core::BaseElement)
+                        as *mut core::InventoryElement);
                 })
             }
             for (plant, num) in region.active_plants.iter() {
@@ -56,7 +72,7 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
                 println!("plant {prob}");
                 do_times(prob, || {
                     chunk.add_object1(core::create_plant(
-                        &plant.base as *const core::BasePlant as *mut core::BasePlant,
+                        plant.get_base() as *const core::BasePlant as *mut core::BasePlant
                     ) as *mut core::InventoryElement);
                 });
             }
@@ -64,9 +80,10 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
                 let prob = num / region.size as f32 + 1.0;
                 println!("animal {prob}");
                 do_times(prob, || {
-                    chunk.add_object1(core::create_animal(
-                        &animal.base as *const core::BaseAnimal as *mut core::BaseAnimal,
-                    ) as *mut core::InventoryElement);
+                    chunk.add_object1(core::create_animal(animal.get_base()
+                        as *const core::BaseAnimal
+                        as *mut core::BaseAnimal)
+                        as *mut core::InventoryElement);
                 })
             }
             core::world_table[map_y as usize][map_x as usize] = Box::into_raw(chunk);
@@ -91,11 +108,12 @@ where
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize)]
 struct World {
-    // terrains: Vec<Rc<TerrainType>>, maybe it will be useful in the future
+    terrains: Vec<Rc<TerrainType>>,
     plants: Vec<Rc<PlantType>>,
     animals: Vec<Rc<AnimalType>>,
+    #[serde(skip)]
     regions: Vec<Region>,
 }
 
@@ -106,7 +124,7 @@ impl World {
         let animals = create_animals(&plants);
         let regions = create_regions(&terrains, &plants, &animals);
         World {
-            // terrains,
+            terrains,
             plants,
             animals,
             regions,
@@ -130,7 +148,7 @@ pub fn generate() {
     println!("{:#?}", world.regions[0]);
     simulate(&mut world.regions, &mut world.plants, &mut world.animals);
     println!("{:#?}", world.regions[0]);
-    for _ in 0..100 {
+    for _ in 0..10 {
         simulate(&mut world.regions, &mut world.plants, &mut world.animals);
         // for r in regions.iter() {
         //     print!(
@@ -242,7 +260,7 @@ fn simulate(
                 let (best_plant, _) = r
                     .active_plants
                     .iter()
-                    .max_by(|(plant, num), (plant2, num2)| num.partial_cmp(num2).unwrap())
+                    .max_by(|(_plant, num), (_plant2, num2)| num.partial_cmp(num2).unwrap())
                     .unwrap();
                 if let Some(new_animal) = animals
                     .iter()
@@ -394,14 +412,6 @@ impl Coords {
         (self.x - other.x) * (self.x - other.x) + (self.y - other.y) * (self.y - other.y)
     }
 }
-
-#[repr(C)]
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-struct TerrainType {
-    id: u32,
-    base: core::BaseElement,
-}
-
 /*impl serde::Serialize for core::BaseElement {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -422,176 +432,7 @@ struct TerrainType {
 //     }
 // }
 
-impl PartialEq for TerrainType {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-    }
-}
-impl Eq for TerrainType {}
-
-impl Hash for TerrainType {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
-    }
-}
-
-impl TerrainType {
-    fn new(id: u32) -> TerrainType {
-        TerrainType {
-            id,
-            base: unsafe { core::BaseElement::new(core::Form_Form_solid, id as i32) },
-        }
-    }
-}
-
-trait Food: std::fmt::Debug {}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-struct PlantType {
-    pub id: u32,
-    pub possible_ground: HashMap<Rc<TerrainType>, f32>,
-    pub size: u32,
-    //pub sun_required: u32,
-    pub growth_speed: f32,
-    // TODO
-    // overcrowd immunity
-    base: core::BasePlant,
-}
-
-impl PlantType {
-    fn new(id: u32, terrains: &Vec<Rc<TerrainType>>) -> PlantType {
-        let n = rand::random_range(terrains.len() / 2..terrains.len() + 1);
-        let mut possible_ground = HashMap::new();
-        possible_ground.insert(Rc::clone(terrains.choose(&mut rand::rng()).unwrap()), 1.0);
-        for _ in 1..n {
-            let choice = terrains.choose(&mut rand::rng()).unwrap();
-            if !possible_ground.contains_key(&**choice) {
-                possible_ground.insert(Rc::clone(choice), rand::random_range(0.1..1.2));
-            }
-        }
-        PlantType {
-            id,
-            possible_ground,
-            size: rand::random_range(1..3),
-            growth_speed: rand::random_range(0.1..0.4),
-            base: unsafe { core::BasePlant::new(id as i32) },
-        }
-    }
-}
-
-impl PartialEq for PlantType {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-    }
-}
-
-impl Eq for PlantType {}
-
-impl std::hash::Hash for PlantType {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
-    }
-}
-
-impl Food for PlantType {}
-
-#[derive(serde::Serialize, serde::Deserialize)]
-struct AnimalType {
-    pub id: u32,
-    pub possible_food_plant: Vec<(Rc<PlantType>, f32)>,
-    pub possible_food_animal: Vec<(Rc<AnimalType>, f32)>,
-    pub required_food: f32,
-    pub speed: f32,
-    base: core::BaseAnimal,
-}
-
-impl Food for AnimalType {}
-
-impl AnimalType {
-    fn new(id: u32, plants: &Vec<Rc<PlantType>>, animals: &Vec<Rc<AnimalType>>) -> AnimalType {
-        let food_num = rand::random_range(1..5);
-        let mut possible_food_plant: Vec<(Rc<PlantType>, f32)> = Vec::new();
-        let mut possible_food_animal: Vec<(Rc<AnimalType>, f32)> = Vec::new();
-        if animals.len() > 0 {
-            let animal_food = rand::random_range(0..animals.len().min(food_num));
-            for food in plants.choose_multiple(&mut rand::rng(), food_num - animal_food) {
-                possible_food_plant.push((Rc::clone(food), rand::random_range(0.7..1.5)));
-            }
-            for food in animals.choose_multiple(&mut rand::rng(), animal_food) {
-                possible_food_animal.push((Rc::clone(food), rand::random_range(0.7..1.5)));
-            }
-        } else {
-            for food in plants.choose_multiple(&mut rand::rng(), food_num) {
-                possible_food_plant.push((Rc::clone(food), rand::random_range(0.7..1.5)));
-            }
-        }
-        let speed = rand::random_range(16.0..64.0);
-        let required_food = speed / 64.0 * speed / 64.0;
-        AnimalType {
-            id,
-            possible_food_plant,
-            possible_food_animal,
-            required_food,
-            speed,
-            base: unsafe { core::BaseAnimal::new(id as i32) },
-        }
-    }
-    fn new_eating(
-        id: u32,
-        plant: &Rc<PlantType>,
-        plants: &Vec<Rc<PlantType>>,
-        animals: &Vec<Rc<AnimalType>>,
-    ) -> AnimalType {
-        let mut animal = AnimalType::new(id, plants, animals);
-        if !animal.possible_food_plant.iter().any(|(p, _)| p == plant) {
-            animal
-                .possible_food_plant
-                .push((Rc::clone(plant), rand::random_range(0.7..1.5)));
-        }
-        animal
-    }
-    fn can_eat_plant(&self, plant: &Rc<PlantType>) -> bool {
-        for (p, _) in self.possible_food_plant.iter() {
-            if p == plant {
-                return true;
-            }
-        }
-        false
-    }
-}
-
-impl std::fmt::Debug for AnimalType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("AnimalType")
-            .field("id", &self.id)
-            .field("speed", &self.speed)
-            .field("required food", &self.required_food);
-        f.write_fmt(format_args!("Food:\n"))?;
-        for (plant, multiplier) in self.possible_food_plant.iter() {
-            f.write_fmt(format_args!("    Plant {}: {}\n", plant.id, multiplier))?;
-        }
-        for (food, multiplier) in self.possible_food_animal.iter() {
-            f.write_fmt(format_args!("    Animal {}: {}\n", food.id, multiplier))?;
-        }
-        f.write_str("}")
-    }
-}
-
-impl PartialEq for AnimalType {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-    }
-}
-
-impl Eq for AnimalType {}
-
-impl std::hash::Hash for AnimalType {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
-    }
-}
-
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize)]
 struct Region {
     pub terrain_type: Rc<TerrainType>,
     //pub liquid_type: u32,
@@ -672,7 +513,8 @@ impl std::fmt::Debug for Region {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_fmt(format_args!(
             "Region: \n    size: {:?}\n    terrain: {:?}\n",
-            self.size, self.terrain_type.id
+            self.size,
+            self.terrain_type.get_id()
         ))?;
         for (plant, num) in self.active_plants.iter() {
             f.write_fmt(format_args!("Plant {}: {}\n", plant.id, num))?;
@@ -681,5 +523,200 @@ impl std::fmt::Debug for Region {
             f.write_fmt(format_args!("Animal {} {}\n", animal.id, num))?;
         }
         f.write_str("\n")
+    }
+}
+
+#[repr(C)]
+#[derive(Debug, serde::Serialize)]
+pub struct TerrainType {
+    #[serde(skip)]
+    id: u32,
+    base: core::BaseElementServer,
+}
+
+impl TerrainType {
+    pub fn get_id(&self) -> u32 {
+        self.id
+    }
+
+    pub fn get_base(&self) -> &core::BaseElementServer {
+        &self.base
+    }
+
+    pub fn new(id: u32) -> TerrainType {
+        TerrainType {
+            id,
+            base: unsafe { core::BaseElementServer::new(core::Form_Form_solid, id as i32) },
+        }
+    }
+}
+
+impl PartialEq for TerrainType {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for TerrainType {}
+
+impl Hash for TerrainType {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+#[derive(Debug, serde::Serialize)]
+pub struct PlantType {
+    #[serde(skip)]
+    pub id: u32,
+    #[serde(skip)]
+    pub possible_ground: HashMap<Rc<TerrainType>, f32>,
+    #[serde(skip)]
+    pub size: u32,
+    //pub sun_required: u32,
+    #[serde(skip)]
+    pub growth_speed: f32,
+    // TODO
+    // overcrowd immunity
+    base: core::BasePlant,
+}
+
+impl PlantType {
+    pub fn new(id: u32, terrains: &Vec<Rc<TerrainType>>) -> PlantType {
+        let n = rand::random_range(terrains.len() / 2..terrains.len() + 1);
+        let mut possible_ground = HashMap::new();
+        possible_ground.insert(Rc::clone(terrains.choose(&mut rand::rng()).unwrap()), 1.0);
+        for _ in 1..n {
+            let choice = terrains.choose(&mut rand::rng()).unwrap();
+            if !possible_ground.contains_key(&**choice) {
+                possible_ground.insert(Rc::clone(choice), rand::random_range(0.1..1.2));
+            }
+        }
+        PlantType {
+            id,
+            possible_ground,
+            size: rand::random_range(1..3),
+            growth_speed: rand::random_range(0.1..0.4),
+            base: unsafe { core::BasePlant::new(id as i32) },
+        }
+    }
+
+    pub fn get_base(&self) -> &core::BasePlant {
+        &self.base
+    }
+}
+
+impl PartialEq for PlantType {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for PlantType {}
+
+impl std::hash::Hash for PlantType {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+
+#[derive(serde::Serialize)]
+pub struct AnimalType {
+    #[serde(skip)]
+    pub id: u32,
+    #[serde(skip)]
+    pub possible_food_plant: Vec<(Rc<PlantType>, f32)>,
+    #[serde(skip)]
+    pub possible_food_animal: Vec<(Rc<AnimalType>, f32)>,
+    #[serde(skip)]
+    pub required_food: f32,
+    #[serde(skip)]
+    pub speed: f32,
+    base: core::BaseAnimal,
+}
+
+impl AnimalType {
+    pub fn new(id: u32, plants: &Vec<Rc<PlantType>>, animals: &Vec<Rc<AnimalType>>) -> AnimalType {
+        let food_num = rand::random_range(1..5);
+        let mut possible_food_plant: Vec<(Rc<PlantType>, f32)> = Vec::new();
+        let mut possible_food_animal: Vec<(Rc<AnimalType>, f32)> = Vec::new();
+        if animals.len() > 0 {
+            let animal_food = rand::random_range(0..animals.len().min(food_num));
+            for food in plants.choose_multiple(&mut rand::rng(), food_num - animal_food) {
+                possible_food_plant.push((Rc::clone(food), rand::random_range(0.7..1.5)));
+            }
+            for food in animals.choose_multiple(&mut rand::rng(), animal_food) {
+                possible_food_animal.push((Rc::clone(food), rand::random_range(0.7..1.5)));
+            }
+        } else {
+            for food in plants.choose_multiple(&mut rand::rng(), food_num) {
+                possible_food_plant.push((Rc::clone(food), rand::random_range(0.7..1.5)));
+            }
+        }
+        let speed = rand::random_range(16.0..64.0);
+        let required_food = speed / 64.0 * speed / 64.0;
+        AnimalType {
+            id,
+            possible_food_plant,
+            possible_food_animal,
+            required_food,
+            speed,
+            base: unsafe { core::BaseAnimal::new(id as i32) },
+        }
+    }
+    pub fn new_eating(
+        id: u32,
+        plant: &Rc<PlantType>,
+        plants: &Vec<Rc<PlantType>>,
+        animals: &Vec<Rc<AnimalType>>,
+    ) -> AnimalType {
+        let mut animal = AnimalType::new(id, plants, animals);
+        if !animal.possible_food_plant.iter().any(|(p, _)| p == plant) {
+            animal
+                .possible_food_plant
+                .push((Rc::clone(plant), rand::random_range(0.7..1.5)));
+        }
+        animal
+    }
+    pub fn get_base(&self) -> &core::BaseAnimal {
+        &self.base
+    }
+    pub fn can_eat_plant(&self, plant: &Rc<PlantType>) -> bool {
+        for (p, _) in self.possible_food_plant.iter() {
+            if p == plant {
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl std::fmt::Debug for AnimalType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("AnimalType")
+            .field("id", &self.id)
+            .field("speed", &self.speed)
+            .field("required food", &self.required_food);
+        f.write_fmt(format_args!("Food:\n"))?;
+        for (plant, multiplier) in self.possible_food_plant.iter() {
+            f.write_fmt(format_args!("    Plant {}: {}\n", plant.id, multiplier))?;
+        }
+        for (food, multiplier) in self.possible_food_animal.iter() {
+            f.write_fmt(format_args!("    Animal {}: {}\n", food.id, multiplier))?;
+        }
+        f.write_str("}")
+    }
+}
+
+impl PartialEq for AnimalType {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for AnimalType {}
+
+impl std::hash::Hash for AnimalType {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
     }
 }

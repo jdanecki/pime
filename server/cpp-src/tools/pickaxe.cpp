@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <cstdio>
 
-PickAxe::PickAxe(InventoryElement * el1, InventoryElement * el2) : Product(el1, el2, PROD_PICKAXE, Form_solid)
+PickAxe::PickAxe(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_PICKAXE, Form_solid)
 {
 }
 

@@ -18,33 +18,33 @@ char traversable_tiles[TILE_MAX_NUM] = {
 
 void remove_from_chunks(InventoryElement * object)
 {
-    world_table[object->location.data.chunk.map_y][object->location.data.chunk.map_x]->remove_object(object);
+    world_table[object->location.chunk.map_y][object->location.chunk.map_x]->remove_object(object);
 }
 
-Being ** get_being_at(int chunk_x, int chunk_y, int x, int y)
-{
-    // TODO
-    /*for (int i = 0; i < 128; i++)
-    {
-        Being *b = world_table[chunk_y][chunk_x]->beings[i];
-        if (b)
-        {
-            int b_x, b_y;
-            b->get_posittion(&b_x, &b_y);
+// Being ** get_being_at(int chunk_x, int chunk_y, int x, int y)
+// {
+//     // TODO
+//     /*for (int i = 0; i < 128; i++)
+//     {
+//         Being *b = world_table[chunk_y][chunk_x]->beings[i];
+//         if (b)
+//         {
+//             int b_x, b_y;
+//             b->get_posittion(&b_x, &b_y);
 
-            if (b_x == x && b_y == y)
-            {
-                return &world_table[chunk_y][chunk_x]->beings[i];
-            }
-        }
-    }*/
-    return NULL;
-}
+//             if (b_x == x && b_y == y)
+//             {
+//                 return &world_table[chunk_y][chunk_x]->beings[i];
+//             }
+//         }
+//     }*/
+//     return NULL;
+// }
 
-Being ** get_being_at_ppos(Player * player)
-{
-    return get_being_at(player->map_x, player->map_y, player->x, player->y);
-}
+// Being ** get_being_at_ppos(Player * player)
+// {
+//     return get_being_at(player->map_x, player->map_y, player->x, player->y);
+// }
 
 Animal ** get_animal_at(int chunk_x, int chunk_y, int x, int y)
 {

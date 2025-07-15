@@ -3,7 +3,7 @@
 
 #include "../elements_server.h"
 
-class Axe : public Product
+class Axe : public ProductServer
 {
   public:
     Axe(InventoryElement * el1, InventoryElement * el2);

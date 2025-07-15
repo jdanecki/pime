@@ -115,11 +115,12 @@ bool PlayerServer::plant_with_seed(InventoryElement * el, int map_x, int map_y, 
 
 bool PlayerServer::pickup(InventoryElement * item)
 {
-    if (!item->pickable)
-    {
-        printf("can't pickup %s\n", item->get_name());
-        return false;
-    }
+    // FIXME
+    // if (!item->pickable)
+    // {
+    //     printf("can't pickup %s\n", item->get_name());
+    //     return false;
+    // }
     ItemLocation old_location = item->location;
     remove_from_chunks(item);
     Player::pickup(item);

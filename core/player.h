@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "alchemist/elements.h"
 #include "alchemist/npc_talk.h"
 #include <stdint.h>
 
@@ -28,7 +29,7 @@ struct PlayerRelation
     PlayerRelation(Player *p, enum Relations r);
 };
 
-class Player : public Being
+class Player : public InventoryElement
 {
     int * padding; // FIXME
     int id;

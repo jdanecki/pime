@@ -13,8 +13,8 @@ void Player::pickup(InventoryElement * item)
     inventory->add(item);
 
     ItemLocation location;
-    location.type = LOCATION_PLAYER_INV;
-    location.data.player.id = id;
+    location.tag = ItemLocation::Tag::Player;
+    location.player.id = id;
     item->location = location;
 }
 
@@ -59,10 +59,6 @@ Player::Player(int id) : id(id)
         hotbar[i] = NULL;
         craftbar[i] = 0;
     }
-    alive = true;
-    max_age = new Property("max age", 1 + rand() % 180000);
-    age = new Property("age", rand() % max_age->value);
-    can_talk = true;
     in_conversation = false;
     talking_to = nullptr;
     welcomed = false;
@@ -106,7 +102,7 @@ void Player::stop_conversation()
 
 void Player::show(bool details)
 {
-    Being::show(true);
+    // Being::show(true);
     if (talking_to)
     {
         printf("%s is talking to %s\n", get_name(), talking_to->get_name());
@@ -212,17 +208,18 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
 
 char * Player::get_el_description(InventoryElement * el)
 {
-    if (el->crafted)
-        return el->get_description();
+    // TODO jacek check if item known
+    // if (el->crafted)
+    //     return el->get_description();
 
     Class_id b = el->get_base_cid();
     ElementsTable * known_list = dynamic_cast<ElementsTable *>(known_elements->find(&b));
-    bool known = known_list->is_known(el->get_id());
+    // bool known = known_list->is_known(el->get_id());
 
-    if (known)
+    // if (known)
         return el->get_description();
-    else
-        return nullptr;
+    // else
+    //     return nullptr;
 }
 
 void Player::set_known(InventoryElement * el)
