@@ -1,5 +1,6 @@
 
 #include "main.h"
+#include "window.h"
 // Normal speed
 #define UPDATE_DELAY 1000
 
@@ -15,6 +16,8 @@ Player * player;
 bool finish;
 
 const NetClient * client;
+
+DHotbar hotbar;
 
 extern void draw();
 
@@ -149,6 +152,16 @@ void do_auto_explore()
     if (dst_map_y < player.map_y) player.move(0, -1);*/
 }
 
+void draw_dialogs()
+{
+    hotbar.draw(renderer);
+}
+
+void update_dialogs()
+{
+    hotbar.update();
+}
+
 void loop()
 {
     // int dst_map_x=player.map_x;
@@ -165,6 +178,7 @@ void loop()
 
         // TODO disconnect
         network_tick(client);
+        update_dialogs();
 
         /*if (auto_explore) {
             do_auto_explore();
@@ -173,6 +187,7 @@ void loop()
                 //dst_map_y=player.map_y;
          }*/
         draw();
+        draw_dialogs();
 
         SDL_RenderPresent(renderer);
         if (!auto_explore)

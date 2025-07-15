@@ -5,12 +5,28 @@
 #include "alchemist/npc_talk.h"
 #include <stdint.h>
 
-enum class direction
+/*enum class direction
 {
     up,
     right,
     down,
     left,
+};
+*/
+class Player;
+
+enum Relations
+{
+    REL_unknown,
+    REL_known,
+};
+
+struct PlayerRelation
+{
+    Player * who;
+    enum Relations rel;
+    struct PlayerRelation * next;
+    PlayerRelation(Player *p, enum Relations r);
 };
 
 class Player : public InventoryElement
@@ -31,54 +47,37 @@ class Player : public InventoryElement
     char running;
     char sneaking;
     char going_right;
-    enum direction direction;
+    //enum direction direction;
     int thirst;
     int hunger; // hungry, very hungry, full
     int nutrition;
     InvList * inventory;
     InventoryElement * hotbar[10];
     int craftbar[10];
-    bool conversation;
+    bool in_conversation;
     bool welcomed;
     Player * talking_to;
+    PlayerRelation * relations;
 
     void pickup(InventoryElement * item);
     void drop(InventoryElement * item);
     InventoryElement * get_item_by_uid(size_t id);
-    int get_id()
-    {
-        return id;
-    }
+    int get_id();
     Player(int id);
-    void start_conversation(Player * who)
-    {
-        conversation = true;
-        printf("%s start talking to %s\n", get_name(), who->get_name());
-        talking_to = who;
-        who->talking_to = this;
-    }
-    void stop_conversation()
-    {
-        conversation = false;
-        welcomed = false;
-        printf("%s stopped talking to %s\n", talking_to->get_name(), get_name());
-        talking_to = nullptr;
-    }
+    int conversation(Player * who, Sentence * s, InventoryElement *el);
+    void stop_conversation();
 
-    void show(bool details = true)
-    {
-        // Being::show(true);
-        if (talking_to)
-        {
-            printf("%s is talking to %s\n", get_name(), talking_to->get_name());
-        }
-    }
+    void show(bool details = true);
     bool say(Sentence * s);
     Sentence *get_answer(Sentence * s);
     void ask(Sentence * s, InventoryElement * el);
     void ask(enum Npc_say s, InventoryElement * el);
     char * get_el_description(InventoryElement * el);
     void set_known(InventoryElement * el);
+    bool conversation_started() { return in_conversation;}
+    enum  Relations find_relation(Player *who);
+    void set_relation(Player *who, enum Relations rel);
 };
+
 
 #endif

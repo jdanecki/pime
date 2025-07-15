@@ -40,8 +40,9 @@ enum menu_actions
     MENU_NPC_SAY,
     MENU_NPC_ASK,
 
-    // must be the last
     MENU_ITEM = 0x1000,
+    MENU_NPC_CONV  = 0x2000,
+
 };
 
 class Menu_entry
@@ -72,12 +73,13 @@ class Menu
     bool show_texture_literal;
     Menu(const char * n, int opt);
     ~Menu();
+
     void add(const char * e, enum menu_actions a);
     void add(const char * e, enum menu_actions a, int val);
     void add(const char * e, enum menu_actions a, int val, InventoryElement * p_el);
     void add(const char * e, enum menu_actions a, InventoryElement * p_el);
     void add(const char * e, enum menu_actions a, SDL_Texture * t, int index, int item_id);
-    void add(const char * e, enum menu_actions a, Sentence * s, InventoryElement * p_el);
+    void add(const char * e, enum Npc_say a, Sentence * s, InventoryElement * p_el);
     int get_val(int v);
     int get_val();
     Sentence * get_sentence();

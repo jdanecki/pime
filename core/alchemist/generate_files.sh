@@ -57,11 +57,13 @@ mkdir -p generated
 
 create_inline_file questions
 create_inline_file sentences
+create_inline_file answers
 
 create_enum_file
 
 do_files questions
 do_files sentences
+do_files answers
 
 echo "#ifndef _NPC_TALK_GENERATED_H
 #define _NPC_TALK_GENERATED_H

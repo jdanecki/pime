@@ -25,7 +25,7 @@ endif()
 add_executable(pime_SDL
     window.cpp music.cpp text.cpp
     texture.cpp main.cpp render.cpp menu.cpp
-    networking.cpp
+    networking.cpp dialog/dialog.cpp dialog/d_hotbar.cpp
     inputs.cpp player_actions.cpp npc.cpp
     
     implementations/alchemistSDL.cpp

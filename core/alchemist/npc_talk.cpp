@@ -2,6 +2,7 @@
 
 #include "generated/sentences.cpp"
 #include "generated/questions.cpp"
+#include "generated/answers.cpp"
 
 void SentencesList::disable(Npc_say id)
 {

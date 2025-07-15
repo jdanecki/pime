@@ -16,63 +16,8 @@ int request_delay = 0;
 char text[300];
 
 // TODO remove that when not necessary
-extern NetClient* client;
+extern NetClient * client;
 
-void draw_hotbar()
-{
-    int ty = window_height - 112;
-
-    for (int i = 0; i < 10; i++)
-    {
-        SDL_Rect rect;
-        rect.x = tx + 48 * i;
-        rect.y = ty;
-        rect.w = 48;
-        rect.h = 48;
-
-        if (player->hotbar[i])
-        {
-            InventoryElement * item = player->hotbar[i];
-            Renderable * r = dynamic_cast<Renderable *>(player->hotbar[i]);
-            SDL_Texture * texture = r->get_texture();
-            SDL_RenderCopy(renderer, texture, NULL, &rect);
-            if (i == active_hotbar)
-            {
-                char * t = player->get_el_description(item);
-                if (t)
-                {
-                    write_text(tx + 3, rect.y + 50, t, Yellow, 10, 20);
-                }
-                else
-                {
-                    // write_text(tx + 3, rect.y + 50, item->get_form_name(), Yellow, 10, 20);
-                }
-            }
-        }
-        if (i == active_hotbar)
-        {
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        }
-        else
-        {
-            SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
-        }
-
-        if (player->craftbar[i])
-        {
-            if (i == active_hotbar)
-            {
-                SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
-            }
-            else
-            {
-                SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-            }
-        }
-
-        SDL_RenderDrawRect(renderer, &rect);
-    }
-}
 void draw_texts()
 {
     int ty = 10;
@@ -211,8 +156,8 @@ bool draw_terrain()
                 SDL_Rect img_rect = {x * tile_dungeon_size, y * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
                 // enum game_tiles tile = get_tile_at(player.map_x, player.map_y, x, y);
                 int tile = get_tile_at(player->map_x, player->map_y, x, y);
-                SDL_Texture * texture = tiles_textures[(tile+1) % 6];
-                SDL_SetTextureColorMod(texture, get_base_element(tile)->color.r,  get_base_element(tile)->color.g, get_base_element(tile)->color.b);
+                SDL_Texture * texture = tiles_textures[(tile + 1) % 6];
+                SDL_SetTextureColorMod(texture, get_base_element(tile)->color.r, get_base_element(tile)->color.g, get_base_element(tile)->color.b);
                 SDL_RenderCopy(renderer, texture, NULL, &img_rect);
             }
         }
@@ -309,7 +254,6 @@ void draw()
         draw_players();
         draw_npc();
         draw_texts();
-        draw_hotbar();
 
         // FIXME when more chunks enabled
         // draw_maps();

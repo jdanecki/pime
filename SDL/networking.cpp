@@ -168,6 +168,8 @@ extern "C"
         srand(seed);
         init_elements();
         init_sentences();
+        init_questions();
+        init_answers();
         printf("got id %ld\n", id);
         print_status(1, "player %d connected", id);
     }

@@ -1,7 +1,12 @@
-#include "player.h"
 #include "tiles.h"
+#include "player.h"
 
 extern void print_status(int i, const char * format, ...);
+
+const char * relations_names[]=
+{
+  "unknown", "known"
+};
 
 void Player::pickup(InventoryElement * item)
 {
@@ -30,6 +35,11 @@ InventoryElement * Player::get_item_by_uid(size_t id)
     return NULL;
 }
 
+int Player::get_id()
+{
+    return id;
+}
+
 Player::Player(int id) : id(id)
 {
     c_id = Class_Player;
@@ -38,7 +48,8 @@ Player::Player(int id) : id(id)
     map_x = WORLD_CENTER;
     map_y = WORLD_CENTER;
     inventory = new InvList("inventory");
-    direction = direction::right;
+    relations = nullptr;
+    //direction = direction::right;
 
     x = 0;
     y = 0;
@@ -48,11 +59,7 @@ Player::Player(int id) : id(id)
         hotbar[i] = NULL;
         craftbar[i] = 0;
     }
-    // alive = true;
-    // max_age = new Property("max age", 1 + rand() % 180000);
-    // age = new Property("age", rand() % max_age->value);
-    // can_talk = true;
-    conversation = false;
+    in_conversation = false;
     talking_to = nullptr;
     welcomed = false;
     delete name;
@@ -65,82 +72,82 @@ Player::Player(int id) : id(id)
     known_elements->add(new ElementsTable(BASE_PLANTS, Class_BasePlant));
 }
 
+int Player::conversation(Player *who, Sentence *s, InventoryElement *el)
+{
+    if (!in_conversation)
+    {
+        in_conversation = true;
+        printf("%s start talking to %s\n", get_name(), who->get_name());
+        talking_to = who;
+        who->talking_to = this;
+    }
+    if (s->id < NPC_Say_Nothing)
+    {
+        ask(s, el);
+        return 0;
+    }else {
+
+        return say(s) ? 1 : 0;
+    }
+
+}
+
+void Player::stop_conversation()
+{
+    in_conversation = false;
+    welcomed = false;
+    printf("%s stopped talking to %s\n", talking_to->get_name(), get_name());
+    talking_to = nullptr;
+}
+
+void Player::show(bool details)
+{
+    // Being::show(true);
+    if (talking_to)
+    {
+        printf("%s is talking to %s\n", get_name(), talking_to->get_name());
+    }
+}
+
 bool Player::say(Sentence * s)
 {
     if (!s)
-        return false;
-    if (!talking_to)
-    {
-        print_status(1, "conversation not started yet!");
-        return false;
-    }
+        return false;    
     switch (s->id)
     {
+        case NPC_Say_Bye:
+        case NPC_Say_See_you_later:
+        case NPC_Say_See_you_next_time:
+            stop_conversation();
+            return true;
+
         case NPC_Say_Hello:
-        case NPC_Ask_how_are_you:
-            sentences->enable(NPC_Say_Bye);
             talking_to->welcomed = true;
         // pass through
-        default:
-        {
-            Sentence * answer = talking_to->get_answer(s);
-
-            switch (answer->id)
-            {
-                default:
-                    print_status(0, "%s answers: %s", talking_to->get_name(), answer->text);
-                    break;
-                case NPC_Say_Im:
-                    print_status(0, "%s answers: %s %s", talking_to->get_name(), answer->text, talking_to->get_name());
-                    break;
-            }
-           // s->disable();
-            switch (answer->id)
-            {
-                case NPC_Say_Nothing:
-                    break;
-                case NPC_Ask_do_we_know_each_other:
-                    print_status(1, "%s: Don't you remember me? I'm..., we've met some time ago.", get_name());
-                    break;
-                case NPC_Say_I_dont_know_you:
-                    print_status(1, "%s: Let me introduce myself...", get_name());
-                    break;
-                case NPC_Say_Im_not_fine:
-                    print_status(1, "%s: I'm sorry...", get_name());
-                    break;
-                case NPC_Ask_do_you_really_care:
-                    print_status(1, "%s: Not really... Hmm, I was kidding.", get_name());
-                    break;
-                case NPC_Ask_why_do_you_ask:
-                    print_status(1, "%s: I'm interrested.", get_name());
-                    break;
-                case NPC_Ask_whos_asking:
-                    print_status(1, "%s: It's me.", get_name());
-                    break;
-                case NPC_Ask_have_you_lost:
-                    print_status(1, "%s: Yes", get_name());
-                    break;
-                case NPC_Ask_dont_you_remember:
-                    print_status(1, "%s: No, I don't remember", get_name());
-                    break;
-            }
-
-            if (s->id == NPC_Say_Bye)
-            {
-
-                stop_conversation();
-                return true;
-            }
+        default:        
+            talking_to->get_answer(s);
             break;
-        }
+
     }
     return false;
 }
 
 Sentence * Player::get_answer(Sentence *s)
 {
-    Npc_say sid=NPC_Say_Nothing;
+    Npc_say sid=NPC_Say_Hello;
     Sentence * a=dynamic_cast<Sentence *>(sentences->find(&sid));
+
+    const char * n;
+    if (talking_to->find_relation(this) == REL_known)
+        n=get_name();
+    else n=get_class_name();
+
+    switch (s->id)
+    {
+        default:
+            print_status(0, "%s answers: %s", n, a->text);
+            break;
+    }
     return a;
 }
 
@@ -152,18 +159,50 @@ void Player::ask(Sentence * s, InventoryElement * el)
 
 void Player::ask(enum Npc_say s, InventoryElement * el)
 {
-    switch (s)
+    Npc_say sid=NPC_Say_Nothing;
+    Sentence * a;
+    const char * n;
+    Relations player_rel=talking_to->find_relation(this);
+     if (player_rel == REL_known) n=get_name();
+        else n=get_class_name();
+
+    if (s == NPC_Ask_do_you_know_item)
     {
-        case NPC_Ask_do_you_know_item:
             char * des = get_el_description(el);
+            if (des) sid=NPC_Answer_I_know_it;
+            else
+                sid=NPC_Answer_I_dont_know_it;
+
+            a=dynamic_cast<Sentence *>(answers->find(&sid));
             if (des)
             {
-                print_status(1, "%s says: I know it. It's %s", get_name(), des);
-                talking_to->set_known(el);
+                print_status(1, "%s says: %s. It's %s", n, a->text, des);
+                talking_to->set_known(el);                
             }
             else
-                print_status(1, "%s says: I don't know it", get_name());
-            break;
+            {
+                print_status(1, "%s says: %s", n, a);
+            }
+    }
+    else {
+        switch (s)
+        {
+            case NPC_Ask_do_we_know_each_other:
+                if (player_rel == REL_known)
+                sid = NPC_Answer_I_know_you;
+                    else
+                sid = NPC_Answer_I_dont_know_you;
+                break;
+            case NPC_Ask_how_are_you: sid = NPC_Answer_Im_fine; break;
+            case NPC_Ask_where_am_I: sid=NPC_Answer_You_are_in_pime; break;
+            case NPC_Ask_who_are_you:
+                print_status(1, "%s says: I'm %s", n, get_name());
+                talking_to->set_relation(this, REL_known);
+                break;
+        }
+        a=dynamic_cast<Sentence *>(answers->find(&sid));
+        if (a)
+            print_status(1, "%s says: %s", n, a->text);
     }
 }
 
@@ -188,4 +227,49 @@ void Player::set_known(InventoryElement * el)
     Class_id b = el->get_base_cid();
     ElementsTable * known_list = dynamic_cast<ElementsTable *>(known_elements->find(&b));
     known_list->set_known((el->get_id()));
+}
+
+Relations Player::find_relation(Player *who)
+{
+    if (relations)
+    {
+        PlayerRelation *p=relations;
+        while(p)
+        {
+            if (p->who == who) return p->rel;
+            p=p->next;
+        }
+    }
+    return REL_unknown;
+}
+
+void Player::set_relation(Player *who, enum Relations rel)
+{
+    if (relations)
+    {
+        PlayerRelation *p=relations;
+        while(p)
+        {
+            if (p->who == who) {
+                p->rel = rel;
+                return;
+            }
+            p=p->next;
+        }
+        PlayerRelation * new_rel=new PlayerRelation(who, rel);
+        new_rel->next=relations;
+        relations=new_rel;
+    }
+    else
+    {
+        relations=new PlayerRelation(who, rel);
+    }
+
+}
+
+PlayerRelation::PlayerRelation(Player *p, Relations r)
+{
+    who=p;
+    rel=r;
+    next=nullptr;
 }

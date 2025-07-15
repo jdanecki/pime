@@ -20,3 +20,9 @@
     - Rare
 * Duplicator for above
     - Rare
+
+* inventory containers (backpack element x, that is equipped on y)
+* multilayers
+    - creating a new chunk (maybe with an unique item..?)
+    - creating a link between worlds
+    - generating existing links/entrances

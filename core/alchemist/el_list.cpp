@@ -73,6 +73,17 @@ void ElementsList::enable_all()
     }
 }
 
+void ElementsList::disable_all()
+{
+    ListElement * cur = head;
+
+    while (cur)
+    {
+        cur->disable();
+        cur = cur->next;
+    }
+}
+
 void ElementsList::tick()
 {
     ListElement * cur = head;
