@@ -20,7 +20,6 @@ enum Class_id
     Class_Ingredient,
     Class_Product,
 
-    Class_Being,
     Class_Plant,
     Class_Animal,
     Class_Player,
@@ -33,7 +32,7 @@ class Base
 {
   public:
     Class_id c_id;
-    int id; // index in BaseTable
+    int id;
     SerializableCString name;
     Base(int index, Class_id c, const char* name);
     virtual void show(bool details = true);
@@ -155,6 +154,12 @@ class InventoryElement
     virtual void update_item_location(ItemLocation &, ItemLocation &)
     {
     }
+    virtual Form get_form() { return Form_unknown; }
+    virtual const char * get_form_name()
+    {
+        return Form_name[Form_unknown];
+    }
+
 };
 
 enum object_types
@@ -363,35 +368,6 @@ class Product : public InventoryElement
     }
 };
 
-// FIXME is it even needed?
-// class Being : public InventoryElement
-// {
-//     size_t padding; // FIXME
-
-//   public:
-//     // shared with client
-
-//     bool alive;
-//     bool can_talk;
-
-//     Being()
-//     {
-//         alive = true;
-//         c_id = Class_Being;
-
-//         name = nullptr;
-//         can_talk = false;
-//     }
-//     bool is_alive()
-//     {
-//         return alive;
-//     }
-//     void show(bool details = true)
-//     {
-//         printf("%s %s alive=%d uid=%lx\n", Class_names[c_id], name, alive, uid);
-//     }
-// };
-
 class BaseAnimal : public Base
 {
   public:
@@ -419,8 +395,7 @@ class Animal : public InventoryElement
 
   public:
     Animal(BaseAnimal * b);
-    // Animal();
-    // Animal(int i);
+
     void show(bool details = true) override
     {
         printf("Animal %s uid=%lx\n", get_name(), uid);
@@ -505,8 +480,7 @@ class Plant : public InventoryElement
     bool grown;
 
        Plant(BasePlant * b);
-    // Plant();
-    // Plant(int i);
+
     void show(bool details = true) override
     {
         printf("Plant -> %d name=%s grown=%d uid=%lx\n", c_id, get_name(), grown, uid);
@@ -550,9 +524,5 @@ class Plant : public InventoryElement
 #define BASE_ANIMALS 40
 #define BASE_PLANTS 30
 
-void init_elements();
-void show_base_table(Class_id id, bool details);
-
-// BaseElement* get_base_element(int id);
 
 #endif

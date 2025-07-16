@@ -166,7 +166,6 @@ extern "C"
 
         printf("seed: %ld\n", seed);
         srand(seed);
-        init_elements();
         init_sentences();
         init_questions();
         init_answers();

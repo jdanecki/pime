@@ -74,7 +74,10 @@ class Player : public InventoryElement
     void ask(Sentence * s, InventoryElement * el);
     void ask(enum Npc_say s, InventoryElement * el);
     char * get_el_description(InventoryElement * el);
+
+    virtual bool check_known(InventoryElement *el);
     void set_known(InventoryElement * el);
+
     bool conversation_started() { return in_conversation;}
     enum  Relations find_relation(Player *who);
     void set_relation(Player *who, enum Relations rel);

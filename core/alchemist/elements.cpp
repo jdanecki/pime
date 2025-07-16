@@ -31,7 +31,7 @@ const char * Product_name[] = {
 
 const char * object_names[] = {"wall"};
 const char * Plant_phase_name[] = {"Seed", "Seedling", "Growing", "Flowers", "Fruits"};
-const char * Class_names[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Being", "Plant", "Animal", "Player", "Npc"};
+const char * Class_names[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Plant", "Animal", "Player", "Npc"};
 
 Base::Base(int index, Class_id c, const char* name) : name(name)
 {
@@ -41,7 +41,7 @@ Base::Base(int index, Class_id c, const char* name) : name(name)
 
 void Base::show(bool details)
 {
-    printf("Base name=%s class:%d id=%d \n", get_name(), c_id, id);
+    printf("Base name=%s class:%s id=%d \n", get_name(), Class_names[c_id], id);
 }
 
 const char* Base::get_name() 
@@ -66,7 +66,7 @@ InventoryElement::InventoryElement(Class_id c_id, size_t uid, unsigned int mass,
 }
 void Element::show(bool details)
  {
-    printf("%s: base=%s form=%s uid=%lx\n", Class_names[c_id], base.get()->get_name(), get_form_name(), uid);
+    printf("%s: base=%s form=%s uid=%lx\n", get_class_name(), get_name(), get_form_name(), uid);
      if (!details)
          return;
 
@@ -83,7 +83,7 @@ Ingredient::Ingredient(Ingredient_id i) : InventoryElement(Class_Ingredient),
 
 void Ingredient::show(bool details)
 {
-    printf("%s -> class:%d id=%d\n", Ingredient_name[id], c_id, id);
+    printf("%s -> class:%s id=%d\n", get_name(), get_class_name(), id);
     if (!details)
         return;
     quality.show();
@@ -101,57 +101,12 @@ Product::Product(Product_id i) : InventoryElement(Class_Product),
 
 void Product::show(bool details)
 {
-    printf("%s -> class:%d id=%d\n", Product_name[id], c_id, id);
+    printf("%s -> class:%s id=%d\n", get_name(), get_class_name(), id);
     if (!details)
         return;
     quality.show();
     resilience.show();
     usage.show();
-}
-
-void init_elements()
-{
-    // base_list = new ElementsList("base list");
-
-    // BaseTable * base_elements = new BaseTable(BASE_ELEMENTS, Class_BaseElement);
-
-    // int i = 0;
-
-    // for (; i < SOLID_ELEMENTS; i++)
-    // {
-    //     base_elements->add(i, new BaseElement(Form_solid, i));
-    // }
-    // for (; i < SOLID_ELEMENTS + LIQUID_ELEMENTS; i++)
-    // {
-    //     base_elements->add(i, new BaseElement(Form_liquid, i));
-    // }
-    // for (; i < SOLID_ELEMENTS + LIQUID_ELEMENTS + GAS_ELEMENTS; i++)
-    // {
-    //     base_elements->add(i, new BaseElement(Form_gas, i));
-    // }
-    // base_list->add(base_elements);
-
-    // BaseTable * base_animals = new BaseTable(BASE_ANIMALS, Class_BaseAnimal);
-
-    // for (i = 0; i < BASE_ANIMALS; i++)
-    // {
-    //     base_animals->add(i, new BaseAnimal(i));
-    // }
-    // base_list->add(base_animals);
-
-    // BaseTable * base_plants = new BaseTable(BASE_PLANTS, Class_BasePlant);
-
-    // for (i = 0; i < BASE_PLANTS; i++)
-    // {
-    //     base_plants->add(i, new BasePlant(i));
-    // }
-    // base_list->add(base_plants);
-}
-
-void show_base_table(Class_id id, bool details)
-{
-    BaseTable * table = dynamic_cast<BaseTable *>(base_list->find(&id));
-    table->show(details);
 }
 
 void Animal::init(BaseAnimal * b)
@@ -175,41 +130,12 @@ Animal::Animal(BaseAnimal * b) : InventoryElement(Class_Animal),  base(b){
     init(b);
 }
 
-// Animal::Animal()
-// {
-//     Class_id id = Class_BaseAnimal;
-//     BaseTable * table = dynamic_cast<BaseTable *>(base_list->find(&id));
-//     init(dynamic_cast<BaseAnimal *>(table->get_random()));
-// }
-
-// Animal::Animal(int i)
-// {
-//     Class_id id = Class_BaseAnimal;
-//     BaseTable * table = dynamic_cast<BaseTable *>(base_list->find(&id));
-//     init(dynamic_cast<BaseAnimal *>(table->get(i)));
-// }
-
 BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(15))
 {
     flowers = rand() % 2;
     leaves = rand() % 2;
 }
 
-// Plant::Plant()
-// {
-//     Class_id id = Class_BasePlant;
-//     BaseTable * table = dynamic_cast<BaseTable *>(base_list->find(&id));
-//     init(dynamic_cast<BasePlant *>(table->get_random()));
-// }
-
-// Plant::Plant(int i)
-// {
-//     Class_id id = Class_BasePlant;
-//     BaseTable * table = dynamic_cast<BaseTable *>(base_list->find(&id));
-//     init(dynamic_cast<BasePlant *>(table->get(i)));
-// }
-
-// FIXME split Plant to sertver/client side
 void Plant::init(BasePlant * b)
 {    
     base = b;
@@ -252,9 +178,3 @@ Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)
 {
     init(b);
 }
-
-// BaseElement* get_base_element(int id)
-// {
-//     BaseTable* table = (BaseTable*)base_list->head;
-//     return (BaseElement*)table->get(id);
-// }

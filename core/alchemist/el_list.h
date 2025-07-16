@@ -41,81 +41,39 @@ class ListElement
     virtual ~ListElement() {}
 };
 
-//FIXME - change this table to list
-class ElementsTable : public ListElement
+
+struct ElId
 {
-    int count;
-    bool * elements;
     Class_id c_id;
-
-  public:
-    ElementsTable(int c, Class_id t)
-    {
-        elements = new bool[c];
-        for (int i = 0; i < c; i++)
-            elements[i] = false;
-        c_id = t;
-        count = c;
-    }
-
-    bool is_known(int i)
-    {
-        return elements[i];
-    }
-    void set_known(int i)
-    {
-        elements[i] = true;
-    }
-    void set_all_known()
-    {
-        for (int i = 0; i < count; i++)
-            elements[i] = true;
-    }
-    bool check(void * what)
-    {
-        Class_id i = *(Class_id *)what;
-        return i == c_id;
-    }
+    int id;
 };
 
-//FIXME - change this table to list
-class BaseTable : public ListElement
+class KnownElement : public ListElement
 {
-    int count;
-    Base ** base;
-    Class_id c_id;
+     ElId elid;
+    bool known;
 
   public:
-    BaseTable(int c, Class_id t)
+    KnownElement(Class_id t, int i)
     {
-        base = new Base *[c];
-        for (int i = 0; i < c; i++)
-            base[i] = nullptr;
-        c_id = t;
-        count = c;
+        elid.c_id = t;
+        elid.id=i;
+        known=false;
     }
-    void add(int i, Base * b)
+
+    bool is_known()
     {
-        base[i] = b;
+        return known;
     }
-    void show(bool details)
+    void set_known()
     {
-        for (int i = 0; i < count; i++)
-            base[i]->show(details);
+        known = true;
     }
+
     bool check(void * what)
     {
-        Class_id i = *(Class_id *)what;
-        return i == c_id;
-    }
-    Base * get_random()
-    {
-        return base[rand() % count];
-    }
-    Base * get(int i)
-    {
-        //FIXME
-        return base[i % count];
+        ElId *i = (ElId *)what;
+        return (elid.c_id == i->c_id && elid.id == i->id);
     }
 };
 
