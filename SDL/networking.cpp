@@ -99,15 +99,6 @@ InventoryElement * el_from_data(const ObjectData* data)
             el = new AnimalSDL(data->animal.data);
             break;
     }
-    if (el)
-    {
-        el->uid = data->inv_element.data.uid;
-        el->location.tag = ItemLocation::Tag::Chunk; //(ItemLocationType)data.inv_element.data.location.tag;
-        el->location.chunk.map_x = data->inv_element.data.location.chunk.map_x;
-        el->location.chunk.map_y = data->inv_element.data.location.chunk.map_y;
-        el->location.chunk.x = data->inv_element.data.location.chunk.x;
-        el->location.chunk.y = data->inv_element.data.location.chunk.y;
-    }
     return el;
 }
 
@@ -269,20 +260,32 @@ extern "C"
 
     void create_object(const ObjectData* data)
     {
-        int x = data->inv_element.data.location.chunk.map_x;
-        int y = data->inv_element.data.location.chunk.map_y;
-        if (world_table[y][x])
+        InventoryElement * el = el_from_data(data);
+        if (el)
         {
-            InventoryElement * el = el_from_data(data);
-            if (el)
+            switch (el->location.tag)
             {
-                int item_x = el->location.chunk.x;
-                int item_y = el->location.chunk.y;
-                world_table[y][x]->add_object(el, item_x, item_y);
-
-                printf("created object: %s\n", el->get_name());
-                print_status(1, "created object: %s", el->get_name());
+                case ItemLocation::Tag::Chunk:
+                {
+                    int item_x = el->location.chunk.x;
+                    int item_y = el->location.chunk.y;
+                    int x = el->location.chunk.map_x;
+                    int y = el->location.chunk.map_y;
+                    if (world_table[y][x])
+                    {
+                        world_table[y][x]->add_object(el, item_x, item_y);
+                    }
+                    break;
+                }
+                case ItemLocation::Tag::Player:
+                {
+                    int p_id = el->location.player.id;
+                    players[p_id]->inventory->add(el);
+                    update_hotbar();
+                }
             }
+            printf("created object: %s\n", el->get_name());
+            print_status(1, "created object: %s", el->get_name());
         }
         else
         {
