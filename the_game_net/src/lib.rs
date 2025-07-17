@@ -10,6 +10,7 @@ mod events;
 mod send_packets;
 mod types;
 
+/// cbindgen:no-export
 #[repr(C)]
 pub struct NetClient {
     socket: UdpSocket,
@@ -35,7 +36,7 @@ impl NetClient {
 }
 
 #[no_mangle]
-pub extern "C" fn init() -> *const NetClient {
+pub extern "C" fn init() -> *mut NetClient {
     unsafe {
         let a = core::Player::new(1);
     }
@@ -184,7 +185,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                 }
                 core::PACKET_OBJECT_UPDATE => unsafe {
                     events::update_object(
-                        bincode::deserialize(&value[1..amt]).expect("bad object update"),
+                        &bincode::deserialize(&value[1..amt]).expect("bad object update"),
                     );
                 },
                 core::PACKET_LOCATION_UPDATE => unsafe {

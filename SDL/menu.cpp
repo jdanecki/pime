@@ -15,7 +15,7 @@
 
 extern class Player * player;
 extern int active_hotbar;
-extern const NetClient * client;
+extern NetClient * client;
 
 Menu * menu_music;
 Menu * menu_main;

@@ -15,7 +15,7 @@ Player * player;
 
 bool finish;
 
-const NetClient * client;
+NetClient * client;
 
 DHotbar hotbar;
 

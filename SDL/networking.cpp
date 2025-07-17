@@ -174,12 +174,12 @@ extern "C"
         print_status(1, "player %d connected", id);
     }
 
-    void update_object(ObjectData data)
+    void update_object(const ObjectData* data)
     {
 //        size_t uid = data.inv_element.data.uid;
-        Class_id c_id = data.inv_element.data.c_id;
+        Class_id c_id = data->inv_element.data.c_id;
 
-        InventoryElement * el = find_by_uid(data.inv_element.data.uid, data.inv_element.data.location.chunk.map_x, data.inv_element.data.location.chunk.map_y);
+        InventoryElement * el = find_by_uid(data->inv_element.data.uid, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
 
         if (el && el->c_id == c_id)
         {
@@ -194,8 +194,8 @@ extern "C"
                 case Class_Plant:
                 {
                     Plant * p = dynamic_cast<Plant *>(el);
-                    p->phase = data.plant.data.phase;
-                    p->grown = data.plant.data.grown;
+                    p->phase = data->plant.data.phase;
+                    p->grown = data->plant.data.grown;
                     // p->age->value = data.plant.data.age;
                     // p->max_age->value = data.plant.data.max_age; FIXME
                     break;
