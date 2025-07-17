@@ -186,25 +186,33 @@ extern "C"
             switch (c_id)
             {
                 case Class_Element:
+                {
+                    ElementSDL* el = dynamic_cast<ElementSDL*>(el);
+                    *el = data->element.data;
                     break;
+                }
                 case Class_Ingredient:
+                {
+                    IngredientSDL* ing = dynamic_cast<IngredientSDL*>(el);
+                    *ing = data->ingredient.data;
                     break;
+                }
                 case Class_Product:
+                {
+                    ProductSDL* prod = dynamic_cast<ProductSDL*>(el);
+                    *prod = data->product.data;
                     break;
+                }
                 case Class_Plant:
                 {
-                    Plant * p = dynamic_cast<Plant *>(el);
-                    p->phase = data->plant.data.phase;
-                    p->grown = data->plant.data.grown;
-                    // p->age->value = data.plant.data.age;
-                    // p->max_age->value = data.plant.data.max_age; FIXME
+                    PlantSDL * plant = dynamic_cast<PlantSDL*>(el);
+                    *plant = data->plant.data;
                     break;
                 }
                 case Class_Animal:
                 {
-                    Animal * p = dynamic_cast<Animal *>(el);
-                    // p->age->value = data.animal.data.age;
-                    // p->max_age->value = data.animal.data.max_age;FIXME
+                    AnimalSDL* animal = dynamic_cast<AnimalSDL*>(el);
+                    *animal = data->animal.data;
                     break;
                 }
                 default:
