@@ -208,12 +208,18 @@ fn add_player(
     server.socket.send_to(&response, &peer).unwrap();
 
     unsafe {
-        let p = core::PlayerServer::new(players.len() as i32);
+        let mut p = core::PlayerServer::new(players.len() as i32);
+        let axe = Box::into_raw(Box::new(core::Axe::new(
+            std::ptr::null_mut(),
+            std::ptr::null_mut(),
+        ))) as *mut core::InventoryElement;
+        (*core::world_table[128][128]).add_object1(axe);
+        p.pickup(axe);
         players.push(p);
+        update_chunk_for_player(server, &mut peer, (128, 128));
+        core::objects_to_create.add(axe);
     }
     //println!("{:?} , players {:?}", peer, players);
-
-    update_chunk_for_player(server, &mut peer, (128, 128));
 }
 
 fn update_players(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
@@ -231,11 +237,8 @@ fn update_players(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
 }
 
 fn update_chunk_for_player(server: &mut Server, peer: &SocketAddr, coords: (u8, u8)) {
-    let mut data = vec![
-        0 as u8;
-        3 + (core::CHUNK_SIZE * core::CHUNK_SIZE) as usize
-            * size_of::<i32>()
-    ];
+    let mut data =
+        vec![0 as u8; 3 + (core::CHUNK_SIZE * core::CHUNK_SIZE) as usize * size_of::<i32>()];
     data[0] = core::PACKET_CHUNK_UPDATE;
     data[1] = coords.0;
     data[2] = coords.1;
