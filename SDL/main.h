@@ -14,6 +14,7 @@
 #include <stdlib.h>
 // #include <SDL2/SDL2_framerate.h>
 #include "../core/tiles.h"
+#include "dialog/d_craft.h"
 #include "dialog/d_hotbar.h"
 #include "inputs.h"
 #include "menu.h"

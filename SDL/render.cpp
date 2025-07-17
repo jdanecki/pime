@@ -56,7 +56,7 @@ void draw_texts()
             sprintf(t, "It looks like %s, ", item->get_class_name());
             write_text(tx, ty, t, White, 15, 30);
 
-            // sprintf(t, "it has %s form, but ", item->get_form_name());
+            sprintf(t, "it has %s form, but ", item->get_form_name());
             write_text(tx, ty + 25, t, White, 15, 30);
 
             write_text(tx, ty + 50, "I don't know what it's exactly", White, 15, 30);
@@ -156,7 +156,7 @@ bool draw_terrain()
                 SDL_Rect img_rect = {x * tile_dungeon_size, y * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
                 // enum game_tiles tile = get_tile_at(player.map_x, player.map_y, x, y);
                 int tile = get_tile_at(player->map_x, player->map_y, x, y);
-                SDL_Texture * texture = tiles_textures[(tile + 1) % 6];
+                SDL_Texture * texture = tiles_textures[(tile + 1) % tiles_textures_count];
                 SDL_SetTextureColorMod(texture, get_base_element(tile)->color.r, get_base_element(tile)->color.g, get_base_element(tile)->color.b);
                 SDL_RenderCopy(renderer, texture, NULL, &img_rect);
             }

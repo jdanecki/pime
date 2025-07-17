@@ -49,7 +49,7 @@ DialogText::DialogText(int id, int x, int y, int size, SDL_Color color, std::str
 
 void DialogText::draw(SDL_Renderer * renderer)
 {
-    write_text(this->x, this->y, this->text.c_str(), this->color, this->size, this->size);
+    write_text(this->x, this->y, this->text.c_str(), this->color, this->size, this->size * 1.5);
 }
 
 DialogImage::DialogImage(int id, int x, int y, int w, int h, std::string filename) : DialogElement(id, DialogElementType::Image)

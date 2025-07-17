@@ -3,19 +3,6 @@
 
 chunk * world_table[WORLD_SIZE][WORLD_SIZE];
 
-char traversable_tiles[TILE_MAX_NUM] = {
-    1, // TILE_STONE,
-    1, // TILE_DIRT,
-    1, // TILE_SAND,
-    1, // TILE_SANDSTONE,
-    1, // TILE_SWEET_TREE,
-    1, // TILE_SWEET_BUSH,
-    1, // TILE_SWEET_FLOWER,
-    1, // TILE_GRASS,
-    1, // TILE_SWEET_GRASS,
-    1, // TILE_WATER,
-};
-
 void remove_from_chunks(InventoryElement * object)
 {
     world_table[object->location.chunk.map_y][object->location.chunk.map_x]->remove_object(object);
@@ -160,9 +147,4 @@ void set_item_at_ppos(InventoryElement * item, Player * player)
 int get_tile_at(int chunk_x, int chunk_y, int x, int y)
 {
     return world_table[chunk_y][chunk_x]->table[y][x].tile;
-}
-
-enum game_tiles get_tile_at_ppos(Player * player)
-{
-    return (game_tiles)get_tile_at(player->map_x, player->map_y, player->x, player->y);
 }

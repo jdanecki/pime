@@ -6,7 +6,18 @@
 #include "show_list.h"
 
 #include "test_axe.h"
+#include "test_knife.h"
+#include "../../server/cpp-src/tools/pickaxe.h"
+#include "../../server/cpp-src/tools/pickaxe_blade.h"
+#include "../../server/cpp-src/tools/pickaxe_handle.h"
+
+#include "../../server/cpp-src/tools/knife.h"
+#include "../../server/cpp-src/tools/knife_blade.h"
+#include "../../server/cpp-src/tools/knife_handle.h"
+
 #include "../../server/cpp-src/tools/wall.h"
+#include "../../server/cpp-src/tools/hut.h"
+#include "../../server/cpp-src/elements_server.h"
 
 #include <cstdio>
 #include <stdarg.h>
@@ -89,11 +100,7 @@ void show_description()
 
 void show()
 {
-    printf("%sb/B - base elements (details off/on)\n", colorCyan);
-    printf("1/! - base animals (details off/on)\n");
-    printf("2/@ - base plants (details off/on)\n");
-
-    printf("e/E - elements (details off/on)\n");
+    printf("%se/E - elements (details off/on)\n", colorCyan);
     printf("i/I - inventory (details off/on)\n");
     printf("p/P - plants (details off/on)\n");
     printf("a/A - animals (details off/on)\n");
@@ -103,22 +110,7 @@ void show()
 
     char c = wait_key('s');
     switch (c)
-    {
-        case 'b':
-        case 'B':
-            show_base_table(Class_BaseElement, c == 'B');
-            break;
-
-        case '1':
-        case '!':
-            show_base_table(Class_BaseAnimal, c == '!');
-            break;
-
-        case '2':
-        case '@':
-            show_base_table(Class_BasePlant, c == '@');
-            break;
-
+    {        
         case 'i':
         case 'I':
             player->inventory->show(c == 'I');
@@ -152,21 +144,21 @@ void show()
 }
 void add_new_element()
 {
-    Element * el = new Element;
+    Element * el = create_element(new BaseElement(Form_solid,Color {0,0,0}, 0 ));
     elements->add(el);
     printf("new Element %s found\n", el->get_name());
 }
 
 void add_new_animal()
 {
-    Animal * el = new Animal;
+    Animal * el = create_animal(new BaseAnimal(0));
     animals->add(el);
     printf("new Animal %s found\n", el->get_name());
 }
 
 void add_new_plant()
 {
-    Plant * p = new Plant;
+    Plant * p = create_plant(new BasePlant(0));
     plants->add(p);
     printf("new Plant %s found\n", p->get_name());
 }
@@ -234,53 +226,77 @@ void change_clock()
     }
 }
 
-void clone()
-{
-    InventoryElement * el = select_element(player->inventory);
-    if (!el)
-        return;
-    el->show();
-    Class_id cid = el->get_base_cid();
-    InventoryElement * new_el;
-    switch (cid)
-    {
-        case Class_BaseElement:
-            new_el = new Element(el->get_id());
-            break;
-        case Class_BaseAnimal:
-            new_el = new Animal(el->get_id());
-            break;
-        case Class_BasePlant:
-            new_el = new Plant(el->get_id());
-            break;
-    }
-    if (!new_el)
-        return;
-    player->inventory->add(new_el);
-    new_el->show();
-}
 
 void test()
 {
     printf("%sa - test axe\n", colorCyan);
-    printf("c - clone item\n");
-
+    printf("%sk - test knife\n", colorCyan);
     printf("%s%s", colorNormal, colorGreenBold);
 
     char c = wait_key('t');
+    InventoryElement *el=nullptr;
     switch (c)
     {
-        case 'a':
-        {
-            Axe * axe = test_axe();
-            if (axe)
-                player->inventory->add(axe);
-        }
-        break;
-        case 'c':
-            clone();
+        case 'a': el = test_axe(); break;
+        case 'k': el = test_knife(); break;
+    }
+    if (el)
+        player->inventory->add(el);
+}
+
+InventoryElement * craft2_ing(char c)
+{
+    InventoryElement * target = nullptr;
+    InventoryElement *el2[2];
+    el2[0]= nullptr;
+    el2[1] = nullptr;
+    if (!select_inventory2(2, el2))
+        return nullptr;
+    switch (c)
+    {
+        case 'a': target = new Axe(el2[0], el2[1]); break;
+        case '1': target = new PickAxe(el2[0], el2[1]); break;
+        case '4': target = new Knife(el2[0], el2[1]); break;
+        case '7': target = new Hut(el2[0], el2[1]); break;
+    }
+    if (!target) return nullptr;
+    if (!target->craft())
+    {
+        delete target;
+        return nullptr;
+    }
+
+    player->inventory->remove(el2[0]);
+    player->inventory->remove(el2[1]);
+    return target;
+}
+
+InventoryElement * craft_ing(char c)
+{
+    InventoryElement * target = nullptr;
+    InventoryElement * el = select_element(player->inventory);
+    if (!el) return nullptr;
+
+    switch (c)
+    {
+        case 'b': target = new AxeBlade(el); break;
+        case 'h': target = new AxeHandle(el); break;
+        case '2': target = new PickAxeBlade(el); break;
+        case '3': target = new PickAxeHandle(el); break;
+        case '5': target = new KnifeBlade(el); break;
+        case '6': target = new KnifeHandle(el); break;
+
+        case 'w': target = new Wall(el);
             break;
     }
+    if (!target) return nullptr;
+    if (!target->craft())
+    {
+        delete target;
+        return nullptr;
+    }
+    player->inventory->remove(el);
+    return target;
 }
 
 void craft()
@@ -288,59 +304,45 @@ void craft()
     printf("%sa - craft axe\n", colorCyan);
     printf("b - craft axe blade\n");
     printf("h - craft axe handle\n");
+
+    printf("1 - craft pickaxe\n");
+    printf("2 - craft pickaxe blade\n");
+    printf("3 - craft pickaxe handle\n");
+
+    printf("4 - craft knife\n");
+    printf("5 - craft knife blade\n");
+    printf("6 - craft knife handle\n");
+
+    printf("7 - craft hut\n");
     printf("w - craft wall\n");
 
     printf("%s%s", colorNormal, colorGreenBold);
 
+    InventoryElement * target=nullptr;
     char c = wait_key('c');
     switch (c)
     {
         case 'a':
-        {
-            InventoryElement *el2[2];
-            el2[0]= nullptr;
-            el2[1] = nullptr;
-            if (!select_inventory2(2, el2))
-                return;
-            Axe * axe = new Axe(el2[0], el2[1]);
-            if (!axe->craft())
-                return;
-            player->inventory->add(axe);
-            player->inventory->remove(el2[0]);
-            player->inventory->remove(el2[1]);
-            printf("axe added to inventory\n");
-        }
+        case '1':
+        case '4':
+        case '7':
+            target = craft2_ing(c);
         break;
         case 'b':
         case 'h':
         case 'w':
-        {
-            InventoryElement * el = select_element(player->inventory);
-            if (!el)
-                return;
-            InventoryElement * target;
-            switch (c)
-            {
-                case 'b':
-                    target = new AxeBlade(el);
-                    break;
-                case 'h':
-                    target = new AxeHandle(el);
-                    break;
-                case 'w':
-                    target = new Wall(el);
-                    break;
-            }
-            if (!target->craft())
-            {
-                delete target;
-                return;
-            }
-            player->inventory->add(target);
-            player->inventory->remove(el);
-            printf("%s added to inventory\n", target->get_name());
-        }        
+        case '2':
+        case '3':
+        case '5':
+        case '6':
+            target = craft_ing(c);
         break;
+    }
+    if (target)
+    {
+        player->inventory->add(target);
+        player->set_known(target);
+        printf("%s added to inventory\n", target->get_name());
     }
 }
 
@@ -456,7 +458,8 @@ void ask_say(char c)
                 el = select_element(player->inventory);
             }
         }
-        player->conversation(current_npc, s, el);
+        if (player->conversation(current_npc, s, el))
+            current_npc=nullptr;
         printf("%s%s", colorNormal, colorGreenBold);
     }
 }
@@ -528,9 +531,9 @@ void play()
                 break;
         }
         game_time->update_time(1);
-        plants->tick();
-        animals->tick();
-        npcs->tick();
+      //  plants->tick();
+      //  animals->tick();
+      //  npcs->tick();
     }
 }
 
@@ -555,7 +558,7 @@ int main()
     set_terminal();
 
     srandom(time(nullptr));
-    init_elements();
+
     game_time = new Game_time;
 
     elements = new InvList("elements");

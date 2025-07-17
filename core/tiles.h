@@ -4,22 +4,6 @@
 #include "alchemist/el_list.h"
 #include "alchemist/elements.h"
 
-enum game_tiles
-{
-    TILE_AIR,
-    TILE_STONE,
-    TILE_DIRT,
-    TILE_SAND,
-    TILE_SANDSTONE,
-    TILE_SWEET_TREE,
-    TILE_SWEET_BUSH,
-    TILE_SWEET_FLOWER,
-    TILE_GRASS,
-    TILE_SWEET_GRASS,
-    TILE_WATER,
-    TILE_MAX_NUM
-};
-
 enum biomes
 {
     BIOME_DESERT, // yellow

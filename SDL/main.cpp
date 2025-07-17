@@ -1,5 +1,6 @@
 
 #include "main.h"
+#include "dialog/d_craft.h"
 #include "window.h"
 // Normal speed
 #define UPDATE_DELAY 1000
@@ -154,12 +155,17 @@ void do_auto_explore()
 
 void draw_dialogs()
 {
+    if (d_craft.show)
+    {
+        d_craft.draw(renderer);
+    }
     hotbar.draw(renderer);
 }
 
 void update_dialogs()
 {
     hotbar.update();
+    d_craft.update();
 }
 
 void loop()

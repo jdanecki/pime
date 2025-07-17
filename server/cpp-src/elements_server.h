@@ -3,11 +3,12 @@
 
 #include "../../core/alchemist/elements.h"
 
-class BaseElementServer : BaseElement
+class BaseElementServer : public BaseElement
 {
+    public:
     Property * density;
     Solid * solid;
-    public:
+
     BaseElementServer(Form f, int index);
     ~BaseElementServer();
     int foo(int a);
@@ -34,24 +35,13 @@ class ElementServer : public Element
   public:
     Property sharpness;
     Property smoothness;
-    Property length;
-    Property width;
-    Property height;
-    Property volume; // lenght*width*height
-    
-    Property ** get_properties(int * count)
-    {
-        Property ** props = new Property *[7];
-        props[0] = &sharpness;
-        props[1] = &smoothness;
-        // props[2] = &mass; FIXME
-        props[2] = &length;
-        props[3] = &width;
-        props[4] = &height;
-        props[5] = &volume;
-        *count = 6;
-        return props;
-    }
+
+    ElementServer(BaseElement* base);    
+    bool action(Product_action action);
+    bool action_cut();
+    bool action_hit();
+
+
 };
 
 class BeingServer
@@ -111,6 +101,13 @@ class AnimalServer : public Animal
     bool tick() override;
     // AnimalServer();
     AnimalServer(BaseAnimal* base);
+    bool action(Product_action action)
+    {
+        Animal::action(action);
+        printf("ANIMAL_SERVER: %s %s\n", Product_action_names[action], get_name());
+        return false;
+    }
+
 };
 
 class PlantServer : public Plant, public BeingServer
@@ -142,9 +139,15 @@ class PlantServer : public Plant, public BeingServer
                     age->value = 0;
                     break;
             }
-            printf("%s changing phase: %s -> %s age=%u/%u\n", name, Plant_phase_name[phase], Plant_phase_name[p], age->value, max_age->value);
+            printf("%s changing phase: %s -> %s age=%u/%u\n", get_name(), Plant_phase_name[phase], Plant_phase_name[p], age->value, max_age->value);
         }
         phase = p;
+    }
+    bool action(Product_action action)
+    {
+        Plant::action(action);
+        printf("PLANT_SERVER: %s %s\n", Product_action_names[action], get_name());
+        return false;
     }
 };
 
@@ -174,6 +177,6 @@ public:
 
 AnimalServer* create_animal(BaseAnimal* base);
 PlantServer* create_plant(BasePlant* base);
-Element* create_element(BaseElement* base);
+ElementServer *create_element(BaseElement* base);
 
 #endif

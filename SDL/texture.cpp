@@ -7,7 +7,9 @@
 #include <stdio.h>
 
 struct textures Texture;
-SDL_Texture * tiles_textures[TILE_MAX_NUM];
+
+int tiles_textures_count;
+SDL_Texture ** tiles_textures;
 SDL_Texture * items_textures[BASE_ELEMENTS];
 SDL_Texture * ing_textures[ING_ELEMENTS];
 SDL_Texture * prod_textures[PROD_ELEMENTS];
@@ -40,11 +42,6 @@ SDL_Texture * load_texture(const char * texture_name)
     }
 
     return texture;
-}
-
-void add_tile_texture(enum game_tiles id, const char * file)
-{
-    tiles_textures[id] = load_texture(file);
 }
 
 void add_items_texture(int id, const char * file)
@@ -98,20 +95,14 @@ void load_textures()
 
     npc_texture = load_texture("textures/npc.png");
 
-    add_tile_texture(TILE_AIR, "textures/game_tiles/air.png");
-    add_tile_texture(TILE_STONE, "textures/game_tiles/stone.png");
-    add_tile_texture(TILE_DIRT, "textures/game_tiles/dirt.png");
-    //    add_tile_texture(TILE_TREE, "textures/game_tiles/tree.png");
-    add_tile_texture(TILE_SAND, "textures/game_tiles/sand.png");
-    add_tile_texture(TILE_SANDSTONE, "textures/game_tiles/sandstone.png");
-    //    add_tile_texture(TILE_SWEET_TREE, "textures/game_tiles/sweet_tree.png");
-    //    add_tile_texture(TILE_SWEET_BUSH,"textures/game_tiles/sweet_bush.png");
-    //    add_tile_texture(TILE_SWEET_FLOWER,"textures/game_tiles/sweet_flower.png");
-    add_tile_texture(TILE_GRASS, "textures/game_tiles/grass.png");
-    add_tile_texture(TILE_SWEET_GRASS, "textures/game_tiles/sweet_grass.png");
-    add_tile_texture(TILE_WATER, "textures/game_tiles/water.png");
-
     int i = 0;
+
+    //FIXME check number of tiles textures
+    tiles_textures=new SDL_Texture*[20];
+
+    tiles_textures_count=add_textures_from_dir(tiles_textures, i, "textures/game_tiles");
+
+    i = 0;
     i = add_textures_from_dir(items_textures, i, "textures/items/solid");
     i = add_textures_from_dir(items_textures, i, "textures/items/liquid");
     i = add_textures_from_dir(items_textures, i, "textures/items/gas");
