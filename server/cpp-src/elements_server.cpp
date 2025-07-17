@@ -318,7 +318,14 @@ bool ElementServer::action(Product_action action)
         case ACT_CUT:     res = action_cut(); break;
         case ACT_HIT:     res = action_hit(); break;
     }
-    objects_to_update.add(this);
+    if (volume.value < 1)
+    {
+        destroy(this);
+    }
+    else
+    {
+        objects_to_update.add(this);
+    }
     return res;
 }
 
