@@ -189,7 +189,7 @@ fn update_chunk_for_player(server: &Server, peer: &SocketAddr, coords: (u8, u8))
     let mut data = vec![
         0 as u8;
         3 + (core::CHUNK_SIZE * core::CHUNK_SIZE) as usize
-            * size_of::<core::game_tiles>()
+            * size_of::<i32>()
     ];
     data[0] = core::PACKET_CHUNK_UPDATE;
     data[1] = coords.0;

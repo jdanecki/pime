@@ -40,9 +40,8 @@ int Player::get_id()
     return id;
 }
 
-Player::Player(int id) : id(id)
-{
-    c_id = Class_Player;
+Player::Player(int id) : InventoryElement(Class_Player ),id(id)
+{    
     hunger = 500;
     thirst = 250;
     map_x = WORLD_CENTER;
@@ -61,15 +60,11 @@ Player::Player(int id) : id(id)
     }
     in_conversation = false;
     talking_to = nullptr;
-    welcomed = false;
-    delete name;
+    welcomed = false;    
     name = new char[16];
     sprintf((char *)name, "%s%d", "Player", id);
 
-    known_elements = new ElementsList("known elements");
-    known_elements->add(new ElementsTable(BASE_ELEMENTS, Class_BaseElement));
-    known_elements->add(new ElementsTable(BASE_ANIMALS, Class_BaseAnimal));
-    known_elements->add(new ElementsTable(BASE_PLANTS, Class_BasePlant));
+    known_elements = new ElementsList("known elements");    
 }
 
 int Player::conversation(Player *who, Sentence *s, InventoryElement *el)
@@ -96,13 +91,18 @@ void Player::stop_conversation()
 {
     in_conversation = false;
     welcomed = false;
-    printf("%s stopped talking to %s\n", talking_to->get_name(), get_name());
-    talking_to = nullptr;
+    if (talking_to) {
+        printf("%s stopped talking to %s\n", talking_to->get_name(), get_name());
+        Player * p = talking_to;
+        talking_to = nullptr;
+        p->stop_conversation();
+    }
 }
 
 void Player::show(bool details)
 {
-    // Being::show(true);
+    printf("%s %s\n", Class_names[c_id], get_name());
+
     if (talking_to)
     {
         printf("%s is talking to %s\n", get_name(), talking_to->get_name());
@@ -118,7 +118,7 @@ bool Player::say(Sentence * s)
         case NPC_Say_Bye:
         case NPC_Say_See_you_later:
         case NPC_Say_See_you_next_time:
-            stop_conversation();
+            stop_conversation();            
             return true;
 
         case NPC_Say_Hello:
@@ -181,7 +181,7 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
             }
             else
             {
-                print_status(1, "%s says: %s", n, a);
+                print_status(1, "%s says: %s", n, a->text);
             }
     }
     else {
@@ -207,26 +207,37 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
 }
 
 char * Player::get_el_description(InventoryElement * el)
-{
-    // TODO jacek check if item known
-    // if (el->crafted)
-    //     return el->get_description();
-
-    Class_id b = el->get_base_cid();
-    ElementsTable * known_list = dynamic_cast<ElementsTable *>(known_elements->find(&b));
-    // bool known = known_list->is_known(el->get_id());
-
-    // if (known)
+{       
+    if (check_known(el))
         return el->get_description();
-    // else
-    //     return nullptr;
+     else
+        return nullptr;
+}
+
+bool Player::check_known(InventoryElement *el)
+{
+    ElId i;
+    i.c_id = el->get_base_cid();
+    i.id = el->get_id();
+
+    KnownElement *k = dynamic_cast<KnownElement *>(known_elements->find(&i));
+    if (!k) return false;
+    return k->is_known();
 }
 
 void Player::set_known(InventoryElement * el)
 {
-    Class_id b = el->get_base_cid();
-    ElementsTable * known_list = dynamic_cast<ElementsTable *>(known_elements->find(&b));
-    known_list->set_known((el->get_id()));
+    ElId i;
+    i.c_id = el->get_base_cid();
+    i.id = el->get_id();
+
+    KnownElement *k = dynamic_cast<KnownElement *>(known_elements->find(&i));
+    if (!k)
+    {
+        KnownElement * n=new KnownElement(i.c_id, i.id);
+        known_elements->add(n);
+        n->set_known();
+    }
 }
 
 Relations Player::find_relation(Player *who)

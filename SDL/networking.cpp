@@ -148,7 +148,7 @@ extern "C"
             // world_table[y][x] = (chunk*)calloc(1, sizeof(chunk));
             // world_table[y][x]->objects = InvList();
             world_table[y][x] = new chunk(x, y);
-            memcpy(world_table[y][x]->table, &data[0], CHUNK_SIZE * CHUNK_SIZE * sizeof(game_tiles));
+            memcpy(world_table[y][x]->table, &data[0], CHUNK_SIZE * CHUNK_SIZE * sizeof(int));
             /*printf("got %d items\n[", item_num);
             for (int i = 0; i < 1027 + item_num*20; i++)
             {
@@ -166,7 +166,6 @@ extern "C"
 
         printf("seed: %ld\n", seed);
         srand(seed);
-        init_elements();
         init_sentences();
         init_questions();
         init_answers();
@@ -202,7 +201,7 @@ extern "C"
                 }
                 case Class_Animal:
                 {
-                    Animal * p = dynamic_cast<Animal *>(el);
+                    //Animal * p = dynamic_cast<Animal *>(el);
                     // p->age->value = data.animal.data.age;
                     // p->max_age->value = data.animal.data.max_age;FIXME
                     break;
@@ -273,6 +272,7 @@ extern "C"
                 int item_y = el->location.chunk.y;
                 world_table[y][x]->add_object(el, item_x, item_y);
 
+                printf("created object: %s\n", el->get_name());
                 print_status(1, "created object: %s", el->get_name());
             }
         }

@@ -20,7 +20,6 @@ enum Class_id
     Class_Ingredient,
     Class_Product,
 
-    Class_Being,
     Class_Plant,
     Class_Animal,
     Class_Player,
@@ -33,11 +32,12 @@ class Base
 {
   public:
     Class_id c_id;
-    int id; // index in BaseTable
+    int id;
     SerializableCString name;
     Base(int index, Class_id c, const char* name);
     virtual void show(bool details = true);
     const char* get_name();
+
 };
 
 struct Color
@@ -61,18 +61,22 @@ class chunk;
 class InventoryElement
 {
     // int x, y, z;
-  protected:
-    const char * name;
-
-  public:
+   public:
     // Property mass; // density*volume // FIXME maybe
+
+
+    Class_id c_id;
+    size_t uid;
     unsigned int mass;
     ItemLocation location;
-    size_t uid;
-    Class_id c_id;
 
-    InventoryElement(); //: mass("unknown element", 0)
     InventoryElement(Class_id c_id, size_t uid, unsigned int mass, ItemLocation location);
+    InventoryElement(Class_id c_id)
+    {
+        this->c_id=c_id;
+        uid=(size_t)this;
+        mass=rand() % 100;
+    }
     virtual bool use(int map_x, int map_y, int x, int y)
     {
         return false;
@@ -91,7 +95,7 @@ class InventoryElement
     }
     virtual const char * get_name()
     {
-        return name;
+        return nullptr;
     }
     const char * get_class_name()
     {
@@ -150,6 +154,12 @@ class InventoryElement
     virtual void update_item_location(ItemLocation &, ItemLocation &)
     {
     }
+    virtual Form get_form() { return Form_unknown; }
+    virtual const char * get_form_name()
+    {
+        return Form_name[Form_unknown];
+    }
+
 };
 
 enum object_types
@@ -179,10 +189,10 @@ class Object : public InventoryElement
     {
         return object_names[type];
     }
-    void show()
+    void show(bool details = true) override
     {
         printf("Object type: %s", get_name());
-        base->show();
+        base->show(details);
     }
 };
 
@@ -209,7 +219,7 @@ class Element : public InventoryElement
     {
         return base.get();
     }
-    // void show(bool details = true) override;
+    void show(bool details = true) override;
     Element(BaseElement * b);
     Form get_form()
     {
@@ -298,6 +308,10 @@ class Ingredient : public InventoryElement
 
     void show(bool details = true);
 
+    const char * get_name()
+    {
+        return Ingredient_name[id];
+    }
     char * get_description()
     {
         char * buf = new char[128];
@@ -337,6 +351,10 @@ class Product : public InventoryElement
     }
     void show(bool details = true) override;
 
+    const char * get_name()
+    {
+        return Product_name[id];
+    }
     char * get_description() override
     {
         char * buf = new char[128];
@@ -349,35 +367,6 @@ class Product : public InventoryElement
         return object->use(this);
     }
 };
-
-// FIXME is it even needed?
-// class Being : public InventoryElement
-// {
-//     size_t padding; // FIXME
-
-//   public:
-//     // shared with client
-
-//     bool alive;
-//     bool can_talk;
-
-//     Being()
-//     {
-//         alive = true;
-//         c_id = Class_Being;
-
-//         name = nullptr;
-//         can_talk = false;
-//     }
-//     bool is_alive()
-//     {
-//         return alive;
-//     }
-//     void show(bool details = true)
-//     {
-//         printf("%s %s alive=%d uid=%lx\n", Class_names[c_id], name, alive, uid);
-//     }
-// };
 
 class BaseAnimal : public Base
 {
@@ -406,11 +395,10 @@ class Animal : public InventoryElement
 
   public:
     Animal(BaseAnimal * b);
-    // Animal();
-    // Animal(int i);
+
     void show(bool details = true) override
     {
-        printf("Animal %s uid=%lx\n", name, uid);
+        printf("Animal %s uid=%lx\n", get_name(), uid);
         if (details)
             base.get()->show(details);
     }
@@ -432,10 +420,14 @@ class Animal : public InventoryElement
         printf("using %s on %s, do you want to kill it?\n", object->get_name(), get_name());
         return false;
     }
+    const char * get_name()
+    {
+        return base.get()->get_name();
+    }
     char * get_description() override
     {
         char * buf = new char[128];
-        sprintf(buf, "%s: (%s)", get_class_name(), base.get()->get_name());
+        sprintf(buf, "%s: (%s)", get_class_name(), get_name());
         return buf;
     }
 };
@@ -487,16 +479,19 @@ class Plant : public InventoryElement
     Plant_phase phase;
     bool grown;
 
-    Plant(BasePlant * b);
-    // Plant();
-    // Plant(int i);
+       Plant(BasePlant * b);
+
     void show(bool details = true) override
     {
-        printf("Plant -> %d name=%s grown=%d uid=%lx\n", c_id, name, grown, uid);
+        printf("Plant -> %d name=%s grown=%d uid=%lx\n", c_id, get_name(), grown, uid);
         if (details)
         {
             printf("phase=%s planted=%d times=%d/%d/%d/ water=%d\n", Plant_phase_name[phase], planted, seedling_time, growing_time, flowers_time, water);
         }
+    }
+    const char * get_name()
+    {
+        return base.get()->get_name();
     }
     int get_id() override
     {
@@ -514,7 +509,7 @@ class Plant : public InventoryElement
     char * get_description() override
     {
         char * buf = new char[128];
-        sprintf(buf, "%s: (%s)", get_class_name(), base.get()->get_name());
+        sprintf(buf, "%s: (%s)", get_class_name(), get_name());
         return buf;
     }
 };
@@ -529,9 +524,5 @@ class Plant : public InventoryElement
 #define BASE_ANIMALS 40
 #define BASE_PLANTS 30
 
-void init_elements();
-void show_base_table(Class_id id, bool details);
-
-// BaseElement* get_base_element(int id);
 
 #endif

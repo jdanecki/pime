@@ -142,7 +142,7 @@ class PlantServer : public Plant, public BeingServer
                     age->value = 0;
                     break;
             }
-            printf("%s changing phase: %s -> %s age=%u/%u\n", name, Plant_phase_name[phase], Plant_phase_name[p], age->value, max_age->value);
+            printf("%s changing phase: %s -> %s age=%u/%u\n", get_name(), Plant_phase_name[phase], Plant_phase_name[p], age->value, max_age->value);
         }
         phase = p;
     }
