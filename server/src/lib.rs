@@ -164,8 +164,8 @@ impl<'a> From<&'a [u8]> for ClientEvent<'a> {
 }
 
 pub fn init_server() -> Result<Server, Box<dyn Error>> {
-    // let socket = UdpSocket::bind("127.0.0.1:1234")?;
-    let socket = UdpSocket::bind("0.0.0.0:1234")?;
+    let socket = UdpSocket::bind("127.0.0.1:1234")?;
+    // let socket = UdpSocket::bind("0.0.0.0:1234")?;
     socket.set_nonblocking(true).unwrap();
     generator::generate();
 
@@ -326,17 +326,12 @@ fn handle_packet(
         if diff > 1 && diff <= 32 {
             client_data.acks_bitmap = client_data.acks_bitmap << (diff - 1);
         }
-        // for i in 0..diff - 1 {
-        //     if client_data.acks_bitmap & (1 << (31 - i)) > 0 {
-        //         println!("PACKET NOT CONFIRMED {}", client_data.remote_seq_num - (31 - i));
-        //     }
-        // }
         client_data.remote_seq_num = seq;
     } else if seq < client_data.remote_seq_num {
         let diff = client_data.remote_seq_num - seq;
         client_data.acks_bitmap = client_data.acks_bitmap | (1 << (diff - 1));
     } else {
-        panic!("WTF");
+        panic!("Shouldn't ever receive 2 packets with same seq_num");
     }
     // Detect packet loss
     for i in 0..31 {
@@ -347,14 +342,19 @@ fn handle_packet(
     client_data.not_confirmed_packets.remove(&ack);
 
     let mut to_remove = vec![];
-    for (&id, _) in client_data.not_confirmed_packets.iter() {
+    let mut to_resend = vec![];
+    for (&id, d) in client_data.not_confirmed_packets.iter() {
         if id + 32 < ack {
             println!("PACKET NOT CONFIRMED {}", id);
+            to_resend.push(d.clone());
             to_remove.push(id);
         }
     }
     for i in to_remove {
         client_data.not_confirmed_packets.remove(&i);
+    }
+    for d in to_resend {
+        server.send_to_reliable(&d, peer);
     }
 
     let packet = &packet[12..];

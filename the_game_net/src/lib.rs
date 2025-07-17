@@ -74,10 +74,10 @@ pub extern "C" fn init() -> *mut NetClient {
 }
 
 fn init_internal() -> Result<NetClient, Box<dyn Error>> {
-    // let socket = UdpSocket::bind("127.0.0.1:0")?;
-    // socket.connect("127.0.0.1:1234")?;
-    let socket = UdpSocket::bind("0.0.0.0:0")?;
-    socket.connect("141.147.35.247:1234")?;
+    let socket = UdpSocket::bind("127.0.0.1:0")?;
+    socket.connect("127.0.0.1:1234")?;
+    // let socket = UdpSocket::bind("0.0.0.0:0")?;
+    // socket.connect("141.147.35.247:1234")?;
 
     Ok(NetClient {
         socket,
@@ -121,7 +121,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                     client.my_acks_bitmap = client.my_acks_bitmap | (1 << (diff - 1));
                 }
             } else {
-                panic!("WTF");
+                panic!("Shouldn't ever receive 2 packets with same seq_num");
             }
             // Detect packet loss
             for i in 0..31 {
@@ -132,14 +132,19 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             client.not_confirmed_packets.remove(&ack);
 
             let mut to_remove = vec![];
-            for (&id, _) in client.not_confirmed_packets.iter() {
+            let mut to_resend = vec![];
+            for (&id, d) in client.not_confirmed_packets.iter() {
                 if id + 32 < ack {
                     println!("PACKET NOT CONFIRMED {}", id);
+                    to_resend.push(d.clone());
                     to_remove.push(id);
                 }
             }
             for i in to_remove {
                 client.not_confirmed_packets.remove(&i);
+            }
+            for d in to_resend {
+                client.send(&d);
             }
             client.unsent_acks += 1;
             if client.unsent_acks > 20 {
