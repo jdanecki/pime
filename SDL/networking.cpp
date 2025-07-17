@@ -186,8 +186,8 @@ extern "C"
             {
                 case Class_Element:
                 {
-                    ElementSDL* el = dynamic_cast<ElementSDL*>(el);
-                    *el = data->element.data;
+                    ElementSDL* element = dynamic_cast<ElementSDL*>(el);
+                    *element = data->element.data;
                     break;
                 }
                 case Class_Ingredient:

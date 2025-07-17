@@ -312,12 +312,14 @@ bool ElementServer::action(Product_action action)
 {
     printf("ELEMENT_SERVER: %s %s\n", Product_action_names[action], get_name());
     printf("%s\n", get_description());
+    bool res = false;
     switch(action)
     {
-        case ACT_CUT:     return action_cut(); break;
-        case ACT_HIT:     return action_hit(); break;
+        case ACT_CUT:     res = action_cut(); break;
+        case ACT_HIT:     res = action_hit(); break;
     }
-    return false;
+    objects_to_update.add(this);
+    return res;
 }
 
 bool ElementServer::action_cut()
