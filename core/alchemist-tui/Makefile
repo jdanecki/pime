@@ -5,11 +5,12 @@ TOOLS=../../server/cpp-src/tools/axe.cpp ../../server/cpp-src/tools/axe_blade.cp
 	  ../../server/cpp-src/tools/wall.cpp ../../server/cpp-src/tools/hut.cpp
 CORE=../world.cpp ../tiles.cpp ../player.cpp ../npc.cpp
 SERVER=../../server/cpp-src/elements_server.cpp
+TEST=test_axe.cpp test_knife.cpp
 
 all:
 	ccache g++ -Wall -Wno-switch -DCORE_TUI -g -o alchemist \
         $(ALCHEMIST) $(SERVER) $(TOOLS)  $(CORE) \
-        main.cpp test_axe.cpp show_list.cpp game_time.cpp plants.cpp 
+        main.cpp $(TEST) show_list.cpp game_time.cpp plants.cpp 
 
 clean:
 	rm alchemist

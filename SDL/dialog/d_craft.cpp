@@ -67,6 +67,7 @@ void button_switch(int id)
 DCraft::DCraft() : Dialog(0, 0, 500, 500, {125, 125, 125, 125}), ingredients(140, 120, 500 - 140, 500 - 120, {125, 125, 125, 10}), products(140, 120, 500 - 140, 500 - 120, {125, 125, 125, 10})
 {
     this->show = false;
+    //FIXME Piotr - change to struct instead of bunch of parameters
     this->add_button(0, 0, 0, 250, 100, 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Ingredients", &button_switch);
     this->add_button(1, 250, 0, 250, 100, 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Products", &button_switch);
     this->add_image(0, 20, 120, 100, 100);

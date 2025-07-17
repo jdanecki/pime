@@ -296,7 +296,63 @@ PlantServer* create_plant(BasePlant* base)
     return new PlantServer(base);
 }
 
-Element* create_element(BaseElement* base)
+ElementServer* create_element(BaseElement* base)
 {
-    return new Element(base);
+    return new ElementServer(base);
+}
+
+ElementServer::ElementServer(BaseElement *base):Element(base),
+      sharpness("sharpness", rand() %100),
+      smoothness("smoothness", rand() %100)
+{
+
+}
+
+bool ElementServer::action(Product_action action)
+{
+    printf("ELEMENT_SERVER: %s %s\n", Product_action_names[action], get_name());
+    printf("%s\n", get_description());
+    switch(action)
+    {
+        case ACT_CUT:     return action_cut(); break;
+        case ACT_HIT:     return action_hit(); break;
+    }
+    return false;
+}
+
+bool ElementServer::action_cut()
+{
+    BaseElementServer *b=(BaseElementServer*) get_base();
+    if (b->form == Form_solid)
+    {
+        //    if (b->solid->hardness < 50)
+        {
+            length.value/=2;
+            width.value/=2;
+            height.value/=2;
+            volume.value=length.value * width.value * height.value;
+        }
+        printf("%s\n", get_description());
+        return true;
+    }
+    return false;
+}
+
+bool ElementServer::action_hit()
+{
+     BaseElementServer *b=(BaseElementServer*) get_base();
+    if (b->form == Form_solid)
+    {
+        //    if (b->solid->hardness < 50)
+
+        {
+            length.value/=4;
+            width.value/=4;
+            height.value/=4;
+            volume.value=length.value * width.value * height.value;
+        }
+        printf("%s\n", get_description());
+        return true;
+    }
+    return false;
 }
