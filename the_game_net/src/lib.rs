@@ -2,6 +2,7 @@ use std::borrow::{Borrow, BorrowMut};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::error::Error;
+use std::ffi::CStr;
 use std::net::UdpSocket;
 use std::rc::Rc;
 
@@ -36,36 +37,47 @@ impl NetClient {
 }
 
 #[no_mangle]
-pub extern "C" fn init() -> *mut NetClient {
+pub extern "C" fn init(
+    server_ip: *const std::os::raw::c_char,
+    port: *const std::os::raw::c_char,
+) -> *mut NetClient {
+    let mut ip;
     unsafe {
         let a = core::Player::new(1);
+        ip = CStr::from_ptr(server_ip).to_str().unwrap().to_owned();
+        ip.push(':');
+        ip.push_str(CStr::from_ptr(port).to_str().unwrap())
     }
-    let client = Box::new(init_internal().expect("failed to init NetClient"));
+    let client = Box::new(init_internal(&ip).expect("failed to init NetClient"));
 
     let mut buf = [0; 13];
     buf[12] = core::PACKET_JOIN_REQUEST;
     client.socket.send(&buf).unwrap();
     let mut buf = [0; 4096];
-    let amt = client.socket.recv(&mut buf).unwrap();
-    println!("{:?}", buf);
+    loop {
+        let amt = client.socket.recv(&mut buf).unwrap();
+        println!("{:?}", buf);
 
-    let buf = &buf[12..];
+        let buf = &buf[12..];
 
-    if buf[0] == core::PACKET_PLAYER_ID {
-        unsafe {
-            events::got_id(
-                usize::from_le_bytes(buf[1..9].try_into().unwrap()),
-                0, //i64::from_le_bytes(buf[9..17].try_into().unwrap()),
-            );
-            println!("RECEIVED {:?}", &buf[9..amt]);
-            WORLD.set(bincode::deserialize::<World>(&buf[9..amt]).expect("failed to create world"));
-            WORLD.with_borrow(|world| {
-                println!("{:#?}", world);
-            })
-        };
-    } else {
-        println!("did not get id");
-        panic!();
+        if buf[0] == core::PACKET_PLAYER_ID {
+            unsafe {
+                events::got_id(
+                    usize::from_le_bytes(buf[1..9].try_into().unwrap()),
+                    0, //i64::from_le_bytes(buf[9..17].try_into().unwrap()),
+                );
+                println!("RECEIVED {:?}", &buf[9..amt]);
+                WORLD.set(
+                    bincode::deserialize::<World>(&buf[9..amt]).expect("failed to create world"),
+                );
+                WORLD.with_borrow(|world| {
+                    println!("{:#?}", world);
+                });
+                break;
+            };
+        } else {
+            println!("did not get id");
+        }
     }
 
     client.socket.set_nonblocking(true).unwrap();
@@ -73,11 +85,10 @@ pub extern "C" fn init() -> *mut NetClient {
     Box::into_raw(client)
 }
 
-fn init_internal() -> Result<NetClient, Box<dyn Error>> {
-    let socket = UdpSocket::bind("127.0.0.1:0")?;
-    socket.connect("127.0.0.1:1234")?;
-    // let socket = UdpSocket::bind("0.0.0.0:0")?;
-    // socket.connect("141.147.35.247:1234")?;
+fn init_internal(server_ip: &str) -> Result<NetClient, Box<dyn Error>> {
+    let socket = UdpSocket::bind("0.0.0.0:0")?;
+    println!("{server_ip}");
+    socket.connect(server_ip)?;
 
     Ok(NetClient {
         socket,
@@ -106,7 +117,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             if seq > client.remote_seq_num {
                 let diff = seq - client.remote_seq_num;
                 client.my_acks_bitmap = (client.my_acks_bitmap << 1) | 1;
-                if diff > 1 {
+                if diff > 1 && diff < 32 {
                     client.my_acks_bitmap = client.my_acks_bitmap << (diff - 1);
                 }
                 // for i in 0..diff - 1 {

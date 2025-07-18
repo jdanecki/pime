@@ -119,14 +119,14 @@ int init_SDL()
     return 0;
 }
 
-int setup()
+int setup(const char * ip, const char * port)
 {
     setbuf(stdout, nullptr); // fix for qtcreator console
 
     if (init_SDL() != 0)
         return 1;
 
-    client = init();
+    client = init(ip, port);
     // FIXME
     current_npc = new Npc;
 
@@ -201,9 +201,25 @@ void loop()
     }
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-    if (setup())
+    if (argc < 2)
+    {
+        printf("usage: ./pime_SDL <ip> [port]\n");
+        return 1;
+    }
+    const char* ip;
+    ip = argv[1];
+    const char* port;
+    if (argc < 3)
+    {
+        port = "1234";
+    }
+    else 
+    {
+        port = argv[2];
+    }
+    if (setup(ip, port))
         return 1;
     loop();
 }

@@ -2,7 +2,6 @@
 #include "networking.h"
 #include "world_server.h"
 
-#ifndef CORE_TUI
 void destroy(InventoryElement * el)
 {
     notify_destroy(el->get_uid(), el->location);
@@ -12,7 +11,6 @@ void destroy(InventoryElement * el)
     }
     delete el;
 }
-#endif
 
 BaseElementServer::BaseElementServer(Form f, int index) : BaseElement(f, {rand()%256, rand()%256, rand()%256},index)
 {
@@ -79,6 +77,12 @@ AnimalServer::AnimalServer(BaseAnimal* base) : Animal(base)
     delay_for_move = max_delay_move; // 600 * 100ms -> 1min
     dst_loc_x = rand() % CHUNK_SIZE;
     dst_loc_y = rand() % CHUNK_SIZE;
+}
+
+void AnimalServer::show(bool details)
+{
+    Animal::show(details);
+    BeingServer::show(details);
 }
 
 void AnimalServer::move()
@@ -148,6 +152,12 @@ bool AnimalServer::tick()
 PlantServer::PlantServer(BasePlant* base) : Plant(base)
 {
     delay_for_grow = max_delay_grow;
+}
+
+void PlantServer::show(bool details)
+{
+    Plant::show(details);
+    BeingServer::show(details);
 }
 
 bool PlantServer::grow()
@@ -266,6 +276,11 @@ ProductServer::ProductServer(InventoryElement ** from, int count, Product_id i, 
     init(i, count, f);
 }
 
+void ProductServer::show(bool details)
+{
+    Product::show(details);
+}
+
 bool ProductServer::craft() // executed only on server
 {
     for (int i = 0; i < ing_count; i++)
@@ -364,4 +379,21 @@ bool ElementServer::action_hit()
         return true;
     }
     return false;
+}
+
+void ElementServer::show(bool details)
+{
+    Element::show((details));
+    if (details)
+    {
+        sharpness.show();
+        smoothness.show();
+    }
+
+}
+
+void BeingServer::show(bool details)
+{
+    age->show();
+    max_age->show();
 }
