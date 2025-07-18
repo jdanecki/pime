@@ -6,7 +6,7 @@
 class Knife : public ProductServer
 {
   public:
-    Knife(InventoryElement * el1, InventoryElement * el2);    
+    Knife(InventoryElement * el1, InventoryElement * el2);
     bool check_ing();
 };
 #endif

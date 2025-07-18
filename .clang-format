@@ -7,4 +7,5 @@ PointerAlignment: Middle
 IndentCaseLabels: true
 AllowShortFunctionsOnASingleLine: None
 BreakStringLiterals: false
-
+SortIncludes: Never
+IncludeBlocks: Preserve

@@ -1,7 +1,9 @@
 #include "properties.h"
 #include <stdlib.h>
 
-SerializableCString::SerializableCString(const char* ptr) : str(ptr) {}
+SerializableCString::SerializableCString(const char * ptr) : str(ptr)
+{
+}
 
 Edible::Edible()
 {
@@ -33,26 +35,26 @@ void Edible::show()
 Solid::Solid()
 {
     tooling = new Property("tooling", 1 + rand() % 100);
-    //1 - trudna - potrzebne narzędzia
-    //100 - łatwe - obróbka ręczna
-/*
- *  stal sztabka	niska
-    kamień	niska
-    drewno	średnia
-    mięso	średnia
-    kauczuk	średnia
-    pajęczyna	wysoka
-    glina	wysoka
-  */
+    // 1 - trudna - potrzebne narzędzia
+    // 100 - łatwe - obróbka ręczna
+    /*
+     *  stal sztabka	niska
+        kamień	niska
+        drewno	średnia
+        mięso	średnia
+        kauczuk	średnia
+        pajęczyna	wysoka
+        glina	wysoka
+      */
     stretching = new Property("stretching", 1 + rand() % 10000);
-    //wytrzymałość
-    // styropian: 1
-    // beton:     5
-    // cyna:     14
-    // drewno:   800
-    // diament: 1800
-    // żelazo:  3800
-    // stal:   10000
+    // wytrzymałość
+    //  styropian: 1
+    //  beton:     5
+    //  cyna:     14
+    //  drewno:   800
+    //  diament: 1800
+    //  żelazo:  3800
+    //  stal:   10000
     /*
         kamień	niska - kruszy się
         glina	niska
@@ -63,14 +65,13 @@ Solid::Solid()
         stal sztabka	wysoka
       */
 
-
     squeezing = new Property("squezzing", 1 + rand() % 20000);
-    //wytrzymałość
-    // styropian:     1
-    // beton:        50
-    // kość:        150
-    // kamień: 100-5000
-    // diament:   17000
+    // wytrzymałość
+    //  styropian:     1
+    //  beton:        50
+    //  kość:        150
+    //  kamień: 100-5000
+    //  diament:   17000
     /*
         kamień	niska
         stal sztabka	niska
@@ -81,11 +82,10 @@ Solid::Solid()
         pajęczyna wysoka
       */
 
-    //na bazie wytrzymałości materiału
-    //fragility = new Property("fragility", 1000 * stretching->value / squeezing->value);
-    // < 100 kruche
-    // > spręzyste
-
+    // na bazie wytrzymałości materiału
+    // fragility = new Property("fragility", 1000 * stretching->value / squeezing->value);
+    //  < 100 kruche
+    //  > spręzyste
 
     bending = new Property("bending", 1 + rand() % 100);
     // 1 trudno  zginalne
@@ -100,9 +100,8 @@ Solid::Solid()
         pajęczyna	wysoka
       */
 
-
     solubility = new Property("solubility", 1 + rand() % 100);
-    //rozpuszczalność
+    // rozpuszczalność
 
     hardness = new Property("hardness", 1 + rand() % 100);
     /*
@@ -114,7 +113,6 @@ Solid::Solid()
         pajęczyna	niska
         stal sztabka	wysoka
       */
-
 }
 
 Solid::~Solid()
@@ -122,7 +120,7 @@ Solid::~Solid()
     delete stretching;
     delete squeezing;
     delete bending;
-   // delete fragility;
+    // delete fragility;
     delete solubility;
 }
 
@@ -133,9 +131,8 @@ void Solid::show()
     stretching->show(); // rozciąganie
     squeezing->show();  // ściskanie
     bending->show();    // zginanie
-    //fragility->show();  // kruchość
+    // fragility->show();  // kruchość
     solubility->show(); // rozpuszczalność
 }
-
 
 const char * Form_name[]{"unknown", "solid", "liquid", "gas"};

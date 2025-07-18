@@ -6,9 +6,9 @@
 
 PickAxe::PickAxe(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_PICKAXE, Form_solid)
 {
-   /* actions = new Product_action[1];
-    actions[0]=ACT_HIT;*/
-    actions=ACT_HIT;
+    /* actions = new Product_action[1];
+     actions[0]=ACT_HIT;*/
+    actions = ACT_HIT;
 }
 
 bool PickAxe::check_ing()

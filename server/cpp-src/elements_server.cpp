@@ -12,10 +12,10 @@ void destroy(InventoryElement * el)
     delete el;
 }
 
-BaseElementServer::BaseElementServer(Form f, int index) : BaseElement(f, {rand()%256, rand()%256, rand()%256},index)
+BaseElementServer::BaseElementServer(Form f, int index) : BaseElement(f, {rand() % 256, rand() % 256, rand() % 256}, index)
 {
     solid = NULL;
-    
+
     density = nullptr;
     form = f;
     switch (f)
@@ -35,7 +35,7 @@ BaseElementServer::BaseElementServer(Form f, int index) : BaseElement(f, {rand()
     name = create_name(5 - form);
 }
 
-BaseElementServer::~BaseElementServer() 
+BaseElementServer::~BaseElementServer()
 {
     delete density;
     if (solid)
@@ -44,7 +44,7 @@ BaseElementServer::~BaseElementServer()
 
 int BaseElementServer::foo(int a)
 {
-    return a+1;
+    return a + 1;
 }
 
 void BaseElementServer::show(bool details)
@@ -72,7 +72,7 @@ void BaseElementServer::show(bool details)
 //     dst_loc_y = rand() % CHUNK_SIZE;
 // }
 
-AnimalServer::AnimalServer(BaseAnimal* base) : Animal(base)
+AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
 {
     delay_for_move = max_delay_move; // 600 * 100ms -> 1min
     dst_loc_x = rand() % CHUNK_SIZE;
@@ -149,7 +149,7 @@ bool AnimalServer::tick()
 //     delay_for_grow = max_delay_grow;
 // }
 
-PlantServer::PlantServer(BasePlant* base) : Plant(base)
+PlantServer::PlantServer(BasePlant * base) : Plant(base)
 {
     delay_for_grow = max_delay_grow;
 }
@@ -229,7 +229,6 @@ bool PlantServer::tick()
     return true;
 }*/
 
-
 IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id i, Form f) : Ingredient(i)
 {
     c_id = Class_Ingredient;
@@ -251,7 +250,6 @@ bool IngredientServer::craft()
     // usage = Property("usage", rand() % 100);
     return true;
 }
-
 
 void ProductServer::init(Product_id i, int c, Form f)
 {
@@ -301,26 +299,23 @@ bool ProductServer::craft() // executed only on server
     return true;
 }
 
-AnimalServer* create_animal(BaseAnimal* base)
+AnimalServer * create_animal(BaseAnimal * base)
 {
     return new AnimalServer(base);
 }
 
-PlantServer* create_plant(BasePlant* base)
+PlantServer * create_plant(BasePlant * base)
 {
     return new PlantServer(base);
 }
 
-ElementServer* create_element(BaseElement* base)
+ElementServer * create_element(BaseElement * base)
 {
     return new ElementServer(base);
 }
 
-ElementServer::ElementServer(BaseElement *base):Element(base),
-      sharpness("sharpness", rand() %100),
-      smoothness("smoothness", rand() %100)
+ElementServer::ElementServer(BaseElement * base) : Element(base), sharpness("sharpness", rand() % 100), smoothness("smoothness", rand() % 100)
 {
-
 }
 
 bool ElementServer::action(Product_action action)
@@ -328,10 +323,14 @@ bool ElementServer::action(Product_action action)
     printf("ELEMENT_SERVER: %s %s\n", Product_action_names[action], get_name());
 
     bool res = false;
-    switch(action)
+    switch (action)
     {
-        case ACT_CUT:     res = action_cut(); break;
-        case ACT_HIT:     res = action_hit(); break;
+        case ACT_CUT:
+            res = action_cut();
+            break;
+        case ACT_HIT:
+            res = action_hit();
+            break;
     }
     if (volume.value < 1)
     {
@@ -346,15 +345,15 @@ bool ElementServer::action(Product_action action)
 
 bool ElementServer::action_cut()
 {
-    BaseElementServer *b=(BaseElementServer*) get_base();
+    BaseElementServer * b = (BaseElementServer *)get_base();
     if (b->form == Form_solid)
     {
         //    if (b->solid->hardness < 50)
         {
-            length.value/=2;
-            width.value/=2;
-            height.value/=2;
-            volume.value=length.value * width.value * height.value;
+            length.value /= 2;
+            width.value /= 2;
+            height.value /= 2;
+            volume.value = length.value * width.value * height.value;
         }
 
         return true;
@@ -364,16 +363,16 @@ bool ElementServer::action_cut()
 
 bool ElementServer::action_hit()
 {
-     BaseElementServer *b=(BaseElementServer*) get_base();
+    BaseElementServer * b = (BaseElementServer *)get_base();
     if (b->form == Form_solid)
     {
         //    if (b->solid->hardness < 50)
 
         {
-            length.value/=4;
-            width.value/=4;
-            height.value/=4;
-            volume.value=length.value * width.value * height.value;
+            length.value /= 4;
+            width.value /= 4;
+            height.value /= 4;
+            volume.value = length.value * width.value * height.value;
         }
 
         return true;
@@ -389,7 +388,6 @@ void ElementServer::show(bool details)
         sharpness.show();
         smoothness.show();
     }
-
 }
 
 void BeingServer::show(bool details)

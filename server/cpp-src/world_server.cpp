@@ -15,7 +15,7 @@ void update()
     {
         for (int x = 0; x < WORLD_SIZE; x++)
         {
-            chunk* c = world_table[y][x];
+            chunk * c = world_table[y][x];
             if (!c)
                 continue;
             ListElement * el = world_table[y][x]->beings.head;

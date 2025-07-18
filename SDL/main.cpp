@@ -201,21 +201,21 @@ void loop()
     }
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char * argv[])
 {
     if (argc < 2)
     {
         printf("usage: ./pime_SDL <ip> [port]\n");
         return 1;
     }
-    const char* ip;
+    const char * ip;
     ip = argv[1];
-    const char* port;
+    const char * port;
     if (argc < 3)
     {
         port = "1234";
     }
-    else 
+    else
     {
         port = argv[2];
     }

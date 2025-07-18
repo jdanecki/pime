@@ -42,7 +42,7 @@ void use_tile(int map_x, int map_y, int x, int y)
         send_packet_item_used_on_object(client, item->uid, object->uid);
         return;
     }
-    //FIXME pickable only on server side
+    // FIXME pickable only on server side
     send_packet_pickup(client, object->uid);
     // if (object->pickable) send_packet_pickup(client, object->uid);
     // else

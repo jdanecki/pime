@@ -33,7 +33,7 @@ enum Product_action
     ACT_NOTHING,
     ACT_CUT,
     ACT_HIT,
-    ACT_STAB, //dźgnij
+    ACT_STAB, // dźgnij
 
 };
 
@@ -45,10 +45,9 @@ class Base
     Class_id c_id;
     int id;
     SerializableCString name;
-    Base(int index, Class_id c, const char* name);
+    Base(int index, Class_id c, const char * name);
     virtual void show(bool details = true);
-    const char* get_name();
-
+    const char * get_name();
 };
 
 struct Color
@@ -61,7 +60,7 @@ struct Color
 class BaseElement : public Base
 {
   public:
-    Form form; //solid, liquid, gas
+    Form form; // solid, liquid, gas
     Color color;
 
     BaseElement(Form f, Color color, int index);
@@ -72,9 +71,8 @@ class chunk;
 class InventoryElement
 {
     // int x, y, z;
-   public:
+  public:
     // Property mass; // density*volume // FIXME maybe
-
 
     Class_id c_id;
     size_t uid;
@@ -84,9 +82,9 @@ class InventoryElement
     InventoryElement(Class_id c_id, size_t uid, unsigned int mass, ItemLocation location);
     InventoryElement(Class_id c_id)
     {
-        this->c_id=c_id;
-        uid=(size_t)this;
-        mass=rand() % 100;
+        this->c_id = c_id;
+        uid = (size_t)this;
+        mass = rand() % 100;
     }
 
     virtual bool action(Product_action action)
@@ -164,12 +162,14 @@ class InventoryElement
     virtual void update_item_location(ItemLocation &, ItemLocation &)
     {
     }
-    virtual Form get_form() { return Form_unknown; }
+    virtual Form get_form()
+    {
+        return Form_unknown;
+    }
     virtual const char * get_form_name()
     {
         return Form_name[Form_unknown];
     }
-
 };
 
 enum object_types
@@ -206,14 +206,13 @@ class Object : public InventoryElement
     }
 };
 
-template<typename T>
-class SerializablePointer
+template <typename T> class SerializablePointer
 {
-    T* ptr;
-    
-public:
-    SerializablePointer(T* p);
-    T* get()
+    T * ptr;
+
+  public:
+    SerializablePointer(T * p);
+    T * get()
     {
         return ptr;
     }
@@ -261,7 +260,7 @@ class Element : public InventoryElement
         printf("ELEMENT: %s %s\n", Product_action_names[action], get_name());
         return false;
     }
-     char * get_description() override
+    char * get_description() override
     {
         char * buf = new char[128];
         sprintf(buf, "%s: (%s) ", get_class_name(), get_name());
@@ -269,10 +268,10 @@ class Element : public InventoryElement
     }
     Property ** get_properties(int * count) override
     {
-        //FIXME
+        // FIXME
         Property ** props = new Property *[4];
-     //   props[0] = &sharpness;
-      //  props[1] = &smoothness;
+        //   props[0] = &sharpness;
+        //  props[1] = &smoothness;
         // props[2] = &mass; FIXME
         props[0] = &length;
         props[1] = &width;
@@ -317,7 +316,7 @@ class Ingredient : public InventoryElement
     size_t padding; // FIXME
 
   public:
-    //properties only needed to create product
+    // properties only needed to create product
     Property quality;    //[0..100] slaby..najlepszy
     Property resilience; // [0..100] wytrzymały..słaby
     Property usage;      // [0..100] łatwy..trudny
@@ -361,8 +360,6 @@ class Ingredient : public InventoryElement
     }
 };
 
-
-
 class Product : public InventoryElement
 {
     size_t padding; // FIXME
@@ -372,7 +369,7 @@ class Product : public InventoryElement
     Property usage;      // [0..100] łatwy..trudny
     Form req_form;
 
-    //FIMXE change it to Product_action *
+    // FIMXE change it to Product_action *
     Product_action actions;
     int actions_count;
 
@@ -382,9 +379,8 @@ class Product : public InventoryElement
         return id;
     }
     Product(Product_id i);
-    virtual void add_action(Product_action *a)
+    virtual void add_action(Product_action * a)
     {
-
     }
     Property ** get_properties(int * count) override
     {
@@ -414,12 +410,12 @@ class Product : public InventoryElement
     }
     bool use(InventoryElement * object)
     {
-       // if (!actions) return false;
-        if (actions==ACT_NOTHING) return false;
+        // if (!actions) return false;
+        if (actions == ACT_NOTHING)
+            return false;
         printf("%s: %s %s\n", get_name(), Product_action_names[actions], object->get_name());
         return object->action(actions);
-        //FIXME change properties of product after action
-
+        // FIXME change properties of product after action
     }
 };
 
@@ -540,7 +536,7 @@ class Plant : public InventoryElement
     Plant_phase phase;
     bool grown;
 
-       Plant(BasePlant * b);
+    Plant(BasePlant * b);
 
     void show(bool details = true) override
     {
@@ -548,9 +544,7 @@ class Plant : public InventoryElement
         if (details)
         {
             get_base()->show(details);
-            printf("phase=%s grown=%d planted=%d times=%d/%d/%d/ water=%d \n",
-                Plant_phase_name[phase], grown, planted, seedling_time, growing_time,
-                flowers_time, water);
+            printf("phase=%s grown=%d planted=%d times=%d/%d/%d/ water=%d \n", Plant_phase_name[phase], grown, planted, seedling_time, growing_time, flowers_time, water);
         }
     }
     BasePlant * get_base()
@@ -592,6 +586,5 @@ class Plant : public InventoryElement
 
 #define BASE_ANIMALS 40
 #define BASE_PLANTS 30
-
 
 #endif

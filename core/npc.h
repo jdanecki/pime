@@ -7,7 +7,7 @@ class Npc : public Player
 {
   public:
     Npc();
-    bool check_known(InventoryElement *el)
+    bool check_known(InventoryElement * el)
     {
         return true;
     }

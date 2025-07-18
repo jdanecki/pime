@@ -10,4 +10,3 @@
 InventoryElement * craft_prod(int product_id, InventoryElement * el1, InventoryElement * el2);
 
 #endif
-

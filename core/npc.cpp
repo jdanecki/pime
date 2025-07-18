@@ -9,5 +9,4 @@ Npc::Npc() : Player(16 + (++npcs_count))
 {
     c_id = Class_Npc;
     name = create_name(rand() % 3 + 3);
-
 }

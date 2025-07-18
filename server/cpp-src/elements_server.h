@@ -5,7 +5,7 @@
 
 class BaseElementServer : public BaseElement
 {
-    public:
+  public:
     Property * density;
     Solid * solid;
 
@@ -36,13 +36,11 @@ class ElementServer : public Element
     Property sharpness;
     Property smoothness;
 
-    ElementServer(BaseElement* base);    
+    ElementServer(BaseElement * base);
     bool action(Product_action action);
     bool action_cut();
     bool action_hit();
     void show(bool details = true) override;
-
-
 };
 
 class BeingServer
@@ -99,11 +97,12 @@ class AnimalServer : public Animal, public BeingServer
     int delay_for_move;
     int dst_loc_x, dst_loc_y;
     int padding1;
+
   public:
     void move();
     bool tick() override;
 
-    AnimalServer(BaseAnimal* base);
+    AnimalServer(BaseAnimal * base);
     bool action(Product_action action) override
     {
         Animal::action(action);
@@ -111,7 +110,6 @@ class AnimalServer : public Animal, public BeingServer
         return false;
     }
     void show(bool details = true) override;
-
 };
 
 class PlantServer : public Plant, public BeingServer
@@ -123,7 +121,7 @@ class PlantServer : public Plant, public BeingServer
     bool grow() override;
     // bool tick() override;
     // PlantServer();
-    PlantServer(BasePlant* base);
+    PlantServer(BasePlant * base);
 
     void sow()
     {
@@ -158,8 +156,8 @@ class PlantServer : public Plant, public BeingServer
 
 class IngredientServer : public Ingredient
 {
-    
-public:  
+
+  public:
     InventoryElement * el;
     bool craft();
     IngredientServer(InventoryElement * from, Ingredient_id i, Form f);
@@ -167,7 +165,7 @@ public:
 
 class ProductServer : public Product
 {
-public:        
+  public:
     int ing_count;
     InventoryElement ** ings;
     bool craft() override;
@@ -178,8 +176,8 @@ public:
     void show(bool details = true) override;
 };
 
-AnimalServer* create_animal(BaseAnimal* base);
-PlantServer* create_plant(BasePlant* base);
-ElementServer *create_element(BaseElement* base);
+AnimalServer * create_animal(BaseAnimal * base);
+PlantServer * create_plant(BasePlant * base);
+ElementServer * create_element(BaseElement * base);
 
 #endif

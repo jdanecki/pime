@@ -1,13 +1,17 @@
 #ifndef NETWORKING_H
 #define NETWORKING_H
 
-class NetClient {};
+class NetClient
+{
+};
 
 #include "../core/world.h"
 #include "networking_gen.h"
 
-class UdpSocket {};
+class UdpSocket
+{
+};
 
 extern NetClient * client;
- 
+
 #endif

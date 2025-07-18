@@ -7,8 +7,8 @@
 class SerializableCString
 {
   public:
-      const char* str;
-      SerializableCString(const char* ptr);
+    const char * str;
+    SerializableCString(const char * ptr);
 };
 
 class Property
@@ -28,8 +28,8 @@ class Property
 
 class Edible
 { // FIXME should be changed to being property
-  // when more npc's are added
-  // can be eaten by humans or animals
+    // when more npc's are added
+    // can be eaten by humans or animals
   public:
     Property * irrigation;
     Property * poison;
@@ -43,13 +43,13 @@ class Edible
 class Solid
 {
   public:
-    Property * tooling; //obróbka
+    Property * tooling;    // obróbka
     Property * stretching; // rozciągalność
     Property * squeezing;  // ściskalność
-    Property * bending; //elastyczność
-  //  Property * fragility;  // kruchosc
+    Property * bending;    // elastyczność
+    //  Property * fragility;  // kruchosc
     Property * solubility; // rozpuszczalnosc
-    Property * hardness; //twardość
+    Property * hardness;   // twardość
     Solid();
     ~Solid();
     void show();

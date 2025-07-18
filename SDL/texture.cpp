@@ -97,10 +97,10 @@ void load_textures()
 
     int i = 0;
 
-    //FIXME check number of tiles textures
-    tiles_textures=new SDL_Texture*[20];
+    // FIXME check number of tiles textures
+    tiles_textures = new SDL_Texture *[20];
 
-    tiles_textures_count=add_textures_from_dir(tiles_textures, i, "textures/game_tiles");
+    tiles_textures_count = add_textures_from_dir(tiles_textures, i, "textures/game_tiles");
 
     i = 0;
     i = add_textures_from_dir(items_textures, i, "textures/items/solid");

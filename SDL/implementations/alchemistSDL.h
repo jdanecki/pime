@@ -28,8 +28,8 @@ class Renderable
             SDL_RenderCopy(renderer, get_texture(), NULL, rect);
     }
 };
-//FIXME remove Renderable class
-//core_class -> core_class_SDL { texture }
+// FIXME remove Renderable class
+// core_class -> core_class_SDL { texture }
 
 class IngredientSDL : public Ingredient, public Renderable
 {

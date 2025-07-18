@@ -38,9 +38,10 @@ class ListElement
     {
         return what == this;
     }
-    virtual ~ListElement() {}
+    virtual ~ListElement()
+    {
+    }
 };
-
 
 struct ElId
 {
@@ -50,15 +51,15 @@ struct ElId
 
 class KnownElement : public ListElement
 {
-     ElId elid;
+    ElId elid;
     bool known;
 
   public:
     KnownElement(Class_id t, int i)
     {
         elid.c_id = t;
-        elid.id=i;
-        known=false;
+        elid.id = i;
+        known = false;
     }
 
     bool is_known()
@@ -72,7 +73,7 @@ class KnownElement : public ListElement
 
     bool check(void * what)
     {
-        ElId *i = (ElId *)what;
+        ElId * i = (ElId *)what;
         return (elid.c_id == i->c_id && elid.id == i->id);
     }
 };

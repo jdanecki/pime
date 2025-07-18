@@ -13,4 +13,3 @@
 InventoryElement * craft_ing(int product_id, InventoryElement * el);
 
 #endif
-

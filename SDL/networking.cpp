@@ -16,7 +16,7 @@ extern Player * player;
 InventoryElement * find_by_uid(size_t uid, int chunk_x, int chunk_y)
 {
     if (!world_table[chunk_y][chunk_x])
-       return nullptr;
+        return nullptr;
     ListElement * el = world_table[chunk_y][chunk_x]->objects.head;
     while (el)
     {
@@ -73,7 +73,7 @@ InventoryElement * remove_from_location(ItemLocation location, size_t id)
     return el;
 }
 
-InventoryElement * el_from_data(const ObjectData* data)
+InventoryElement * el_from_data(const ObjectData * data)
 {
     InventoryElement * el = nullptr;
     switch (data->tag)
@@ -133,7 +133,7 @@ extern "C"
 
     void update_chunk(int32_t x, int32_t y, const chunk_table * data)
     {
-        data = (chunk_table*)((char*)(data) + 3);
+        data = (chunk_table *)((char *)(data) + 3);
         if (!world_table[y][x])
         {
             // world_table[y][x] = (chunk*)calloc(1, sizeof(chunk));
@@ -164,9 +164,9 @@ extern "C"
         print_status(1, "player %d connected", id);
     }
 
-    void update_object(const ObjectData* data)
+    void update_object(const ObjectData * data)
     {
-//        size_t uid = data.inv_element.data.uid;
+        //        size_t uid = data.inv_element.data.uid;
         Class_id c_id = data->inv_element.data.c_id;
 
         InventoryElement * el = find_by_uid(data->inv_element.data.uid, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
@@ -177,31 +177,31 @@ extern "C"
             {
                 case Class_Element:
                 {
-                    ElementSDL* element = dynamic_cast<ElementSDL*>(el);
+                    ElementSDL * element = dynamic_cast<ElementSDL *>(el);
                     *element = data->element.data;
                     break;
                 }
                 case Class_Ingredient:
                 {
-                    IngredientSDL* ing = dynamic_cast<IngredientSDL*>(el);
+                    IngredientSDL * ing = dynamic_cast<IngredientSDL *>(el);
                     *ing = data->ingredient.data;
                     break;
                 }
                 case Class_Product:
                 {
-                    ProductSDL* prod = dynamic_cast<ProductSDL*>(el);
+                    ProductSDL * prod = dynamic_cast<ProductSDL *>(el);
                     *prod = data->product.data;
                     break;
                 }
                 case Class_Plant:
                 {
-                    PlantSDL * plant = dynamic_cast<PlantSDL*>(el);
+                    PlantSDL * plant = dynamic_cast<PlantSDL *>(el);
                     *plant = data->plant.data;
                     break;
                 }
                 case Class_Animal:
                 {
-                    AnimalSDL* animal = dynamic_cast<AnimalSDL*>(el);
+                    AnimalSDL * animal = dynamic_cast<AnimalSDL *>(el);
                     *animal = data->animal.data;
                     break;
                 }
@@ -228,7 +228,7 @@ extern "C"
         InventoryElement * el = remove_from_location(old_loc, id);
         if (!el)
         {
-            //print_status(1, "not found item to remove %d %d", old_loc.chunk.map_x, old_loc.chunk.map_y);
+            // print_status(1, "not found item to remove %d %d", old_loc.chunk.map_x, old_loc.chunk.map_y);
             return;
         }
         switch (new_loc.tag)
@@ -258,7 +258,7 @@ extern "C"
         }
     }
 
-    void create_object(const ObjectData* data)
+    void create_object(const ObjectData * data)
     {
         InventoryElement * el = el_from_data(data);
         if (el)

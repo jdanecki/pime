@@ -178,7 +178,7 @@ bool select_inventory2(int count, InventoryElement ** el2)
         if (el->selected)
         {
             printf("%s ", el->l_el->el->get_name());
-            el2[i]=el->l_el->el;
+            el2[i] = el->l_el->el;
             i++;
         }
         el = (Show_el *)el->next;

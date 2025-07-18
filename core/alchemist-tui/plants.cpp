@@ -23,7 +23,7 @@ void sow_plant()
     player->inventory->remove(el);
     plants->add(el);
     Plant * p = (Plant *)el;
-    p->planted=1;
+    p->planted = 1;
 
     printf("%s planted\n", el->get_name());
 }
@@ -34,8 +34,8 @@ void harvest_plant()
     //   plants->enable_all();
     if (!el)
         return;
-    //FIXME
-   // el->change_phase(Plant_seed);
+    // FIXME
+    // el->change_phase(Plant_seed);
     player->inventory->add(el);
     plants->remove(el);
     printf("plant: %s harvested to inventory\n", el->get_name());

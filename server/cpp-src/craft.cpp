@@ -30,7 +30,7 @@ bool craft(int product_id, int ingredients_num, const size_t * ingredients_ids, 
             return false;
         }
 
-        crafted=craft_ing(product_id, el);
+        crafted = craft_ing(product_id, el);
     }
     else
     {
@@ -65,5 +65,3 @@ bool craft(int product_id, int ingredients_num, const size_t * ingredients_ids, 
     }
     return false;
 }
-
-

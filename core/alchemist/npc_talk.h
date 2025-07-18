@@ -10,10 +10,10 @@ class Sentence : public ListElement
     const char * text;
     enum Npc_say id;
 
-    Sentence( enum Npc_say i, const char * t)
+    Sentence(enum Npc_say i, const char * t)
     {
         text = t;
-        id = i;        
+        id = i;
     }
     void show(bool details = true)
     {
@@ -23,7 +23,7 @@ class Sentence : public ListElement
     {
         enum Npc_say * i = (enum Npc_say *)what;
         return id == *i;
-    }    
+    }
 };
 
 class SentencesList : public ElementsList

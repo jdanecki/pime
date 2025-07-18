@@ -314,7 +314,6 @@ void create_menus()
     menu_npc->add("Talk to NPC", MENU_NPC_SAY);
     menu_npc->add("Ask NPC", MENU_NPC_ASK);
     menu_npc->add("Cancel", MENU_CANCEL);
-
 }
 
 Menu * create_inv_category_menu(enum Form f)

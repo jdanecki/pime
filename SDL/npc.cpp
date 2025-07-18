@@ -14,7 +14,8 @@ int npc(menu_actions a)
     SentencesList * list;
     if (a == MENU_NPC_SAY)
         list = sentences;
-    else list = questions;
+    else
+        list = questions;
 
     int menu_entries = list->nr_elements;
     list->enable_all();
@@ -30,16 +31,18 @@ int npc(menu_actions a)
             list->disable(NPC_Ask_do_you_know_item);
             menu_entries--;
         }
-    } else {
-        Npc_say sid=NPC_Say_Nothing;
-        Sentence * a=dynamic_cast<Sentence *>(sentences->find(&sid));
+    }
+    else
+    {
+        Npc_say sid = NPC_Say_Nothing;
+        Sentence * a = dynamic_cast<Sentence *>(sentences->find(&sid));
         a->disable();
         menu_entries--;
     }
 
-    menu_dialog = new Menu("NPC conversation", menu_entries +1);
+    menu_dialog = new Menu("NPC conversation", menu_entries + 1);
 
-    Sentence * sentence = (Sentence *) list->head;
+    Sentence * sentence = (Sentence *)list->head;
     while (sentence)
     {
         if (sentence->is_enabled())
@@ -52,6 +55,6 @@ int npc(menu_actions a)
         sentence = (Sentence *)sentence->next;
     }
     menu_dialog->add("Cancel", MENU_CANCEL);
-    current_menu = menu_dialog;   
+    current_menu = menu_dialog;
     return 0;
 }

@@ -26,15 +26,17 @@ struct PlayerRelation
     Player * who;
     enum Relations rel;
     struct PlayerRelation * next;
-    PlayerRelation(Player *p, enum Relations r);
+    PlayerRelation(Player * p, enum Relations r);
 };
 
 class Player : public InventoryElement
 {
     int * padding; // FIXME
     int id;
+
   protected:
     char * name;
+
   protected:
     ElementsList * known_elements;
 
@@ -48,7 +50,7 @@ class Player : public InventoryElement
     char running;
     char sneaking;
     char going_right;
-    //enum direction direction;
+    // enum direction direction;
     int thirst;
     int hunger; // hungry, very hungry, full
     int nutrition;
@@ -65,28 +67,30 @@ class Player : public InventoryElement
     InventoryElement * get_item_by_uid(size_t id);
     int get_id();
     Player(int id);
-    int conversation(Player * who, Sentence * s, InventoryElement *el);
+    int conversation(Player * who, Sentence * s, InventoryElement * el);
     void stop_conversation();
 
     void show(bool details = true);
     bool say(Sentence * s);
-    Sentence *get_answer(Sentence * s);
+    Sentence * get_answer(Sentence * s);
     void ask(Sentence * s, InventoryElement * el);
     void ask(enum Npc_say s, InventoryElement * el);
     char * get_el_description(InventoryElement * el);
 
-    virtual bool check_known(InventoryElement *el);
+    virtual bool check_known(InventoryElement * el);
     void set_known(InventoryElement * el);
 
-    bool conversation_started() { return in_conversation;}
-    enum  Relations find_relation(Player *who);
-    void set_relation(Player *who, enum Relations rel);
+    bool conversation_started()
+    {
+        return in_conversation;
+    }
+    enum Relations find_relation(Player * who);
+    void set_relation(Player * who, enum Relations rel);
 
     const char * get_name()
     {
         return name;
     }
 };
-
 
 #endif

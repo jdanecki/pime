@@ -94,8 +94,7 @@ void show_description()
     if (des)
         printf("%s\n", des);
     else
-        printf("It looks like %s, it has %s form, but I don't know what it's exactly\n",
-            el->get_class_name(), el->get_form_name());
+        printf("It looks like %s, it has %s form, but I don't know what it's exactly\n", el->get_class_name(), el->get_form_name());
 }
 
 void show()
@@ -110,7 +109,7 @@ void show()
 
     char c = wait_key('s');
     switch (c)
-    {        
+    {
         case 'i':
         case 'I':
             player->inventory->show(c == 'I');
@@ -144,7 +143,7 @@ void show()
 }
 void add_new_element()
 {
-    Element * el = create_element(new BaseElement(Form_solid,Color {0,0,0}, 0 ));
+    Element * el = create_element(new BaseElement(Form_solid, Color{0, 0, 0}, 0));
     elements->add(el);
     printf("new Element %s found\n", el->get_name());
 }
@@ -226,7 +225,6 @@ void change_clock()
     }
 }
 
-
 void test()
 {
     printf("%sa - test axe\n", colorCyan);
@@ -234,11 +232,15 @@ void test()
     printf("%s%s", colorNormal, colorGreenBold);
 
     char c = wait_key('t');
-    InventoryElement *el=nullptr;
+    InventoryElement * el = nullptr;
     switch (c)
     {
-        case 'a': el = test_axe(); break;
-        case 'k': el = test_knife(); break;
+        case 'a':
+            el = test_axe();
+            break;
+        case 'k':
+            el = test_knife();
+            break;
     }
     if (el)
         player->inventory->add(el);
@@ -247,19 +249,28 @@ void test()
 InventoryElement * craft2_ing(char c)
 {
     InventoryElement * target = nullptr;
-    InventoryElement *el2[2];
-    el2[0]= nullptr;
+    InventoryElement * el2[2];
+    el2[0] = nullptr;
     el2[1] = nullptr;
     if (!select_inventory2(2, el2))
         return nullptr;
     switch (c)
     {
-        case 'a': target = new Axe(el2[0], el2[1]); break;
-        case '1': target = new PickAxe(el2[0], el2[1]); break;
-        case '4': target = new Knife(el2[0], el2[1]); break;
-        case '7': target = new Hut(el2[0], el2[1]); break;
+        case 'a':
+            target = new Axe(el2[0], el2[1]);
+            break;
+        case '1':
+            target = new PickAxe(el2[0], el2[1]);
+            break;
+        case '4':
+            target = new Knife(el2[0], el2[1]);
+            break;
+        case '7':
+            target = new Hut(el2[0], el2[1]);
+            break;
     }
-    if (!target) return nullptr;
+    if (!target)
+        return nullptr;
     if (!target->craft())
     {
         delete target;
@@ -275,21 +286,36 @@ InventoryElement * craft_ing(char c)
 {
     InventoryElement * target = nullptr;
     InventoryElement * el = select_element(player->inventory);
-    if (!el) return nullptr;
+    if (!el)
+        return nullptr;
 
     switch (c)
     {
-        case 'b': target = new AxeBlade(el); break;
-        case 'h': target = new AxeHandle(el); break;
-        case '2': target = new PickAxeBlade(el); break;
-        case '3': target = new PickAxeHandle(el); break;
-        case '5': target = new KnifeBlade(el); break;
-        case '6': target = new KnifeHandle(el); break;
+        case 'b':
+            target = new AxeBlade(el);
+            break;
+        case 'h':
+            target = new AxeHandle(el);
+            break;
+        case '2':
+            target = new PickAxeBlade(el);
+            break;
+        case '3':
+            target = new PickAxeHandle(el);
+            break;
+        case '5':
+            target = new KnifeBlade(el);
+            break;
+        case '6':
+            target = new KnifeHandle(el);
+            break;
 
-        case 'w': target = new Wall(el);
+        case 'w':
+            target = new Wall(el);
             break;
     }
-    if (!target) return nullptr;
+    if (!target)
+        return nullptr;
     if (!target->craft())
     {
         delete target;
@@ -318,7 +344,7 @@ void craft()
 
     printf("%s%s", colorNormal, colorGreenBold);
 
-    InventoryElement * target=nullptr;
+    InventoryElement * target = nullptr;
     char c = wait_key('c');
     switch (c)
     {
@@ -327,7 +353,7 @@ void craft()
         case '4':
         case '7':
             target = craft2_ing(c);
-        break;
+            break;
         case 'b':
         case 'h':
         case 'w':
@@ -336,7 +362,7 @@ void craft()
         case '5':
         case '6':
             target = craft_ing(c);
-        break;
+            break;
     }
     if (target)
     {
@@ -417,22 +443,24 @@ void use()
 
     product->use(obj);
 
-  //  player->inventory->remove(el);
+    //  player->inventory->remove(el);
 }
 
 void ask_say(char c)
-{// # say
- // @ ask
+{ // # say
+  // @ ask
     if (!current_npc)
     {
         printf("Who do you want to talk to?\n");
         current_npc = dynamic_cast<Npc *>(select_element(npcs));
-        if (c=='#') questions->enable_all();
-        else  sentences->enable_all();
+        if (c == '#')
+            questions->enable_all();
+        else
+            sentences->enable_all();
     }
     if (current_npc)
     {
-        if (c=='@')
+        if (c == '@')
         {
             if (!player->inventory->nr_elements)
                 questions->disable(NPC_Ask_do_you_know_item);
@@ -442,8 +470,8 @@ void ask_say(char c)
             }
         }
         Sentence * s;
-        if (c =='@')
-            s= dynamic_cast<Sentence *>(select_list_element(questions));
+        if (c == '@')
+            s = dynamic_cast<Sentence *>(select_list_element(questions));
         else
             s = dynamic_cast<Sentence *>(select_list_element(sentences));
 
@@ -451,7 +479,7 @@ void ask_say(char c)
         printf("%s says: %s\n", player->get_name(), s->text);
 
         InventoryElement * el = nullptr;
-        if (c=='@')
+        if (c == '@')
         {
             if (s->id == NPC_Ask_do_you_know_item)
             {
@@ -459,7 +487,7 @@ void ask_say(char c)
             }
         }
         if (player->conversation(current_npc, s, el))
-            current_npc=nullptr;
+            current_npc = nullptr;
         printf("%s%s", colorNormal, colorGreenBold);
     }
 }
@@ -531,9 +559,9 @@ void play()
                 break;
         }
         game_time->update_time(1);
-      //  plants->tick();
-      //  animals->tick();
-      //  npcs->tick();
+        //  plants->tick();
+        //  animals->tick();
+        //  npcs->tick();
     }
 }
 
