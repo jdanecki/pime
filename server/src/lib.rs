@@ -118,7 +118,7 @@ impl Server {
         buf.extend_from_slice(&data);
         client
             .not_confirmed_packets
-            .insert(client.local_seq_num, buf.to_vec());
+            .insert(client.local_seq_num, data.to_vec());
         self.socket.send_to(&buf, to).unwrap();
     }
 }
@@ -196,13 +196,11 @@ fn add_player(
     let mut response = vec![0; 13];
     response[12] = core::PACKET_PLAYER_ID as u8;
     response.extend_from_slice(&players.len().to_le_bytes());
-    // if players.len() > 0 {
-    //     panic!("second join");
-    // }
     let data = generator::get_world_data();
     response.extend_from_slice(&data);
     println!("SEND {:?}", data.len());
-    generator::show_world();
+    // generator::show_world();
+    println!("PLAYER {} CONNECTED", &players.len());
 
     server.socket.send_to(&response, &peer).unwrap();
 
@@ -291,10 +289,23 @@ fn handle_network(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
             match server.clients.get_mut(&src) {
                 Some(data) => {
                     let id = data.id;
-                    if id < players.len() {
-                        handle_packet(server, &mut players[id], &buf, &src);
+                    if buf[12] == core::PACKET_JOIN_REQUEST {
+                        let mut response = vec![0; 13];
+                        response[12] = core::PACKET_PLAYER_ID as u8;
+                        response.extend_from_slice(&id.to_le_bytes());
+                        let data = generator::get_world_data();
+                        response.extend_from_slice(&data);
+                        println!("SEND {:?}", data.len());
+                        println!("PLAYER {} RECONNECTED", id);
+
+                        server.socket.send_to(&response, &src).unwrap();
+                        update_chunk_for_player(server, &src, (128, 128))
                     } else {
-                        println!("invalid player idx {}", id);
+                        if id < players.len() {
+                            handle_packet(server, &mut players[id], &buf, &src);
+                        } else {
+                            println!("invalid player idx {}", id);
+                        }
                     }
                 }
                 None => {

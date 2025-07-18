@@ -53,10 +53,12 @@ pub extern "C" fn init(
     let mut buf = [0; 13];
     buf[12] = core::PACKET_JOIN_REQUEST;
     client.socket.send(&buf).unwrap();
+
     let mut buf = [0; 4096];
+    let mut time_to_resend = 50;
     loop {
         let amt = client.socket.recv(&mut buf).unwrap();
-        println!("{:?}", buf);
+        println!("{:?}", buf[12]);
 
         let buf = &buf[12..];
 
@@ -71,12 +73,19 @@ pub extern "C" fn init(
                     bincode::deserialize::<World>(&buf[9..amt]).expect("failed to create world"),
                 );
                 WORLD.with_borrow(|world| {
-                    println!("{:#?}", world);
+//                    println!("{:#?}", world);
                 });
                 break;
             };
         } else {
             println!("did not get id");
+            time_to_resend -= 1;
+            if time_to_resend == 0 {
+                let mut buf = [0; 13];
+                buf[12] = core::PACKET_JOIN_REQUEST;
+                client.socket.send(&buf).unwrap();
+                println!("RESENT REQUEST");
+            }
         }
     }
 
