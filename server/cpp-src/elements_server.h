@@ -50,6 +50,7 @@ class BeingServer
     Property * age;
     Property * max_age;
     bool alive;
+    int padding;
     BeingServer()
     {
         max_age = new Property("max age", 1 + rand() % 36000); // 100 years
@@ -95,7 +96,7 @@ class AnimalServer : public Animal, public BeingServer
 {
     int delay_for_move;
     int dst_loc_x, dst_loc_y;
-
+    int padding1;
   public:
     void move();
     bool tick() override;
