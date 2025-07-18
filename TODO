@@ -1,17 +1,9 @@
 * improve rust compilation 
     - don't build game_net for debug and release, only one target
 * refactor world generator
-* add npc conversation
-* names of elements are different on server and client
-* make npc and player as deratives of InventoryElement
 * wait on network events on main_loop
 * update on server should be triggered by timer
 * add books for players with player's knowledge 
-* player can learn about items from other players, npc's and books, scrolls
-* player can start with some knowledge, items
-* show properties for items in inventory
-* new action: look at item -> show properties
-* emotions: anger, fear, disgust, joy
 
 * Generation
 * Unique items (one of a kind)
@@ -26,3 +18,9 @@
     - creating a new chunk (maybe with an unique item..?)
     - creating a link between worlds
     - generating existing links/entrances
+
+
+- player at screen center, load more chunk on the screen
+- npc's created by server
+- moving for npc's
+
