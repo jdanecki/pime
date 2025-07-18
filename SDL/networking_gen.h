@@ -63,7 +63,7 @@ struct LocationUpdateData {
 
 extern "C" {
 
-NetClient *init();
+NetClient *init(const char *server_ip, const char *port);
 
 void network_tick(NetClient *client);
 
