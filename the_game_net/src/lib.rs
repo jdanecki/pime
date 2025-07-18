@@ -54,26 +54,30 @@ pub extern "C" fn init(
     buf[12] = core::PACKET_JOIN_REQUEST;
     client.socket.send(&buf).unwrap();
     let mut buf = [0; 4096];
-    let amt = client.socket.recv(&mut buf).unwrap();
-    println!("{:?}", buf);
+    loop {
+        let amt = client.socket.recv(&mut buf).unwrap();
+        println!("{:?}", buf);
 
-    let buf = &buf[12..];
+        let buf = &buf[12..];
 
-    if buf[0] == core::PACKET_PLAYER_ID {
-        unsafe {
-            events::got_id(
-                usize::from_le_bytes(buf[1..9].try_into().unwrap()),
-                0, //i64::from_le_bytes(buf[9..17].try_into().unwrap()),
-            );
-            println!("RECEIVED {:?}", &buf[9..amt]);
-            WORLD.set(bincode::deserialize::<World>(&buf[9..amt]).expect("failed to create world"));
-            WORLD.with_borrow(|world| {
-                println!("{:#?}", world);
-            })
-        };
-    } else {
-        println!("did not get id");
-        panic!();
+        if buf[0] == core::PACKET_PLAYER_ID {
+            unsafe {
+                events::got_id(
+                    usize::from_le_bytes(buf[1..9].try_into().unwrap()),
+                    0, //i64::from_le_bytes(buf[9..17].try_into().unwrap()),
+                );
+                println!("RECEIVED {:?}", &buf[9..amt]);
+                WORLD.set(
+                    bincode::deserialize::<World>(&buf[9..amt]).expect("failed to create world"),
+                );
+                WORLD.with_borrow(|world| {
+                    println!("{:#?}", world);
+                });
+                break;
+            };
+        } else {
+            println!("did not get id");
+        }
     }
 
     client.socket.set_nonblocking(true).unwrap();
