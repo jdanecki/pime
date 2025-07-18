@@ -121,10 +121,7 @@ class InventoryElement
     {
         return nullptr;
     }
-  /*  virtual Base * get_base()
-    {
-        return nullptr;
-    }*/
+
 #ifndef CORE_FOR_CLIENT
 
     virtual bool craft()
@@ -234,7 +231,7 @@ class Element : public InventoryElement
     }
     void show(bool details = true) override;
     Element(BaseElement * b);
-    Form get_form()
+    Form get_form() override
     {
         return get_base()->form;
     }
@@ -265,8 +262,9 @@ class Element : public InventoryElement
         sprintf(buf, "%s: (%s) ", get_class_name(), get_name());
         return buf;
     }
-    Property ** get_properties(int * count)
+    Property ** get_properties(int * count) override
     {
+        //FIXME
         Property ** props = new Property *[4];
      //   props[0] = &sharpness;
       //  props[1] = &smoothness;
@@ -382,7 +380,7 @@ class Product : public InventoryElement
     {
 
     }
-    Property ** get_properties(int * count)
+    Property ** get_properties(int * count) override
     {
         Property ** props = new Property *[3];
         props[0] = &quality;
@@ -398,7 +396,7 @@ class Product : public InventoryElement
     }
     void show(bool details = true) override;
 
-    const char * get_name()
+    const char * get_name() override
     {
         return Product_name[id];
     }
@@ -450,7 +448,7 @@ class Animal : public InventoryElement
     {
         printf("Animal %s uid=%lx\n", get_name(), uid);
         if (details)
-            base.get()->show(details);
+            get_base()->show(details);
     }
     /* bool tick()
      {
@@ -471,12 +469,12 @@ class Animal : public InventoryElement
         return get_base()->c_id;
     }
 
-    bool action(Product_action action)
+    bool action(Product_action action) override
     {
         printf("ANIMAL: %s %s\n", Product_action_names[action], get_name());
         return false;
     }
-    const char * get_name()
+    const char * get_name() override
     {
         return get_base()->get_name();
     }

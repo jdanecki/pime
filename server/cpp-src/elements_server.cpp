@@ -311,7 +311,7 @@ ElementServer::ElementServer(BaseElement *base):Element(base),
 bool ElementServer::action(Product_action action)
 {
     printf("ELEMENT_SERVER: %s %s\n", Product_action_names[action], get_name());
-    printf("%s\n", get_description());
+
     bool res = false;
     switch(action)
     {
@@ -341,7 +341,7 @@ bool ElementServer::action_cut()
             height.value/=2;
             volume.value=length.value * width.value * height.value;
         }
-        printf("%s\n", get_description());
+
         return true;
     }
     return false;
@@ -360,7 +360,7 @@ bool ElementServer::action_hit()
             height.value/=4;
             volume.value=length.value * width.value * height.value;
         }
-        printf("%s\n", get_description());
+
         return true;
     }
     return false;
