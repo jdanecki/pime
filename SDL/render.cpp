@@ -56,7 +56,7 @@ void draw_texts()
             sprintf(t, "It looks like %s, ", item->get_class_name());
             write_text(tx, ty, t, White, 15, 30);
 
-            // sprintf(t, "it has %s form, but ", item->get_form_name());
+            sprintf(t, "it has %s form, but ", item->get_form_name());
             write_text(tx, ty + 25, t, White, 15, 30);
 
             write_text(tx, ty + 50, "I don't know what it's exactly", White, 15, 30);

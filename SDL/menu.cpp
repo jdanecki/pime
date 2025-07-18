@@ -15,7 +15,7 @@
 
 extern class Player * player;
 extern int active_hotbar;
-extern const NetClient * client;
+extern NetClient * client;
 
 Menu * menu_music;
 Menu * menu_main;
@@ -24,8 +24,7 @@ Menu * current_menu;
 Menu * menu_inventory_categories;
 Menu * menu_inventory;
 Menu * menu_inventory_categories2;
-Menu * menu_dev;
-Menu * menu_build;
+
 Menu * menu_npc;
 Menu * menu_dialog;
 
@@ -315,6 +314,7 @@ void create_menus()
     menu_npc->add("Talk to NPC", MENU_NPC_SAY);
     menu_npc->add("Ask NPC", MENU_NPC_ASK);
     menu_npc->add("Cancel", MENU_CANCEL);
+
 }
 
 Menu * create_inv_category_menu(enum Form f)
@@ -396,15 +396,7 @@ int menu_interact(int key)
                 current_menu = menu_main;
             return 1;
         }
-        case SDLK_b:
-        {
-            if (!current_menu)
-                current_menu = menu_build;
-            else if (current_menu == menu_build)
-                current_menu = NULL;
 
-            return 1;
-        }
         case SDLK_RETURN:
         case SDLK_e:
         {
@@ -427,14 +419,7 @@ int menu_interact(int key)
                 current_menu = NULL;
             return 1;
         }
-        case SDLK_l:
-        {
-            if (current_menu)
-                current_menu = NULL;
-            else
-                current_menu = menu_dev;
-            return 1;
-        }
+
         case SDLK_n:
         {
             if (!current_menu)

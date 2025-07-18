@@ -17,7 +17,6 @@
 #include "window.h"
 
 extern Player * player;
-extern const NetClient * client;
 extern int active_hotbar;
 extern int auto_explore;
 extern DHotbar hotbar;

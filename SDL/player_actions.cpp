@@ -4,7 +4,6 @@
 #include "../core/world.h"
 #include "networking.h"
 
-extern const NetClient * client;
 extern Player * player;
 extern int active_hotbar;
 

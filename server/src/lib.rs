@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::error::Error;
 use std::net::SocketAddr;
+use std::net::ToSocketAddrs;
 use std::net::UdpSocket;
 
 mod convert_types;
@@ -69,16 +70,56 @@ pub enum ClientEvent<'a> {
     Whatever,
 }
 
+#[derive(Clone)]
+struct ClientData {
+    id: usize,
+    local_seq_num: u32,
+    remote_seq_num: u32,
+    acks_bitmap: u32,
+    not_confirmed_packets: HashMap<u32, Vec<u8>>,
+}
+
+impl ClientData {
+    fn new(id: usize) -> ClientData {
+        ClientData {
+            id,
+            local_seq_num: 0,
+            remote_seq_num: 0,
+            acks_bitmap: 0,
+            not_confirmed_packets: HashMap::new(),
+        }
+    }
+}
+
 pub struct Server {
     socket: UdpSocket,
-    clients: HashMap<SocketAddr, usize>,
+    clients: HashMap<SocketAddr, ClientData>,
 }
 
 impl Server {
-    fn broadcast(&self, data: &[u8]) {
-        for client in self.clients.keys() {
-            self.socket.send_to(data, client).unwrap();
+    fn broadcast(&mut self, data: &[u8]) {
+        let clients = self.clients.clone();
+        for client in clients.keys() {
+            self.send_to_reliable(data, client);
         }
+    }
+
+    fn send_to_reliable(&mut self, data: &[u8], to: &SocketAddr) {
+        let client = self.clients.get_mut(&to).unwrap();
+        client.local_seq_num += 1;
+        // println!("{} {}", client.local_seq_num, data[0]);
+        if data.len() > 65507 {
+            panic!("data too big");
+        }
+        let mut buf = Vec::with_capacity(12 + data.len());
+        buf.extend_from_slice(&client.local_seq_num.to_le_bytes());
+        buf.extend_from_slice(&client.remote_seq_num.to_le_bytes());
+        buf.extend_from_slice(&client.acks_bitmap.to_le_bytes());
+        buf.extend_from_slice(&data);
+        client
+            .not_confirmed_packets
+            .insert(client.local_seq_num, buf.to_vec());
+        self.socket.send_to(&buf, to).unwrap();
     }
 }
 
@@ -116,6 +157,7 @@ impl<'a> From<&'a [u8]> for ClientEvent<'a> {
                 y: i32::from_le_bytes(value[5..9].try_into().unwrap()),
             },
             1 => ClientEvent::Whatever,
+            core::PACKET_KEEP_ALIVE => ClientEvent::Whatever,
             _ => panic!("invalid event {:?}", value),
         }
     }
@@ -123,6 +165,7 @@ impl<'a> From<&'a [u8]> for ClientEvent<'a> {
 
 pub fn init_server() -> Result<Server, Box<dyn Error>> {
     let socket = UdpSocket::bind("127.0.0.1:1234")?;
+    // let socket = UdpSocket::bind("0.0.0.0:1234")?;
     socket.set_nonblocking(true).unwrap();
     generator::generate();
 
@@ -149,29 +192,37 @@ fn add_player(
     mut peer: std::net::SocketAddr,
     players: &mut Vec<core::PlayerServer>,
 ) {
-    // TODO
-    //peer.set_data(Some(players.len()));
-    server.clients.insert(peer, players.len());
+    server.clients.insert(peer, ClientData::new(players.len()));
 
-    let mut response = vec![core::PACKET_PLAYER_ID as u8];
+    let mut response = vec![0; 13];
+    response[12] = core::PACKET_PLAYER_ID as u8;
     response.extend_from_slice(&players.len().to_le_bytes());
+    // if players.len() > 0 {
+    //     panic!("second join");
+    // }
     let data = generator::get_world_data();
     response.extend_from_slice(&data);
     println!("SEND {:?}", data.len());
     generator::show_world();
 
-    server.socket.send_to(&response, peer).unwrap();
+    server.socket.send_to(&response, &peer).unwrap();
 
     unsafe {
-        let p = core::PlayerServer::new(players.len() as i32);
+        let mut p = core::PlayerServer::new(players.len() as i32);
+        let axe = Box::into_raw(Box::new(core::Axe::new(
+            std::ptr::null_mut(),
+            std::ptr::null_mut(),
+        ))) as *mut core::InventoryElement;
+        (*core::world_table[128][128]).add_object1(axe);
+        p.pickup(axe);
         players.push(p);
+        update_chunk_for_player(server, &mut peer, (128, 128));
+        core::objects_to_create.add(axe);
     }
     //println!("{:?} , players {:?}", peer, players);
-
-    update_chunk_for_player(server, &mut peer, (128, 128));
 }
 
-fn update_players(server: &Server, players: &mut Vec<core::PlayerServer>) {
+fn update_players(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
     for (i, p) in players.iter().enumerate() {
         let mut data = [0 as u8; 25];
         data[0] = core::PACKET_PLAYER_UPDATE;
@@ -185,12 +236,9 @@ fn update_players(server: &Server, players: &mut Vec<core::PlayerServer>) {
     }
 }
 
-fn update_chunk_for_player(server: &Server, peer: &SocketAddr, coords: (u8, u8)) {
-    let mut data = vec![
-        0 as u8;
-        3 + (core::CHUNK_SIZE * core::CHUNK_SIZE) as usize
-            * size_of::<i32>()
-    ];
+fn update_chunk_for_player(server: &mut Server, peer: &SocketAddr, coords: (u8, u8)) {
+    let mut data =
+        vec![0 as u8; 3 + (core::CHUNK_SIZE * core::CHUNK_SIZE) as usize * size_of::<i32>()];
     data[0] = core::PACKET_CHUNK_UPDATE;
     data[1] = coords.0;
     data[2] = coords.1;
@@ -207,11 +255,11 @@ fn update_chunk_for_player(server: &Server, peer: &SocketAddr, coords: (u8, u8))
         dest.clone_from_slice(table);
     }
 
-    server.socket.send_to(&data, peer).unwrap();
+    server.send_to_reliable(&data, peer);
     create_objects_in_chunk_for_player(server, peer, coords);
 }
 
-fn create_objects_in_chunk_for_player(server: &Server, peer: &SocketAddr, coords: (u8, u8)) {
+fn create_objects_in_chunk_for_player(server: &mut Server, peer: &SocketAddr, coords: (u8, u8)) {
     let chunk;
     unsafe {
         chunk = *core::world_table[coords.1 as usize][coords.0 as usize];
@@ -225,7 +273,7 @@ fn create_objects_in_chunk_for_player(server: &Server, peer: &SocketAddr, coords
             data.extend_from_slice(obj_data);
 
             le = (*le).next;
-            server.socket.send_to(&data, peer).unwrap();
+            server.send_to_reliable(&data, peer);
         }
     }
 }
@@ -237,21 +285,27 @@ fn handle_network(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
             if amt == 0 {
                 break;
             }
-            match buf[0] {
-                core::PACKET_JOIN_REQUEST => {
-                    println!("connected");
-                    add_player(server, src, players);
-                }
-                _ => match server.clients.get(&src) {
-                    Some(id) => {
-                        if *id < players.len() {
-                            handle_packet(server, &mut players[*id], &buf, *id, &src);
-                        } else {
-                            println!("invalid player idx {}", *id);
-                        }
+            if amt < 12 {
+                panic!("BAD PACKET!!!");
+            }
+
+            match server.clients.get_mut(&src) {
+                Some(data) => {
+                    let id = data.id;
+                    if id < players.len() {
+                        handle_packet(server, &mut players[id], &buf, &src);
+                    } else {
+                        println!("invalid player idx {}", id);
                     }
-                    None => println!("player without idx"),
-                },
+                }
+                None => {
+                    if buf[12] == core::PACKET_JOIN_REQUEST {
+                        println!("connected");
+                        add_player(server, src, players);
+                    } else {
+                        println!("player without idx")
+                    }
+                }
             }
         } else {
             break;
@@ -260,12 +314,54 @@ fn handle_network(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
 }
 
 fn handle_packet(
-    server: &Server,
+    server: &mut Server,
     player: &mut core::PlayerServer,
     packet: &[u8],
-    _player_id: usize,
     peer: &SocketAddr,
 ) {
+    let client_data = server.clients.get_mut(&peer).unwrap();
+    let seq = u32::from_le_bytes(packet[0..4].try_into().unwrap());
+    let ack = u32::from_le_bytes(packet[4..8].try_into().unwrap());
+    let acks = u32::from_le_bytes(packet[8..12].try_into().unwrap());
+    if seq > client_data.remote_seq_num {
+        let diff = seq - client_data.remote_seq_num;
+        client_data.acks_bitmap = (client_data.acks_bitmap << 1) | 1;
+        if diff > 1 && diff <= 32 {
+            client_data.acks_bitmap = client_data.acks_bitmap << (diff - 1);
+        }
+        client_data.remote_seq_num = seq;
+    } else if seq < client_data.remote_seq_num {
+        let diff = client_data.remote_seq_num - seq;
+        client_data.acks_bitmap = client_data.acks_bitmap | (1 << (diff - 1));
+    } else {
+        panic!("Shouldn't ever receive 2 packets with same seq_num");
+    }
+    // Detect packet loss
+    for i in 0..31 {
+        if (acks & (1 << i)) > 0 {
+            client_data.not_confirmed_packets.remove(&(ack - i));
+        }
+    }
+    client_data.not_confirmed_packets.remove(&ack);
+
+    let mut to_remove = vec![];
+    let mut to_resend = vec![];
+    for (&id, d) in client_data.not_confirmed_packets.iter() {
+        if id + 32 < ack {
+            println!("PACKET NOT CONFIRMED {}", id);
+            to_resend.push(d.clone());
+            to_remove.push(id);
+        }
+    }
+    for i in to_remove {
+        client_data.not_confirmed_packets.remove(&i);
+    }
+    for d in to_resend {
+        server.send_to_reliable(&d, peer);
+    }
+
+    let packet = &packet[12..];
+
     let tag = ClientEvent::from(packet);
     match tag {
         ClientEvent::Move { x, y } => {
@@ -313,7 +409,7 @@ fn handle_packet(
                     .find_by_id(oid);
                 if !player.use_item_on_object(item, object) {
                     let response = [core::PACKET_FAILED_CRAFT];
-                    server.socket.send_to(&response, peer).unwrap();
+                    server.send_to_reliable(&response, peer);
                 }
             }
         }
@@ -351,7 +447,7 @@ fn handle_packet(
                     }
                 } else {
                     let response = [core::PACKET_FAILED_CRAFT];
-                    server.socket.send_to(&response, peer).unwrap();
+                    server.send_to_reliable(&response, peer);
                 }
             };
         }
@@ -382,7 +478,7 @@ fn handle_packet(
     }
 }
 
-fn send_game_updates(server: &Server, players: &mut Vec<core::PlayerServer>) {
+fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
     update_players(server, players);
     unsafe {
         let list = std::ptr::addr_of_mut!(core::objects_to_create);
@@ -422,7 +518,7 @@ fn send_game_updates(server: &Server, players: &mut Vec<core::PlayerServer>) {
     send_destroy_updates(server);
 }
 
-fn send_location_updates(server: &Server) {
+fn send_location_updates(server: &mut Server) {
     unsafe {
         if LOCATION_UPDATES.len() > 0 {
             for update in LOCATION_UPDATES.iter() {
@@ -435,7 +531,7 @@ fn send_location_updates(server: &Server) {
     }
 }
 
-fn send_destroy_updates(server: &Server) {
+fn send_destroy_updates(server: &mut Server) {
     unsafe {
         if DESTROY_ITEMS.len() > 0 {
             for (id, location) in DESTROY_ITEMS.iter() {
@@ -446,7 +542,7 @@ fn send_destroy_updates(server: &Server) {
     }
 }
 
-fn destroy_object(server: &Server, id: usize, location: core::ItemLocation) {
+fn destroy_object(server: &mut Server, id: usize, location: core::ItemLocation) {
     let mut buf = vec![core::PACKET_OBJECT_DESTROY];
     buf.extend_from_slice(&id.to_le_bytes());
     buf.extend_from_slice(&bincode::serialize(&location).unwrap()[..]);

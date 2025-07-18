@@ -1,5 +1,6 @@
 use std::borrow::{Borrow, BorrowMut};
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::error::Error;
 use std::net::UdpSocket;
 use std::rc::Rc;
@@ -9,33 +10,47 @@ mod events;
 mod send_packets;
 mod types;
 
+/// cbindgen:no-export
 #[repr(C)]
 pub struct NetClient {
     socket: UdpSocket,
+    local_seq_num: u32,
+    remote_seq_num: u32,
+    my_acks_bitmap: u32,
+    unsent_acks: u32,
+    not_confirmed_packets: HashMap<u32, Vec<u8>>,
 }
 
 impl NetClient {
-    fn send(&self, data: &[u8]) {
-        self.socket.send(data).unwrap();
+    fn send(&mut self, data: &[u8]) {
+        let mut buf = Vec::with_capacity(12 + data.len());
+        self.local_seq_num += 1;
+        buf.extend_from_slice(&self.local_seq_num.to_le_bytes());
+        buf.extend_from_slice(&self.remote_seq_num.to_le_bytes());
+        buf.extend_from_slice(&self.my_acks_bitmap.to_le_bytes());
+        buf.extend_from_slice(&data);
+        self.not_confirmed_packets
+            .insert(self.local_seq_num, buf.to_vec());
+        self.socket.send(&buf).unwrap();
     }
 }
 
 #[no_mangle]
-pub extern "C" fn init() -> *const NetClient {
+pub extern "C" fn init() -> *mut NetClient {
     unsafe {
         let a = core::Player::new(1);
     }
-    Box::into_raw(Box::new(init_internal().expect("failed to init NetClient")))
-}
+    let client = Box::new(init_internal().expect("failed to init NetClient"));
 
-fn init_internal() -> Result<NetClient, Box<dyn Error>> {
-    let socket = UdpSocket::bind("127.0.0.1:0")?;
-    socket.connect("127.0.0.1:1234")?;
-    let mut buf = [0];
-    buf[0] = core::PACKET_JOIN_REQUEST;
-    socket.send(&buf)?;
+    let mut buf = [0; 13];
+    buf[12] = core::PACKET_JOIN_REQUEST;
+    client.socket.send(&buf).unwrap();
     let mut buf = [0; 4096];
-    let amt = socket.recv(&mut buf).unwrap();
+    let amt = client.socket.recv(&mut buf).unwrap();
+    println!("{:?}", buf);
+
+    let buf = &buf[12..];
+
     if buf[0] == core::PACKET_PLAYER_ID {
         unsafe {
             events::got_id(
@@ -53,9 +68,25 @@ fn init_internal() -> Result<NetClient, Box<dyn Error>> {
         panic!();
     }
 
-    socket.set_nonblocking(true)?;
+    client.socket.set_nonblocking(true).unwrap();
 
-    Ok(NetClient { socket })
+    Box::into_raw(client)
+}
+
+fn init_internal() -> Result<NetClient, Box<dyn Error>> {
+    let socket = UdpSocket::bind("127.0.0.1:0")?;
+    socket.connect("127.0.0.1:1234")?;
+    // let socket = UdpSocket::bind("0.0.0.0:0")?;
+    // socket.connect("141.147.35.247:1234")?;
+
+    Ok(NetClient {
+        socket,
+        local_seq_num: 0,
+        remote_seq_num: 0,
+        my_acks_bitmap: 0,
+        unsent_acks: 0,
+        not_confirmed_packets: HashMap::new(),
+    })
 }
 
 // #[no_mangle]
@@ -65,18 +96,68 @@ fn init_internal() -> Result<NetClient, Box<dyn Error>> {
 // }
 
 #[no_mangle]
-pub extern "C" fn network_tick(client: &NetClient) {
-    let socket = &client.socket;
-
+pub extern "C" fn network_tick(client: &mut NetClient) {
     let mut buf = [0; 2048];
     loop {
-        if let Ok((amt, _src)) = socket.recv_from(&mut buf) {
+        if let Ok((amt, _src)) = client.socket.recv_from(&mut buf) {
+            let seq = u32::from_le_bytes(buf[0..4].try_into().unwrap());
+            let ack = u32::from_le_bytes(buf[4..8].try_into().unwrap());
+            let acks = u32::from_le_bytes(buf[8..12].try_into().unwrap());
+            if seq > client.remote_seq_num {
+                let diff = seq - client.remote_seq_num;
+                client.my_acks_bitmap = (client.my_acks_bitmap << 1) | 1;
+                if diff > 1 {
+                    client.my_acks_bitmap = client.my_acks_bitmap << (diff - 1);
+                }
+                // for i in 0..diff - 1 {
+                //     if client.acks_bitmap & (1 << (31 - i)) > 0 {
+                //         println!("PACKET NOT CONFIRMED {}", client.remote_seq_num - (31 - i));
+                //     }
+                // }
+                client.remote_seq_num = seq;
+            } else if seq < client.remote_seq_num {
+                let diff = client.remote_seq_num - seq;
+                if diff <= 32 {
+                    client.my_acks_bitmap = client.my_acks_bitmap | (1 << (diff - 1));
+                }
+            } else {
+                panic!("Shouldn't ever receive 2 packets with same seq_num");
+            }
+            // Detect packet loss
+            for i in 0..31 {
+                if (acks & (1 << i)) > 0 {
+                    client.not_confirmed_packets.remove(&(ack - i));
+                }
+            }
+            client.not_confirmed_packets.remove(&ack);
+
+            let mut to_remove = vec![];
+            let mut to_resend = vec![];
+            for (&id, d) in client.not_confirmed_packets.iter() {
+                if id + 32 < ack {
+                    println!("PACKET NOT CONFIRMED {}", id);
+                    to_resend.push(d.clone());
+                    to_remove.push(id);
+                }
+            }
+            for i in to_remove {
+                client.not_confirmed_packets.remove(&i);
+            }
+            for d in to_resend {
+                client.send(&d);
+            }
+            client.unsent_acks += 1;
+            if client.unsent_acks > 20 {
+                client.send(&vec![core::PACKET_KEEP_ALIVE as u8]);
+                client.unsent_acks = 0;
+            }
+
             //println!("{:?}", &buf);
-            let value = &mut buf;
-            //println!("{:?}", &value);
+            let value = &mut buf[12..];
+            // println!("{seq} {}", value[0]);
             match value[0] {
                 core::PACKET_PLAYER_UPDATE => {
-                    if amt == 25 {
+                    if amt == (25 + 12) {
                         unsafe {
                             events::update_player(
                                 usize::from_le_bytes(value[1..9].try_into().unwrap()),
@@ -92,7 +173,7 @@ pub extern "C" fn network_tick(client: &NetClient) {
                 }
                 core::PACKET_CHUNK_UPDATE => {
                     println!("chunk update {}", amt);
-                    if amt == size_of::<core::chunk_table>() + 3 {
+                    if amt == size_of::<core::chunk_table>() + 3 + 12 {
                         unsafe {
                             println!("OK");
                             events::update_chunk(
@@ -109,7 +190,7 @@ pub extern "C" fn network_tick(client: &NetClient) {
                 }
                 core::PACKET_OBJECT_UPDATE => unsafe {
                     events::update_object(
-                        bincode::deserialize(&value[1..amt]).expect("bad object update"),
+                        &bincode::deserialize(&value[1..amt]).expect("bad object update"),
                     );
                 },
                 core::PACKET_LOCATION_UPDATE => unsafe {

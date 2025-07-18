@@ -6,6 +6,7 @@
 
 Hut::Hut(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_HUT, Form_solid)
 {
+    actions=ACT_NOTHING;
 }
 
 bool Hut::check_ing()

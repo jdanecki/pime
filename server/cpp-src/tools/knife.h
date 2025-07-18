@@ -6,8 +6,7 @@
 class Knife : public ProductServer
 {
   public:
-    Knife(InventoryElement * el1, InventoryElement * el2);
-   // virtual bool use(int map_x, int map_y, int x, int y);
+    Knife(InventoryElement * el1, InventoryElement * el2);    
     bool check_ing();
 };
 #endif

@@ -6,6 +6,7 @@
 #include "show_list.h"
 
 #include "test_axe.h"
+#include "test_knife.h"
 #include "../../server/cpp-src/tools/pickaxe.h"
 #include "../../server/cpp-src/tools/pickaxe_blade.h"
 #include "../../server/cpp-src/tools/pickaxe_handle.h"
@@ -16,6 +17,7 @@
 
 #include "../../server/cpp-src/tools/wall.h"
 #include "../../server/cpp-src/tools/hut.h"
+#include "../../server/cpp-src/elements_server.h"
 
 #include <cstdio>
 #include <stdarg.h>
@@ -142,21 +144,21 @@ void show()
 }
 void add_new_element()
 {
-    Element * el = new Element(new BaseElement(Form_solid,Color {0,0,0}, 0 ));
+    Element * el = create_element(new BaseElement(Form_solid,Color {0,0,0}, 0 ));
     elements->add(el);
     printf("new Element %s found\n", el->get_name());
 }
 
 void add_new_animal()
 {
-    Animal * el = new Animal(new BaseAnimal(0));
+    Animal * el = create_animal(new BaseAnimal(0));
     animals->add(el);
     printf("new Animal %s found\n", el->get_name());
 }
 
 void add_new_plant()
 {
-    Plant * p = new Plant(new BasePlant(0));
+    Plant * p = create_plant(new BasePlant(0));
     plants->add(p);
     printf("new Plant %s found\n", p->get_name());
 }
@@ -227,20 +229,19 @@ void change_clock()
 
 void test()
 {
-    printf("%sa - test axe\n", colorCyan);    
+    printf("%sa - test axe\n", colorCyan);
+    printf("%sk - test knife\n", colorCyan);
     printf("%s%s", colorNormal, colorGreenBold);
 
     char c = wait_key('t');
+    InventoryElement *el=nullptr;
     switch (c)
     {
-        case 'a':
-        {
-            Axe * axe = test_axe();
-            if (axe)
-                player->inventory->add(axe);
-        }
-        break;      
+        case 'a': el = test_axe(); break;
+        case 'k': el = test_knife(); break;
     }
+    if (el)
+        player->inventory->add(el);
 }
 
 InventoryElement * craft2_ing(char c)

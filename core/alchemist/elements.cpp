@@ -29,6 +29,13 @@ const char * Product_name[] = {
     "Hut",
 };
 
+const char * Product_action_names[] ={
+    "nothing",
+    "cut",
+    "hit",
+    "stab",
+};
+
 const char * object_names[] = {"wall"};
 const char * Plant_phase_name[] = {"Seed", "Seedling", "Growing", "Flowers", "Fruits"};
 const char * Class_names[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Plant", "Animal", "Player", "Npc"};
@@ -56,7 +63,11 @@ BaseElement::BaseElement(Form f, Color color, int index) : Base(index, Class_Bas
 template<typename T>
 SerializablePointer<T>::SerializablePointer(T* p) : ptr(p) {}
 
-Element::Element(BaseElement * b) : InventoryElement(Class_Element), base(b)
+Element::Element(BaseElement * b) : InventoryElement(Class_Element), base(b),
+      length("length", rand() %100),
+      width("width", rand() %100),
+      height("height", rand() %100),
+      volume("volume", length.value*width.value*height.value)
 {
 
 }
@@ -96,7 +107,10 @@ Product::Product(Product_id i) : InventoryElement(Class_Product),
       quality("quality", 0), resilience("resilience", 0) , usage("usage", 0)
 {
     id = i;
-    c_id = Class_Product;    
+    c_id = Class_Product;
+   // actions = nullptr;
+    actions = ACT_NOTHING;
+    actions_count =0;
 }
 
 void Product::show(bool details)
