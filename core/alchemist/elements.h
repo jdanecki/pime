@@ -96,6 +96,11 @@ class InventoryElement
     }
     virtual void show(bool details = true)
     {
+        printf("%s\n", get_class_name());
+        if (details)
+        {
+            printf("mass=%u\n", mass);
+        }
     }
     virtual bool tick()
     {
@@ -312,6 +317,7 @@ class Ingredient : public InventoryElement
     size_t padding; // FIXME
 
   public:
+    //properties only needed to create product
     Property quality;    //[0..100] slaby..najlepszy
     Property resilience; // [0..100] wytrzymały..słaby
     Property usage;      // [0..100] łatwy..trudny
@@ -412,6 +418,7 @@ class Product : public InventoryElement
         if (actions==ACT_NOTHING) return false;
         printf("%s: %s %s\n", get_name(), Product_action_names[actions], object->get_name());
         return object->action(actions);
+        //FIXME change properties of product after action
 
     }
 };
@@ -537,10 +544,13 @@ class Plant : public InventoryElement
 
     void show(bool details = true) override
     {
-        printf("Plant -> %d name=%s grown=%d uid=%lx\n", c_id, get_name(), grown, uid);
+        InventoryElement::show(details);
         if (details)
         {
-            printf("phase=%s planted=%d times=%d/%d/%d/ water=%d\n", Plant_phase_name[phase], planted, seedling_time, growing_time, flowers_time, water);
+            get_base()->show(details);
+            printf("phase=%s grown=%d planted=%d times=%d/%d/%d/ water=%d \n",
+                Plant_phase_name[phase], grown, planted, seedling_time, growing_time,
+                flowers_time, water);
         }
     }
     BasePlant * get_base()

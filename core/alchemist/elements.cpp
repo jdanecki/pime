@@ -80,8 +80,11 @@ void Element::show(bool details)
     printf("%s: base=%s form=%s uid=%lx\n", get_class_name(), get_name(), get_form_name(), uid);
      if (!details)
          return;
-
-     base.get()->show(details);
+    length.show();
+    width.show();
+    height.show();
+    volume.show();
+    get_base()->show(details);
  }
 
 Ingredient::Ingredient(Ingredient_id i) : InventoryElement(Class_Ingredient),

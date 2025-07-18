@@ -89,8 +89,6 @@ fn init_internal(server_ip: &str) -> Result<NetClient, Box<dyn Error>> {
     let socket = UdpSocket::bind("0.0.0.0:0")?;
     println!("{server_ip}");
     socket.connect(server_ip)?;
-    // let socket = UdpSocket::bind("0.0.0.0:0")?;
-    // socket.connect("141.147.35.247:1234")?;
 
     Ok(NetClient {
         socket,
