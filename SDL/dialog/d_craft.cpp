@@ -70,10 +70,10 @@ DCraft::DCraft() : Dialog(0, 0, 500, 500, {125, 125, 125, 125}), ingredients(140
     //FIXME Piotr - change to struct instead of bunch of parameters
     this->add_button(0, 0, 0, 250, 100, 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Ingredients", &button_switch);
     this->add_button(1, 250, 0, 250, 100, 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Products", &button_switch);
-    this->add_image(0, 20, 120, 100, 100);
-    this->add_image(1, 20, 240, 100, 100);
     this->add_box(0, 20, 120, 100, 100, {0, 0, 0, 125}, true);
     this->add_box(1, 20, 240, 100, 100, {0, 0, 0, 125}, true);
+    this->add_image(0, 20, 120, 100, 100);
+    this->add_image(1, 20, 240, 100, 100);
 
     for (int i = 0; i < ING_NUM; i++)
     {
