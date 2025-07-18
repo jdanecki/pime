@@ -40,6 +40,7 @@ class ElementServer : public Element
     bool action(Product_action action);
     bool action_cut();
     bool action_hit();
+    void show(bool details = true) override;
 
 
 };
@@ -56,6 +57,7 @@ class BeingServer
         max_age = new Property("max age", 1 + rand() % 36000); // 100 years
         age = new Property("age", rand() % max_age->value);
     }
+    void show(bool details = true);
     Property ** get_properties(int * count)
     {
         Property ** props = new Property *[2];
@@ -108,6 +110,7 @@ class AnimalServer : public Animal, public BeingServer
         printf("ANIMAL_SERVER: %s %s\n", Product_action_names[action], get_name());
         return false;
     }
+    void show(bool details = true) override;
 
 };
 
@@ -150,6 +153,7 @@ class PlantServer : public Plant, public BeingServer
         printf("PLANT_SERVER: %s %s\n", Product_action_names[action], get_name());
         return false;
     }
+    void show(bool details = true) override;
 };
 
 class IngredientServer : public Ingredient
@@ -163,8 +167,7 @@ public:
 
 class ProductServer : public Product
 {
-public:
-        
+public:        
     int ing_count;
     InventoryElement ** ings;
     bool craft() override;
@@ -172,6 +175,7 @@ public:
     void init(Product_id i, int c, Form f);
     ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id i, Form f);
     ProductServer(InventoryElement ** from, int count, Product_id i, Form f);
+    void show(bool details = true) override;
 };
 
 AnimalServer* create_animal(BaseAnimal* base);
