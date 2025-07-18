@@ -91,7 +91,7 @@ class BeingServer
     }
 };
 
-class AnimalServer : public Animal
+class AnimalServer : public Animal, public BeingServer
 {
     int delay_for_move;
     int dst_loc_x, dst_loc_y;
@@ -99,9 +99,9 @@ class AnimalServer : public Animal
   public:
     void move();
     bool tick() override;
-    // AnimalServer();
+
     AnimalServer(BaseAnimal* base);
-    bool action(Product_action action)
+    bool action(Product_action action) override
     {
         Animal::action(action);
         printf("ANIMAL_SERVER: %s %s\n", Product_action_names[action], get_name());
@@ -143,7 +143,7 @@ class PlantServer : public Plant, public BeingServer
         }
         phase = p;
     }
-    bool action(Product_action action)
+    bool action(Product_action action) override
     {
         Plant::action(action);
         printf("PLANT_SERVER: %s %s\n", Product_action_names[action], get_name());
@@ -154,10 +154,8 @@ class PlantServer : public Plant, public BeingServer
 class IngredientServer : public Ingredient
 {
     
-public:
-
-    
-    InventoryElement * el; // available only in server , move to IngredientServer class
+public:  
+    InventoryElement * el;
     bool craft();
     IngredientServer(InventoryElement * from, Ingredient_id i, Form f);
 };
