@@ -2,6 +2,7 @@
 #define ELEMENTS_SERVER_H
 
 #include "../../core/alchemist/elements.h"
+#include "../../core//player.h"
 
 class BaseElementServer : public BaseElement
 {
@@ -37,10 +38,11 @@ class ElementServer : public Element
     Property smoothness;
 
     ElementServer(BaseElement * base);
-    bool action(Product_action action);
+    bool action(Product_action action, Player *pl);
     bool action_cut();
     bool action_hit();
     void show(bool details = true) override;
+
 };
 
 class BeingServer
@@ -103,12 +105,7 @@ class AnimalServer : public Animal, public BeingServer
     bool tick() override;
 
     AnimalServer(BaseAnimal * base);
-    bool action(Product_action action) override
-    {
-        Animal::action(action);
-        printf("ANIMAL_SERVER: %s %s\n", Product_action_names[action], get_name());
-        return false;
-    }
+    bool action(Product_action action, Player * pl) override;
     void show(bool details = true) override;
 };
 
@@ -145,9 +142,9 @@ class PlantServer : public Plant, public BeingServer
         }
         phase = p;
     }
-    bool action(Product_action action) override
+    bool action(Product_action action, Player *pl) override
     {
-        Plant::action(action);
+        Plant::action(action, pl);
         printf("PLANT_SERVER: %s %s\n", Product_action_names[action], get_name());
         return false;
     }
@@ -161,6 +158,7 @@ class IngredientServer : public Ingredient
     InventoryElement * el;
     bool craft();
     IngredientServer(InventoryElement * from, Ingredient_id i, Form f);
+
 };
 
 class ProductServer : public Product
@@ -174,6 +172,15 @@ class ProductServer : public Product
     ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id i, Form f);
     ProductServer(InventoryElement ** from, int count, Product_id i, Form f);
     void show(bool details = true) override;
+    bool use(InventoryElement * object, Player *pl)
+    {
+        // if (!actions) return false;
+        if (actions == ACT_NOTHING)
+            return false;
+        printf("%s: %s %s\n", get_name(), Product_action_names[actions], object->get_name());
+        return object->action(actions, pl);
+        // FIXME change properties of product after action
+    }
 };
 
 AnimalServer * create_animal(BaseAnimal * base);

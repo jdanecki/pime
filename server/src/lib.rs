@@ -429,7 +429,7 @@ fn handle_packet(
             ingredients_ids,
         } => {
             unsafe {
-                if core::craft(
+                if core::craft_entry(
                     product_id as i32,
                     ingredients_num as i32,
                     ingredients_ids.as_ptr() as *const usize,

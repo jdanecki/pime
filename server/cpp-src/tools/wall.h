@@ -7,5 +7,6 @@ class Wall : public IngredientServer
 {
   public:
     Wall(InventoryElement * from);
+    bool check_ing();
 };
 #endif

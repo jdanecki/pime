@@ -28,6 +28,8 @@ add_library(server_cpp SHARED
 
     tools/wall.cpp
     tools/hut.cpp
+
+    tools/meat.cpp
 )
 
 target_link_libraries(server_cpp pime)

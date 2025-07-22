@@ -19,6 +19,7 @@ const char * Ingredient_name[] = {
     "Pickaxe handle",
 
     "Wall",
+    "Meat",
 
 };
 

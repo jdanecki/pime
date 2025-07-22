@@ -7,5 +7,6 @@ class KnifeHandle : public IngredientServer
 {
   public:
     KnifeHandle(InventoryElement * from);
+    bool check_ing();
 };
 #endif

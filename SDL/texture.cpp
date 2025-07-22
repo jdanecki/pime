@@ -114,6 +114,7 @@ void load_textures()
     add_ing_texture(ING_PICKAXE_BLADE, "textures/items/ingredients/pickaxe_blade.png");
     add_ing_texture(ING_PICKAXE_HANDLE, "textures/items/ingredients/pickaxe_handle.png");
     add_ing_texture(ING_WALL, "textures/items/ingredients/wall.png");
+    add_ing_texture(ING_MEAT, "textures/items/ingredients/meat.png");
 
     add_prod_texture(PROD_AXE, "textures/items/products/axe.png");
     add_prod_texture(PROD_KNIFE, "textures/items/products/knife.png");

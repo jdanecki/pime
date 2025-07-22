@@ -60,7 +60,7 @@ pub extern "C" fn send_packet_craft(
     for i in 0..ingredients_num {
         unsafe {
             buf.extend_from_slice(&(*iid.add(i)).to_le_bytes());
-            println!("extended");
+            println!("PACKET_PLAYER_ACTION_CRAFT");
         }
     }
     //  println!("{:?}", buf);

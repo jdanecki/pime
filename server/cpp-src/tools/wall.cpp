@@ -4,3 +4,8 @@
 Wall::Wall(InventoryElement * from) : IngredientServer(from, ING_WALL, Form_solid)
 {
 }
+
+bool Wall::check_ing()
+{
+    return true;
+}

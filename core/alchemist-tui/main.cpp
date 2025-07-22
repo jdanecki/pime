@@ -325,7 +325,7 @@ InventoryElement * craft_ing(char c)
     return target;
 }
 
-void craft()
+void craft_entry()
 {
     printf("%sa - craft axe\n", colorCyan);
     printf("b - craft axe blade\n");
@@ -516,7 +516,7 @@ void play()
                 test();
                 break;
             case 'c':
-                craft();
+                craft_entry();
                 break;
             case 's':
                 show();

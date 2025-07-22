@@ -67,6 +67,7 @@ class BaseElement : public Base
 };
 
 class chunk;
+class Player;
 
 class InventoryElement
 {
@@ -87,7 +88,7 @@ class InventoryElement
         mass = rand() % 100;
     }
 
-    virtual bool action(Product_action action)
+    virtual bool action(Product_action action, Player *pl)
     {
         printf("INV: %s %s\n", Product_action_names[action], get_name());
         return false;
@@ -255,7 +256,7 @@ class Element : public InventoryElement
     {
         return get_base()->c_id;
     }
-    bool action(Product_action action) override
+    bool action(Product_action action, Player *pl) override
     {
         printf("ELEMENT: %s %s\n", Product_action_names[action], get_name());
         return false;
@@ -294,6 +295,8 @@ enum Ingredient_id
     ING_PICKAXE_HANDLE,
 
     ING_WALL,
+
+    ING_MEAT,
 
     ING_NUM,
 
@@ -358,6 +361,10 @@ class Ingredient : public InventoryElement
         sprintf(buf, "%s: (%s)", get_class_name(), Ingredient_name[id]);
         return buf;
     }
+    virtual bool check_ing()
+    {
+        return false;
+    }
 };
 
 class Product : public InventoryElement
@@ -408,15 +415,7 @@ class Product : public InventoryElement
         sprintf(buf, "%s: (%s)", get_class_name(), Product_name[id]);
         return buf;
     }
-    bool use(InventoryElement * object)
-    {
-        // if (!actions) return false;
-        if (actions == ACT_NOTHING)
-            return false;
-        printf("%s: %s %s\n", get_name(), Product_action_names[actions], object->get_name());
-        return object->action(actions);
-        // FIXME change properties of product after action
-    }
+
 };
 
 class BaseAnimal : public Base
@@ -472,7 +471,7 @@ class Animal : public InventoryElement
         return get_base()->c_id;
     }
 
-    bool action(Product_action action) override
+    bool action(Product_action action, Player *pl) override
     {
         printf("ANIMAL: %s %s\n", Product_action_names[action], get_name());
         return false;
@@ -563,7 +562,7 @@ class Plant : public InventoryElement
     {
         return get_base()->c_id;
     }
-    bool action(Product_action action)
+    bool action(Product_action action, Player *pl)
     {
         printf("PLANT: %s %s\n", Product_action_names[action], get_name());
         return false;
@@ -581,7 +580,7 @@ class Plant : public InventoryElement
 #define LIQUID_ELEMENTS 1
 #define GAS_ELEMENTS 1
 #define BASE_ELEMENTS (SOLID_ELEMENTS + LIQUID_ELEMENTS + GAS_ELEMENTS)
-#define ING_ELEMENTS 7
+#define ING_ELEMENTS 8
 #define PROD_ELEMENTS 4
 
 #define BASE_ANIMALS 40
