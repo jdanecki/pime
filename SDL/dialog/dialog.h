@@ -30,11 +30,8 @@ class DialogBox : public DialogElement
 
   public:
     SDL_Color color;
-    int x;
-    int y;
-    int w;
-    int h;
-    DialogBox(int id, int x, int y, int w, int h, SDL_Color color, bool fill);
+    SDL_Rect rect;
+    DialogBox(int id, SDL_Rect rect, SDL_Color color, bool fill);
     void draw(SDL_Renderer * renderer);
 };
 
@@ -55,15 +52,12 @@ class DialogText : public DialogElement
 class DialogImage : public DialogElement
 {
   protected:
-    int x;
-    int y;
-    int w;
-    int h;
+    SDL_Rect rect;
 
   public:
     SDL_Texture * texture;
-    DialogImage(int id, int x, int y, int w, int h, std::string filename);
-    DialogImage(int id, int x, int y, int w, int h);
+    DialogImage(int id, SDL_Rect rect, std::string filename);
+    DialogImage(int id, SDL_Rect rect);
     void draw(SDL_Renderer * renderer);
 };
 
@@ -72,7 +66,7 @@ class DialogButton : public DialogElement
   public:
     DialogBox * d_box;
     DialogText * d_text;
-    DialogButton(int id, int x, int y, int w, int h, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int));
+    DialogButton(int id, SDL_Rect rect, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int));
     void draw(SDL_Renderer * renderer);
     void (*on_press)(int);
 };
@@ -80,20 +74,17 @@ class DialogButton : public DialogElement
 class Dialog
 {
     std::list<DialogElement *> elements;
-    int x;
-    int y;
-    int w;
-    int h;
+    SDL_Rect rect;
     SDL_Color background_color;
 
   public:
-    Dialog(int x, int y, int w, int h, SDL_Color background_color);
+    Dialog(SDL_Rect rect, SDL_Color background_color);
     DialogElement * get_element_from_id(int id, enum DialogElementType c_id);
-    void add_box(int id, int x, int y, int w, int h, SDL_Color color, bool fill);
+    void add_box(int id, SDL_Rect rect, SDL_Color color, bool fill);
     void add_text(int id, int x, int y, int size, SDL_Color color, std::string text);
-    void add_image(int id, int x, int y, int w, int h, std::string filename);
-    void add_image(int id, int x, int y, int w, int h);
-    void add_button(int id, int x, int y, int w, int h, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int));
+    void add_image(int id, SDL_Rect rect, std::string filename);
+    void add_image(int id, SDL_Rect rect);
+    void add_button(int id, SDL_Rect rect, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int));
     void draw(SDL_Renderer * renderer);
     void press(int x, int y);
 };

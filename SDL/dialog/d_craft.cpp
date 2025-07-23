@@ -72,31 +72,30 @@ void button_switch(int id)
     }
 }
 
-DCraft::DCraft() : Dialog(0, 0, 500, 500, {125, 125, 125, 125}), ingredients(140, 120, 500 - 140, 500 - 120, {125, 125, 125, 10}), products(140, 120, 500 - 140, 500 - 120, {125, 125, 125, 10})
+DCraft::DCraft() : Dialog({0, 0, 500, 500}, {125, 125, 125, 125}), ingredients({140, 120, 500 - 140, 500 - 120}, {125, 125, 125, 10}), products({140, 120, 500 - 140, 500 - 120}, {125, 125, 125, 10})
 {
     this->show = false;
-    // FIXME Piotr - change to struct instead of bunch of parameters
-    this->add_button(0, 0, 0, 250, 100, 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Ingredients", &button_switch);
-    this->add_button(1, 250, 0, 250, 100, 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Products", &button_switch);
-    this->add_box(0, 20, 120, 100, 100, {0, 0, 0, 125}, true);
-    this->add_box(1, 20, 240, 100, 100, {0, 0, 0, 125}, true);
-    this->add_image(0, 20, 120, 100, 100);
-    this->add_image(1, 20, 240, 100, 100);
+    this->add_button(0, {0, 0, 250, 100}, 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Ingredients", &button_switch);
+    this->add_button(1, {250, 0, 250, 100}, 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Products", &button_switch);
+    this->add_box(0, {20, 120, 100, 100}, {0, 0, 0, 125}, true);
+    this->add_box(1, {20, 240, 100, 100}, {0, 0, 0, 125}, true);
+    this->add_image(0, {20, 120, 100, 100});
+    this->add_image(1, {20, 240, 100, 100});
 
     for (int i = 0; i < ING_NUM; i++)
     {
         int x = i % 6 * 54;
         int y = i / 6 * 54;
-        this->ingredients.add_button(i, x, y, 50, 50, 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", &button_craft_ing);
-        this->ingredients.add_image(i, x + 2, y + 2, 46, 46);
+        this->ingredients.add_button(i, {x, y, 50, 50}, 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", &button_craft_ing);
+        this->ingredients.add_image(i, {x + 2, y + 2, 46, 46});
     }
 
     for (int i = 0; i < PROD_ELEMENTS; i++)
     {
         int x = i % 6 * 54;
         int y = i / 6 * 54;
-        this->products.add_button(i, x, y, 50, 50, 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", &button_craft_prod);
-        this->products.add_image(i, x + 2, y + 2, 46, 46);
+        this->products.add_button(i, {x, y, 50, 50}, 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", &button_craft_prod);
+        this->products.add_image(i, {x + 2, y + 2, 46, 46});
     }
 }
 

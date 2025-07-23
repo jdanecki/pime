@@ -18,24 +18,20 @@ enum DialogElementType DialogElement::get_c_id()
     return this->c_id;
 }
 
-DialogBox::DialogBox(int id, int x, int y, int w, int h, SDL_Color color, bool fill) : DialogElement(id, DialogElementType::Box)
+DialogBox::DialogBox(int id, SDL_Rect rect, SDL_Color color, bool fill) : DialogElement(id, DialogElementType::Box)
 {
-    this->x = x;
-    this->y = y;
-    this->w = w;
-    this->h = h;
+    this->rect = rect;
     this->color = color;
     this->fill = fill;
 }
 
 void DialogBox::draw(SDL_Renderer * renderer)
 {
-    SDL_Rect rect = {x, y, w, h};
     SDL_SetRenderDrawColor(renderer, this->color.r, this->color.g, this->color.b, this->color.a);
     if (this->fill)
-        SDL_RenderFillRect(renderer, &rect);
+        SDL_RenderFillRect(renderer, &this->rect);
     else
-        SDL_RenderDrawRect(renderer, &rect);
+        SDL_RenderDrawRect(renderer, &this->rect);
 }
 
 DialogText::DialogText(int id, int x, int y, int size, SDL_Color color, std::string text) : DialogElement(id, DialogElementType::Text)
@@ -52,21 +48,15 @@ void DialogText::draw(SDL_Renderer * renderer)
     write_text(this->x, this->y, this->text.c_str(), this->color, this->size, this->size * 1.5);
 }
 
-DialogImage::DialogImage(int id, int x, int y, int w, int h, std::string filename) : DialogElement(id, DialogElementType::Image)
+DialogImage::DialogImage(int id, SDL_Rect rect, std::string filename) : DialogElement(id, DialogElementType::Image)
 {
-    this->x = x;
-    this->y = y;
-    this->w = w;
-    this->h = h;
+    this->rect = rect;
     this->texture = load_texture(filename.c_str());
 }
 
-DialogImage::DialogImage(int id, int x, int y, int w, int h) : DialogElement(id, DialogElementType::Image)
+DialogImage::DialogImage(int id, SDL_Rect rect) : DialogElement(id, DialogElementType::Image)
 {
-    this->x = x;
-    this->y = y;
-    this->w = w;
-    this->h = h;
+    this->rect = rect;
     this->texture = NULL;
 }
 
@@ -74,14 +64,13 @@ void DialogImage::draw(SDL_Renderer * renderer)
 {
     if (this->texture == NULL)
         return;
-    SDL_Rect rect = {this->x, this->y, this->w, this->h};
-    SDL_RenderCopy(renderer, this->texture, NULL, &rect);
+    SDL_RenderCopy(renderer, this->texture, NULL, &this->rect);
 }
 
-DialogButton::DialogButton(int id, int x, int y, int w, int h, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int)) : DialogElement(id, DialogElementType::Button)
+DialogButton::DialogButton(int id, SDL_Rect rect, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int)) : DialogElement(id, DialogElementType::Button)
 {
-    this->d_box = new DialogBox(id, x, y, w, h, bgcolor, 1);
-    this->d_text = new DialogText(id, x, y, size, fgcolor, text);
+    this->d_box = new DialogBox(id, rect, bgcolor, 1);
+    this->d_text = new DialogText(id, rect.x, rect.y, size, fgcolor, text);
     this->on_press = on_press;
 }
 
@@ -91,12 +80,9 @@ void DialogButton::draw(SDL_Renderer * renderer)
     this->d_text->draw(renderer);
 }
 
-Dialog::Dialog(int x, int y, int w, int h, SDL_Color background_color)
+Dialog::Dialog(SDL_Rect rect, SDL_Color background_color)
 {
-    this->x = x;
-    this->y = y;
-    this->w = w;
-    this->h = h;
+    this->rect = rect;
     this->background_color = background_color;
 };
 
@@ -108,36 +94,50 @@ DialogElement * Dialog::get_element_from_id(int id, enum DialogElementType c_id)
     return NULL;
 }
 
-void Dialog::add_box(int id, int x, int y, int w, int h, SDL_Color color, bool fill)
+void offset_rect(SDL_Rect * rect, int x, int y)
 {
-    this->elements.push_back(new DialogBox(id, x + this->x, y + this->y, w, h, color, fill));
+    rect->x += x;
+    rect->y += y;
+}
+
+void offset_rect(SDL_Rect * rect1, SDL_Rect * rect2)
+{
+    offset_rect(rect1, rect2->x, rect2->y);
+}
+
+void Dialog::add_box(int id, SDL_Rect rect, SDL_Color color, bool fill)
+{
+    offset_rect(&rect, &this->rect);
+    this->elements.push_back(new DialogBox(id, rect, color, fill));
 }
 
 void Dialog::add_text(int id, int x, int y, int size, SDL_Color color, std::string text)
 {
-    this->elements.push_back(new DialogText(id, x + this->x, y + this->y, size, color, text));
+    this->elements.push_back(new DialogText(id, x + this->rect.x, y + this->rect.y, size, color, text));
 }
 
-void Dialog::add_image(int id, int x, int y, int w, int h, std::string filename)
+void Dialog::add_image(int id, SDL_Rect rect, std::string filename)
 {
-    this->elements.push_back(new DialogImage(id, x + this->x, y + this->y, w, h, filename));
+    offset_rect(&rect, &this->rect);
+    this->elements.push_back(new DialogImage(id, rect, filename));
 }
 
-void Dialog::add_image(int id, int x, int y, int w, int h)
+void Dialog::add_image(int id, SDL_Rect rect)
 {
-    this->elements.push_back(new DialogImage(id, x + this->x, y + this->y, w, h));
+    offset_rect(&rect, &this->rect);
+    this->elements.push_back(new DialogImage(id, rect));
 }
 
-void Dialog::add_button(int id, int x, int y, int w, int h, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int))
+void Dialog::add_button(int id, SDL_Rect rect, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int))
 {
-    this->elements.push_back(new DialogButton(id, x + this->x, y + this->y, w, h, size, bgcolor, fgcolor, text, on_press));
+    offset_rect(&rect, &this->rect);
+    this->elements.push_back(new DialogButton(id, rect, size, bgcolor, fgcolor, text, on_press));
 }
 
 void Dialog::draw(SDL_Renderer * renderer)
 {
     SDL_SetRenderDrawColor(renderer, this->background_color.r, this->background_color.g, this->background_color.b, this->background_color.a);
-    SDL_Rect rect = {this->x, this->y, this->w, this->h};
-    SDL_RenderFillRect(renderer, &rect);
+    SDL_RenderFillRect(renderer, &this->rect);
     for (DialogElement * de : this->elements)
     {
         de->draw(renderer);
@@ -154,7 +154,7 @@ void Dialog::press(int x, int y)
             if (button->on_press)
             {
                 DialogBox * box = dynamic_cast<DialogBox *>(button->d_box);
-                if (box->x < x && box->y < y && box->x + box->w > x && box->y + box->h > y)
+                if (box->rect.x < x && box->rect.y < y && box->rect.x + box->rect.w > x && box->rect.y + box->rect.h > y)
                 {
                     button->on_press(button->id);
                 }
