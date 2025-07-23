@@ -330,9 +330,10 @@ fn simulate(
 }
 
 fn create_terrains() -> Vec<Rc<TerrainType>> {
-    let mut terrains = Vec::<Rc<TerrainType>>::with_capacity(core::BASE_ELEMENTS as usize);
-    for i in 0..core::BASE_ELEMENTS {
-        terrains.push(Rc::new(TerrainType::new(i)));
+    let num = rand::random_range(10..20);
+    let mut terrains = Vec::<Rc<TerrainType>>::with_capacity(num);
+    for i in 0..num {
+        terrains.push(Rc::new(TerrainType::new(i as u32)));
     }
     terrains
 }
@@ -544,9 +545,15 @@ impl TerrainType {
     }
 
     pub fn new(id: u32) -> TerrainType {
+        let f = match rand::random_range(0..10) {
+            0..=7 => core::Form_Form_solid,
+            8..=9 => core::Form_Form_liquid,
+            10 => core::Form_Form_gas,
+            _ => unreachable!(),
+        };
         TerrainType {
             id,
-            base: unsafe { core::BaseElementServer::new(core::Form_Form_solid, id as i32) },
+            base: unsafe { core::BaseElementServer::new(f, id as i32) },
         }
     }
 }
