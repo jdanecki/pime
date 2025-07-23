@@ -366,7 +366,7 @@ fn create_regions(
 
     for i in 0..REGIONS_NUM as usize {
         let r = Region::new(
-            Rc::clone(&terrains[i % core::BASE_ELEMENTS as usize]),
+            Rc::clone(terrains.choose(&mut rand::rng()).unwrap()),
             terrains,
             plants,
             animals,
