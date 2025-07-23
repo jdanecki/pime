@@ -1,0 +1,12 @@
+#include "stick.h"
+
+Stick::Stick(InventoryElement * from) : IngredientServer(from, ING_STICK, Form_solid)
+{
+}
+
+bool Stick::check_ing()
+{
+    if (el->get_base_cid() == Class_BasePlant)
+        return true;
+    else return false;
+}

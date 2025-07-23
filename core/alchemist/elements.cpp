@@ -21,6 +21,9 @@ const char * Ingredient_name[] = {
     "Wall",
     "Meat",
 
+    "Log",
+    "Tinder",
+    "Stick",
 };
 
 const char * Product_name[] = {
@@ -28,6 +31,8 @@ const char * Product_name[] = {
     "Knife",
     "Pickaxe",
     "Hut",
+    "Fire",
+    "Roasted meat",
 };
 
 const char * Product_action_names[] = {
@@ -35,6 +40,7 @@ const char * Product_action_names[] = {
     "cut",
     "hit",
     "stab",
+    "fire",
 };
 
 const char * object_names[] = {"wall"};

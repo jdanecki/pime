@@ -8,5 +8,6 @@ class Meat : public IngredientServer
   public:
     Meat(InventoryElement * from);
     bool check_ing();
+    bool action(Product_action action, Player *pl);
 };
 #endif

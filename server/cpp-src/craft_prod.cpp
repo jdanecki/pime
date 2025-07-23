@@ -18,6 +18,12 @@ InventoryElement * craft_prod(int product_id, InventoryElement * el1, InventoryE
         case PROD_KNIFE:
             crafted = new Knife(el1, el2);
             break;
+        case PROD_FIRE:
+            crafted = new Fire(el1, el2);
+            break;
+        case PROD_ROASTED_MEAT:
+            crafted = new Roasted_meat(el1, el2);
+            break;
     }
 
     if (!crafted) return nullptr;

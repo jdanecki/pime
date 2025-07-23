@@ -156,8 +156,9 @@ class IngredientServer : public Ingredient
 
   public:
     InventoryElement * el;
-    bool craft();
+    bool craft() override;
     IngredientServer(InventoryElement * from, Ingredient_id i, Form f);
+    bool action(Product_action action, Player * pl) override;
 
 };
 

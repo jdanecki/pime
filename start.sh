@@ -1,9 +1,9 @@
 #!/bin/bash
 
-cd server/
+pushd server
 cargo run &
 server_PID=$!
 sleep 5
-cd ../SDL
-./build/pime_SDL 127.0.0.1
+pushd ../SDL
+./run_local.sh
 kill $server_PID

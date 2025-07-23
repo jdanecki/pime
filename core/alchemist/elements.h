@@ -34,6 +34,7 @@ enum Product_action
     ACT_CUT,
     ACT_HIT,
     ACT_STAB, // dźgnij
+    ACT_FIRE,
 
 };
 
@@ -118,6 +119,10 @@ class InventoryElement
         return -1;
     }
     virtual Class_id get_base_cid()
+    {
+        return c_id;
+    }
+    virtual Class_id get_cid()
     {
         return c_id;
     }
@@ -298,6 +303,10 @@ enum Ingredient_id
 
     ING_MEAT,
 
+    ING_LOG,
+    ING_TINDER,
+    ING_STICK,
+
     ING_NUM,
 
 };
@@ -308,6 +317,9 @@ enum Product_id
     PROD_KNIFE,
     PROD_PICKAXE,
     PROD_HUT,
+    PROD_FIRE,
+    PROD_ROASTED_MEAT,
+
 };
 
 extern const char * Ingredient_name[];
@@ -363,6 +375,11 @@ class Ingredient : public InventoryElement
     }
     virtual bool check_ing()
     {
+        return false;
+    }
+    bool action(Product_action action, Player *pl)
+    {
+        printf("ING: %s %s\n", Product_action_names[action], get_name());
         return false;
     }
 };
@@ -576,14 +593,14 @@ class Plant : public InventoryElement
     }
 };
 
-#define SOLID_ELEMENTS 17
+#define SOLID_ELEMENTS 6
 #define LIQUID_ELEMENTS 1
 #define GAS_ELEMENTS 1
 #define BASE_ELEMENTS (SOLID_ELEMENTS + LIQUID_ELEMENTS + GAS_ELEMENTS)
-#define ING_ELEMENTS 8
-#define PROD_ELEMENTS 4
+#define ING_ELEMENTS 11
+#define PROD_ELEMENTS 6
 
 #define BASE_ANIMALS 40
-#define BASE_PLANTS 30
+#define BASE_PLANTS 10
 
 #endif

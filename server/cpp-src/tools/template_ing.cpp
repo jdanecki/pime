@@ -1,11 +1,10 @@
-#include "wall.h"
-//#include <cstdlib>
+#include "HEADER.h"
 
-Wall::Wall(InventoryElement * from) : IngredientServer(from, ING_WALL, Form_solid)
+CLASS_NAME::CLASS_NAME(InventoryElement * from) : IngredientServer(from, ING, Form_solid)
 {
 }
 
-bool Wall::check_ing()
+bool CLASS_NAME::check_ing()
 {
     if ((el->get_base_cid() == Class_BaseElement) ||
         (el->get_base_cid() == Class_BasePlant))

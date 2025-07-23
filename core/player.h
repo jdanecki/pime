@@ -88,7 +88,7 @@ class Player : public InventoryElement
     char * get_el_description(InventoryElement * el);
 
     virtual bool check_known(InventoryElement * el);
-    void set_known(InventoryElement * el);
+    void set_known(Class_id cid, int el_id);
 
     bool conversation_started()
     {

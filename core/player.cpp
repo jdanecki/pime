@@ -179,7 +179,7 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
         if (des)
         {
             print_status(1, "%s says: %s. It's %s", n, a->text, des);
-            talking_to->set_known(el);
+            talking_to->set_known(el->get_base_cid(), el->get_id());
         }
         else
         {
@@ -233,11 +233,11 @@ bool Player::check_known(InventoryElement * el)
     return k->is_known();
 }
 
-void Player::set_known(InventoryElement * el)
+void Player::set_known(Class_id cid, int el_id)
 {
     ElId i;
-    i.c_id = el->get_base_cid();
-    i.id = el->get_id();
+    i.c_id = cid;
+    i.id = el_id;
 
     KnownElement * k = dynamic_cast<KnownElement *>(known_elements->find(&i));
     if (!k)

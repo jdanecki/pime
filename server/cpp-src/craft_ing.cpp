@@ -30,6 +30,15 @@ InventoryElement * craft_ing(int product_id, InventoryElement * el)
         case ING_MEAT:
             crafted = new Meat(el);
             break;
+        case ING_LOG:
+            crafted = new Log(el);
+            break;
+        case ING_TINDER:
+            crafted = new Tinder(el);
+            break;
+        case ING_STICK:
+            crafted = new Stick(el);
+            break;
 
     }
     if (!crafted) return nullptr;

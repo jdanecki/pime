@@ -33,6 +33,9 @@ bool craft2elements(Product_id what)
     {
         size_t ingredients[2] = {el1->uid, el2->uid};
         send_packet_craft(client, ING_NUM + what, 2, ingredients);
+        //FIXME what if crafting will fail?
+        player->set_known(Class_Product, what);
+
         player->craftbar[i1] = 0;
         player->craftbar[i2] = 0;
         return true;
@@ -44,7 +47,12 @@ void button_craft_ing(int id)
 {
     printf("Crafting %d\n", id);
     if (player->hotbar[active_hotbar])
+    {
         send_packet_craft(client, id, 1, &player->hotbar[active_hotbar]->uid);
+        //FIXME what if crafting will fail?
+        player->set_known(Class_Ingredient, id);
+
+    }
 }
 
 void button_craft_prod(int id)

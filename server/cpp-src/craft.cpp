@@ -57,6 +57,9 @@ bool craft_entry(int product_id, int ingredients_num, const size_t * ingredients
         world_table[player->map_y][player->map_x]->add_object(crafted, player->x, player->y);
         objects_to_create.add(crafted);
         printf("crafted\n");
+
+        //FIXME share this with client
+        //player->set_known(crafted);
         return true;
     }
     else

@@ -115,11 +115,18 @@ void load_textures()
     add_ing_texture(ING_PICKAXE_HANDLE, "textures/items/ingredients/pickaxe_handle.png");
     add_ing_texture(ING_WALL, "textures/items/ingredients/wall.png");
     add_ing_texture(ING_MEAT, "textures/items/ingredients/meat.png");
+    add_ing_texture(ING_LOG, "textures/items/ingredients/log.png");
+    add_ing_texture(ING_STICK, "textures/items/ingredients/stick.png");
+    add_ing_texture(ING_TINDER, "textures/items/ingredients/tinder.png");
 
     add_prod_texture(PROD_AXE, "textures/items/products/axe.png");
     add_prod_texture(PROD_KNIFE, "textures/items/products/knife.png");
     add_prod_texture(PROD_PICKAXE, "textures/items/products/pickaxe.png");
+    add_prod_texture(PROD_FIRE, "textures/items/products/fire.png");
+    add_prod_texture(PROD_ROASTED_MEAT, "textures/items/products/roasted_meat.png");
+
     add_prod_texture(PROD_HUT, "textures/objects/hut.png");
+
 
     i = 0;
     i = add_textures_from_dir(plant_textures, i, "textures/plants");

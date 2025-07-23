@@ -1,7 +1,4 @@
 #include "knife.h"
-#include "../world_server.h"
-#include <cstdio>
-#include <cstdlib>
 
 Knife::Knife(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_KNIFE, Form_solid)
 {
@@ -18,6 +15,6 @@ bool Knife::check_ing()
 
     if ((id1 == ING_KNIFE_BLADE && id2 == ING_KNIFE_HANDLE) || (id1 == ING_KNIFE_HANDLE && id2 == ING_KNIFE_BLADE))
         return true;
-    printf("wrong ingredients\n");
+    printf(" wrong ingredients\n");
     return false;
 }

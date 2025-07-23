@@ -1,8 +1,4 @@
 #include "pickaxe.h"
-#include "../networking.h"
-#include "../world_server.h"
-#include <cstddef>
-#include <cstdio>
 
 PickAxe::PickAxe(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_PICKAXE, Form_solid)
 {
@@ -18,6 +14,6 @@ bool PickAxe::check_ing()
 
     if ((id1 == ING_PICKAXE_BLADE && id2 == ING_PICKAXE_HANDLE) || (id1 == ING_PICKAXE_HANDLE && id2 == ING_PICKAXE_BLADE))
         return true;
-    printf("wrong ingredients\n");
+    printf(" wrong ingredients\n");
     return false;
 }

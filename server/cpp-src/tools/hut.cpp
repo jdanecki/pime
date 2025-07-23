@@ -1,8 +1,4 @@
 #include "hut.h"
-#include "../networking.h"
-#include "../world_server.h"
-#include <cstddef>
-#include <cstdio>
 
 Hut::Hut(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_HUT, Form_solid)
 {
@@ -16,6 +12,6 @@ bool Hut::check_ing()
 
     if (id1 == ING_WALL && id2 == ING_WALL)
         return true;
-    printf("wrong ingredients\n");
+    printf(" wrong ingredients\n");
     return false;
 }

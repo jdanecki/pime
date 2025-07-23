@@ -82,7 +82,7 @@ AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
 
 bool AnimalServer::action(Product_action action, Player *pl)
 {
-    Animal::action(action, pl);
+    //Animal::action(action, pl);
     printf("ANIMAL_SERVER: %s %s\n", Product_action_names[action], get_name());
 
     InventoryElement * crafted=nullptr;
@@ -268,6 +268,13 @@ IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id i, For
     id = i;
     req_form = f;
 }
+
+bool IngredientServer::action(Product_action action, Player *pl)
+{
+    printf("ING_SERVER: %s %s\n", Product_action_names[action], get_name());
+    return false;
+}
+
 bool IngredientServer::craft()
 {
     // FIXME

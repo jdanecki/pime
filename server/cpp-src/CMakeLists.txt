@@ -30,6 +30,12 @@ add_library(server_cpp SHARED
     tools/hut.cpp
 
     tools/meat.cpp
+    tools/roasted_meat.cpp
+
+    tools/tinder.cpp
+    tools/log.cpp
+    tools/stick.cpp
+    tools/fire.cpp
 )
 
 target_link_libraries(server_cpp pime)

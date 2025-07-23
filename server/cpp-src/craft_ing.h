@@ -10,6 +10,9 @@
 #include "tools/knife_handle.h"
 #include "tools/wall.h"
 #include "tools/meat.h"
+#include "tools/log.h"
+#include "tools/tinder.h"
+#include "tools/stick.h"
 
 InventoryElement * craft_ing(int product_id, InventoryElement * el);
 

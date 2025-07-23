@@ -53,13 +53,19 @@ void draw_texts()
         else
         {
             t = new char[256];
-            sprintf(t, "It looks like %s, ", item->get_class_name());
+            sprintf(t, "It looks like %s", item->get_class_name());
             write_text(tx, ty, t, White, 15, 30);
+            Class_id el_cid=item->get_cid();
+            ty+=25;
+            if (el_cid == Class_Element)
+            {
+                sprintf(t, "it has %s form", item->get_form_name());
+                write_text(tx, ty, t, White, 15, 30);
+                ty+=25;
+            }
+            if (el_cid != Class_Ingredient && el_cid != Class_Product)
+                write_text(tx, ty, "I don't know what it's exactly", White, 15, 30);
 
-            sprintf(t, "it has %s form, but ", item->get_form_name());
-            write_text(tx, ty + 25, t, White, 15, 30);
-
-            write_text(tx, ty + 50, "I don't know what it's exactly", White, 15, 30);
             delete[] t;
         }
     }

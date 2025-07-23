@@ -26,7 +26,7 @@ SDL_Texture * PlantSDL::get_texture()
 {
     // FIXME combine plant textures in one file for each phase
     // if (grown)
-    return plant_textures[get_id() % 6];
+    return plant_textures[get_id() % BASE_PLANTS];
 }
 
 PlantSDL::PlantSDL(Plant data) : Plant(data)

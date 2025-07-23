@@ -1,11 +1,10 @@
-#include "wall.h"
-//#include <cstdlib>
+#include "tinder.h"
 
-Wall::Wall(InventoryElement * from) : IngredientServer(from, ING_WALL, Form_solid)
+Tinder::Tinder(InventoryElement * from) : IngredientServer(from, ING_TINDER, Form_solid)
 {
 }
 
-bool Wall::check_ing()
+bool Tinder::check_ing()
 {
     if ((el->get_base_cid() == Class_BaseElement) ||
         (el->get_base_cid() == Class_BasePlant))
