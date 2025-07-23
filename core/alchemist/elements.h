@@ -595,9 +595,9 @@ class Plant : public InventoryElement
 };
 
 #define SOLID_ELEMENTS 6
-#define LIQUID_ELEMENTS 1
+#define LIQUID_ELEMENTS 4
 #define GAS_ELEMENTS 1
-#define BASE_ELEMENTS (SOLID_ELEMENTS + LIQUID_ELEMENTS + GAS_ELEMENTS)
+
 #define ING_ELEMENTS 11
 #define PROD_ELEMENTS 6
 

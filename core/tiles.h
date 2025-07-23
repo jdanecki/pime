@@ -30,6 +30,8 @@ class chunk
 
   public:
     chunk_table table;
+    //all elements are in objects in client
+    //in server beings are on both lists
     InvList objects;
     InvList beings;
 

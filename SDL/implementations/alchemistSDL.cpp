@@ -31,14 +31,21 @@ ElementSDL::ElementSDL(Element data) : Element(data)
 
 SDL_Texture * ElementSDL::get_texture()
 {
-    return items_textures[get_base()->id];
+    switch(get_form())
+    {
+        case Form_solid:
+            return solid_items_textures[get_base()->id % SOLID_ELEMENTS];
+        case Form_liquid:
+            return liquid_items_textures[get_base()->id % LIQUID_ELEMENTS];
+        case Form_gas:
+            return gas_items_textures[get_base()->id % GAS_ELEMENTS];
+    }
+    return nullptr;
 }
 
 IngredientSDL::IngredientSDL(Ingredient data) : Ingredient(data)
 {
-    // quality->value = data->quality;
-    // resilience->value = data->resilience;
-    // usage->value = data->usage;
+
 }
 
 SDL_Texture * IngredientSDL::get_texture()
@@ -48,9 +55,7 @@ SDL_Texture * IngredientSDL::get_texture()
 
 ProductSDL::ProductSDL(Product data) : Product(data)
 {
-    // quality->value = data->quality;
-    // resilience->value = data->resilience;
-    // usage->value = data->usage;
+
 }
 
 SDL_Texture * ProductSDL::get_texture()

@@ -185,7 +185,7 @@ bool draw_terrain()
     chunk * c = world_table[player->map_y][player->map_x];
     if (c)
     {
-        ListElement * el = c->objects.head;
+        ListElement * el = c->objects.head;        
         while (el)
         {
             InventoryElement * o = (el->el);
