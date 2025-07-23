@@ -17,3 +17,5 @@ bool PickAxe::check_ing()
     printf(" wrong ingredients\n");
     return false;
 }
+
+ProductServer *createPickAxe(InventoryElement *el1, InventoryElement *el2) { return new PickAxe(el1, el2); }

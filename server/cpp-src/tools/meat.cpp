@@ -46,3 +46,8 @@ bool Meat::action(Product_action action, Player *pl)
     }
     return false;
 }
+
+IngredientServer *createMeat(InventoryElement *from)
+{
+    return new Meat(from);
+}

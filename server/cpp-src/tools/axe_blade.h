@@ -9,4 +9,6 @@ class AxeBlade : public IngredientServer
     AxeBlade(InventoryElement * from);
     bool check_ing();
 };
+
+IngredientServer* createAxeBlade(InventoryElement* from);
 #endif

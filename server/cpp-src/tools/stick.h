@@ -9,4 +9,6 @@ class Stick : public IngredientServer
     Stick(InventoryElement * from);
     bool check_ing();
 };
+
+IngredientServer* createStick(InventoryElement* from);
 #endif

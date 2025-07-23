@@ -9,4 +9,5 @@ class KnifeHandle : public IngredientServer
     KnifeHandle(InventoryElement * from);
     bool check_ing();
 };
+IngredientServer* createKnifeHandle(InventoryElement* from);
 #endif

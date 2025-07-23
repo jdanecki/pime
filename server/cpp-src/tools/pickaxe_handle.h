@@ -8,4 +8,6 @@ class PickAxeHandle : public IngredientServer
   public:
     PickAxeHandle(InventoryElement * from);
 };
+
+IngredientServer* createPickAxeHandle(InventoryElement* from);
 #endif

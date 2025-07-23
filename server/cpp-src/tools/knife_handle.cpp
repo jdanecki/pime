@@ -10,3 +10,8 @@ bool KnifeHandle::check_ing()
         return true;
     else return false;
 }
+
+IngredientServer *createKnifeHandle(InventoryElement *from)
+{
+ return new KnifeHandle(from);
+}

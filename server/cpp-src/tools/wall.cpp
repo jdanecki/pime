@@ -12,3 +12,8 @@ bool Wall::check_ing()
         return true;
     else return false;
 }
+
+IngredientServer *createWall(InventoryElement *from)
+{
+    return new Wall(from);
+}

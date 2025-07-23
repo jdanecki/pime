@@ -11,3 +11,8 @@ bool AxeHandle::check_ing()
         return true;
     else return false;
 }
+
+IngredientServer *createAxeHandle(InventoryElement *from)
+{
+    return new AxeHandle(from);
+}

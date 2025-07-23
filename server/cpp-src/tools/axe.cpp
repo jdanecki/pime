@@ -17,3 +17,5 @@ bool Axe::check_ing()
     printf(" wrong ingredients\n");
     return false;
 }
+
+ProductServer *createAxe(InventoryElement *el1, InventoryElement *el2) { return new Axe(el1, el2); }

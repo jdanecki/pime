@@ -1,47 +1,25 @@
 #include "craft_ing.h"
 
+typedef IngredientServer* (*IngredientFunction)(InventoryElement*);
+
+IngredientFunction ingredientFunctions[] = {
+    createAxeBlade,
+    createAxeHandle,
+    createKnifeBlade,
+    createKnifeHandle,
+    createPickAxeBlade,
+    createPickAxeHandle,
+    createWall,
+    createWall,
+    createLog,
+    createTinder,
+    createStick
+};
+
 InventoryElement * craft_ing(int product_id, InventoryElement * el)
 {
-    InventoryElement * crafted = nullptr;
-
-    switch (product_id)
-    {
-        case ING_AXE_BLADE:
-            crafted = new AxeBlade(el);
-            break;
-        case ING_AXE_HANDLE:
-            crafted = new AxeHandle(el);
-            break;
-        case ING_PICKAXE_BLADE:
-            crafted = new PickAxeBlade(el);
-            break;
-        case ING_PICKAXE_HANDLE:
-            crafted = new PickAxeHandle(el);
-            break;
-        case ING_WALL:
-            crafted = new Wall(el);
-            break;
-        case ING_KNIFE_BLADE:
-            crafted = new KnifeBlade(el);
-            break;
-        case ING_KNIFE_HANDLE:
-            crafted = new KnifeHandle(el);
-            break;
-        case ING_MEAT:
-            crafted = new Meat(el);
-            break;
-        case ING_LOG:
-            crafted = new Log(el);
-            break;
-        case ING_TINDER:
-            crafted = new Tinder(el);
-            break;
-        case ING_STICK:
-            crafted = new Stick(el);
-            break;
-
-    }
-    if (!crafted) return nullptr;
+    if (product_id >= ING_COUNT) return nullptr;
+    InventoryElement * crafted = ingredientFunctions[product_id](el);
 
     if (crafted->craft())
     {

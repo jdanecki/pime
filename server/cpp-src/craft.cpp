@@ -17,7 +17,7 @@ bool craft_entry(int product_id, int ingredients_num, const size_t * ingredients
 {
     // printf("id in craft %ld\n", ingredients_ids[0]);
     InventoryElement * crafted = nullptr;
-    if (product_id < ING_NUM)
+    if (product_id < ING_COUNT)
     {
         printf("crafting ingredient %d\n", product_id);
         if (ingredients_num < 1)
@@ -34,7 +34,7 @@ bool craft_entry(int product_id, int ingredients_num, const size_t * ingredients
     }
     else
     {
-        product_id -= ING_NUM;
+        product_id -= ING_COUNT;
         if (ingredients_num != 2)
         {
             printf("invalid num of ingredients %d\n", ingredients_num);

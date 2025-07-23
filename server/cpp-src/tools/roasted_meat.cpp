@@ -15,3 +15,5 @@ bool Roasted_meat::check_ing()
     printf(" wrong ingredients\n");
     return false;
 }
+
+ProductServer *createRoasted_meat(InventoryElement *el1, InventoryElement *el2) { return new Roasted_meat(el1, el2); }

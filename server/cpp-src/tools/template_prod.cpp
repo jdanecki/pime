@@ -15,3 +15,8 @@ bool CLASS_NAME::check_ing()
     printf(" wrong ingredients\n");
     return false;
 }
+
+ProductServer* createCLASS_NAME(InventoryElement* el1, InventoryElement* el2) 
+{ 
+    return new CLASS_NAME(el1, el2); 
+}

@@ -11,3 +11,8 @@ bool Tinder::check_ing()
         return true;
     else return false;
 }
+
+IngredientServer *createTinder(InventoryElement *from)
+{
+    return new Tinder(from);
+}

@@ -10,3 +10,8 @@ bool Stick::check_ing()
         return true;
     else return false;
 }
+
+IngredientServer *createStick(InventoryElement *from)
+{
+    return new Stick(from);
+}

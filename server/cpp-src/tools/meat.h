@@ -10,4 +10,6 @@ class Meat : public IngredientServer
     bool check_ing();
     bool action(Product_action action, Player *pl);
 };
+
+IngredientServer* createMeat(InventoryElement* from);
 #endif

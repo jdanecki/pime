@@ -1,32 +1,21 @@
 #include "craft_prod.h"
 
+typedef ProductServer* (*ProductFunction)(InventoryElement*, InventoryElement*);
+
+ProductFunction productFunctions[] = {
+    createAxe,
+    createPickAxe,
+    createHut,
+    createKnife,
+    createFire,
+    createRoasted_meat
+};
+
 InventoryElement * craft_prod(int product_id, InventoryElement * el1, InventoryElement * el2)
 {
-    InventoryElement * crafted = nullptr;
+    if (product_id >= PROD_COUNT) return nullptr;
+    InventoryElement * crafted = productFunctions[product_id](el1, el2);
 
-    switch (product_id)
-    {
-        case PROD_AXE:
-            crafted = new Axe(el1, el2);
-            break;
-        case PROD_PICKAXE:
-            crafted = new PickAxe(el1, el2);
-            break;
-        case PROD_HUT:
-            crafted = new Hut(el1, el2);
-            break;
-        case PROD_KNIFE:
-            crafted = new Knife(el1, el2);
-            break;
-        case PROD_FIRE:
-            crafted = new Fire(el1, el2);
-            break;
-        case PROD_ROASTED_MEAT:
-            crafted = new Roasted_meat(el1, el2);
-            break;
-    }
-
-    if (!crafted) return nullptr;
     if (crafted->craft())
     {
         crafted->show();

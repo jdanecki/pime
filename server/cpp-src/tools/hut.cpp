@@ -15,3 +15,5 @@ bool Hut::check_ing()
     printf(" wrong ingredients\n");
     return false;
 }
+
+ProductServer *createHut(InventoryElement *el1, InventoryElement *el2) { return new Hut(el1, el2); }

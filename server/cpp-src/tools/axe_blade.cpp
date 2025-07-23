@@ -11,3 +11,8 @@ bool AxeBlade::check_ing()
         return true;
     else return false;
 }
+
+IngredientServer *createAxeBlade(InventoryElement *from)
+{
+    return new AxeBlade(from);
+}

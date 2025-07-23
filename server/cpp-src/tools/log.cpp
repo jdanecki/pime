@@ -11,3 +11,8 @@ bool Log::check_ing()
         return true;
     else return false;
 }
+
+IngredientServer *createLog(InventoryElement *from)
+{
+       return new Log(from);
+}

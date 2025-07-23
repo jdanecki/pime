@@ -9,4 +9,5 @@ class AxeHandle : public IngredientServer
     AxeHandle(InventoryElement * from);
     bool check_ing();
 };
+IngredientServer* createAxeHandle(InventoryElement* from);
 #endif

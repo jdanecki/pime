@@ -11,3 +11,9 @@ bool CLASS_NAME::check_ing()
         return true;
     else return false;
 }
+
+IngredientServer* createCLASS_NAME(InventoryElement* from) 
+{ 
+    return new CLASS_NAME(from); 
+}
+

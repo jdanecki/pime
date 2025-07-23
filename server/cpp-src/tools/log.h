@@ -9,4 +9,6 @@ class Log : public IngredientServer
     Log(InventoryElement * from);
     bool check_ing();
 };
+
+IngredientServer* createLog(InventoryElement* from);
 #endif

@@ -15,3 +15,5 @@ bool Fire::check_ing()
     printf(" wrong ingredients\n");
     return false;
 }
+
+ProductServer *createFire(InventoryElement *el1, InventoryElement *el2) { return new Fire(el1, el2); }

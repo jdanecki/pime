@@ -9,4 +9,6 @@ class CLASS_NAME : public IngredientServer
     CLASS_NAME(InventoryElement * from);
     bool check_ing();
 };
+
+IngredientServer* createCLASS_NAME(InventoryElement* from);
 #endif

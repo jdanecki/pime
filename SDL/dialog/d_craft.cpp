@@ -32,7 +32,7 @@ bool craft2elements(Product_id what)
     if (el1 && el2)
     {
         size_t ingredients[2] = {el1->uid, el2->uid};
-        send_packet_craft(client, ING_NUM + what, 2, ingredients);
+        send_packet_craft(client, ING_COUNT + what, 2, ingredients);
         //FIXME what if crafting will fail?
         player->set_known(Class_Product, what);
 
@@ -82,7 +82,7 @@ DCraft::DCraft() : Dialog({0, 0, 500, 500}, {125, 125, 125, 125}), ingredients({
     this->add_image(0, {20, 120, 100, 100});
     this->add_image(1, {20, 240, 100, 100});
 
-    for (int i = 0; i < ING_NUM; i++)
+    for (int i = 0; i < ING_COUNT; i++)
     {
         int x = i % 6 * 54;
         int y = i / 6 * 54;
@@ -182,7 +182,7 @@ void DCraft::update()
     DialogImage * img = dynamic_cast<DialogImage *>(this->ingredients.get_element_from_id(0, DialogElementType::Image));
     if (img->texture)
         return;
-    for (int i = 0; i < ING_NUM; i++)
+    for (int i = 0; i < ING_COUNT; i++)
     {
         DialogImage * img = dynamic_cast<DialogImage *>(this->ingredients.get_element_from_id(i, DialogElementType::Image));
         img->texture = ing_textures[i];

@@ -307,7 +307,7 @@ enum Ingredient_id
     ING_TINDER,
     ING_STICK,
 
-    ING_NUM,
+    ING_COUNT,
 
 };
 
@@ -320,6 +320,7 @@ enum Product_id
     PROD_FIRE,
     PROD_ROASTED_MEAT,
 
+    PROD_COUNT
 };
 
 extern const char * Ingredient_name[];

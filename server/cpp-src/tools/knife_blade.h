@@ -9,4 +9,6 @@ class KnifeBlade : public IngredientServer
     KnifeBlade(InventoryElement * from);
     bool check_ing();
 };
+
+IngredientServer* createKnifeBlade(InventoryElement* from);
 #endif

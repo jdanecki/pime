@@ -10,4 +10,6 @@ class Fire : public ProductServer
     bool check_ing();
 };
 
+ProductServer* createFire(InventoryElement* el1, InventoryElement* el2);
+
 #endif
