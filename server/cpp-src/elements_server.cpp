@@ -1,6 +1,7 @@
 #include "elements_server.h"
 #include "networking.h"
 #include "world_server.h"
+#include "craft_ing.h"
 
 void destroy(InventoryElement * el)
 {
@@ -77,6 +78,37 @@ AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
     delay_for_move = max_delay_move; // 600 * 100ms -> 1min
     dst_loc_x = rand() % CHUNK_SIZE;
     dst_loc_y = rand() % CHUNK_SIZE;
+}
+
+bool AnimalServer::action(Product_action action, Player *pl)
+{
+    Animal::action(action, pl);
+    printf("ANIMAL_SERVER: %s %s\n", Product_action_names[action], get_name());
+
+    InventoryElement * crafted=nullptr;
+    switch (action)
+    {
+        case ACT_CUT:
+        case ACT_HIT:
+        case ACT_STAB:
+            crafted = craft_ing((int)ING_MEAT, this);
+            break;
+        default:
+            return false;
+    }
+    if (crafted)
+    {
+        world_table[pl->map_y][pl->map_x]->add_object(crafted, pl->x, pl->y);
+        objects_to_create.add(crafted);
+        printf("crafted\n");
+        destroy(this);
+        return true;
+    }
+    else
+    {
+        printf("failed to craft\n");
+    }
+    return false;
 }
 
 void AnimalServer::show(bool details)
@@ -244,10 +276,12 @@ bool IngredientServer::craft()
     //     printf("form != %d\n", req_form);
     //     return false;
     // }
+    if (!check_ing())
+        return false;
 
-    // quality = Property("quality", rand() % 100);
-    // resilience = Property("resilience", rand() % 100);
-    // usage = Property("usage", rand() % 100);
+    quality = Property("quality", rand() % 100);
+    resilience = Property("resilience", rand() % 100);
+    usage = Property("usage", rand() % 100);
     return true;
 }
 
@@ -318,7 +352,7 @@ ElementServer::ElementServer(BaseElement * base) : Element(base), sharpness("sha
 {
 }
 
-bool ElementServer::action(Product_action action)
+bool ElementServer::action(Product_action action, Player *pl)
 {
     printf("ELEMENT_SERVER: %s %s\n", Product_action_names[action], get_name());
 

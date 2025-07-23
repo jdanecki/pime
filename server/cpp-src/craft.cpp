@@ -13,7 +13,7 @@
 // extern int active_hotbar;
 int active_hotbar = 0;
 
-bool craft(int product_id, int ingredients_num, const size_t * ingredients_ids, Player * player)
+bool craft_entry(int product_id, int ingredients_num, const size_t * ingredients_ids, Player * player)
 {
     // printf("id in craft %ld\n", ingredients_ids[0]);
     InventoryElement * crafted = nullptr;

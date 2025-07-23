@@ -21,6 +21,16 @@ enum Relations
     REL_known,
 };
 
+enum Emotions
+{
+    EMO_UNKNOWN,
+    EMO_ANGER,
+    EMO_FEAR,
+    EMO_DISGUST,
+    EMO_JOY,
+    EMO_SADNESS
+};
+
 struct PlayerRelation
 {
     Player * who;

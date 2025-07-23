@@ -27,7 +27,12 @@ InventoryElement * craft_ing(int product_id, InventoryElement * el)
         case ING_KNIFE_HANDLE:
             crafted = new KnifeHandle(el);
             break;
+        case ING_MEAT:
+            crafted = new Meat(el);
+            break;
+
     }
+    if (!crafted) return nullptr;
 
     if (crafted->craft())
     {

@@ -48,10 +48,12 @@ void PlayerServer::move(int dx, int dy)
 
 bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement * object)
 {
-    Product * i = (Product *)item;
-
-    printf("%s: using %s on %s\n", get_name(), i->get_name(), object->get_name());
-    return i->use(object);
+    ProductServer * i = dynamic_cast<ProductServer *>(item);
+    if (i)
+    {
+        printf("%s: using %s on %s\n", get_name(), i->get_name(), object->get_name());
+        return i->use(object, this);
+    } else return false;
 }
 
 bool PlayerServer::plant_with_seed(InventoryElement * el, int map_x, int map_y, int x, int y)

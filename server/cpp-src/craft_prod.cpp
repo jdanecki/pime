@@ -20,6 +20,7 @@ InventoryElement * craft_prod(int product_id, InventoryElement * el1, InventoryE
             break;
     }
 
+    if (!crafted) return nullptr;
     if (crafted->craft())
     {
         crafted->show();

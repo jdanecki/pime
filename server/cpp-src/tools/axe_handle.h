@@ -7,5 +7,6 @@ class AxeHandle : public IngredientServer
 {
   public:
     AxeHandle(InventoryElement * from);
+    bool check_ing();
 };
 #endif
