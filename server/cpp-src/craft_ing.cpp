@@ -5,12 +5,15 @@ typedef IngredientServer* (*IngredientFunction)(InventoryElement*);
 IngredientFunction ingredientFunctions[] = {
     createAxeBlade,
     createAxeHandle,
+
     createKnifeBlade,
     createKnifeHandle,
+
     createPickAxeBlade,
     createPickAxeHandle,
+
     createWall,
-    createWall,
+    createMeat,
     createLog,
     createTinder,
     createStick
