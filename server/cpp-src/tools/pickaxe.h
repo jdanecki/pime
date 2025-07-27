@@ -10,6 +10,6 @@ class PickAxe : public ProductServer
     bool check_ing();
 };
 
-ProductServer* createPickAxe(InventoryElement* el1, InventoryElement* el2);
+ProductServer * createPickAxe(InventoryElement * el1, InventoryElement * el2);
 
 #endif

@@ -22,12 +22,15 @@ class PlantSDL : public Plant, public Renderable
     {
         int width, height;
 
-        if (SDL_QueryTexture(get_texture(), NULL, NULL, &width, &height) != 0) {
+        if (SDL_QueryTexture(get_texture(), NULL, NULL, &width, &height) != 0)
+        {
             printf("SDL_QueryTexture failed: %s", SDL_GetError());
-        } else {
-           // printf("%s: Szerokość: %d, Wysokość: %d\n", get_name(), width, height);
         }
-        SDL_Rect img_rect={rect->x, rect->y, width, height};
+        else
+        {
+            // printf("%s: Szerokość: %d, Wysokość: %d\n", get_name(), width, height);
+        }
+        SDL_Rect img_rect = {rect->x, rect->y, width, height};
         Renderable::render(&img_rect);
     }
 };

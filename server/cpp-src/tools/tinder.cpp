@@ -6,13 +6,13 @@ Tinder::Tinder(InventoryElement * from) : IngredientServer(from, ING_TINDER, For
 
 bool Tinder::check_ing()
 {
-    if ((el->get_base_cid() == Class_BaseElement) ||
-        (el->get_base_cid() == Class_BasePlant))
+    if ((el->get_base_cid() == Class_BaseElement) || (el->get_base_cid() == Class_BasePlant))
         return true;
-    else return false;
+    else
+        return false;
 }
 
-IngredientServer *createTinder(InventoryElement *from)
+IngredientServer * createTinder(InventoryElement * from)
 {
     return new Tinder(from);
 }

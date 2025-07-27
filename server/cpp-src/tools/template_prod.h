@@ -10,6 +10,6 @@ class CLASS_NAME : public ProductServer
     bool check_ing();
 };
 
-ProductServer* createCLASS_NAME(InventoryElement* el1, InventoryElement* el2);
+ProductServer * createCLASS_NAME(InventoryElement * el1, InventoryElement * el2);
 
 #endif

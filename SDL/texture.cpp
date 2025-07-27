@@ -131,7 +131,6 @@ void load_textures()
 
     add_prod_texture(PROD_HUT, "textures/objects/hut.png");
 
-
     i = 0;
     i = add_textures_from_dir(plant_textures, i, "textures/plants");
 

@@ -8,10 +8,11 @@ bool Stick::check_ing()
 {
     if (el->get_base_cid() == Class_BasePlant)
         return true;
-    else return false;
+    else
+        return false;
 }
 
-IngredientServer *createStick(InventoryElement *from)
+IngredientServer * createStick(InventoryElement * from)
 {
     return new Stick(from);
 }

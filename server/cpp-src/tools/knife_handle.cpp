@@ -8,10 +8,11 @@ bool KnifeHandle::check_ing()
 {
     if (el->get_base_cid() == Class_BaseElement)
         return true;
-    else return false;
+    else
+        return false;
 }
 
-IngredientServer *createKnifeHandle(InventoryElement *from)
+IngredientServer * createKnifeHandle(InventoryElement * from)
 {
- return new KnifeHandle(from);
+    return new KnifeHandle(from);
 }

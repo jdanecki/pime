@@ -10,5 +10,5 @@ class Knife : public ProductServer
     bool check_ing();
 };
 
-ProductServer* createKnife(InventoryElement* el1, InventoryElement* el2);
+ProductServer * createKnife(InventoryElement * el1, InventoryElement * el2);
 #endif

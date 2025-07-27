@@ -16,4 +16,7 @@ bool Fire::check_ing()
     return false;
 }
 
-ProductServer *createFire(InventoryElement *el1, InventoryElement *el2) { return new Fire(el1, el2); }
+ProductServer * createFire(InventoryElement * el1, InventoryElement * el2)
+{
+    return new Fire(el1, el2);
+}

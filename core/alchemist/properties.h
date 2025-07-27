@@ -28,8 +28,8 @@ class Property
 
 class Edible
 { // FIXME should be changed to being property
-    // when more npc's are added
-    // can be eaten by humans or animals
+  // when more npc's are added
+  // can be eaten by humans or animals
   public:
     Property * irrigation;
     Property * poison;

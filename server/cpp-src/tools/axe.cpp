@@ -18,4 +18,7 @@ bool Axe::check_ing()
     return false;
 }
 
-ProductServer *createAxe(InventoryElement *el1, InventoryElement *el2) { return new Axe(el1, el2); }
+ProductServer * createAxe(InventoryElement * el1, InventoryElement * el2)
+{
+    return new Axe(el1, el2);
+}

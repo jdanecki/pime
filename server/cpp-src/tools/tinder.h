@@ -10,5 +10,5 @@ class Tinder : public IngredientServer
     bool check_ing();
 };
 
-IngredientServer* createTinder(InventoryElement* from);
+IngredientServer * createTinder(InventoryElement * from);
 #endif

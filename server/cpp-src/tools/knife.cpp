@@ -19,4 +19,7 @@ bool Knife::check_ing()
     return false;
 }
 
-ProductServer *createKnife(InventoryElement *el1, InventoryElement *el2) { return new Knife(el1, el2); }
+ProductServer * createKnife(InventoryElement * el1, InventoryElement * el2)
+{
+    return new Knife(el1, el2);
+}

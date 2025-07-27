@@ -9,10 +9,11 @@ bool AxeBlade::check_ing()
 {
     if (el->get_base_cid() == Class_BaseElement)
         return true;
-    else return false;
+    else
+        return false;
 }
 
-IngredientServer *createAxeBlade(InventoryElement *from)
+IngredientServer * createAxeBlade(InventoryElement * from)
 {
     return new AxeBlade(from);
 }

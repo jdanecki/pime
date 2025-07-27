@@ -10,5 +10,5 @@ class KnifeBlade : public IngredientServer
     bool check_ing();
 };
 
-IngredientServer* createKnifeBlade(InventoryElement* from);
+IngredientServer * createKnifeBlade(InventoryElement * from);
 #endif

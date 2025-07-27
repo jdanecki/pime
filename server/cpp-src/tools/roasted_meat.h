@@ -10,6 +10,6 @@ class Roasted_meat : public ProductServer
     bool check_ing();
 };
 
-ProductServer* createRoasted_meat(InventoryElement* el1, InventoryElement* el2);
+ProductServer * createRoasted_meat(InventoryElement * el1, InventoryElement * el2);
 
 #endif

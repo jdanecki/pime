@@ -5,7 +5,7 @@ PickAxeHandle::PickAxeHandle(InventoryElement * from) : IngredientServer(from, I
 {
 }
 
-IngredientServer *createPickAxeHandle(InventoryElement *from)
+IngredientServer * createPickAxeHandle(InventoryElement * from)
 {
     return new PickAxeHandle(from);
 }

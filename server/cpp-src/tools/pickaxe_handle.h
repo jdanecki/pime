@@ -9,5 +9,5 @@ class PickAxeHandle : public IngredientServer
     PickAxeHandle(InventoryElement * from);
 };
 
-IngredientServer* createPickAxeHandle(InventoryElement* from);
+IngredientServer * createPickAxeHandle(InventoryElement * from);
 #endif

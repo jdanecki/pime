@@ -9,10 +9,11 @@ bool AxeHandle::check_ing()
 {
     if (el->get_base_cid() == Class_BaseElement)
         return true;
-    else return false;
+    else
+        return false;
 }
 
-IngredientServer *createAxeHandle(InventoryElement *from)
+IngredientServer * createAxeHandle(InventoryElement * from)
 {
     return new AxeHandle(from);
 }

@@ -9,5 +9,5 @@ class Wall : public IngredientServer
     Wall(InventoryElement * from);
     bool check_ing();
 };
-IngredientServer* createWall(InventoryElement* from);
+IngredientServer * createWall(InventoryElement * from);
 #endif

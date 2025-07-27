@@ -18,4 +18,7 @@ bool PickAxe::check_ing()
     return false;
 }
 
-ProductServer *createPickAxe(InventoryElement *el1, InventoryElement *el2) { return new PickAxe(el1, el2); }
+ProductServer * createPickAxe(InventoryElement * el1, InventoryElement * el2)
+{
+    return new PickAxe(el1, el2);
+}

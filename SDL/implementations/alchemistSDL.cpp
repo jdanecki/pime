@@ -31,7 +31,7 @@ ElementSDL::ElementSDL(Element data) : Element(data)
 
 SDL_Texture * ElementSDL::get_texture()
 {
-    switch(get_form())
+    switch (get_form())
     {
         case Form_solid:
             return solid_items_textures[get_base()->id % SOLID_ELEMENTS];
@@ -45,7 +45,6 @@ SDL_Texture * ElementSDL::get_texture()
 
 IngredientSDL::IngredientSDL(Ingredient data) : Ingredient(data)
 {
-
 }
 
 SDL_Texture * IngredientSDL::get_texture()
@@ -55,7 +54,6 @@ SDL_Texture * IngredientSDL::get_texture()
 
 ProductSDL::ProductSDL(Product data) : Product(data)
 {
-
 }
 
 SDL_Texture * ProductSDL::get_texture()

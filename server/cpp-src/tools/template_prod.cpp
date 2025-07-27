@@ -16,7 +16,7 @@ bool CLASS_NAME::check_ing()
     return false;
 }
 
-ProductServer* createCLASS_NAME(InventoryElement* el1, InventoryElement* el2) 
-{ 
-    return new CLASS_NAME(el1, el2); 
+ProductServer * createCLASS_NAME(InventoryElement * el1, InventoryElement * el2)
+{
+    return new CLASS_NAME(el1, el2);
 }

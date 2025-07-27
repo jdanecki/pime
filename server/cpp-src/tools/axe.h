@@ -10,6 +10,6 @@ class Axe : public ProductServer
     bool check_ing();
 };
 
-ProductServer* createAxe(InventoryElement* el1, InventoryElement* el2);
+ProductServer * createAxe(InventoryElement * el1, InventoryElement * el2);
 
 #endif

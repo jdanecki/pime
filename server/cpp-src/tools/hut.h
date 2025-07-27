@@ -10,6 +10,6 @@ class Hut : public ProductServer
     bool check_ing();
 };
 
-ProductServer* createHut(InventoryElement* el1, InventoryElement* el2);
+ProductServer * createHut(InventoryElement * el1, InventoryElement * el2);
 
 #endif

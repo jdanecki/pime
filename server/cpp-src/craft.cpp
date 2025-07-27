@@ -58,8 +58,8 @@ bool craft_entry(int product_id, int ingredients_num, const size_t * ingredients
         objects_to_create.add(crafted);
         printf("crafted\n");
 
-        //FIXME share this with client
-        //player->set_known(crafted);
+        // FIXME share this with client
+        // player->set_known(crafted);
         return true;
     }
     else
