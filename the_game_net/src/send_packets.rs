@@ -31,6 +31,14 @@ pub extern "C" fn send_packet_item_used_on_object(client: &mut NetClient, iid: u
 }
 
 #[no_mangle]
+pub extern "C" fn send_packet_action_on_object(client: &mut NetClient, a: i32, oid: usize) {
+    let mut buf = vec![core::PACKET_PLAYER_ACTION_ACTION_ON_OBJECT];
+    buf.extend_from_slice(&a.to_le_bytes());
+    buf.extend_from_slice(&oid.to_le_bytes());
+    client.send(&buf);
+}
+
+#[no_mangle]
 pub extern "C" fn send_packet_item_used_on_tile(
     client: &mut NetClient,
     iid: usize,

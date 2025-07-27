@@ -58,9 +58,7 @@ void key_pressed(int key)
         case SDLK_v:
             sprintf(status_line, " ");
             break;
-        case SDLK_t:
-            player->hotbar[active_hotbar] = NULL;
-            break;
+
         /*case SDLK_SEMICOLON:
         {
             InventoryElement * el = player.hotbar[active_hotbar];
@@ -205,7 +203,6 @@ void key_pressed(int key)
             break;
         }
         case SDLK_RETURN:
-        case SDLK_e:
             use_tile(player->map_x, player->map_y, player->x, player->y);
             break;
         case SDLK_c:
@@ -302,23 +299,23 @@ Uint64 handle_keyboard_state(const Uint8 * keys)
 
     if (current_menu == NULL && ((current_time - last_time > time_period) || !(last_frame_press)))
     {
-        if (keys[SDL_SCANCODE_DOWN] || keys[SDL_SCANCODE_S])
+        if (keys[SDL_SCANCODE_DOWN])
         {
             send_packet_move(client, 0, 1);
             last_frame_press = 1;
         }
-        else if (keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_W])
+        else if (keys[SDL_SCANCODE_UP])
         {
             send_packet_move(client, 0, -1);
             last_frame_press = 1;
         }
-        if (keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_RIGHT])
+        if (keys[SDL_SCANCODE_RIGHT])
         {
             player->going_right = 1;
             send_packet_move(client, 1, 0);
             last_frame_press = 1;
         }
-        else if (keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_LEFT])
+        else if (keys[SDL_SCANCODE_LEFT])
         {
             player->going_right = 0;
             send_packet_move(client, -1, 0);
@@ -329,8 +326,7 @@ Uint64 handle_keyboard_state(const Uint8 * keys)
             return SDL_GetTicks64();
         }
     }
-    if (keys[SDL_SCANCODE_DOWN] || keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_A] ||
-        keys[SDL_SCANCODE_LEFT])
+    if (keys[SDL_SCANCODE_DOWN] || keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_LEFT])
     {
         print_status(0, " ");
         print_status(1, " ");

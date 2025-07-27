@@ -80,12 +80,12 @@ AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
     dst_loc_y = rand() % CHUNK_SIZE;
 }
 
-bool AnimalServer::action(Product_action action, Player *pl)
+bool AnimalServer::action(Product_action action, Player * pl)
 {
-    //Animal::action(action, pl);
-    printf("ANIMAL_SERVER: %s %s\n", Product_action_names[action], get_name());
+    // Animal::action(action, pl);
+    printf("ANIMAL_SERVER: %s %s\n", product_action_name[action], get_name());
 
-    InventoryElement * crafted=nullptr;
+    InventoryElement * crafted = nullptr;
     switch (action)
     {
         case ACT_CUT:
@@ -100,7 +100,7 @@ bool AnimalServer::action(Product_action action, Player *pl)
     {
         world_table[pl->map_y][pl->map_x]->add_object(crafted, pl->x, pl->y);
         objects_to_create.add(crafted);
-        printf("crafted\n");
+        printf("crafted meat\n");
         destroy(this);
         return true;
     }
@@ -269,9 +269,9 @@ IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id i, For
     req_form = f;
 }
 
-bool IngredientServer::action(Product_action action, Player *pl)
+bool IngredientServer::action(Product_action action, Player * pl)
 {
-    printf("ING_SERVER: %s %s\n", Product_action_names[action], get_name());
+    printf("ING_SERVER: %s %s\n", product_action_name[action], get_name());
     return false;
 }
 
@@ -359,9 +359,9 @@ ElementServer::ElementServer(BaseElement * base) : Element(base), sharpness("sha
 {
 }
 
-bool ElementServer::action(Product_action action, Player *pl)
+bool ElementServer::action(Product_action action, Player * pl)
 {
-    printf("ELEMENT_SERVER: %s %s\n", Product_action_names[action], get_name());
+    printf("ELEMENT_SERVER: %s %s\n", product_action_name[action], get_name());
 
     bool res = false;
     switch (action)
@@ -416,6 +416,71 @@ bool ElementServer::action_hit()
             volume.value = length.value * width.value * height.value;
         }
 
+        return true;
+    }
+    return false;
+}
+
+bool ElementServer::player_action(Player_action action, Player * pl)
+{
+    printf("ELEMENT_SERVER: %s %s\n", player_action_name[action], get_name());
+    bool res = false;
+    switch (action)
+    {
+        case PLAYER_DRINK:
+            res = action_drink();
+            if (res)
+                pl->thirst += 10;
+            break;
+        case PLAYER_EAT:
+            res = action_eat();
+            if (res)
+                pl->hunger += 10;
+            break;
+    }
+
+    if (volume.value < 1)
+    {
+        destroy(this);
+    }
+    else
+    {
+        objects_to_update.add(this);
+    }
+    return res;
+}
+
+bool ElementServer::action_drink()
+{
+    BaseElementServer * b = (BaseElementServer *)get_base();
+    if (b->form == Form_liquid)
+    {
+        //    if (b->solid->hardness < 50)
+        {
+            length.value -= 2;
+            width.value -= 2;
+            height.value -= 2;
+            volume.value = length.value * width.value * height.value;
+            printf("drunk %s\n", get_name());
+        }
+        return true;
+    }
+    return false;
+}
+
+bool ElementServer::action_eat()
+{
+    BaseElementServer * b = (BaseElementServer *)get_base();
+    if (b->form == Form_solid)
+    {
+        //    if (b->solid->hardness < 50)
+        {
+            length.value -= 4;
+            width.value -= 4;
+            height.value -= 4;
+            volume.value = length.value * width.value * height.value;
+            printf("ate %s\n", get_name());
+        }
         return true;
     }
     return false;

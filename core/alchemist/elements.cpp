@@ -8,7 +8,7 @@
 
 ElementsList * base_list;
 
-const char * Ingredient_name[] = {
+const char * ingredient_name[] = {
     "Axe blade",
     "Axe handle",
 
@@ -26,7 +26,7 @@ const char * Ingredient_name[] = {
     "Stick",
 };
 
-const char * Product_name[] = {
+const char * product_name[] = {
     "Axe",
     "Knife",
     "Pickaxe",
@@ -35,17 +35,18 @@ const char * Product_name[] = {
     "Roasted meat",
 };
 
-const char * Product_action_names[] = {
+const char * product_action_name[] = {
     "nothing",
     "cut",
     "hit",
     "stab",
     "fire",
 };
+const char * player_action_name[] = {"drink", "eat"};
 
 const char * object_names[] = {"wall"};
-const char * Plant_phase_name[] = {"Seed", "Seedling", "Growing", "Flowers", "Fruits"};
-const char * Class_names[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Plant", "Animal", "Player", "Npc"};
+const char * plant_phase_name[] = {"Seed", "Seedling", "Growing", "Flowers", "Fruits"};
+const char * class_name[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Plant", "Animal", "Player", "Npc"};
 
 Base::Base(int index, Class_id c, const char * name) : name(name)
 {
@@ -55,7 +56,7 @@ Base::Base(int index, Class_id c, const char * name) : name(name)
 
 void Base::show(bool details)
 {
-    printf("Base name=%s class:%s id=%d \n", get_name(), Class_names[c_id], id);
+    printf("Base name=%s class:%s id=%d \n", get_name(), class_name[c_id], id);
 }
 
 const char * Base::get_name()
@@ -124,6 +125,8 @@ void Product::show(bool details)
     quality.show();
     resilience.show();
     usage.show();
+
+    printf("action: %d -> %s\n", actions, product_action_name[actions]);
 }
 
 void Animal::init(BaseAnimal * b)

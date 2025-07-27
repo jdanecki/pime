@@ -26,7 +26,7 @@ enum Class_id
     Class_Npc,
 };
 
-extern const char * Class_names[];
+extern const char * class_name[];
 
 enum Product_action
 {
@@ -35,10 +35,17 @@ enum Product_action
     ACT_HIT,
     ACT_STAB, // dźgnij
     ACT_FIRE,
-
 };
 
-extern const char * Product_action_names[];
+extern const char * product_action_name[];
+
+enum Player_action
+{
+    PLAYER_DRINK,
+    PLAYER_EAT
+};
+
+extern const char * player_action_name[];
 
 class Base
 {
@@ -89,9 +96,14 @@ class InventoryElement
         mass = rand() % 100;
     }
 
-    virtual bool action(Product_action action, Player *pl)
+    virtual bool action(Product_action action, Player * pl)
     {
-        printf("INV: %s %s\n", Product_action_names[action], get_name());
+        printf("INV: %s %s\n", product_action_name[action], get_name());
+        return false;
+    }
+    virtual bool player_action(Player_action action, Player * pl)
+    {
+        printf("INV: %s %s\n", player_action_name[action], get_name());
         return false;
     }
     virtual void show(bool details = true)
@@ -112,7 +124,7 @@ class InventoryElement
     }
     const char * get_class_name()
     {
-        return Class_names[c_id];
+        return class_name[c_id];
     }
     virtual int get_id()
     {
@@ -261,9 +273,9 @@ class Element : public InventoryElement
     {
         return get_base()->c_id;
     }
-    bool action(Product_action action, Player *pl) override
+    bool action(Product_action action, Player * pl) override
     {
-        printf("ELEMENT: %s %s\n", Product_action_names[action], get_name());
+        printf("ELEMENT: %s %s\n", product_action_name[action], get_name());
         return false;
     }
     char * get_description() override
@@ -323,8 +335,8 @@ enum Product_id
     PROD_COUNT
 };
 
-extern const char * Ingredient_name[];
-extern const char * Product_name[];
+extern const char * ingredient_name[];
+extern const char * product_name[];
 extern const char * items_name[];
 
 class Ingredient : public InventoryElement
@@ -366,21 +378,21 @@ class Ingredient : public InventoryElement
 
     const char * get_name()
     {
-        return Ingredient_name[id];
+        return ingredient_name[id];
     }
     char * get_description()
     {
         char * buf = new char[128];
-        sprintf(buf, "%s: (%s)", get_class_name(), Ingredient_name[id]);
+        sprintf(buf, "%s: (%s)", get_class_name(), ingredient_name[id]);
         return buf;
     }
     virtual bool check_ing()
     {
         return false;
     }
-    bool action(Product_action action, Player *pl)
+    bool action(Product_action action, Player * pl)
     {
-        printf("ING: %s %s\n", Product_action_names[action], get_name());
+        printf("ING: %s %s\n", product_action_name[action], get_name());
         return false;
     }
 };
@@ -425,15 +437,14 @@ class Product : public InventoryElement
 
     const char * get_name() override
     {
-        return Product_name[id];
+        return product_name[id];
     }
     char * get_description() override
     {
         char * buf = new char[128];
-        sprintf(buf, "%s: (%s)", get_class_name(), Product_name[id]);
+        sprintf(buf, "%s: (%s)", get_class_name(), product_name[id]);
         return buf;
     }
-
 };
 
 class BaseAnimal : public Base
@@ -489,9 +500,9 @@ class Animal : public InventoryElement
         return get_base()->c_id;
     }
 
-    bool action(Product_action action, Player *pl) override
+    bool action(Product_action action, Player * pl) override
     {
-        printf("ANIMAL: %s %s\n", Product_action_names[action], get_name());
+        printf("ANIMAL: %s %s\n", product_action_name[action], get_name());
         return false;
     }
     const char * get_name() override
@@ -515,7 +526,7 @@ enum Plant_phase
     Plant_fruits
 };
 
-extern const char * Plant_phase_name[];
+extern const char * plant_phase_name[];
 
 class BasePlant : public Base
 {
@@ -561,7 +572,7 @@ class Plant : public InventoryElement
         if (details)
         {
             get_base()->show(details);
-            printf("phase=%s grown=%d planted=%d times=%d/%d/%d/ water=%d \n", Plant_phase_name[phase], grown, planted, seedling_time, growing_time, flowers_time, water);
+            printf("phase=%s grown=%d planted=%d times=%d/%d/%d/ water=%d \n", plant_phase_name[phase], grown, planted, seedling_time, growing_time, flowers_time, water);
         }
     }
     BasePlant * get_base()
@@ -580,9 +591,9 @@ class Plant : public InventoryElement
     {
         return get_base()->c_id;
     }
-    bool action(Product_action action, Player *pl)
+    bool action(Product_action action, Player * pl)
     {
-        printf("PLANT: %s %s\n", Product_action_names[action], get_name());
+        printf("PLANT: %s %s\n", product_action_name[action], get_name());
         return false;
     }
 

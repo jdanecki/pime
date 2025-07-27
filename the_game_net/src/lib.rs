@@ -177,7 +177,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             // println!("{seq} {}", value[0]);
             match value[0] {
                 core::PACKET_PLAYER_UPDATE => {
-                    if amt == (25 + 12) {
+                    if amt == (33 + 12) {
                         unsafe {
                             events::update_player(
                                 usize::from_le_bytes(value[1..9].try_into().unwrap()),
@@ -185,6 +185,8 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                                 i32::from_le_bytes(value[13..17].try_into().unwrap()),
                                 i32::from_le_bytes(value[17..21].try_into().unwrap()),
                                 i32::from_le_bytes(value[21..25].try_into().unwrap()),
+                                i32::from_le_bytes(value[25..29].try_into().unwrap()),
+                                i32::from_le_bytes(value[29..33].try_into().unwrap()),
                             );
                         }
                     } else {

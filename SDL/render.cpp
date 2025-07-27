@@ -22,7 +22,7 @@ void draw_texts()
 {
     int ty = 10;
 
-    sprintf(text, "Hunger=%d Irrigation=%d %d %d", player->hunger, player->thirst, player->map_x, player->map_y);
+    sprintf(text, "Hunger=%d Thirst=%d %d %d", player->hunger, player->thirst, player->map_x, player->map_y);
     write_text(tx, ty, text, (player->hunger < 100 || player->thirst < 100) ? Red : White, 15, 30);
     ty += 25;
 
@@ -55,13 +55,13 @@ void draw_texts()
             t = new char[256];
             sprintf(t, "It looks like %s", item->get_class_name());
             write_text(tx, ty, t, White, 15, 30);
-            Class_id el_cid=item->get_cid();
-            ty+=25;
+            Class_id el_cid = item->get_cid();
+            ty += 25;
             if (el_cid == Class_Element)
             {
                 sprintf(t, "it has %s form", item->get_form_name());
                 write_text(tx, ty, t, White, 15, 30);
-                ty+=25;
+                ty += 25;
             }
             if (el_cid != Class_Ingredient && el_cid != Class_Product)
                 write_text(tx, ty, "I don't know what it's exactly", White, 15, 30);
@@ -70,6 +70,7 @@ void draw_texts()
         }
     }
 }
+int wait_for_chunk;
 
 void draw_maps()
 {
@@ -77,33 +78,48 @@ void draw_maps()
     int pitch, x, y;
 
     SDL_LockTexture(map, NULL, (void **)&pixels, &pitch);
+    bool sent_request = false;
 
-    for (y = 0; y < WORLD_SIZE; y++)
+    int start_x = player->map_x - 5;
+    int start_y = player->map_y - 5;
+
+    for (y = start_y; y < start_y + 10; y++)
     {
-        for (x = 0; x < WORLD_SIZE; x++)
+        for (x = start_x; x < start_x + 10; x++)
         {
+            if (x < 0)
+                break;
+            if (y < 0)
+                break;
+            if (x >= WORLD_SIZE)
+                break;
+            if (y >= WORLD_SIZE)
+                break;
+
             chunk * chunk = world_table[y][x];
             if (chunk)
             {
-                // FIXME
-                /*
-                 * switch (chunk->biome)
-                {
-                    case BIOME_DESERT:
-                        pixels[y * WORLD_SIZE + x] = 0xffffff00;
-                        break;
-                    case BIOME_FOREST:
-                        pixels[y * WORLD_SIZE + x] = 0xff00ff00;
-                        break;
-                    case BIOME_PLAINS:
-                        pixels[y * WORLD_SIZE + x] = 0xff22ff22;
-                        break;
-                    default:
-                        pixels[y * WORLD_SIZE + x] = 0xffffffff;
-                }*/
+                int tile = get_tile_at(x, y, 0, 0);
+                BaseElement * b = get_base_element(tile);
+                unsigned long c = 0xff000000 | (b->color.r) | (b->color.g << 8) | (b->color.b << 16);
+                pixels[y * WORLD_SIZE + x] = c;
             }
             else
-                pixels[y * WORLD_SIZE + x] = 0xff202020;
+            {
+                pixels[y * WORLD_SIZE + x] = 0xff303030;
+                if (!wait_for_chunk)
+                {
+                    if (!sent_request)
+                    {
+                        printf("request_chunk: %d %d\n", x, y);
+                        send_packet_request_chunk(client, x, y);
+                        sent_request = true;
+                    }
+                    wait_for_chunk = 50;
+                }
+                else
+                    wait_for_chunk--;
+            }
         }
     }
 
@@ -119,18 +135,18 @@ void draw_maps()
     SDL_UnlockTexture(map);
 
     SDL_Rect window_rec;
-    if (window_height > 650)
+    //  if (window_height > 650)
     {
         window_rec.w = WORLD_SIZE;
         window_rec.h = WORLD_SIZE;
     }
-    else
+    /*else
     {
         window_rec.w = 0;
         window_rec.h = 0;
-    }
+    }*/
     window_rec.x = width + 10;
-    window_rec.y = window_height - WORLD_SIZE - STATUS_LINES;
+    window_rec.y = 200; // window_height - WORLD_SIZE - STATUS_LINES;
 
     SDL_RenderCopy(renderer, map, NULL, &window_rec);
 }
@@ -162,7 +178,7 @@ bool draw_terrain()
                 SDL_Rect img_rect = {x * tile_dungeon_size, y * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
                 // enum game_tiles tile = get_tile_at(player.map_x, player.map_y, x, y);
                 int tile = get_tile_at(player->map_x, player->map_y, x, y);
-                SDL_Texture * texture = tiles_textures[(tile + 1) % tiles_textures_count];
+                SDL_Texture * texture = tiles_textures[tile % tiles_textures_count];
                 SDL_SetTextureColorMod(texture, get_base_element(tile)->color.r, get_base_element(tile)->color.g, get_base_element(tile)->color.b);
                 SDL_RenderCopy(renderer, texture, NULL, &img_rect);
             }
@@ -185,7 +201,7 @@ bool draw_terrain()
     chunk * c = world_table[player->map_y][player->map_x];
     if (c)
     {
-        ListElement * el = c->objects.head;        
+        ListElement * el = c->objects.head;
         while (el)
         {
             InventoryElement * o = (el->el);
@@ -260,9 +276,7 @@ void draw()
         draw_players();
         draw_npc();
         draw_texts();
-
-        // FIXME when more chunks enabled
-        // draw_maps();
+        //  draw_maps();
     }
     if (status_line[0] != ' ')
     {

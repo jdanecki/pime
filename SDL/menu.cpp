@@ -12,6 +12,8 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include "dialog/d_craft.h"
+#include "player_actions.h"
 
 extern class Player * player;
 extern int active_hotbar;
@@ -27,6 +29,7 @@ Menu * menu_inventory_categories2;
 
 Menu * menu_npc;
 Menu * menu_dialog;
+Menu * menu_action;
 
 void load(char with_player);
 void save(char with_player);
@@ -277,27 +280,31 @@ void create_menus()
     menu_main->add("Change music volume", MENU_MUSIC);
     menu_main->add("Cancel", MENU_CANCEL);
 
-    menu_help = new Menu("Help 1", 11);
-    menu_help->add("; - show item info", MENU_CANCEL);
+    menu_help = new Menu("Help 1", 15);
+    menu_help->add("esc - main menu", MENU_CANCEL);
+    menu_help->add("f1 - show item info", MENU_CANCEL);
     menu_help->add("f11 - resize", MENU_CANCEL);
     menu_help->add("1-9,0 - hotbar", MENU_CANCEL);
-    //  menu_help->add("q - drop item", MENU_CANCEL);
+    menu_help->add("enter - use item", MENU_CANCEL);
+    menu_help->add("q - drop item", MENU_CANCEL);
     menu_help->add("` - previous item", MENU_CANCEL);
     menu_help->add("tab - next item", MENU_CANCEL);
-    //   menu_help->add("minus - deselect hotbar", MENU_CANCEL);
-    menu_help->add("esc - main menu", MENU_CANCEL);
+    menu_help->add("= - select hotbar", MENU_CANCEL);
+    menu_help->add("minus - deselect hotbar", MENU_CANCEL);
+    menu_help->add("shift/control - sneak/run", MENU_CANCEL);
+    menu_help->add("arrows - move", MENU_CANCEL);
+    menu_help->add("n - NPC", MENU_CANCEL);
+    menu_help->add("c - Craft", MENU_CRAFT);
+    menu_help->add("a - Action", MENU_ACTION);
+
     //   menu_help->add("l - devmenu", MENU_CANCEL);
-    menu_help->add("i - inventory", MENU_CANCEL);
+    // menu_help->add("i - inventory", MENU_CANCEL);
     //  menu_help->add("v - clear statusline", MENU_CANCEL);
     //   menu_help->add("g - terrain break", MENU_CANCEL);
     //  menu_help->add("r - remove from hotbar", MENU_CANCEL);
-    //  menu_help->add("= - select hotbar", MENU_CANCEL);
+
     //  menu_help->add("F5 - autoexplore", MENU_CANCEL);
     //  menu_help->add("F4 - item info at player", MENU_CANCEL);
-    menu_help->add("e / enter - use", MENU_CANCEL);
-    menu_help->add("shift/control - sneak/run", MENU_CANCEL);
-    menu_help->add("wasd+arrows - move", MENU_CANCEL);
-    menu_help->add("n - NPC", MENU_CANCEL);
 
     menu_music = new Menu("Music", 3);
     menu_music->add("+5 Volume", MENU_LOUDER);
@@ -314,6 +321,11 @@ void create_menus()
     menu_npc->add("Talk to NPC", MENU_NPC_SAY);
     menu_npc->add("Ask NPC", MENU_NPC_ASK);
     menu_npc->add("Cancel", MENU_CANCEL);
+
+    menu_action = new Menu("Action", 3);
+    menu_action->add("Drink", MENU_DRINK);
+    menu_action->add("Eat", MENU_EAT);
+    menu_action->add("Cancel", MENU_CANCEL);
 }
 
 Menu * create_inv_category_menu(enum Form f)
@@ -397,7 +409,6 @@ int menu_interact(int key)
         }
 
         case SDLK_RETURN:
-        case SDLK_e:
         {
             if (current_menu)
             {
@@ -430,18 +441,25 @@ int menu_interact(int key)
         }
 
         case SDLK_DOWN:
-        case SDLK_s:
         {
             if (current_menu)
                 current_menu->go_down();
             break;
         }
-        case SDLK_w:
         case SDLK_UP:
         {
             if (current_menu)
                 current_menu->go_up();
             break;
+        }
+        case SDLK_a:
+        {
+            if (!current_menu)
+                current_menu = menu_action;
+            else if (current_menu == menu_action)
+                current_menu = NULL;
+
+            return 1;
         }
     }
     return current_menu ? 1 : 0;
@@ -462,6 +480,17 @@ int Menu::handle_item(int i)
     }
     return 1;
 }
+/*
+void action(menu_actions a)
+{
+    InventoryElement * el=player->hotbar[active_hotbar];
+    if (!el) return;
+    Product * product=dynamic_cast<Product *>(el);
+    if (!product) return;
+    printf("action: %d -> %s\n", product->actions, Product_action_names[product->actions]);
+
+}
+*/
 
 int Menu::interact()
 {
@@ -507,6 +536,9 @@ int Menu::interact()
         case MENU_HELP:
             current_menu = menu_help;
             return 0;
+        case MENU_CRAFT:
+            d_craft.show ^= 1;
+            return 1; // hide menu
 
         case MENU_INV_SOLID:
         case MENU_INV_LIGQUID:
@@ -530,8 +562,19 @@ int Menu::interact()
         case MENU_NPC_ASK:
             return npc(a);
 
+        case MENU_ACTION:
+            current_menu = menu_action;
+            return 0;
+
+        case MENU_DRINK:
+            action_tile(PLAYER_DRINK, player->map_x, player->map_y, player->x, player->y);
+            return 0;
+        case MENU_EAT:
+            action_tile(PLAYER_EAT, player->map_x, player->map_y, player->x, player->y);
+            return 0;
+
         default:
-            return 1;
+            return 1; // hide menu
     }
-    return 1;
+    return 1; // hide menu
 }

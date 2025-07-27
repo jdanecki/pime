@@ -14,17 +14,17 @@ bool Meat::check_ing()
     return false;
 }
 
-bool Meat::action(Product_action action, Player *pl)
+bool Meat::action(Product_action action, Player * pl)
 {
-    printf("MEAT: %s %s\n", Product_action_names[action], get_name());
+    printf("MEAT: %s %s\n", product_action_name[action], get_name());
 
-    InventoryElement * crafted=nullptr;
+    InventoryElement * crafted = nullptr;
 
     switch (action)
     {
         case ACT_FIRE:
         {
-            Fire *fire=new Fire(nullptr, nullptr);
+            Fire * fire = new Fire(nullptr, nullptr);
             crafted = craft_prod((int)PROD_ROASTED_MEAT, this, fire);
             delete fire;
             break;
@@ -37,17 +37,17 @@ bool Meat::action(Product_action action, Player *pl)
         world_table[pl->map_y][pl->map_x]->add_object(crafted, pl->x, pl->y);
         objects_to_create.add(crafted);
         printf("crafted\n");
-        destroy(this);        
+        destroy(this);
         return true;
     }
     else
-    {        
+    {
         printf("failed to craft\n");
     }
     return false;
 }
 
-IngredientServer *createMeat(InventoryElement *from)
+IngredientServer * createMeat(InventoryElement * from)
 {
     return new Meat(from);
 }

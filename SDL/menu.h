@@ -19,6 +19,10 @@ enum menu_actions
     MENU_INV_SOLID,
     MENU_INV_LIGQUID,
     MENU_INV_GAS,
+    MENU_CRAFT,
+    MENU_ACTION,
+    MENU_DRINK,
+    MENU_EAT,
 
     MENU_CATEGORIES,
 
@@ -83,6 +87,7 @@ extern Menu * menu_help2;
 extern Menu * current_menu;
 extern Menu * menu_npc;
 extern Menu * menu_dialog;
+extern Menu * menu_action;
 
 int interact(enum menu_actions a);
 void show_menu();

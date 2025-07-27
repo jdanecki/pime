@@ -2,7 +2,7 @@ use crate::core;
 use crate::types;
 
 extern "C" {
-    pub fn update_player(id: usize, map_x: i32, map_y: i32, x: i32, y: i32);
+    pub fn update_player(id: usize, map_x: i32, map_y: i32, x: i32, y: i32, thirst: i32, hunger: i32);
     pub fn update_chunk(x: i32, y: i32, data: &core::chunk_table);
     pub fn got_id(id: usize, seed: i64);
     pub fn update_object(data: &types::ObjectData);

@@ -51,6 +51,10 @@ pub enum ClientEvent<'a> {
         iid: usize,
         oid: usize,
     },
+    ActionOnObject {
+        a: u32,
+        oid: usize,
+    },
     Craft {
         product_id: usize,
         ingredients_num: u32,
@@ -140,6 +144,10 @@ impl<'a> From<&'a [u8]> for ClientEvent<'a> {
                 iid: usize::from_le_bytes(value[1..9].try_into().unwrap()),
                 oid: usize::from_le_bytes(value[9..17].try_into().unwrap()),
             },
+            core::PACKET_PLAYER_ACTION_ACTION_ON_OBJECT => ClientEvent::ActionOnObject {
+                a: u32::from_le_bytes(value[1..5].try_into().unwrap()),
+                oid: usize::from_le_bytes(value[5..13].try_into().unwrap()),
+            },
             core::PACKET_PLAYER_ACTION_CRAFT => ClientEvent::Craft {
                 product_id: usize::from_le_bytes(value[1..9].try_into().unwrap()),
                 ingredients_num: 2/*((value.len()-1)/8)*/ as u32,
@@ -221,13 +229,15 @@ fn add_player(
 
 fn update_players(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
     for (i, p) in players.iter().enumerate() {
-        let mut data = [0 as u8; 25];
+        let mut data = [0 as u8; 33];
         data[0] = core::PACKET_PLAYER_UPDATE;
         data[1..9].clone_from_slice(&i.to_le_bytes());
         data[9..13].clone_from_slice(&p._base.map_x.to_le_bytes());
         data[13..17].clone_from_slice(&p._base.map_y.to_le_bytes());
         data[17..21].clone_from_slice(&p._base.x.to_le_bytes());
         data[21..25].clone_from_slice(&p._base.y.to_le_bytes());
+        data[25..29].clone_from_slice(&p._base.thirst.to_le_bytes());
+        data[29..33].clone_from_slice(&p._base.hunger.to_le_bytes());
 
         server.broadcast(&data);
     }
@@ -423,6 +433,18 @@ fn handle_packet(
                 }
             }
         }
+        ClientEvent::ActionOnObject { a, oid } => {
+            println!("player action {a} on {oid}");
+            unsafe {
+                let object = (*core::world_table[player._base.map_y as usize]
+                    [player._base.map_x as usize])
+                    .find_by_id(oid);
+                if !player.action_on_object(a, object) {
+                    let response = [core::PACKET_FAILED_CRAFT];
+                    server.send_to_reliable(&response, peer);
+                }
+            }
+        }
         ClientEvent::Craft {
             product_id,
             ingredients_num,
@@ -484,7 +506,8 @@ fn handle_packet(
                 }
             }
         },
-        ClientEvent::Whatever => println!("whatever"),
+        //FIXME change id to get_id()
+        ClientEvent::Whatever => println!("player {} alive", player._base.id),
     }
 }
 

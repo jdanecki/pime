@@ -1,6 +1,5 @@
 #include "player_actions.h"
 
-#include "../core/player.h"
 #include "../core/world.h"
 #include "networking.h"
 
@@ -103,4 +102,14 @@ void use_tile(int map_x, int map_y, int x, int y)
                 }
             }
         }*/
+}
+
+void action_tile(Player_action a, int map_x, int map_y, int x, int y)
+{
+    InventoryElement * object = get_item_at(map_x, map_y, x, y);
+    if (!object)
+        return;
+
+    printf("SDL: action %s on %s\n", player_action_name[a], object->get_name());
+    send_packet_action_on_object(client, a, object->uid);
 }

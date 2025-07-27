@@ -38,11 +38,14 @@ class ElementServer : public Element
     Property smoothness;
 
     ElementServer(BaseElement * base);
-    bool action(Product_action action, Player *pl);
+    bool action(Product_action action, Player * pl) override;
     bool action_cut();
     bool action_hit();
-    void show(bool details = true) override;
 
+    bool player_action(Player_action action, Player * pl) override;
+    bool action_drink();
+    bool action_eat();
+    void show(bool details = true) override;
 };
 
 class BeingServer
@@ -138,14 +141,14 @@ class PlantServer : public Plant, public BeingServer
                     age->value = 0;
                     break;
             }
-            printf("%s changing phase: %s -> %s age=%u/%u\n", get_name(), Plant_phase_name[phase], Plant_phase_name[p], age->value, max_age->value);
+            printf("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
         }
         phase = p;
     }
-    bool action(Product_action action, Player *pl) override
+    bool action(Product_action action, Player * pl) override
     {
         Plant::action(action, pl);
-        printf("PLANT_SERVER: %s %s\n", Product_action_names[action], get_name());
+        printf("PLANT_SERVER: %s %s\n", product_action_name[action], get_name());
         return false;
     }
     void show(bool details = true) override;
@@ -159,7 +162,6 @@ class IngredientServer : public Ingredient
     bool craft() override;
     IngredientServer(InventoryElement * from, Ingredient_id i, Form f);
     bool action(Product_action action, Player * pl) override;
-
 };
 
 class ProductServer : public Product
@@ -173,12 +175,12 @@ class ProductServer : public Product
     ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id i, Form f);
     ProductServer(InventoryElement ** from, int count, Product_id i, Form f);
     void show(bool details = true) override;
-    bool use(InventoryElement * object, Player *pl)
+    bool use(InventoryElement * object, Player * pl)
     {
         // if (!actions) return false;
         if (actions == ACT_NOTHING)
             return false;
-        printf("%s: %s %s\n", get_name(), Product_action_names[actions], object->get_name());
+        printf("%s: %s %s\n", get_name(), product_action_name[actions], object->get_name());
         return object->action(actions, pl);
         // FIXME change properties of product after action
     }

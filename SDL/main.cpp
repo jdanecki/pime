@@ -188,10 +188,7 @@ void loop()
 
         /*if (auto_explore) {
             do_auto_explore();
-         } else {
-                //dst_map_x=player.map_x;
-                //dst_map_y=player.map_y;
-         }*/
+        } */
         draw();
         draw_dialogs();
 

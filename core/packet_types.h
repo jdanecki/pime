@@ -20,5 +20,6 @@ constexpr static const PacketType PACKET_FAILED_CRAFT = 14;
 constexpr static const PacketType PACKET_PLAYER_ACTION_USE_ITEM_ON_TILE = 15;
 constexpr static const PacketType PACKET_REQUEST_CHUNK = 16;
 constexpr static const PacketType PACKET_KEEP_ALIVE = 17;
+constexpr static const PacketType PACKET_PLAYER_ACTION_ACTION_ON_OBJECT = 18;
 
 #endif

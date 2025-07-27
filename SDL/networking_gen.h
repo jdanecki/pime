@@ -82,7 +82,7 @@ extern "C"
 
     BaseAnimal * get_base_animal(int32_t id);
 
-    extern void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y);
+    extern void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y, int32_t thirst, int32_t hunger);
 
     extern void update_chunk(int32_t x, int32_t y, const chunk_table * data);
 
@@ -105,6 +105,8 @@ extern "C"
     void send_packet_drop(NetClient * client, uintptr_t id);
 
     void send_packet_item_used_on_object(NetClient * client, uintptr_t iid, uintptr_t oid);
+
+    void send_packet_action_on_object(NetClient * client, int32_t a, uintptr_t oid);
 
     void send_packet_item_used_on_tile(NetClient * client, uintptr_t iid, int32_t map_x, int32_t map_y, int32_t x, int32_t y);
 

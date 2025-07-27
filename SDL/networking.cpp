@@ -105,7 +105,7 @@ InventoryElement * el_from_data(const ObjectData * data)
 extern "C"
 {
 
-    void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y)
+    void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y, int thirst, int hunger)
     {
         if (id >= 0 && id < PLAYER_NUM)
         {
@@ -126,6 +126,8 @@ extern "C"
                 p->going_right = p->x > x ? 0 : 1;
             p->x = x;
             p->y = y;
+            p->thirst = thirst;
+            p->hunger = hunger;
 
             // printf("updated player %ld: %d %d %d %d\n", id, player->map_x, player->map_y, player->x, player->y);
         }
@@ -284,8 +286,8 @@ extern "C"
                     update_hotbar();
                 }
             }
-            printf("created object: %s\n", el->get_name());
-            print_status(1, "created object: %s", el->get_name());
+            // printf("created object: %s\n", el->get_name());
+            // print_status(1, "created object: %s", el->get_name());
         }
         else
         {

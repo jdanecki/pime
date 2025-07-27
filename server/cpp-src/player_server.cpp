@@ -11,6 +11,7 @@ void PlayerServer::check_and_move(int new_map_x, int new_map_y, int new_x, int n
     y = new_y;
     hunger -= 3;
     thirst--;
+    printf("hunger=%d thirst=%d\n", hunger, thirst);
 }
 
 void PlayerServer::move(int dx, int dy)
@@ -53,7 +54,16 @@ bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement 
     {
         printf("%s: using %s on %s\n", get_name(), i->get_name(), object->get_name());
         return i->use(object, this);
-    } else return false;
+    }
+    else
+        return false;
+}
+
+bool PlayerServer::action_on_object(Player_action a, InventoryElement * object)
+{
+    printf("%s action: %s on %s\n", get_name(), player_action_name[a], object->get_name());
+    object->player_action(a, this);
+    return true;
 }
 
 bool PlayerServer::plant_with_seed(InventoryElement * el, int map_x, int map_y, int x, int y)
