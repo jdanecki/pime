@@ -190,7 +190,8 @@ pub fn main_loop(server: &mut Server) {
             core::update();
         }
         send_game_updates(server, &mut players);
-        std::thread::sleep(std::time::Duration::from_millis(100));
+        //std::thread::sleep(std::time::Duration::from_millis(100));
+        std::thread::sleep(std::time::Duration::from_millis(core::TICK_DELAY));
     }
 }
 
@@ -541,6 +542,7 @@ fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>)
             data.extend_from_slice(obj_data);
 
             le = (*le).next;
+//            println!("PACKET_OBJECT_UPDATE");
             server.broadcast(&data);
         }
         while (*el)._base.head != std::ptr::null_mut() {

@@ -175,6 +175,7 @@ extern "C"
 
         if (el && el->c_id == c_id)
         {
+            //  printf("SDL update_object: %s %s\n", class_name[c_id],  el->get_name());
             switch (c_id)
             {
                 case Class_Element:
@@ -199,12 +200,14 @@ extern "C"
                 {
                     PlantSDL * plant = dynamic_cast<PlantSDL *>(el);
                     *plant = data->plant.data;
+                    //  printf("%s size=%f\n", plant->get_name(), plant->size);
                     break;
                 }
                 case Class_Animal:
                 {
                     AnimalSDL * animal = dynamic_cast<AnimalSDL *>(el);
                     *animal = data->animal.data;
+                    //      printf("%s size=%f\n", animal->get_name(), animal->size);
                     break;
                 }
                 default:
@@ -300,7 +303,7 @@ extern "C"
         InventoryElement * el = remove_from_location(location, id);
         if (el)
         {
-            print_status(1, "delete %ld", id);
+            // print_status(1, "delete %ld", id);
             delete el;
         }
         else

@@ -11,7 +11,7 @@ void PlayerServer::check_and_move(int new_map_x, int new_map_y, int new_x, int n
     y = new_y;
     hunger -= 3;
     thirst--;
-    printf("hunger=%d thirst=%d\n", hunger, thirst);
+    // printf("hunger=%d thirst=%d\n", hunger, thirst);
 }
 
 void PlayerServer::move(int dx, int dy)

@@ -8,6 +8,9 @@
 
 class Renderable
 {
+    SDL_Texture * texture;
+    int width, height;
+
   protected:
     bool flip;
 
@@ -15,17 +18,41 @@ class Renderable
     Renderable()
     {
         flip = false;
+        texture = nullptr;
+        width = 0;
+        height = 0;
     }
     virtual SDL_Texture * get_texture()
     {
         return NULL;
     }
+    virtual float get_scale()
+    {
+        return 1.0;
+    }
     virtual void render(SDL_Rect * rect)
     {
+        if (!texture)
+        {
+            texture = get_texture();
+            if (SDL_QueryTexture(texture, NULL, NULL, &width, &height) != 0)
+            {
+                printf("SDL_QueryTexture failed: %s", SDL_GetError());
+            }
+            else
+            {
+                // printf("%s: width: %d, heigh: %d\n", get_name(), width, height);
+            }
+        }
+        float scale = get_scale();
+        if (scale < 0.01)
+            return;
+        SDL_Rect img_rect = {rect->x, rect->y, (int)(width * scale), (int)(height * scale)};
+
         if (flip)
-            SDL_RenderCopyEx(renderer, get_texture(), NULL, rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+            SDL_RenderCopyEx(renderer, texture, NULL, &img_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
         else
-            SDL_RenderCopy(renderer, get_texture(), NULL, rect);
+            SDL_RenderCopy(renderer, texture, NULL, &img_rect);
     }
 };
 // FIXME remove Renderable class

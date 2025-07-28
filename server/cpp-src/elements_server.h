@@ -27,8 +27,10 @@ extern "C"
 
 void destroy(InventoryElement * el);
 
-const int max_delay_move = 10;  // 1 sec.
-const int max_delay_grow = 600; // 1 min.
+const int max_delay_move = 10; // 1 sec.
+const int max_delay_grow = 10; // 600=1 min.
+
+constexpr static const unsigned long TICK_DELAY = 100;
 
 class ElementServer : public Element
 {
@@ -57,8 +59,9 @@ class BeingServer
     int padding;
     BeingServer()
     {
-        max_age = new Property("max age", 1 + rand() % 36000); // 100 years
-        age = new Property("age", rand() % max_age->value);
+        max_age = new Property("max age", 0);
+        age = new Property("age", 1);
+        alive = true;
     }
     void show(bool details = true);
     Property ** get_properties(int * count)
@@ -75,23 +78,8 @@ class BeingServer
         delete age;
         delete max_age;
     }
-    virtual bool grow()
-    {
-        if (!alive)
-        {
-            //  printf("%s is dead\n", get_name());
-            return false;
-        }
-        age->value++;
-        // printf("%s:%s growing\n", get_class_name(), get_name());
-        if (age->value >= max_age->value)
-        {
-            alive = false;
-            // printf("%s is dying\n", get_name()); // FIXME
-        }
-        return alive;
-    }
-    bool tick()
+    virtual bool grow();
+    virtual bool tick()
     {
         return grow();
     }
@@ -100,6 +88,7 @@ class BeingServer
 class AnimalServer : public Animal, public BeingServer
 {
     int delay_for_move;
+    int delay_for_grow;
     int dst_loc_x, dst_loc_y;
     int padding1;
 
@@ -110,6 +99,7 @@ class AnimalServer : public Animal, public BeingServer
     AnimalServer(BaseAnimal * base);
     bool action(Product_action action, Player * pl) override;
     void show(bool details = true) override;
+    bool grow() override;
 };
 
 class PlantServer : public Plant, public BeingServer
@@ -119,8 +109,7 @@ class PlantServer : public Plant, public BeingServer
 
   public:
     bool grow() override;
-    // bool tick() override;
-    // PlantServer();
+
     PlantServer(BasePlant * base);
 
     void sow()
@@ -132,16 +121,7 @@ class PlantServer : public Plant, public BeingServer
     {
         if (phase != p)
         {
-            switch (phase)
-            {
-                case Plant_seedling:
-                    age->value = 1;
-                    break;
-                case Plant_seed:
-                    age->value = 0;
-                    break;
-            }
-            printf("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
+            //   printf("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
         }
         phase = p;
     }

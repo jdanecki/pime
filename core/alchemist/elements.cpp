@@ -73,7 +73,7 @@ template <typename T> SerializablePointer<T>::SerializablePointer(T * p) : ptr(p
 }
 
 Element::Element(BaseElement * b)
-    : InventoryElement(Class_Element), base(b), length("length", rand() % 100), width("width", rand() % 100), height("height", rand() % 100),
+    : InventoryElement(Class_Element), base(b), length("length", 5 + rand() % 100), width("width", 5 + rand() % 100), height("height", 1 + rand() % 64),
       volume("volume", length.value * width.value * height.value)
 {
 }
@@ -132,13 +132,10 @@ void Product::show(bool details)
 void Animal::init(BaseAnimal * b)
 {
     c_id = Class_Animal;
-    // alive = true;
-    // max_age = new Property("max age", 1 + rand() % 36000); // 100 years
-    // age = new Property("age", rand() % max_age->value);
-    // can_talk = false;
+    size = 0;
 }
 
-BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(10))
+BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(7))
 {
     id = index;
     carnivorous = rand() % 2;
@@ -151,7 +148,7 @@ Animal::Animal(BaseAnimal * b) : InventoryElement(Class_Animal), base(b)
     init(b);
 }
 
-BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(15))
+BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(5))
 {
     flowers = rand() % 2;
     leaves = rand() % 2;
@@ -160,39 +157,13 @@ BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(15))
 void Plant::init(BasePlant * b)
 {
     base = b;
-    seedling_time = 7 + rand() % 14;
+    seedling_time = 10 + rand() % 20;
     growing_time = seedling_time + rand() % 150;
     flowers_time = growing_time + rand() % 30;
-    // max_age = new Property("max age", flowers_time + rand() % 100);
+    size = 0;
     phase = (Plant_phase)(rand() % (Plant_fruits + 1));
     grown = false;
     water = rand() % 100;
-    // age = new Property("age", 0);
-    // can_talk = false;
-    switch (phase)
-    {
-        case Plant_seed:
-            // age->value = 1;
-            planted = false;
-            break;
-        case Plant_seedling:
-            // age->value = seedling_time;
-            planted = true;
-            break;
-        case Plant_growing:
-            // age->value = growing_time;
-            planted = true;
-            break;
-        case Plant_flowers:
-            // age->value = flowers_time;
-            planted = true;
-            break;
-        case Plant_fruits:
-            // age->value = max_age->value;
-            grown = true;
-            planted = true;
-            break;
-    }
 }
 
 Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)

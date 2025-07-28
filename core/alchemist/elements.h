@@ -473,6 +473,7 @@ class Animal : public InventoryElement
     void init(BaseAnimal * b);
 
   public:
+    float size;
     Animal(BaseAnimal * b);
 
     void show(bool details = true) override
@@ -556,6 +557,7 @@ class Plant : public InventoryElement
     unsigned int flowers_time;
 
   public:
+    float size;
     bool planted;
     int water;
 
@@ -600,7 +602,7 @@ class Plant : public InventoryElement
     char * get_description() override
     {
         char * buf = new char[128];
-        sprintf(buf, "%s: (%s)", get_class_name(), get_name());
+        sprintf(buf, "%s: (%s) %s", get_class_name(), get_name(), plant_phase_name[phase]);
         return buf;
     }
 };

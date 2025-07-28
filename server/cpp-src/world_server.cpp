@@ -8,8 +8,20 @@ void generator()
     printf("generated: %d items\n", world_table[128][128]->objects.nr_elements);
 }
 
+unsigned long get_time_ms()
+{
+    struct timespec t;
+    int err;
+
+    err = clock_gettime(CLOCK_MONOTONIC_RAW, &t);
+    if (!err)
+        return (t.tv_sec * 1000 + t.tv_nsec / 1000000);
+    return 0;
+}
+
 void update()
 {
+#if 1
     // TODO maybe in the future make it smarter
     for (int y = 0; y < WORLD_SIZE; y++)
     {
@@ -21,30 +33,29 @@ void update()
             ListElement * el = world_table[y][x]->beings.head;
             while (el)
             {
-                el->el->tick();
+                BeingServer * b = dynamic_cast<BeingServer *>(el->el);
+                b->tick();
+                // unsigned long ms=get_time_ms();
+                // printf("tick: %llu:%llu ms\n", ms/1000, ms % 1000);
                 el = el->next;
             }
         }
     }
-    // TODO kill animals
-    /*            if (!a->alive)
-        {
-            int x,y;
-            a->get_posittion(&x, &y);
+#else
+    chunk * c = world_table[128][128];
+    if (!c)
+        return;
 
-            Element * el;
-            switch (a->type)
-            {
-                case ANIMALID_pig:
-                    el = new Element(base_elements[ID_RAW_HAM]);
-            }
-            el->set_posittion(x, y);
-            set_item_at(el, player.map_x, player.map_y, x, y);
-
-            free(a);
-            a=NULL;
-            world_table[player.map_y][player.map_x]->animals[i]=NULL;
-        }*/
+    ListElement * el = world_table[128][128]->beings.head;
+    while (el)
+    {
+        BeingServer * b = dynamic_cast<BeingServer *>(el->el);
+        b->tick();
+        // unsigned long ms=get_time_ms();
+        // printf("tick: %llu:%llu ms\n", ms/1000, ms % 1000);
+        el = el->next;
+    }
+#endif
 }
 
 void print_status(int l, const char * format, ...)

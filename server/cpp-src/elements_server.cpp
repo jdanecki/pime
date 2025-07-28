@@ -3,6 +3,10 @@
 #include "world_server.h"
 #include "craft_ing.h"
 
+// #define TRACE_PLANTS 1
+
+extern unsigned long get_time_ms();
+
 void destroy(InventoryElement * el)
 {
     notify_destroy(el->get_uid(), el->location);
@@ -66,18 +70,15 @@ void BaseElementServer::show(bool details)
     }
 }
 
-// AnimalServer::AnimalServer()
-// {
-//     delay_for_move = max_delay_move; // 600 * 100ms -> 1min
-//     dst_loc_x = rand() % CHUNK_SIZE;
-//     dst_loc_y = rand() % CHUNK_SIZE;
-// }
-
 AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
 {
-    delay_for_move = max_delay_move; // 600 * 100ms -> 1min
+    delay_for_move = max_delay_move;
+    delay_for_grow = max_delay_grow;
     dst_loc_x = rand() % CHUNK_SIZE;
     dst_loc_y = rand() % CHUNK_SIZE;
+    max_age = new Property("max age", 100 + rand() % 1000);
+    age = new Property("age", rand() % max_age->value);
+    size = 1.0 * age->value / max_age->value;
 }
 
 bool AnimalServer::action(Product_action action, Player * pl)
@@ -115,6 +116,32 @@ void AnimalServer::show(bool details)
 {
     Animal::show(details);
     BeingServer::show(details);
+}
+
+bool AnimalServer::grow()
+{
+    delay_for_grow--;
+    // unsigned long ms=get_time_ms();
+    // printf("AnimalServer.grow: %llu:%llu ms delay=%d\n", ms/1000, ms % 1000, delay_for_grow);
+
+    if (delay_for_grow)
+        return false;
+    delay_for_grow = max_delay_grow;
+
+    bool ret = BeingServer::grow();
+    if (!alive)
+    {
+        printf("%s is dead age=%d/%d\n", get_name(), age->value, max_age->value);
+        destroy(this);
+        // FIXME leave meat after death
+    }
+    else
+    {
+        size = 1.0 * age->value / max_age->value;
+        objects_to_update.add(this);
+        //   printf("%s:%s growing size=%f %d/%d \n", get_class_name(), get_name(), size, age->value, max_age->value);
+    }
+    return ret;
 }
 
 void AnimalServer::move()
@@ -172,18 +199,43 @@ void AnimalServer::move()
 bool AnimalServer::tick()
 {
     move();
-    // return Being::tick();
-    return 1;
+    return BeingServer::tick();
 }
-
-// PlantServer::PlantServer()
-// {
-//     delay_for_grow = max_delay_grow;
-// }
 
 PlantServer::PlantServer(BasePlant * base) : Plant(base)
 {
     delay_for_grow = max_delay_grow;
+    max_age->value = flowers_time + 50;
+
+    switch (phase)
+    {
+        case Plant_seed:
+            age->value = 1;
+            planted = false;
+            size = 0.01;
+            break;
+        case Plant_seedling:
+            age->value = seedling_time;
+            planted = true;
+            size = 0.01;
+            break;
+        case Plant_growing:
+            age->value = growing_time;
+            planted = true;
+            size = 1.0 * age->value / max_age->value;
+            break;
+        case Plant_flowers:
+            age->value = flowers_time;
+            planted = true;
+            size = 1.0;
+            break;
+        case Plant_fruits:
+            age->value = max_age->value;
+            grown = true;
+            planted = true;
+            size = 1.0;
+            break;
+    }
 }
 
 void PlantServer::show(bool details)
@@ -194,28 +246,34 @@ void PlantServer::show(bool details)
 
 bool PlantServer::grow()
 {
+    // unsigned long ms=get_time_ms();
+    // printf("PlantServer.grow: %llu:%llu ms delay=%d\n", ms/1000, ms % 1000, delay_for_grow);
+    if (grown)
+        return false;
+
     delay_for_grow--;
     if (delay_for_grow)
         return false;
     delay_for_grow = max_delay_grow;
 
-    if (grown)
-        return false;
-    if (!water)
-        return !grown;
+    // if (!water)
+    //   return !grown;
     // water--;
-    age->value++;
 
+    age->value++;
+    size = 1.0 * age->value / max_age->value;
+#ifdef TRACE_PLANTS
+    printf("PlantServer:%s growing %d/%d phase=%s grown=%d planted=%d times=%d/%d/%d/ size=%f\n", get_name(), age->value, max_age->value, plant_phase_name[phase], grown, planted, seedling_time,
+        growing_time, flowers_time, size);
+#endif
     if (age->value >= max_age->value)
     {
         if (phase != Plant_fruits)
         {
             grown = true;
             change_phase(Plant_fruits);
-#ifndef CORE_TUI
-            objects_to_update.add(this);
-#endif
         }
+        objects_to_update.add(this);
         return !grown;
     }
     if (age->value >= flowers_time)
@@ -223,10 +281,8 @@ bool PlantServer::grow()
         if (phase != Plant_flowers)
         {
             change_phase(Plant_flowers);
-#ifndef CORE_TUI
-            objects_to_update.add(this);
-#endif
         }
+        objects_to_update.add(this);
         return !grown;
     }
     if (age->value >= growing_time)
@@ -234,10 +290,9 @@ bool PlantServer::grow()
         if (phase != Plant_growing)
         {
             change_phase(Plant_growing);
-#ifndef CORE_TUI
-            objects_to_update.add(this);
-#endif
         }
+        objects_to_update.add(this);
+
         return !grown;
     }
     if (age->value >= seedling_time)
@@ -245,21 +300,12 @@ bool PlantServer::grow()
         if (phase != Plant_seedling)
         {
             change_phase(Plant_seedling);
-#ifndef CORE_TUI
-            objects_to_update.add(this);
-#endif
         }
+        objects_to_update.add(this);
         return !grown;
     }
     return !grown;
 }
-/*
-bool PlantServer::tick()
-{
-    grow();
-    Plant::tick();
-    return true;
-}*/
 
 IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id i, Form f) : Ingredient(i)
 {
@@ -500,4 +546,19 @@ void BeingServer::show(bool details)
 {
     age->show();
     max_age->show();
+}
+
+bool BeingServer::grow()
+{
+    if (!alive)
+    {
+        return false;
+    }
+    age->value++;
+
+    if (age->value >= max_age->value)
+    {
+        alive = false;
+    }
+    return alive;
 }

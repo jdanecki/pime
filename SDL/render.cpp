@@ -70,6 +70,8 @@ void draw_texts()
         }
     }
 }
+
+#if 0
 int wait_for_chunk;
 
 void draw_maps()
@@ -150,6 +152,7 @@ void draw_maps()
 
     SDL_RenderCopy(renderer, map, NULL, &window_rec);
 }
+#endif
 
 bool draw_terrain()
 {

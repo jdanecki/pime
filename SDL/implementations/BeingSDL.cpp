@@ -13,8 +13,12 @@ SDL_Texture * AnimalSDL::get_texture()
 
 AnimalSDL::AnimalSDL(Animal data) : Animal(data)
 {
-    // age->value = data->age;
-    // max_age->value = data->max_age;
+}
+
+void AnimalSDL::render(SDL_Rect * rect)
+{
+    flip = !going_right;
+    Renderable::render(rect);
 }
 
 void AnimalSDL::update_item_location(ItemLocation & old_loc, ItemLocation & new_loc)
@@ -31,7 +35,4 @@ SDL_Texture * PlantSDL::get_texture()
 
 PlantSDL::PlantSDL(Plant data) : Plant(data)
 {
-    // grown = data->grown;
-    // age->value = data->age;
-    // max_age->value = data->max_age;
 }
