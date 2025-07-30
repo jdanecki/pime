@@ -1,9 +1,11 @@
 #include "main.h"
 #include "networking.h"
+#include "text.h"
 #include "texture.h"
 #include "window.h"
 #include <SDL2/SDL_render.h>
 #include <cstddef>
+#include <cstdio>
 
 // TODO move it
 int active_hotbar = 0;
@@ -49,6 +51,7 @@ void draw_texts()
                 }
                 delete props;
             }
+            write_text(tx, ty + 25, item->get_form_name(), {255,255,255,255}, 15, 30);
         }
         else
         {
