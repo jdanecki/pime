@@ -6,6 +6,7 @@
 #include <SDL2/SDL_mouse.h>
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_timer.h>
+#include <cstdio>
 
 #include "../core/player.h"
 #include "../core/tiles.h"
@@ -50,7 +51,7 @@ void update_window_size()
 
 void key_pressed(int key)
 {
-    if (menu_interact(key))
+    if (d_craft.show == false && menu_interact(key))
         return;
 
     switch (key)
@@ -207,6 +208,10 @@ void key_pressed(int key)
             break;
         case SDLK_c:
             d_craft.show ^= 1;
+            break;
+        case SDLK_ESCAPE:
+            d_craft.show = 0;
+            break;
     }
 }
 
