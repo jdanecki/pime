@@ -24,6 +24,14 @@ class Property
     {
         printf("%s = %u\n", name.str, value);
     }
+    unsigned int decrease(unsigned int by)
+    {
+        if (value > by) {
+            value-=by;
+        }
+        else value = 0;
+        return value;
+    }
 };
 
 class Edible

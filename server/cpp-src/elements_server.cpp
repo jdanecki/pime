@@ -437,9 +437,9 @@ bool ElementServer::action_cut()
     {
         //    if (b->solid->hardness < 50)
         {
-            length.value /= 2;
-            width.value /= 2;
-            height.value /= 2;
+            length.value--;
+            width.value--;
+            height.value--;
             volume.value = length.value * width.value * height.value;
         }
 
@@ -456,9 +456,9 @@ bool ElementServer::action_hit()
         //    if (b->solid->hardness < 50)
 
         {
-            length.value /= 4;
-            width.value /= 4;
-            height.value /= 4;
+            length.value -= 3;
+            width.value -= 3;
+            height.value -= 3;
             volume.value = length.value * width.value * height.value;
         }
 
@@ -503,10 +503,7 @@ bool ElementServer::action_drink()
     {
         //    if (b->solid->hardness < 50)
         {
-            length.value -= 2;
-            width.value -= 2;
-            height.value -= 2;
-            volume.value = length.value * width.value * height.value;
+            volume.value = length.decrease(2) * width.decrease(2) * height.decrease(2);
             printf("drunk %s\n", get_name());
         }
         return true;
@@ -520,11 +517,8 @@ bool ElementServer::action_eat()
     if (b->form == Form_solid)
     {
         //    if (b->solid->hardness < 50)
-        {
-            length.value -= 4;
-            width.value -= 4;
-            height.value -= 4;
-            volume.value = length.value * width.value * height.value;
+        {            
+            volume.value = length.decrease(4) * width.decrease(4) * height.decrease(4);
             printf("ate %s\n", get_name());
         }
         return true;

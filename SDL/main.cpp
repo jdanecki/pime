@@ -102,16 +102,6 @@ int init_SDL()
         }
     }
 
-    // ret = stat("world", &statbuf);
-    // if (ret)
-    // {
-    // #if defined(_WIN32)
-    //     mkdir("world");
-    // #else
-    //     mkdir("world", 0777);
-    // #endif
-    // }
-
     load_textures();
     create_menus();
     map = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, WORLD_SIZE, WORLD_SIZE);

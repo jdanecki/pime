@@ -2,13 +2,12 @@
 
 typedef IngredientServer * (*IngredientFunction)(InventoryElement *);
 
-IngredientFunction ingredientFunctions[] = {createAxeBlade, createAxeHandle,
-
+IngredientFunction ingredientFunctions[] = {
+    createAxeBlade, createAxeHandle,
     createKnifeBlade, createKnifeHandle,
-
     createPickAxeBlade, createPickAxeHandle,
-
-    createWall, createMeat, createLog, createTinder, createStick};
+    createWall, createMeat, createLog, createTinder, createStick
+};
 
 InventoryElement * craft_ing(int product_id, InventoryElement * el)
 {

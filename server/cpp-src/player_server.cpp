@@ -61,6 +61,7 @@ bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement 
 
 bool PlayerServer::action_on_object(Player_action a, InventoryElement * object)
 {
+    if (!object) return false;
     printf("%s action: %s on %s\n", get_name(), player_action_name[a], object->get_name());
     object->player_action(a, this);
     return true;
