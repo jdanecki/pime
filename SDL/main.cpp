@@ -1,6 +1,7 @@
 
 #include "main.h"
 #include "dialog/d_craft.h"
+#include "npc.h"
 #include "window.h"
 // Normal speed
 #define UPDATE_DELAY 1000
@@ -117,8 +118,6 @@ int setup(const char * ip, const char * port)
         return 1;
 
     client = init(ip, port);
-    // FIXME
-    current_npc = new Npc;
 
     return 0;
 }
@@ -175,6 +174,9 @@ void loop()
         // TODO disconnect
         network_tick(client);
         update_dialogs();
+        // FIXME
+        if (!current_npc)
+            current_npc = new NpcSDL(Npc());
 
         /*if (auto_explore) {
             do_auto_explore();
