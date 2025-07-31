@@ -1,5 +1,6 @@
 #include "main.h"
 #include "networking.h"
+#include "npc.h"
 #include "text.h"
 #include "texture.h"
 #include "window.h"
@@ -51,7 +52,7 @@ void draw_texts()
                 }
                 delete props;
             }
-            write_text(tx, ty + 25, item->get_form_name(), {255,255,255,255}, 15, 30);
+            write_text(tx, ty + 25, item->get_form_name(), {255, 255, 255, 255}, 15, 30);
         }
         else
         {
@@ -258,6 +259,9 @@ void draw_players()
 
 void draw_npc()
 {
+    // FIXME
+    if (!current_npc)
+        return;
     SDL_Rect img_rect = {5 * tile_dungeon_size, 5 * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
     static int tick = 0;
     static int dir = 1;
@@ -270,9 +274,9 @@ void draw_npc()
 
     side = dir > 0 ? 0 : 1;
     if (side)
-        SDL_RenderCopy(renderer, npc_texture, NULL, &img_rect);
+        SDL_RenderCopy(renderer, current_npc->get_texture(), NULL, &img_rect);
     else
-        SDL_RenderCopyEx(renderer, npc_texture, NULL, &img_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+        SDL_RenderCopyEx(renderer, current_npc->get_texture(), NULL, &img_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
 }
 
 void draw()

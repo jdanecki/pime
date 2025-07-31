@@ -1,6 +1,7 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+#include <SDL2/SDL_surface.h>
 #include <stdlib.h>
 
 #include <SDL2/SDL_image.h>
@@ -20,6 +21,7 @@ enum object_textures_enum
 struct textures
 {
     SDL_Texture * player;
+    SDL_Surface * player_surface;
     SDL_Texture * run_icon;
     SDL_Texture * sneak_icon;
 };
@@ -33,7 +35,6 @@ extern SDL_Texture * animal_textures[BASE_ANIMALS];
 extern SDL_Texture * plant_textures[BASE_PLANTS];
 
 extern SDL_Texture * object_textures[TEXTURE_wall_max];
-extern SDL_Texture * npc_texture;
 extern SDL_Texture * up_mask;
 extern SDL_Texture * down_mask;
 extern struct textures Texture;

@@ -3,6 +3,7 @@
 #include "../core/tiles.h"
 #include "window.h"
 #include <SDL2/SDL_blendmode.h>
+#include <SDL2/SDL_image.h>
 #include <dirent.h>
 #include <stdio.h>
 
@@ -18,7 +19,6 @@ SDL_Texture * animal_textures[BASE_ANIMALS];
 SDL_Texture * plant_textures[BASE_PLANTS];
 
 SDL_Texture * object_textures[TEXTURE_wall_max];
-SDL_Texture * npc_texture;
 
 SDL_Texture * load_texture(const char * texture_name)
 {
@@ -88,12 +88,11 @@ int add_textures_from_dir(SDL_Texture ** to, int i, const char * dir_path)
 
 void load_textures()
 {
+    Texture.player_surface = IMG_Load("textures/player.png");
     Texture.player = load_texture("textures/player.png");
 
     Texture.run_icon = load_texture("textures/gui/run_icon.png");
     Texture.sneak_icon = load_texture("textures/gui/sneak_icon.png");
-
-    npc_texture = load_texture("textures/npc.png");
 
     int i = 0;
 
