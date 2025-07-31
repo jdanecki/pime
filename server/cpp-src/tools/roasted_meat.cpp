@@ -5,6 +5,21 @@ Roasted_meat::Roasted_meat(InventoryElement * el1, InventoryElement * el2) : Pro
     actions = ACT_NOTHING;
 }
 
+bool Roasted_meat::player_action(Player_action action, Player *pl)
+{
+    printf("ROASTED_MEAT: %s %s\n", player_action_name[action], get_name());
+
+    switch (action)
+    {
+        case PLAYER_EAT:
+                pl->hunger += 100;
+                destroy(this);
+            break;
+    }
+
+    return true;
+}
+
 bool Roasted_meat::check_ing()
 {
     int id1 = ings[0]->get_id();

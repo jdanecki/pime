@@ -73,7 +73,7 @@ template <typename T> SerializablePointer<T>::SerializablePointer(T * p) : ptr(p
 }
 
 Element::Element(BaseElement * b)
-    : InventoryElement(Class_Element), base(b), length("length", 5 + rand() % 100), width("width", 5 + rand() % 100), height("height", 1 + rand() % 64),
+    : InventoryElement(Class_Element), base(b), length("length", 5 + rand() % 60), width("width", 5 + rand() % 60), height("height", 5 + rand() % 60),
       volume("volume", length.value * width.value * height.value)
 {
 }

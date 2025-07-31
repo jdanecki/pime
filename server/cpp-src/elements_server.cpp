@@ -487,10 +487,12 @@ bool ElementServer::player_action(Player_action action, Player * pl)
 
     if (volume.value < 1)
     {
+        printf("player_action->destroy %s\n", get_name());
         destroy(this);
     }
     else
     {
+        printf("player_action->update %s\n", get_name());
         objects_to_update.add(this);
     }
     return res;

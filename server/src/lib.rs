@@ -275,6 +275,7 @@ fn create_objects_in_chunk_for_player(server: &mut Server, peer: &SocketAddr, co
         let mut le = chunk.objects._base.head;
         while le != std::ptr::null_mut() {
             let mut data = vec![core::PACKET_OBJECT_CREATE];
+          //  println!("create_objects_in_chunk_for_player PACKET_OBJECT_CREATE");
             let obj = convert_types::convert_to_data(&*(*le).el);
             let obj_data = &bincode::serialize(&obj).unwrap()[..];
             //          println!("data {:?}", obj_data);
@@ -519,6 +520,7 @@ fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>)
         let mut le = (*list)._base.head;
         while le != std::ptr::null_mut() {
             let mut data = vec![core::PACKET_OBJECT_CREATE];
+   //         println!("send_game_updates PACKET_OBJECT_CREATE");
             let obj = convert_types::convert_to_data(&*(*le).el);
             let obj_data = &bincode::serialize(&obj).unwrap()[..];
             //            println!("data {:?}", obj_data);
@@ -536,6 +538,7 @@ fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>)
         let mut le = (*el)._base.head;
         while le != std::ptr::null_mut() {
             let mut data = vec![core::PACKET_OBJECT_UPDATE];
+//            println!("send_game_updates PACKET_OBJECT_UPDATE");
             let obj = convert_types::convert_to_data(&*(*le).el);
             let obj_data = &bincode::serialize(&obj).unwrap()[..];
             //            println!("data {:?}", obj_data);

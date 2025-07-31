@@ -11,10 +11,6 @@ struct textures Texture;
 int tiles_textures_count;
 SDL_Texture ** tiles_textures;
 
-SDL_Texture * solid_items_textures[SOLID_ELEMENTS];
-SDL_Texture * liquid_items_textures[LIQUID_ELEMENTS];
-SDL_Texture * gas_items_textures[GAS_ELEMENTS];
-
 SDL_Texture * ing_textures[ING_ELEMENTS];
 SDL_Texture * prod_textures[PROD_ELEMENTS];
 
@@ -105,11 +101,6 @@ void load_textures()
     tiles_textures = new SDL_Texture *[20];
 
     tiles_textures_count = add_textures_from_dir(tiles_textures, i, "textures/game_tiles");
-
-    add_textures_from_dir(solid_items_textures, 0, "textures/items/solid");
-
-    add_textures_from_dir(liquid_items_textures, 0, "textures/items/liquid");
-    add_textures_from_dir(gas_items_textures, 0, "textures/items/gas");
 
     add_ing_texture(ING_AXE_BLADE, "textures/items/ingredients/axe_blade.png");
     add_ing_texture(ING_AXE_HANDLE, "textures/items/ingredients/axe_handle.png");

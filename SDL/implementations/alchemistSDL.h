@@ -9,7 +9,7 @@
 class Renderable
 {
     SDL_Texture * texture;
-    int width, height;
+    int w, h;
 
   protected:
     bool flip;
@@ -19,8 +19,8 @@ class Renderable
     {
         flip = false;
         texture = nullptr;
-        width = 0;
-        height = 0;
+        w = 0;
+        h = 0;
     }
     virtual SDL_Texture * get_texture()
     {
@@ -35,7 +35,7 @@ class Renderable
         if (!texture)
         {
             texture = get_texture();
-            if (SDL_QueryTexture(texture, NULL, NULL, &width, &height) != 0)
+            if (SDL_QueryTexture(texture, NULL, NULL, &w, &h) != 0)
             {
                 printf("SDL_QueryTexture failed: %s", SDL_GetError());
             }
@@ -47,7 +47,7 @@ class Renderable
         float scale = get_scale();
         if (scale < 0.01)
             return;
-        SDL_Rect img_rect = {rect->x, rect->y, (int)(width * scale), (int)(height * scale)};
+        SDL_Rect img_rect = {rect->x, rect->y, (int)(w * scale), (int)(h * scale)};
 
         if (flip)
             SDL_RenderCopyEx(renderer, texture, NULL, &img_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
@@ -81,9 +81,16 @@ class ObjectSDL : public Object, public Renderable
 
 class ElementSDL : public Element, public Renderable
 {
+    int start_width;
+    SDL_Texture * el_texture;
   public:
     SDL_Texture * get_texture();
+
     ElementSDL(Element data);
+    float get_scale() override
+    {
+        return 1.0 * width.value / start_width;
+    }
 };
 
 #endif
