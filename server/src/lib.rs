@@ -135,8 +135,8 @@ impl<'a> From<&'a [u8]> for ClientEvent<'a> {
     fn from(value: &'a [u8]) -> Self {
         match value[0] {
             core::PACKET_PLAYER_MOVE => ClientEvent::Move {
-                x: (value[1] as i8).into(),
-                y: (value[2] as i8).into(),
+                x: i32::from(value[1] as i8),
+                y: i32::from(value[2] as i8),
             },
             core::PACKET_PLAYER_ACTION_PICKUP => ClientEvent::Pickup {
                 id: usize::from_le_bytes(value[1..9].try_into().unwrap()),
@@ -389,10 +389,15 @@ fn handle_packet(
     for d in to_resend {
         server.send_to_reliable(&d, peer);
     }
+    
+    if packet.len() < 13 {
+         panic!("packet to short len={} {:?}", packet.len(), packet );
+    }
 
     let packet = &packet[12..];
 
-    let tag = ClientEvent::from(packet);
+    let tag: ClientEvent = ClientEvent::from(packet);
+
     match tag {
         ClientEvent::Move { x, y } => {
             println!("moved {x} {y}");
