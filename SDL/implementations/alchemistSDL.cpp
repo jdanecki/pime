@@ -97,6 +97,12 @@ ElementSDL::ElementSDL(Element data) : Element(data)
     SDL_UnlockTexture(el_texture);
 }
 
+void ElementSDL::show(bool details)
+{
+    Element::show(details);
+    printf("scale=%0.2f\n", get_scale());
+}
+
 SDL_Texture * ElementSDL::get_texture()
 {
     return el_texture;

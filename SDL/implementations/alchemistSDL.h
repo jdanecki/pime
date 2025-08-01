@@ -92,6 +92,7 @@ class ElementSDL : public Element, public Renderable
     {
         return 1.0 * width.value / start_width;
     }
+    void show(bool details = true) override;
 };
 
 #endif

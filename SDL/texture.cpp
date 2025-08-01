@@ -62,7 +62,6 @@ void add_prod_texture(int id, const char * file)
 
 int add_textures_from_dir(SDL_Texture ** to, int i, const char * dir_path)
 {
-    struct dirent * entry;
     DIR * dir = opendir(dir_path);
 
     if (dir == NULL)
@@ -70,19 +69,29 @@ int add_textures_from_dir(SDL_Texture ** to, int i, const char * dir_path)
         perror("Can't open textures directory'");
         exit(0);
     }
+    closedir(dir);
 
-    while ((entry = readdir(dir)) != NULL)
+    struct dirent ** namelist;
+    int n = scandir(dir_path, &namelist, NULL, alphasort);
+    if (n < 0)
+        perror("scandir");
+    else
     {
         char path[300];
-        if (entry->d_name[0] == '.' && (entry->d_name[1] == '\0' || (entry->d_name[1] == '.' && entry->d_name[2] == '\0')))
+        while (n--)
         {
-            continue;
+            if (namelist[n]->d_name[0] == '.' && (namelist[n]->d_name[1] == '\0' || (namelist[n]->d_name[1] == '.' && namelist[n]->d_name[2] == '\0')))
+            {
+                continue;
+            }
+            sprintf(path, "%s/%s", dir_path, namelist[n]->d_name);
+            printf("adding texture: %s\n", path);
+            to[i++] = load_texture(path);
+            free(namelist[n]);
         }
-        sprintf(path, "%s/%s", dir_path, entry->d_name);
-        printf("adding texture: %s\n", path);
-        to[i++] = load_texture(path);
+        free(namelist);
     }
-    closedir(dir);
+
     return i;
 }
 
