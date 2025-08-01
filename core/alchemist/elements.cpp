@@ -24,6 +24,7 @@ const char * ingredient_name[] = {
     "Log",
     "Tinder",
     "Stick",
+    "Fruit",
 };
 
 const char * product_name[] = {
@@ -33,6 +34,7 @@ const char * product_name[] = {
     "Hut",
     "Fire",
     "Roasted meat",
+    "Fruit Salad",
 };
 
 const char * product_action_name[] = {

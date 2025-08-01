@@ -13,6 +13,7 @@
 #include "tools/log.h"
 #include "tools/tinder.h"
 #include "tools/stick.h"
+#include "tools/fruit.h"
 
 InventoryElement * craft_ing(int product_id, InventoryElement * el);
 

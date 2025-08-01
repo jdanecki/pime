@@ -8,6 +8,7 @@
 #include "tools/hut.h"
 #include "tools/fire.h"
 #include "tools/roasted_meat.h"
+#include "tools/fruit_salad.h"
 
 InventoryElement * craft_prod(int product_id, InventoryElement * el1, InventoryElement * el2);
 

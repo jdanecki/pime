@@ -29,8 +29,8 @@ struct textures
 extern int tiles_textures_count;
 extern SDL_Texture ** tiles_textures;
 
-extern SDL_Texture * ing_textures[ING_ELEMENTS];
-extern SDL_Texture * prod_textures[PROD_ELEMENTS];
+extern SDL_Texture * ing_textures[ING_COUNT];
+extern SDL_Texture * prod_textures[PROD_COUNT];
 extern SDL_Texture * animal_textures[BASE_ANIMALS];
 extern SDL_Texture * plant_textures[BASE_PLANTS];
 

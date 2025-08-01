@@ -12,8 +12,8 @@ struct textures Texture;
 int tiles_textures_count;
 SDL_Texture ** tiles_textures;
 
-SDL_Texture * ing_textures[ING_ELEMENTS];
-SDL_Texture * prod_textures[PROD_ELEMENTS];
+SDL_Texture * ing_textures[ING_COUNT];
+SDL_Texture * prod_textures[PROD_COUNT];
 
 SDL_Texture * animal_textures[BASE_ANIMALS];
 SDL_Texture * plant_textures[BASE_PLANTS];
@@ -112,12 +112,14 @@ void load_textures()
     add_ing_texture(ING_LOG, "textures/items/ingredients/log.png");
     add_ing_texture(ING_STICK, "textures/items/ingredients/stick.png");
     add_ing_texture(ING_TINDER, "textures/items/ingredients/tinder.png");
+    add_ing_texture(ING_FRUIT, "textures/items/ingredients/fruit.png");
 
     add_prod_texture(PROD_AXE, "textures/items/products/axe.png");
     add_prod_texture(PROD_KNIFE, "textures/items/products/knife.png");
     add_prod_texture(PROD_PICKAXE, "textures/items/products/pickaxe.png");
     add_prod_texture(PROD_FIRE, "textures/items/products/fire.png");
     add_prod_texture(PROD_ROASTED_MEAT, "textures/items/products/roasted_meat.png");
+    add_prod_texture(PROD_FRUIT_SALAD, "textures/items/products/fruit_salad.png");
 
     add_prod_texture(PROD_HUT, "textures/objects/hut.png");
 

@@ -36,6 +36,9 @@ add_library(server_cpp SHARED
     tools/log.cpp
     tools/stick.cpp
     tools/fire.cpp
+
+    tools/fruit.cpp
+    tools/fruit_salad.cpp
 )
 
 target_link_libraries(server_cpp pime)

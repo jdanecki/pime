@@ -89,7 +89,7 @@ DCraft::DCraft() : Dialog({50, 50, 500, 500}, {125, 125, 125, 125}), ingredients
         this->ingredients.add_image(i, {x + 2, y + 2, 46, 46});
     }
 
-    for (int i = 0; i < PROD_ELEMENTS; i++)
+    for (int i = 0; i < PROD_COUNT; i++)
     {
         int x = i % 6 * 54;
         int y = i / 6 * 54;
@@ -187,7 +187,7 @@ void DCraft::update()
         img->texture = ing_textures[i];
     }
 
-    for (int i = 0; i < PROD_ELEMENTS; i++)
+    for (int i = 0; i < PROD_COUNT; i++)
     {
         DialogImage * img = dynamic_cast<DialogImage *>(this->products.get_element_from_id(i, DialogElementType::Image));
         img->texture = prod_textures[i];

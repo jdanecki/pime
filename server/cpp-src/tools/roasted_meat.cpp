@@ -5,15 +5,15 @@ Roasted_meat::Roasted_meat(InventoryElement * el1, InventoryElement * el2) : Pro
     actions = ACT_NOTHING;
 }
 
-bool Roasted_meat::player_action(Player_action action, Player *pl)
+bool Roasted_meat::player_action(Player_action action, Player * pl)
 {
     printf("ROASTED_MEAT: %s %s\n", player_action_name[action], get_name());
 
     switch (action)
     {
         case PLAYER_EAT:
-                pl->hunger += 100;
-                destroy(this);
+            pl->hunger += this->quality.value * 2 - 40;
+            destroy(this);
             break;
     }
 

@@ -8,7 +8,9 @@ ProductFunction productFunctions[] = {
     createPickAxe,
     createHut,
     createFire,
-    createRoasted_meat};
+    createRoasted_meat,
+    createFruit_salad,
+};
 
 InventoryElement * craft_prod(int product_id, InventoryElement * el1, InventoryElement * el2)
 {

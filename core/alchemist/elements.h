@@ -320,6 +320,8 @@ enum Ingredient_id
     ING_TINDER,
     ING_STICK,
 
+    ING_FRUIT,
+
     ING_COUNT,
 
 };
@@ -332,6 +334,7 @@ enum Product_id
     PROD_HUT,
     PROD_FIRE,
     PROD_ROASTED_MEAT,
+    PROD_FRUIT_SALAD,
 
     PROD_COUNT
 };
