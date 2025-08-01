@@ -611,9 +611,6 @@ class Plant : public InventoryElement
     }
 };
 
-#define ING_ELEMENTS 11
-#define PROD_ELEMENTS 6
-
 #define BASE_ANIMALS 40
 #define BASE_PLANTS 10
 
