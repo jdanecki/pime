@@ -203,6 +203,9 @@ void key_pressed(int key)
                 item->show();
             break;
         }
+        case SDLK_F2:
+            server_action_tile(SERVER_SHOW_ITEM, player->map_x, player->map_y, player->x, player->y);
+            break;
         case SDLK_RETURN:
             use_tile(player->map_x, player->map_y, player->x, player->y);
             break;

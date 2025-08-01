@@ -47,6 +47,13 @@ enum Player_action
 
 extern const char * player_action_name[];
 
+enum Server_action
+{
+    SERVER_SHOW_ITEM,
+};
+
+extern const char * server_action_name[];
+
 class Base
 {
   public:
@@ -81,19 +88,16 @@ class InventoryElement
 {
     // int x, y, z;
   public:
-    // Property mass; // density*volume // FIXME maybe
-
     Class_id c_id;
     size_t uid;
-    unsigned int mass;
+
     ItemLocation location;
 
-    InventoryElement(Class_id c_id, size_t uid, unsigned int mass, ItemLocation location);
+    InventoryElement(Class_id c_id, size_t uid, ItemLocation location);
     InventoryElement(Class_id c_id)
     {
         this->c_id = c_id;
         uid = (size_t)this;
-        mass = rand() % 100;
     }
 
     virtual bool action(Product_action action, Player * pl)
@@ -109,10 +113,6 @@ class InventoryElement
     virtual void show(bool details = true)
     {
         printf("%s\n", get_class_name());
-        if (details)
-        {
-            printf("mass=%u\n", mass);
-        }
     }
     virtual bool tick()
     {
@@ -187,6 +187,10 @@ class InventoryElement
     virtual const char * get_form_name()
     {
         return Form_name[Form_unknown];
+    }
+    virtual bool can_pickup()
+    {
+        return false;
     }
 };
 
@@ -288,9 +292,6 @@ class Element : public InventoryElement
     {
         // FIXME
         Property ** props = new Property *[4];
-        //   props[0] = &sharpness;
-        //  props[1] = &smoothness;
-        // props[2] = &mass; FIXME
         props[0] = &length;
         props[1] = &width;
         props[2] = &height;

@@ -314,4 +314,9 @@ extern "C"
     {
         print_status(1, "failed craft");
     }
+
+    void action_failed()
+    {
+        print_status(1, "action failed");
+    }
 }

@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include "dialog/d_craft.h"
 #include "player_actions.h"
+#include <cassert>
 
 extern class Player * player;
 extern int active_hotbar;
@@ -51,12 +52,14 @@ Menu::~Menu()
 
 void Menu::add(const char * e, enum menu_actions a)
 {
+    assert(added < options);
     entries[added] = new Menu_entry(e, a, 0, nullptr, nullptr);
     added++;
 }
 
 void Menu::add(const char * e, enum menu_actions a, int val)
 {
+    assert(added < options);
     entries[added] = new Menu_entry(e, a, val, nullptr, nullptr);
     added++;
 }
@@ -64,12 +67,14 @@ void Menu::add(const char * e, enum menu_actions a, int val)
 void Menu::add(const char * e, enum menu_actions a, SDL_Texture * t, int index, int item_id)
 {
     // FIXME why is index here?
+    assert(added < options);
     entries[index] = new Menu_entry(e, a, item_id, nullptr, t);
     added++;
 }
 
 void Menu::add(const char * e, enum Npc_say a, Sentence * s, InventoryElement * p_el)
 {
+    assert(added < options);
     enum menu_actions conv = (enum menu_actions)((int)MENU_NPC_CONV + (int)a);
     entries[added] = new Menu_entry(e, conv, s, p_el);
     added++;
@@ -77,11 +82,13 @@ void Menu::add(const char * e, enum Npc_say a, Sentence * s, InventoryElement * 
 
 void Menu::add(const char * e, enum menu_actions a, int val, InventoryElement * p_el)
 {
+    assert(added < options);
     entries[added] = new Menu_entry(e, a, val, p_el, nullptr);
     added++;
 }
 void Menu::add(const char * e, enum menu_actions a, InventoryElement * p_el)
 {
+    assert(added < options);
     entries[added] = new Menu_entry(e, a, 0, p_el, nullptr);
     added++;
     show_texture = false;
@@ -143,7 +150,7 @@ void Menu::show()
     }
 
     int modx = int((game_size / 2)) - (0.4 * game_size);
-    int modx2 = int((game_size / 2)) + (0.4 * game_size);
+    int modx2 = int((game_size / 2)) + (0.6 * game_size);
 
     SDL_Rect rect = {modx, mody, modx2 - modx, mody2 - mody};
     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 100);
@@ -280,10 +287,11 @@ void create_menus()
     menu_main->add("Change music volume", MENU_MUSIC);
     menu_main->add("Cancel", MENU_CANCEL);
 
-    menu_help = new Menu("Help 1", 15);
+    menu_help = new Menu("Help 1", 16);
     menu_help->add("esc - main menu", MENU_CANCEL);
-    menu_help->add("f1 - show item info", MENU_CANCEL);
-    menu_help->add("f11 - resize", MENU_CANCEL);
+    menu_help->add("F1 - show item info", MENU_CANCEL);
+    menu_help->add("F2 - show item info on server", MENU_CANCEL);
+    menu_help->add("F11 - resize", MENU_CANCEL);
     menu_help->add("1-9,0 - hotbar", MENU_CANCEL);
     menu_help->add("enter - use item", MENU_CANCEL);
     menu_help->add("q - drop item", MENU_CANCEL);

@@ -240,6 +240,9 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                 core::PACKET_FAILED_CRAFT => unsafe {
                     events::failed_craft();
                 },
+                core::PACKET_ACTION_FAILED => unsafe {
+                    events::action_failed();
+                },
                 _ => {
                     println!("invalid packet type {:?}", value);
                 }

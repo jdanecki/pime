@@ -44,6 +44,8 @@ const char * product_action_name[] = {
 };
 const char * player_action_name[] = {"drink", "eat"};
 
+const char * server_action_name[] = {"server show item"};
+
 const char * object_names[] = {"wall"};
 const char * plant_phase_name[] = {"Seed", "Seedling", "Growing", "Flowers", "Fruits"};
 const char * class_name[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Plant", "Animal", "Player", "Npc"};
@@ -73,11 +75,11 @@ template <typename T> SerializablePointer<T>::SerializablePointer(T * p) : ptr(p
 }
 
 Element::Element(BaseElement * b)
-    : InventoryElement(Class_Element), base(b), length("length", 5 + rand() % 60), width("width", 5 + rand() % 60), height("height", 5 + rand() % 60),
+    : InventoryElement(Class_Element), base(b), length("length", 4 + rand() % 60), width("width", 4 + rand() % 60), height("height", 4 + rand() % 60),
       volume("volume", length.value * width.value * height.value)
 {
 }
-InventoryElement::InventoryElement(Class_id c_id, size_t uid, unsigned int mass, ItemLocation location) : c_id(c_id), uid(uid), mass(mass), location(location)
+InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : c_id(c_id), uid(uid), location(location)
 {
 }
 void Element::show(bool details)
@@ -89,6 +91,7 @@ void Element::show(bool details)
     width.show();
     height.show();
     volume.show();
+
     get_base()->show(details);
 }
 

@@ -38,8 +38,9 @@ class ElementServer : public Element
   public:
     Property sharpness;
     Property smoothness;
+    Property mass; // density*volume
 
-    ElementServer(BaseElement * base);
+    ElementServer(BaseElementServer * base);
     bool action(Product_action action, Player * pl) override;
     bool action_cut();
     bool action_hit();
@@ -48,6 +49,7 @@ class ElementServer : public Element
     bool action_drink();
     bool action_eat();
     void show(bool details = true) override;
+    bool can_pickup() override;
 };
 
 class BeingServer
@@ -100,6 +102,10 @@ class AnimalServer : public Animal, public BeingServer
     bool action(Product_action action, Player * pl) override;
     void show(bool details = true) override;
     bool grow() override;
+    bool can_pickup() override
+    {
+        return true;
+    }
 };
 
 class PlantServer : public Plant, public BeingServer
@@ -132,6 +138,10 @@ class PlantServer : public Plant, public BeingServer
         return false;
     }
     void show(bool details = true) override;
+    bool can_pickup() override
+    {
+        return true;
+    }
 };
 
 class IngredientServer : public Ingredient
@@ -142,6 +152,10 @@ class IngredientServer : public Ingredient
     bool craft() override;
     IngredientServer(InventoryElement * from, Ingredient_id i, Form f);
     bool action(Product_action action, Player * pl) override;
+    bool can_pickup() override
+    {
+        return true;
+    }
 };
 
 class ProductServer : public Product
@@ -164,10 +178,14 @@ class ProductServer : public Product
         return object->action(actions, pl);
         // FIXME change properties of product after action
     }
+    bool can_pickup() override
+    {
+        return true;
+    }
 };
 
 AnimalServer * create_animal(BaseAnimal * base);
 PlantServer * create_plant(BasePlant * base);
-ElementServer * create_element(BaseElement * base);
+ElementServer * create_element(BaseElementServer * base);
 
 #endif

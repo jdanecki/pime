@@ -55,6 +55,10 @@ pub enum ClientEvent<'a> {
         a: u32,
         oid: usize,
     },
+    ServerActionOnObject {
+        a: u32,
+        oid: usize,
+    },
     Craft {
         product_id: usize,
         ingredients_num: u32,
@@ -144,11 +148,15 @@ impl<'a> From<&'a [u8]> for ClientEvent<'a> {
                 iid: usize::from_le_bytes(value[1..9].try_into().unwrap()),
                 oid: usize::from_le_bytes(value[9..17].try_into().unwrap()),
             },
-            core::PACKET_PLAYER_ACTION_ACTION_ON_OBJECT => ClientEvent::ActionOnObject {
+            core::PACKET_PLAYER_ACTION_ON_OBJECT => ClientEvent::ActionOnObject {
                 a: u32::from_le_bytes(value[1..5].try_into().unwrap()),
                 oid: usize::from_le_bytes(value[5..13].try_into().unwrap()),
             },
-            core::PACKET_PLAYER_ACTION_CRAFT => ClientEvent::Craft {
+            core::PACKET_SERVER_ACTION_ON_OBJECT => ClientEvent::ServerActionOnObject {
+                a: u32::from_le_bytes(value[1..5].try_into().unwrap()),
+                oid: usize::from_le_bytes(value[5..13].try_into().unwrap()),
+            },
+             core::PACKET_PLAYER_ACTION_CRAFT => ClientEvent::Craft {
                 product_id: usize::from_le_bytes(value[1..9].try_into().unwrap()),
                 ingredients_num: 2/*((value.len()-1)/8)*/ as u32,
                 ingredients_ids: &value[9..],
@@ -391,13 +399,16 @@ fn handle_packet(
             unsafe { player.move_(x, y) }
         }
         ClientEvent::Pickup { id } => {
-            println!("player picked {id}");
+            println!("player picking up {id}");
             unsafe {
                 let item = (*core::world_table[player._base.map_y as usize]
                     [player._base.map_x as usize])
                     .find_by_id(id);
                 if item != std::ptr::null_mut() {
-                    player.pickup(item);
+                    if !player.pickup(item) {
+                        let response = [core::PACKET_ACTION_FAILED];
+                        server.send_to_reliable(&response, peer);
+                    }
                 }
                 //let mut buf = vec![core::PACKET_PLAYER_ACTION_PICKUP];
                 //buf.extend_from_slice(&id.to_le_bytes());
@@ -430,7 +441,7 @@ fn handle_packet(
                     [player._base.map_x as usize])
                     .find_by_id(oid);
                 if !player.use_item_on_object(item, object) {
-                    let response = [core::PACKET_FAILED_CRAFT];
+                    let response = [core::PACKET_ACTION_FAILED];
                     server.send_to_reliable(&response, peer);
                 }
             }
@@ -442,7 +453,19 @@ fn handle_packet(
                     [player._base.map_x as usize])
                     .find_by_id(oid);
                 if !player.action_on_object(a, object) {
-                    let response = [core::PACKET_FAILED_CRAFT];
+                    let response = [core::PACKET_ACTION_FAILED];
+                    server.send_to_reliable(&response, peer);
+                }
+            }
+        }
+        ClientEvent::ServerActionOnObject { a, oid } => {
+            println!("server action {a} on {oid}");
+            unsafe {
+                let object = (*core::world_table[player._base.map_y as usize]
+                    [player._base.map_x as usize])
+                    .find_by_id(oid);
+                if !player.server_action_on_object(a, object) {
+                    let response = [core::PACKET_ACTION_FAILED];
                     server.send_to_reliable(&response, peer);
                 }
             }
@@ -509,7 +532,7 @@ fn handle_packet(
             }
         },
         //FIXME change id to get_id()
-        ClientEvent::Whatever => println!("player {} alive", player._base.id),
+        ClientEvent::Whatever =>  {} , //println!("player {} alive", player._base.id),
     }
 }
 

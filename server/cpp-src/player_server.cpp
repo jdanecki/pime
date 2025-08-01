@@ -61,9 +61,25 @@ bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement 
 
 bool PlayerServer::action_on_object(Player_action a, InventoryElement * object)
 {
-    if (!object) return false;
+    if (!object)
+        return false;
     printf("%s action: %s on %s\n", get_name(), player_action_name[a], object->get_name());
     object->player_action(a, this);
+    return true;
+}
+
+bool PlayerServer::server_action_on_object(Server_action a, InventoryElement * object)
+{
+    if (!object)
+        return false;
+    printf("%s server action: %s on %s\n", get_name(), server_action_name[a], object->get_name());
+    switch (a)
+    {
+        case SERVER_SHOW_ITEM:
+            object->show(true);
+            break;
+    }
+
     return true;
 }
 
@@ -128,12 +144,11 @@ bool PlayerServer::plant_with_seed(InventoryElement * el, int map_x, int map_y, 
 
 bool PlayerServer::pickup(InventoryElement * item)
 {
-    // FIXME
-    // if (!item->pickable)
-    // {
-    //     printf("can't pickup %s\n", item->get_name());
-    //     return false;
-    // }
+    if (!item->can_pickup())
+    {
+        printf("can't pickup %s\n", item->get_name());
+        return false;
+    }
     ItemLocation old_location = item->location;
     remove_from_chunks(item);
     Player::pickup(item);

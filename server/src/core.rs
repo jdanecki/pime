@@ -78,7 +78,6 @@ impl serde::Serialize for InventoryElement {
         let mut state = serializer.serialize_tuple(4)?;
         state.serialize_element(&self.c_id)?;
         state.serialize_element(&self.uid)?;
-        state.serialize_element(&self.mass)?;
         state.serialize_element(&self.location)?;
         state.end()
     }

@@ -396,13 +396,18 @@ PlantServer * create_plant(BasePlant * base)
     return new PlantServer(base);
 }
 
-ElementServer * create_element(BaseElement * base)
+ElementServer * create_element(BaseElementServer * base)
 {
     return new ElementServer(base);
 }
 
-ElementServer::ElementServer(BaseElement * base) : Element(base), sharpness("sharpness", rand() % 100), smoothness("smoothness", rand() % 100)
+ElementServer::ElementServer(BaseElementServer * base) : Element(base), sharpness("sharpness", 0), smoothness("smoothness", 0), mass("mass", base->density->value * volume.value / 1000)
 {
+    if (base->form == Form_solid)
+    {
+        sharpness.value = rand() % 100;
+        smoothness.value = rand() % 100;
+    }
 }
 
 bool ElementServer::action(Product_action action, Player * pl)
@@ -437,10 +442,8 @@ bool ElementServer::action_cut()
     {
         //    if (b->solid->hardness < 50)
         {
-            length.value--;
-            width.value--;
-            height.value--;
-            volume.value = length.value * width.value * height.value;
+            volume.value = length.decrease(1) * width.decrease(1) * height.decrease(1);
+            mass.value = b->density->value * volume.value / 1000;
         }
 
         return true;
@@ -454,12 +457,9 @@ bool ElementServer::action_hit()
     if (b->form == Form_solid)
     {
         //    if (b->solid->hardness < 50)
-
         {
-            length.value -= 3;
-            width.value -= 3;
-            height.value -= 3;
-            volume.value = length.value * width.value * height.value;
+            volume.value = length.decrease(3) * width.decrease(3) * height.decrease(3);
+            mass.value = b->density->value * volume.value / 1000;
         }
 
         return true;
@@ -506,10 +506,13 @@ bool ElementServer::action_drink()
         //    if (b->solid->hardness < 50)
         {
             volume.value = length.decrease(2) * width.decrease(2) * height.decrease(2);
+            mass.value = b->density->value * volume.value / 1000;
             printf("drunk %s\n", get_name());
         }
         return true;
     }
+    else
+        printf("can't drink %s\n", get_name());
     return false;
 }
 
@@ -519,12 +522,15 @@ bool ElementServer::action_eat()
     if (b->form == Form_solid)
     {
         //    if (b->solid->hardness < 50)
-        {            
+        {
             volume.value = length.decrease(4) * width.decrease(4) * height.decrease(4);
+            mass.value = b->density->value * volume.value / 1000;
             printf("ate %s\n", get_name());
         }
         return true;
     }
+    else
+        printf("can't eat %s\n", get_name());
     return false;
 }
 
@@ -535,7 +541,13 @@ void ElementServer::show(bool details)
     {
         sharpness.show();
         smoothness.show();
+        mass.show();
     }
+}
+
+bool ElementServer::can_pickup()
+{
+    return mass.value < 10000;
 }
 
 void BeingServer::show(bool details)

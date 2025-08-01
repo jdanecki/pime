@@ -9,7 +9,7 @@ void change_active_hotbar(int id)
     active_hotbar = id;
 }
 
-DHotbar::DHotbar() : Dialog({520, 460, 500, 50}, {0, 0, 0, 0})
+DHotbar::DHotbar() : Dialog({650, 585, 500, 50}, {0, 0, 0, 0})
 {
     for (int i = 0; i < 10; i++)
     {

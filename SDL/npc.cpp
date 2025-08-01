@@ -74,9 +74,20 @@ int npc(menu_actions a)
     int menu_entries = list->nr_elements;
     list->enable_all();
 
+    InventoryElement * item_at = nullptr;
     if (a == MENU_NPC_ASK)
     {
         if (player->hotbar[active_hotbar])
+        {
+            list->enable(NPC_Ask_do_you_know_inv_item);
+        }
+        else
+        {
+            list->disable(NPC_Ask_do_you_know_inv_item);
+            menu_entries--;
+        }
+        item_at = get_item_at_ppos(player);
+        if (item_at)
         {
             list->enable(NPC_Ask_do_you_know_item);
         }
@@ -101,10 +112,18 @@ int npc(menu_actions a)
     {
         if (sentence->is_enabled())
         {
-            if (sentence->id == NPC_Ask_do_you_know_item)
-                menu_dialog->add(sentence->text, sentence->id, sentence, player->hotbar[active_hotbar]);
-            else
-                menu_dialog->add(sentence->text, sentence->id, sentence, nullptr);
+            switch (sentence->id)
+            {
+                case NPC_Ask_do_you_know_inv_item:
+                    menu_dialog->add(sentence->text, sentence->id, sentence, player->hotbar[active_hotbar]);
+                    break;
+                case NPC_Ask_do_you_know_item:
+                    menu_dialog->add(sentence->text, sentence->id, sentence, item_at);
+                    break;
+                default:
+                    menu_dialog->add(sentence->text, sentence->id, sentence, nullptr);
+                    break;
+            }
         }
         sentence = (Sentence *)sentence->next;
     }

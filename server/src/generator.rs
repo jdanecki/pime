@@ -63,7 +63,7 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
                 do_times(prob, || {
                     chunk.add_object1(core::create_element(rock.get_base()
                         as *const core::BaseElementServer
-                        as *mut core::BaseElement)
+                        as *mut core::BaseElementServer)
                         as *mut core::InventoryElement);
                 })
             }

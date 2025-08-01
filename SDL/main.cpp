@@ -1,6 +1,5 @@
 
 #include "main.h"
-#include "dialog/d_craft.h"
 #include "npc.h"
 #include "window.h"
 // Normal speed
@@ -18,8 +17,6 @@ Player * player;
 bool finish;
 
 NetClient * client;
-
-DHotbar hotbar;
 
 extern void draw();
 
@@ -142,21 +139,6 @@ void do_auto_explore()
     if (dst_map_y < player.map_y) player.move(0, -1);*/
 }
 
-void draw_dialogs()
-{
-    if (d_craft.show)
-    {
-        d_craft.draw(renderer);
-    }
-    hotbar.draw(renderer);
-}
-
-void update_dialogs()
-{
-    hotbar.update();
-    d_craft.update();
-}
-
 void loop()
 {
     // int dst_map_x=player.map_x;
@@ -173,7 +155,7 @@ void loop()
 
         // TODO disconnect
         network_tick(client);
-        update_dialogs();
+
         // FIXME
         if (!current_npc)
             current_npc = new NpcSDL(Npc());
@@ -182,7 +164,6 @@ void loop()
             do_auto_explore();
         } */
         draw();
-        draw_dialogs();
 
         SDL_RenderPresent(renderer);
         if (!auto_explore)

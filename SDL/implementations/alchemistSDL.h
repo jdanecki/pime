@@ -83,6 +83,7 @@ class ElementSDL : public Element, public Renderable
 {
     int start_width;
     SDL_Texture * el_texture;
+
   public:
     SDL_Texture * get_texture();
 

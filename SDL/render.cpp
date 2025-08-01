@@ -7,6 +7,7 @@
 #include <SDL2/SDL_render.h>
 #include <cstddef>
 #include <cstdio>
+#include "dialog/d_craft.h"
 
 // TODO move it
 int active_hotbar = 0;
@@ -15,6 +16,8 @@ int tx;
 int game_size;
 int tile_dungeon_size;
 int request_delay = 0;
+
+DHotbar hotbar;
 
 char text[300];
 
@@ -41,9 +44,10 @@ void draw_texts()
             ty += 25;
             int count = 0;
             Property ** props = item->get_properties(&count);
+            char buf[64];
             if (props)
             {
-                char buf[64];
+
                 for (int i = 0; i < count; i++)
                 {
                     sprintf(buf, "%s: %u", props[i]->name.str, props[i]->value);
@@ -52,7 +56,12 @@ void draw_texts()
                 }
                 delete props;
             }
-            write_text(tx, ty + 25, item->get_form_name(), {255, 255, 255, 255}, 15, 30);
+            Class_id el_cid = item->get_cid();
+            if (el_cid == Class_Element)
+            {
+                sprintf(buf, "it has %s form", item->get_form_name());
+                write_text(tx, ty, buf, White, 15, 30);
+            }
         }
         else
         {
@@ -279,8 +288,20 @@ void draw_npc()
         SDL_RenderCopyEx(renderer, current_npc->get_texture(), NULL, &img_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
 }
 
+void draw_dialogs()
+{
+    if (d_craft.show)
+    {
+        d_craft.draw(renderer);
+    }
+    hotbar.draw(renderer);
+}
+
 void draw()
 {
+    hotbar.update();
+    d_craft.update();
+
     if (draw_terrain())
     {
         draw_players();
@@ -298,4 +319,5 @@ void draw()
 
     if (current_menu)
         current_menu->show();
+    draw_dialogs();
 }

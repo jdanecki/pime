@@ -67,7 +67,6 @@ extern "C" fn foo() -> ObjectData {
             uid: 123,
             location: core::ItemLocation::Player { id: 1 },
             vtable_: todo!(),
-            mass: todo!(),
             c_id: todo!(),
         },
     }

@@ -167,7 +167,7 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
     else
         n = get_class_name();
 
-    if (s == NPC_Ask_do_you_know_item)
+    if (s == NPC_Ask_do_you_know_inv_item || s == NPC_Ask_do_you_know_item)
     {
         char * des = get_el_description(el);
         if (des)

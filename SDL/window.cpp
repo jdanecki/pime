@@ -69,7 +69,7 @@ int init_window()
         return 1;
     }
     SDL_SetWindowTitle(main_window, "pime");
-    SDL_SetWindowPosition(main_window, 100, 100);
+    SDL_SetWindowPosition(main_window, 150, 10);
     SDL_SetWindowSize(main_window, GAME_WINDOW + PANEL_WINDOW, GAME_WINDOW + STATUS_LINES);
     SDL_GetWindowSize(main_window, &window_width, &window_height);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);

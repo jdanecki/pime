@@ -10,4 +10,5 @@ extern "C" {
     pub fn create_object(data: &types::ObjectData);
     pub fn destroy_object(id: usize, location: core::ItemLocation);
     pub fn failed_craft();
+    pub fn action_failed();
 }

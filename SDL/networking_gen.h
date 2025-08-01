@@ -98,6 +98,8 @@ extern "C"
 
     extern void failed_craft();
 
+    extern void action_failed();
+
     void send_packet_move(NetClient * client, int32_t x, int32_t y);
 
     void send_packet_pickup(NetClient * client, uintptr_t id);
@@ -107,6 +109,8 @@ extern "C"
     void send_packet_item_used_on_object(NetClient * client, uintptr_t iid, uintptr_t oid);
 
     void send_packet_action_on_object(NetClient * client, int32_t a, uintptr_t oid);
+
+    void send_packet_server_action_on_object(NetClient * client, int32_t a, uintptr_t oid);
 
     void send_packet_item_used_on_tile(NetClient * client, uintptr_t iid, int32_t map_x, int32_t map_y, int32_t x, int32_t y);
 
