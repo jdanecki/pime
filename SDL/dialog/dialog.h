@@ -67,8 +67,10 @@ class DialogButton : public DialogElement
     DialogBox * d_box;
     DialogText * d_text;
     DialogButton(int id, SDL_Rect rect, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int));
+    DialogButton(int id, SDL_Rect rect, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int), void (*on_secondary_press)(int));
     void draw(SDL_Renderer * renderer);
     void (*on_press)(int);
+    void (*on_secondary_press)(int);
 };
 
 class Dialog
@@ -85,7 +87,9 @@ class Dialog
     void add_image(int id, SDL_Rect rect, std::string filename);
     void add_image(int id, SDL_Rect rect);
     void add_button(int id, SDL_Rect rect, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int));
+    void add_button(int id, SDL_Rect rect, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int), void (*on_secondary_press)(int));
     void draw(SDL_Renderer * renderer);
+    void press(int x, int y, bool secondary);
     void press(int x, int y);
 };
 

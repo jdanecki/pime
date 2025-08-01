@@ -232,7 +232,7 @@ void mouse_pressed(SDL_MouseButtonEvent & event)
     int y = 0;
 
     SDL_GetMouseState(&x, &y);
-    hotbar.press(x, y);
+    hotbar.press(x, y, event.button == 3 ? true : false);
     if (d_craft.show)
     {
         d_craft.press(x, y);

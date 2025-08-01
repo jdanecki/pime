@@ -74,6 +74,15 @@ DialogButton::DialogButton(int id, SDL_Rect rect, int size, SDL_Color bgcolor, S
     this->on_press = on_press;
 }
 
+DialogButton::DialogButton(int id, SDL_Rect rect, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int), void (*on_secondary_press)(int))
+    : DialogElement(id, DialogElementType::Button)
+{
+    this->d_box = new DialogBox(id, rect, bgcolor, 1);
+    this->d_text = new DialogText(id, rect.x, rect.y, size, fgcolor, text);
+    this->on_press = on_press;
+    this->on_secondary_press = on_secondary_press;
+}
+
 void DialogButton::draw(SDL_Renderer * renderer)
 {
     this->d_box->draw(renderer);
@@ -134,6 +143,12 @@ void Dialog::add_button(int id, SDL_Rect rect, int size, SDL_Color bgcolor, SDL_
     this->elements.push_back(new DialogButton(id, rect, size, bgcolor, fgcolor, text, on_press));
 }
 
+void Dialog::add_button(int id, SDL_Rect rect, int size, SDL_Color bgcolor, SDL_Color fgcolor, std::string text, void (*on_press)(int), void (*on_secondary_press)(int))
+{
+    offset_rect(&rect, &this->rect);
+    this->elements.push_back(new DialogButton(id, rect, size, bgcolor, fgcolor, text, on_press, on_secondary_press));
+}
+
 void Dialog::draw(SDL_Renderer * renderer)
 {
     SDL_SetRenderDrawColor(renderer, this->background_color.r, this->background_color.g, this->background_color.b, this->background_color.a);
@@ -144,21 +159,30 @@ void Dialog::draw(SDL_Renderer * renderer)
     }
 }
 
-void Dialog::press(int x, int y)
+void Dialog::press(int x, int y, bool secondary)
 {
     for (DialogElement * de : this->elements)
     {
         if (de->get_c_id() == DialogElementType::Button)
         {
             DialogButton * button = dynamic_cast<DialogButton *>(de);
-            if (button->on_press)
+            DialogBox * box = dynamic_cast<DialogBox *>(button->d_box);
+            if (box->rect.x < x && box->rect.y < y && box->rect.x + box->rect.w > x && box->rect.y + box->rect.h > y)
             {
-                DialogBox * box = dynamic_cast<DialogBox *>(button->d_box);
-                if (box->rect.x < x && box->rect.y < y && box->rect.x + box->rect.w > x && box->rect.y + box->rect.h > y)
+                if (button->on_press && !secondary)
                 {
                     button->on_press(button->id);
+                }
+                if (button->on_secondary_press && secondary)
+                {
+                    button->on_secondary_press(button->id);
                 }
             }
         }
     }
+}
+
+void Dialog::press(int x, int y)
+{
+    press(x, y, false);
 }

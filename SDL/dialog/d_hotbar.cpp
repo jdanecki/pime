@@ -9,6 +9,11 @@ void change_active_hotbar(int id)
     active_hotbar = id;
 }
 
+void change_craftbar(int id)
+{
+    player->craftbar[id] ^= 1;
+}
+
 DHotbar::DHotbar() : Dialog({650, 585, 500, 50}, {0, 0, 0, 0})
 {
     for (int i = 0; i < 10; i++)
@@ -18,7 +23,7 @@ DHotbar::DHotbar() : Dialog({650, 585, 500, 50}, {0, 0, 0, 0})
         else
             this->add_box(i, {i * 50, 0, 50, 50}, {125, 125, 125, 255}, false);
         this->add_image(i, {i * 50 + 2, 2, 50 - 4, 50 - 4});
-        this->add_button(i, {i * 50 + 2, 2, 50 - 4, 50 - 4}, 0, {0, 0, 0, 0}, {0, 0, 0, 0}, "", &change_active_hotbar);
+        this->add_button(i, {i * 50 + 2, 2, 50 - 4, 50 - 4}, 0, {0, 0, 0, 0}, {0, 0, 0, 0}, "", &change_active_hotbar, &change_craftbar);
     }
 }
 
