@@ -58,4 +58,23 @@ packet size:
 | u8    | 0     | PACKET\_INIT\_INVENTORY\_ELEMENT |
 
 
+### server send                                                 ### client receive                    
+```                                                              
+let mut buf = Vec::with_capacity(12 + data.len());              
+client.local_seq_num += 1;                                      
+buf.extend_from_slice(&client.local_seq_num.to_le_bytes());     let seq = u32::from_le_bytes(buf[0..4].try_into().unwrap());       
+buf.extend_from_slice(&client.remote_seq_num.to_le_bytes());    let ack = u32::from_le_bytes(buf[4..8].try_into().unwrap());
+buf.extend_from_slice(&client.acks_bitmap.to_le_bytes());       let acks = u32::from_le_bytes(buf[8..12].try_into().unwrap());
+buf.extend_from_slice(&data);                                   client.remote_seq_num = seq;
+```
+
+### client send                                                 server receive
+```
+let mut buf = Vec::with_capacity(12 + data.len());                        
+self.local_seq_num += 1;
+buf.extend_from_slice(&self.local_seq_num.to_le_bytes());        let seq = u32::from_le_bytes(packet[0..4].try_into().unwrap());
+buf.extend_from_slice(&self.remote_seq_num.to_le_bytes());       let ack = u32::from_le_bytes(packet[4..8].try_into().unwrap());
+buf.extend_from_slice(&self.my_acks_bitmap.to_le_bytes());       let acks = u32::from_le_bytes(packet[8..12].try_into().unwrap());
+buf.extend_from_slice(&data);                                    client_data.remote_seq_num = seq;
+```
 

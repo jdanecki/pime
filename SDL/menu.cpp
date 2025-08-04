@@ -287,11 +287,18 @@ void create_menus()
     menu_main->add("Change music volume", MENU_MUSIC);
     menu_main->add("Cancel", MENU_CANCEL);
 
-    menu_help = new Menu("Help 1", 16);
+    menu_help = new Menu("Help 1", 20);
     menu_help->add("esc - main menu", MENU_CANCEL);
     menu_help->add("F1 - show item info", MENU_CANCEL);
     menu_help->add("F2 - show item info on server", MENU_CANCEL);
+
+    menu_help->add("F3 - show chunk info", MENU_CANCEL);
+    menu_help->add("F4 - show chunk info on server", MENU_CANCEL);
+
+    menu_help->add("F5 - trace network", MENU_CANCEL);
+    menu_help->add("F6 - trace network on server", MENU_CANCEL);
     menu_help->add("F11 - resize", MENU_CANCEL);
+
     menu_help->add("1-9,0 - hotbar", MENU_CANCEL);
     menu_help->add("enter - use item", MENU_CANCEL);
     menu_help->add("q - drop item", MENU_CANCEL);

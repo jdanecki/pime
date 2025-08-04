@@ -107,6 +107,8 @@ pub struct Server {
 impl Server {
     fn broadcast(&mut self, data: &[u8]) {
         let clients = self.clients.clone();
+    //    println!("SERV: clients.len={}", self.clients.len());
+       //  p self.clients.base.table.table.items
         for client in clients.keys() {
             self.send_to_reliable(data, client);
         }
@@ -124,9 +126,16 @@ impl Server {
         buf.extend_from_slice(&client.remote_seq_num.to_le_bytes());
         buf.extend_from_slice(&client.acks_bitmap.to_le_bytes());
         buf.extend_from_slice(&data);
-        client
-            .not_confirmed_packets
-            .insert(client.local_seq_num, data.to_vec());
+        unsafe {
+            if (core::trace_network)
+            {
+                println!("SERV: send len={} local_seq={} remote_seq={}", 
+                12 + data.len(), client.local_seq_num, client.remote_seq_num );
+                    core::show_packet_type_name('S' as i8, data[0] as u8);
+            }
+        }
+
+        client.not_confirmed_packets.insert(client.local_seq_num, data.to_vec());
         self.socket.send_to(&buf, to).unwrap();
     }
 }
@@ -172,7 +181,7 @@ impl<'a> From<&'a [u8]> for ClientEvent<'a> {
                 x: i32::from_le_bytes(value[1..5].try_into().unwrap()),
                 y: i32::from_le_bytes(value[5..9].try_into().unwrap()),
             },
-            1 => ClientEvent::Whatever,
+            core::PACKET_PLAYER_UPDATE => ClientEvent::Whatever,
             core::PACKET_KEEP_ALIVE => ClientEvent::Whatever,
             _ => panic!("invalid event {:?}", value),
         }
@@ -198,7 +207,6 @@ pub fn main_loop(server: &mut Server) {
             core::update();
         }
         send_game_updates(server, &mut players);
-        //std::thread::sleep(std::time::Duration::from_millis(100));
         std::thread::sleep(std::time::Duration::from_millis(core::TICK_DELAY));
     }
 }
@@ -261,14 +269,12 @@ fn update_chunk_for_player(server: &mut Server, peer: &SocketAddr, coords: (u8, 
 
     unsafe {
         let mut chunk = *core::world_table[coords.1 as usize][coords.0 as usize];
-        let tile = core::tile { tile: 1 };
-        chunk.table[5][5] = tile;
-        let table = chunk.table.as_mut_ptr() as *mut u8;
-        let table = std::slice::from_raw_parts(table, 1024);
+        let table_ptr = chunk.table.as_mut_ptr() as *mut u8;
+        let table_slice = std::slice::from_raw_parts(table_ptr, (core::CHUNK_SIZE * core::CHUNK_SIZE * core::TILE_SIZE) as usize);
 
-        let dest = data[3..].as_mut_ptr();
-        let dest = std::slice::from_raw_parts_mut(dest, 1024);
-        dest.clone_from_slice(table);
+        let dest_ptr = data[3..].as_mut_ptr();
+        let dest_slice = std::slice::from_raw_parts_mut(dest_ptr, (core::CHUNK_SIZE * core::CHUNK_SIZE * core::TILE_SIZE) as usize);
+        dest_slice.clone_from_slice(table_slice);
     }
 
     server.send_to_reliable(&data, peer);
@@ -303,12 +309,24 @@ fn handle_network(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
                 break;
             }
             if amt < 12 {
-                panic!("BAD PACKET!!!");
+                panic!("SERV: PACKET too short!!!");
+            }
+            if amt > 99 {
+                panic!("SERV: PACKET to big!!!");
+            }
+            unsafe {
+                if (core::trace_network)
+                {
+                    println!("SERV: handle_network amt={amt}");
+                }
             }
 
             match server.clients.get_mut(&src) {
                 Some(data) => {
                     let id = data.id;
+                    unsafe {
+                        core::show_packet_type_name('S' as i8, buf[12] as u8);
+                    }
                     if buf[12] == core::PACKET_JOIN_REQUEST {
                         let mut response = vec![0; 13];
                         response[12] = core::PACKET_PLAYER_ID as u8;
@@ -338,6 +356,7 @@ fn handle_network(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
                 }
             }
         } else {
+//            println!("SERV: handle_network END");
             break;
         }
     }
@@ -353,6 +372,12 @@ fn handle_packet(
     let seq = u32::from_le_bytes(packet[0..4].try_into().unwrap());
     let ack = u32::from_le_bytes(packet[4..8].try_into().unwrap());
     let acks = u32::from_le_bytes(packet[8..12].try_into().unwrap());
+        unsafe {
+            if (core::trace_network)
+            {
+                println!("SERV: handle_packet seq={seq} remote_seq_num={} ack={ack}", client_data.remote_seq_num);
+            }
+        }
     if seq > client_data.remote_seq_num {
         let diff = seq - client_data.remote_seq_num;
         client_data.acks_bitmap = (client_data.acks_bitmap << 1) | 1;
@@ -378,7 +403,7 @@ fn handle_packet(
     let mut to_resend = vec![];
     for (&id, d) in client_data.not_confirmed_packets.iter() {
         if id + 32 < ack {
-            println!("PACKET NOT CONFIRMED {}", id);
+            println!("SERV: PACKET NOT CONFIRMED id={id} ack={ack}");
             to_resend.push(d.clone());
             to_remove.push(id);
         }
@@ -400,11 +425,11 @@ fn handle_packet(
 
     match tag {
         ClientEvent::Move { x, y } => {
-            println!("moved {x} {y}");
+            println!("SERV: moved {x} {y}");
             unsafe { player.move_(x, y) }
         }
         ClientEvent::Pickup { id } => {
-            println!("player picking up {id}");
+            println!("SERV: player picking up {id}");
             unsafe {
                 let item = (*core::world_table[player._base.map_y as usize]
                     [player._base.map_x as usize])
@@ -422,7 +447,7 @@ fn handle_packet(
             }
         }
         ClientEvent::Drop { id } => {
-            println!("player dropped {id}");
+            println!("SERV: player dropped {id}");
             unsafe {
                 let item = player._base.get_item_by_uid(id);
                 if item != std::ptr::null_mut() {
@@ -439,7 +464,7 @@ fn handle_packet(
             }
         }
         ClientEvent::ItemUsedOnObject { iid, oid } => {
-            println!("player used {iid} on {oid}");
+            println!("SERV: player used {iid} on {oid}");
             unsafe {
                 let item = player._base.get_item_by_uid(iid);
                 let object = (*core::world_table[player._base.map_y as usize]
@@ -452,7 +477,7 @@ fn handle_packet(
             }
         }
         ClientEvent::ActionOnObject { a, oid } => {
-            println!("player action {a} on {oid}");
+            println!("SERV: player action {a} on {oid}");
             unsafe {
                 let object = (*core::world_table[player._base.map_y as usize]
                     [player._base.map_x as usize])
@@ -464,11 +489,13 @@ fn handle_packet(
             }
         }
         ClientEvent::ServerActionOnObject { a, oid } => {
-            println!("server action {a} on {oid}");
+            println!("SERV: server action {a} on {oid}");
             unsafe {
-                let object = (*core::world_table[player._base.map_y as usize]
-                    [player._base.map_x as usize])
-                    .find_by_id(oid);
+                let mut object = 0 as *mut core::InventoryElement;
+                if oid != 0 { 
+                     object = (*core::world_table[player._base.map_y as usize]
+                     [player._base.map_x as usize]).find_by_id(oid);
+                }
                 if !player.server_action_on_object(a, object) {
                     let response = [core::PACKET_ACTION_FAILED];
                     server.send_to_reliable(&response, peer);
@@ -480,6 +507,7 @@ fn handle_packet(
             ingredients_num,
             ingredients_ids,
         } => {
+            println!("SERV: craft product={product_id} ing_num={ingredients_num}");
             unsafe {
                 if core::craft_entry(
                     product_id as i32,
@@ -489,13 +517,13 @@ fn handle_packet(
                 ) {
                     let id = usize::from_le_bytes(ingredients_ids[0..8].try_into().unwrap());
                     let el = player._base.get_item_by_uid(id);
-                    println!("id after CRAFT{:?}", el);
+                    println!("SERV: id after CRAFT{:?}", el);
                     if !el.is_null() {
                         destroy_object(server, (*el).uid, (*el).location);
                         player._base.drop(el);
-                        println!("deleted {}", id);
+                        println!("SERV: deleted {}", id);
                     } else {
-                        println!("invalid id {}", id);
+                        println!("SERV: invalid id {}", id);
                     }
                     if product_id >= 4 {
                         let id2 = usize::from_le_bytes(ingredients_ids[8..16].try_into().unwrap());
@@ -504,7 +532,7 @@ fn handle_packet(
                             destroy_object(server, (*el2).uid, (*el2).location);
                             player._base.drop(el2);
                         } else {
-                            println!("invalid id2 {}", id2);
+                            println!("SERV: invalid id2 {}", id2);
                         }
                     }
                 } else {
@@ -520,22 +548,24 @@ fn handle_packet(
             x,
             y,
         } => unsafe {
+            println!("SERV: ItemUsedOnTile iid={iid} map_x={map_x} map_y={map_y} x={x} y={y}");
             let item = player._base.get_item_by_uid(iid);
             if player.plant_with_seed(item, map_x, map_y, x, y) {
-                println!("planted OK");
+                println!("SERV: planted OK");
             } else {
-                println!("failed to plant");
+                println!("SERV: failed to plant");
             }
         },
         ClientEvent::RequestChunk { x, y } => unsafe {
-            println!("received {} {}", x, y);
+            println!("SERV: RequestChunk: received {} {}", x, y);
             if !(x < 0 || x > core::WORLD_SIZE as i32 || y < 0 || y > core::WORLD_SIZE as i32) {
-                if core::world_table[y as usize][x as usize] != std::ptr::null_mut() {
-                    update_chunk_for_player(server, peer, (x as u8, y as u8));
-                    println!("request received {} {}", x, y);
-                }
+                    if core::world_table[y as usize][x as usize] != std::ptr::null_mut() 
+                    {
+                        println!("SERV: update chunk for {} {}", x, y);
+                        update_chunk_for_player(server, peer, (x as u8, y as u8));
+                    }
             }
-        },
+         },
         //FIXME change id to get_id()
         ClientEvent::Whatever =>  {} , //println!("player {} alive", player._base.id),
     }
@@ -587,8 +617,10 @@ fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>)
 fn send_location_updates(server: &mut Server) {
     unsafe {
         if LOCATION_UPDATES.len() > 0 {
+          //  println!("SERV:send_location_updates len={}", LOCATION_UPDATES.len());
             for update in LOCATION_UPDATES.iter() {
                 let mut data = vec![core::PACKET_LOCATION_UPDATE];
+            //    println!("SERV: send_location_updates id={}", update.id);
                 data.extend_from_slice(&bincode::serialize(update).unwrap()[..]);
                 server.broadcast(&data);
             }

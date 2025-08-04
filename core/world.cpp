@@ -2,6 +2,7 @@
 #include "player.h"
 
 chunk * world_table[WORLD_SIZE][WORLD_SIZE];
+Chunk_state loaded_chunks[WORLD_SIZE][WORLD_SIZE];
 
 void remove_from_chunks(InventoryElement * object)
 {
@@ -109,7 +110,10 @@ Plant ** get_plant_at_ppos(Player * player)
 
 InventoryElement * get_item_at(int chunk_x, int chunk_y, int x, int y)
 {
-    ListElement * le = world_table[chunk_y][chunk_x]->objects.head;
+    chunk * ch = world_table[chunk_y][chunk_x];
+    if (!ch)
+        return nullptr;
+    ListElement * le = ch->objects.head;
     while (le)
     {
         if (le->el->get_x() == x && le->el->get_y() == y)
@@ -142,9 +146,4 @@ void set_item_at(InventoryElement * item, int chunk_x, int chunk_y, int x, int y
 void set_item_at_ppos(InventoryElement * item, Player * player)
 {
     set_item_at(item, player->map_x, player->map_y, player->x, player->y);
-}
-
-int get_tile_at(int chunk_x, int chunk_y, int x, int y)
-{
-    return world_table[chunk_y][chunk_x]->table[y][x].tile;
 }

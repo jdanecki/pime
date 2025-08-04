@@ -47,8 +47,8 @@ Player::Player(int id) : InventoryElement(Class_Player), id(id)
     relations = nullptr;
     // direction = direction::right;
 
-    x = 0;
-    y = 0;
+    x = 8;
+    y = 8;
 
     for (int i = 0; i < 10; i++)
     {

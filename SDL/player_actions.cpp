@@ -108,7 +108,10 @@ void action_tile(Player_action a, int map_x, int map_y, int x, int y)
 {
     InventoryElement * object = get_item_at(map_x, map_y, x, y);
     if (!object)
+    {
+        printf("SDL: nothing on tile\n");
         return;
+    }
 
     printf("SDL: action %s on %s\n", player_action_name[a], object->get_name());
     send_packet_action_on_object(client, a, object->uid);
@@ -117,9 +120,23 @@ void action_tile(Player_action a, int map_x, int map_y, int x, int y)
 void server_action_tile(Server_action a, int map_x, int map_y, int x, int y)
 {
     InventoryElement * object = get_item_at(map_x, map_y, x, y);
-    if (!object)
-        return;
-
-    printf("SDL: server action %s on %s\n", server_action_name[a], object->get_name());
-    send_packet_server_action_on_object(client, a, object->uid);
+    if (object)
+    {
+        printf("SDL: server action %s on %s\n", server_action_name[a], object->get_name());
+        send_packet_server_action_on_object(client, a, object->uid);
+    }
+    else
+    {
+        switch (a)
+        {
+            case SERVER_SHOW_CHUNK:
+            case SERVER_TRACE_NETWORK:
+                printf("SDL: server action %s\n", server_action_name[a]);
+                send_packet_server_action_on_object(client, a, 0);
+                break;
+            default:
+                printf("SDL: nothing to show\n");
+                break;
+        }
+    }
 }

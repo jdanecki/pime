@@ -10,6 +10,7 @@ add_library(pime SHARED
     player.cpp 
     tiles.cpp 
     npc.cpp
+    packet_types.cpp
 
     alchemist/elements.cpp
 	alchemist/names.cpp

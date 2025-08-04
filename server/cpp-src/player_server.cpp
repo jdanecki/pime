@@ -2,16 +2,23 @@
 #include "elements_server.h"
 #include "networking.h"
 #include "world_server.h"
+#include "../../core/packet_types.h"
 
-void PlayerServer::check_and_move(int new_map_x, int new_map_y, int new_x, int new_y)
+bool check_and_load_chunk(int new_map_x, int new_map_y)
 {
-    map_x = new_map_x;
-    map_y = new_map_y;
-    x = new_x;
-    y = new_y;
-    hunger -= 3;
-    thirst--;
-    // printf("hunger=%d thirst=%d\n", hunger, thirst);
+    for (int cy = new_map_y - 1; cy <= new_map_y + 1; cy++)
+    {
+        if (cy >= 0 && cy < WORLD_SIZE)
+        {
+            for (int cx = new_map_x - 1; cx <= new_map_x + 1; cx++)
+                if (cx >= 0 && cx < WORLD_SIZE)
+                {
+                    if (!world_table[cy][cx])
+                        load_chunk(cx, cy);
+                }
+        }
+    }
+    return true;
 }
 
 void PlayerServer::move(int dx, int dy)
@@ -21,30 +28,35 @@ void PlayerServer::move(int dx, int dy)
     int new_map_x = map_x;
     int new_map_y = map_y;
 
+    printf("SERV: player move dx=%d dy=%d\n", dx, dy);
+
     if (!((new_x >= 0 && new_x < CHUNK_SIZE) && (new_y >= 0 && new_y < CHUNK_SIZE)))
     {
         if (new_x < 0 || new_x >= CHUNK_SIZE)
         {
             new_map_x += dx;
             new_x += -CHUNK_SIZE * dx;
-            if (!(new_map_x >= 0 && new_map_x < WORLD_SIZE && new_map_y >= 0 && new_map_y < WORLD_SIZE))
+            if (!check_and_load_chunk(new_map_x, new_map_y))
                 return;
-            if (!world_table[new_map_y][new_map_x])
-                load_chunk(new_map_x, new_map_y);
+            goto move_player;
         }
 
         if (new_y < 0 || new_y >= CHUNK_SIZE)
         {
             new_map_y += dy;
             new_y += -CHUNK_SIZE * dy;
-
-            if (!(new_map_x >= 0 && new_map_x < WORLD_SIZE && new_map_y >= 0 && new_map_y < WORLD_SIZE))
+            if (!check_and_load_chunk(new_map_x, new_map_y))
                 return;
-            if (!world_table[new_map_y][new_map_x])
-                load_chunk(new_map_x, new_map_y);
         }
     }
-    check_and_move(new_map_x, new_map_y, new_x, new_y);
+move_player:
+    map_x = new_map_x;
+    map_y = new_map_y;
+    x = new_x;
+    y = new_y;
+    hunger--;
+    thirst--;
+    printf("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
 }
 
 bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement * object)
@@ -70,13 +82,21 @@ bool PlayerServer::action_on_object(Player_action a, InventoryElement * object)
 
 bool PlayerServer::server_action_on_object(Server_action a, InventoryElement * object)
 {
-    if (!object)
-        return false;
-    printf("%s server action: %s on %s\n", get_name(), server_action_name[a], object->get_name());
+    if (object)
+        printf("%s server action: %s on %s\n", get_name(), server_action_name[a], object->get_name());
+    else
+        printf("%s server action: %s\n", get_name(), server_action_name[a]);
     switch (a)
     {
         case SERVER_SHOW_ITEM:
-            object->show(true);
+            if (object)
+                object->show(true);
+            break;
+        case SERVER_SHOW_CHUNK:
+            world_table[map_y][map_x]->show();
+            break;
+        case SERVER_TRACE_NETWORK:
+            trace_network ^= true;
             break;
     }
 

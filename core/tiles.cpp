@@ -48,3 +48,10 @@ InventoryElement * chunk::find_by_id(size_t id)
 chunk::chunk(int map_x, int map_y) : map_x(map_x), map_y(map_y)
 {
 }
+
+void chunk::show()
+{
+    printf("chunk[%d, %d] obj=%d bei=%d\n", map_x, map_y, objects.nr_elements, beings.nr_elements);
+    if (objects.nr_elements)
+        objects.show(false);
+}

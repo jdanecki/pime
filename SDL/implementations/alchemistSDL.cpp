@@ -50,8 +50,8 @@ ElementSDL::ElementSDL(Element data) : Element(data)
  */
     float cx = width.value / 2.0f;
     float cy = height.value / 2.0f;
-    float rx = 5.0 + rand() % (width.value / 2);
-    float ry = 5.0 + rand() % (height.value / 2);
+    float rx = 5.0 + (rand() % width.value) / 2;
+    float ry = 5.0 + (rand() % height.value) / 2;
 
     for (unsigned int y = 0; y < height.value; y++)
     {
@@ -100,7 +100,7 @@ ElementSDL::ElementSDL(Element data) : Element(data)
 void ElementSDL::show(bool details)
 {
     Element::show(details);
-    printf("scale=%0.2f\n", get_scale());
+    printf("scale=%0.2f %d %d\n", get_scale(), width.value, start_width);
 }
 
 SDL_Texture * ElementSDL::get_texture()

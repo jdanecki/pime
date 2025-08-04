@@ -6,6 +6,14 @@
 class Player;
 
 extern chunk * world_table[WORLD_SIZE][WORLD_SIZE];
+enum Chunk_state
+{
+    CHUNK_NOT_LOADED,
+    CHUNK_LOADING,
+    CHUNK_LOADED
+};
+
+extern Chunk_state loaded_chunks[WORLD_SIZE][WORLD_SIZE];
 
 void remove_from_chunks(InventoryElement * object);
 
@@ -28,5 +36,7 @@ InventoryElement * get_item_at(int chunk_x, int chunk_y, int x, int y);
 
 void set_item_at(InventoryElement * item, int chunk_x, int chunk_y, int x, int y);
 void set_item_at_ppos(InventoryElement * item, Player * player);
+
+bool check_chunks();
 
 #endif

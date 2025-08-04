@@ -10,6 +10,7 @@
 
 #include "../core/player.h"
 #include "../core/tiles.h"
+#include "../core/packet_types.h"
 #include "dialog/d_craft.h"
 #include "dialog/d_hotbar.h"
 #include "menu.h"
@@ -191,21 +192,39 @@ void key_pressed(int key)
                 player->craftbar[active_hotbar] = 1;
             break;
 
-        case SDLK_F5:
-        {
-            auto_explore ^= 1;
-            break;
-        }
+            /* case SDLK_F5:
+             {
+                 auto_explore ^= 1;
+                 break;
+             }*/
         case SDLK_F1:
         {
             InventoryElement * item = get_item_at_ppos(player);
             if (item)
                 item->show();
+            else
+                printf("nothing to show\n");
             break;
         }
         case SDLK_F2:
             server_action_tile(SERVER_SHOW_ITEM, player->map_x, player->map_y, player->x, player->y);
             break;
+
+        case SDLK_F3:
+            if (world_table[player->map_y][player->map_x])
+                world_table[player->map_y][player->map_x]->show();
+            break;
+        case SDLK_F4:
+            server_action_tile(SERVER_SHOW_CHUNK, player->map_x, player->map_y, player->x, player->y);
+            break;
+
+        case SDLK_F5:
+            trace_network ^= true;
+            break;
+        case SDLK_F6:
+            server_action_tile(SERVER_TRACE_NETWORK, player->map_x, player->map_y, player->x, player->y);
+            break;
+
         case SDLK_RETURN:
             use_tile(player->map_x, player->map_y, player->x, player->y);
             break;

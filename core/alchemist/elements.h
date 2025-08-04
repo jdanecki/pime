@@ -50,6 +50,8 @@ extern const char * player_action_name[];
 enum Server_action
 {
     SERVER_SHOW_ITEM,
+    SERVER_SHOW_CHUNK,
+    SERVER_TRACE_NETWORK,
 };
 
 extern const char * server_action_name[];
@@ -575,6 +577,7 @@ class Plant : public InventoryElement
     void show(bool details = true) override
     {
         InventoryElement::show(details);
+        printf("%s\n", get_base()->get_name());
         if (details)
         {
             get_base()->show(details);

@@ -77,7 +77,7 @@ AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
     dst_loc_x = rand() % CHUNK_SIZE;
     dst_loc_y = rand() % CHUNK_SIZE;
     max_age = new Property("max age", 100 + rand() % 1000);
-    age = new Property("age", rand() % max_age->value);
+    age = new Property("age", 10 + rand() % max_age->value);
     size = 1.0 * age->value / max_age->value;
 }
 

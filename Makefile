@@ -1,11 +1,17 @@
-all: serv client
+all: configure serv client
 
 serv:
 	cd server; 	cargo build
 
 client:
-	cd SDL; ./configure
 	@make -C SDL/build -j $(nproc)
+
+configure:
+	pushd core
+	./generate_packet_types.sh
+	popd
+	pushd SDL
+	./configure
 
 tui:
 	@make -C core/alchemist-tui/ -j $(nproc)
@@ -15,5 +21,4 @@ clean:
 	rm -rf SDL/build
 
 format:
-	find . -name \*.h  -exec clang-format -i {}  \;
-	find . -name \*.cpp  -exec clang-format -i {}  \;
+	./format-all.sh

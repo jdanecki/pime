@@ -129,7 +129,7 @@ extern "C"
             p->thirst = thirst;
             p->hunger = hunger;
 
-            // printf("updated player %ld: %d %d %d %d\n", id, player->map_x, player->map_y, player->x, player->y);
+            //  printf("updated player %ld: %d %d %d %d\n", id, map_x, map_y, x, y);
         }
     }
 
@@ -138,6 +138,7 @@ extern "C"
         data = (chunk_table *)((char *)(data) + 3);
         if (!world_table[y][x])
         {
+            printf("SDL: update_chunk new x=%d y=%d\n", x, y);
             // world_table[y][x] = (chunk*)calloc(1, sizeof(chunk));
             // world_table[y][x]->objects = InvList();
             world_table[y][x] = new chunk(x, y);
@@ -180,32 +181,32 @@ extern "C"
             {
                 case Class_Element:
                 {
-                    ElementSDL * element = dynamic_cast<ElementSDL *>(el);
+                    Element * element = dynamic_cast<Element *>(el);
                     *element = data->element.data;
                     break;
                 }
                 case Class_Ingredient:
                 {
-                    IngredientSDL * ing = dynamic_cast<IngredientSDL *>(el);
+                    Ingredient * ing = dynamic_cast<Ingredient *>(el);
                     *ing = data->ingredient.data;
                     break;
                 }
                 case Class_Product:
                 {
-                    ProductSDL * prod = dynamic_cast<ProductSDL *>(el);
+                    Product * prod = dynamic_cast<Product *>(el);
                     *prod = data->product.data;
                     break;
                 }
                 case Class_Plant:
                 {
-                    PlantSDL * plant = dynamic_cast<PlantSDL *>(el);
+                    Plant * plant = dynamic_cast<Plant *>(el);
                     *plant = data->plant.data;
                     //  printf("%s size=%f\n", plant->get_name(), plant->size);
                     break;
                 }
                 case Class_Animal:
                 {
-                    AnimalSDL * animal = dynamic_cast<AnimalSDL *>(el);
+                    Animal * animal = dynamic_cast<Animal *>(el);
                     *animal = data->animal.data;
                     //      printf("%s size=%f\n", animal->get_name(), animal->size);
                     break;
@@ -232,15 +233,27 @@ extern "C"
 
         InventoryElement * el = remove_from_location(old_loc, id);
         if (!el)
-        {
-            // print_status(1, "not found item to remove %d %d", old_loc.chunk.map_x, old_loc.chunk.map_y);
+        { // FIXME
+            /*printf("SDL: not found item %lu to remove on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
+                id,
+                old_loc.chunk.map_x, old_loc.chunk.map_y,
+                old_loc.chunk.x, old_loc.chunk.y,
+                new_loc.chunk.map_x, new_loc.chunk.map_y,
+                new_loc.chunk.x, new_loc.chunk.y);
+              */
             return;
         }
         switch (new_loc.tag)
         {
             case ItemLocation::Tag::Chunk:
             {
-                // printf("added %ld to chunk %d %d\n", id, new_loc.chunk.map_x, new_loc.chunk.map_y);
+                /*     printf("SDL: update item location %s:%s on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
+                         el->get_class_name(), el->get_name(),
+                         old_loc.chunk.map_x, old_loc.chunk.map_y,
+                         old_loc.chunk.x, old_loc.chunk.y,
+                         new_loc.chunk.map_x, new_loc.chunk.map_y,
+                         new_loc.chunk.x, new_loc.chunk.y);
+                  */
                 ItemLocation old_l;
                 ItemLocation new_l;
                 old_l.chunk.x = old_loc.chunk.x;
@@ -294,7 +307,7 @@ extern "C"
         }
         else
         {
-            print_status(1, "inexisting chunk");
+            printf("SDL: inexisting chunk\n");
         }
     }
 
@@ -303,11 +316,11 @@ extern "C"
         InventoryElement * el = remove_from_location(location, id);
         if (el)
         {
-            // print_status(1, "delete %ld", id);
+            printf("SDL: destroy_object %ld", id);
             delete el;
         }
         else
-            print_status(1, "deleting inexisting item %ld", id);
+            printf("SDL: deleting inexisting item %ld\n", id);
     }
 
     void failed_craft()

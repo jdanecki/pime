@@ -2,14 +2,7 @@
 
 ## build
 
-To build server in server directory run:
-
-    cargo build
-
-To build SDL client in SDL directory run:
-
-    cmake -Bbuild
-    cmake --build ./build
+To build server and client run make
 
 ## run
 
@@ -21,4 +14,4 @@ In server directory
 ### SDL Client
 In SDL directory
 
-    ./build/pimeSDL
+    ./run_local.sh

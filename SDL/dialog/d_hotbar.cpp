@@ -14,7 +14,7 @@ void change_craftbar(int id)
     player->craftbar[id] ^= 1;
 }
 
-DHotbar::DHotbar() : Dialog({650, 585, 500, 50}, {0, 0, 0, 0})
+DHotbar::DHotbar() : Dialog({550, 490, 500, 50}, {0, 0, 0, 0})
 {
     for (int i = 0; i < 10; i++)
     {

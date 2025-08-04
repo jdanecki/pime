@@ -89,7 +89,7 @@ pub extern "C" fn send_packet_request_chunk(client: &mut NetClient, x: i32, y: i
     let mut buf = vec![core::PACKET_REQUEST_CHUNK];
     buf.extend_from_slice(&x.to_le_bytes());
     buf.extend_from_slice(&y.to_le_bytes());
-    println!("request {} {}", x, y);
+    println!("SDL: send_packet_request_chunk {} {}", x, y);
 
     client.send(&buf);
 }

@@ -48,18 +48,21 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
             })
             .unwrap();
         unsafe {
-            println!("{:#?}", region);
+            println!("SERV: load_chunk map_x={} map_y={}  {:#?}", map_x, map_y, region);
             let mut chunk = Box::new(core::chunk::new(map_x, map_y));
             for y in 0..core::CHUNK_SIZE as usize {
                 for x in 0..core::CHUNK_SIZE as usize {
                     chunk.table[y][x] = core::tile {
                         tile: region.terrain_type.get_id() as i32,
                     };
+                    //DEBUG stuff
+                    //chunk.table[y][x] = core::tile { tile: ((x + y)  % 10) as i32};
                 }
             }
             for (rock, num) in region.rocks_types.iter() {
                 // TODO remove +1 for each object
                 let prob = num * 10.0 + 1.0;
+                println!("element {prob}");
                 do_times(prob, || {
                     chunk.add_object1(core::create_element(rock.get_base()
                         as *const core::BaseElementServer
@@ -170,7 +173,13 @@ pub fn generate() {
     println!("{:#?}", world.regions);
 
     WORLD.set(world);
-    load_chunk(128, 128);
+    for y in 127..=129
+    {
+        for x in 127..=129
+        {
+             load_chunk(x, y);
+        }
+    }
 }
 
 fn simulate(

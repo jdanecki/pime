@@ -46,7 +46,7 @@ const char * product_action_name[] = {
 };
 const char * player_action_name[] = {"drink", "eat"};
 
-const char * server_action_name[] = {"server show item"};
+const char * server_action_name[] = {"server show item", "server show chunk", "server trace network"};
 
 const char * object_names[] = {"wall"};
 const char * plant_phase_name[] = {"Seed", "Seedling", "Growing", "Flowers", "Fruits"};
@@ -77,7 +77,8 @@ template <typename T> SerializablePointer<T>::SerializablePointer(T * p) : ptr(p
 }
 
 Element::Element(BaseElement * b)
-    : InventoryElement(Class_Element), base(b), length("length", 4 + rand() % 60), width("width", 4 + rand() % 60), height("height", 4 + rand() % 60),
+    //  : InventoryElement(Class_Element), base(b), length("length", 8 + rand() % 120), width("width", 8 + rand() % 120), height("height", 8 + rand() % 120),
+    : InventoryElement(Class_Element), base(b), length("length", 3 + rand() % 30), width("width", 3 + rand() % 30), height("height", 3 + rand() % 30),
       volume("volume", length.value * width.value * height.value)
 {
 }
