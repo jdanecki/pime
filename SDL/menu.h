@@ -2,6 +2,7 @@
 #define MENU_H
 
 #include "../core/alchemist/npc_talk.h"
+#include "../core/alchemist/el_list.h"
 #include "text.h"
 
 enum menu_actions
@@ -16,6 +17,11 @@ enum menu_actions
     MENU_LOUDER,
     MENU_QUIETER,
     MENU_MUSIC,
+    MENU_INV_ELEMENTS,
+    MENU_INV_INGREDIENTS,
+    MENU_INV_PRODUCT,
+    MENU_INV_PLANT,
+    MENU_INV_ANIMAL,
     MENU_INV_SOLID,
     MENU_INV_LIGQUID,
     MENU_INV_GAS,
@@ -24,7 +30,8 @@ enum menu_actions
     MENU_DRINK,
     MENU_EAT,
 
-    MENU_CATEGORIES,
+    MENU_ITEMS_GROUP,
+    MENU_CLASSES,
 
     MENU_NPC_SAY,
     MENU_NPC_ASK,
@@ -34,41 +41,35 @@ enum menu_actions
 
 };
 
-class Menu_entry
+class Menu_entry : public ListElement
 {
-  public:
-    SDL_Texture * texture;
+  public:    
     char * entry;
     bool dynamic_entry;
     enum menu_actions action;
     int value;
     InventoryElement * el;
-    Sentence * sentence;
-    Menu_entry(const char * e, enum menu_actions a, int v, InventoryElement * _el, SDL_Texture * t);
-    Menu_entry(const char * e, enum menu_actions a, Sentence * s, InventoryElement * _el);
+    Sentence * sentence;    
+    Menu_entry(const char * e, enum menu_actions a,  InventoryElement * _el, int v, Sentence * s);
     ~Menu_entry();
 };
 
 class Menu
 {
+    int index;
   public:
-    const char * name;
-    int options;
-    int menu_pos;
-    int added;
-    Menu_entry ** entries;
+    const char * name;    
+    Menu_entry *menu_pos;
+    ElementsList *entries;
 
-    bool show_texture;
-    bool show_texture_literal;
-    Menu(const char * n, int opt);
+    Menu(const char * n);
     ~Menu();
 
     void add(const char * e, enum menu_actions a);
-    void add(const char * e, enum menu_actions a, int val);
-    void add(const char * e, enum menu_actions a, int val, InventoryElement * p_el);
+    void add(const char * e, enum menu_actions a, int v);
     void add(const char * e, enum menu_actions a, InventoryElement * p_el);
-    void add(const char * e, enum menu_actions a, SDL_Texture * t, int index, int item_id);
-    void add(const char * e, enum Npc_say a, Sentence * s, InventoryElement * p_el);
+    void add(const char * e, enum Npc_say a, InventoryElement * p_el, Sentence * s);
+
     int get_val(int v);
     int get_val();
     Sentence * get_sentence();

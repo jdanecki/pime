@@ -23,6 +23,14 @@ void ListElement::show(bool details)
     el->show(details);
 }
 
+void ElementsList::remove_all()
+{
+    while(head)
+    {
+        remove(head);
+    }
+}
+
 ElementsList::ElementsList(const char * n)
 {
     name = n;
@@ -163,41 +171,63 @@ void ElementsList::remove(ListElement * el)
     }
 }
 
-// FIXME jacek is this needed?
-//  InventoryElement ** InvList::find_form(enum Form f, int * count)
-//  {
-//      ListElement * cur = head;
-//      InventoryElement ** a = (InventoryElement **)calloc(nr_elements, sizeof(InventoryElement *));
-//      int c = 0;
-//      while (cur)
-//      {
-//          if (cur->el->get_form() == f)
-//          {
-//              a[c] = cur->el;
-//              c++;
-//          }
-//          cur = cur->next;
-//      }
-//      if (!c)
-//      {
-//          free(a);
-//          return NULL;
-//      }
-//      else
-//      {
-//          *count = c;
-//          return a;
-//      }
-//  }
-//  FIXME jacek
-#if 0
-InventoryElement ** InvList::find_id(enum Item_id id, int * count)
+InventoryElement ** InvList::find_by_fun(FindFunc fun, void *arg, int *count)
 {
     ListElement * cur = head;
     InventoryElement ** a = (InventoryElement **)calloc(nr_elements, sizeof(InventoryElement *));
     int c = 0;
-
     while (cur)
+    {
+        if (fun(cur->el, arg))
+        {
+            a[c] = cur->el;
+            c++;
+        }
+        cur = cur->next;
+    }
+    if (!c)
+    {
+        free(a);
+        return NULL;
+    }
+    else
+    {
+        *count = c;
+        return a;
+    }
+}
+
+bool match_form(InventoryElement * el, void * arg)
+{
+    enum Form f = *(enum Form *)arg;
+    return el->get_form() == f;
+}
+
+InventoryElement ** InvList::find_form(enum Form f, int * count)
+{
+    return find_by_fun(match_form, &f, count);
+}
+
+bool match_class(InventoryElement * el, void * arg)
+{
+    enum Class_id cl = *(enum Class_id *)arg;
+    return el->get_cid() == cl;
+}
+
+InventoryElement **InvList::find_class(Class_id cl, int *count)
+{
+    return find_by_fun(match_form, &cl, count);
+}
+
+InventoryElement ** InvList::find_id(int id, int * count)
+{
+    //FIXME
+#if 0
+    ListElement * cur = head;
+    InventoryElement ** a = (InventoryElement **)calloc(nr_elements, sizeof(InventoryElement *));
+    int c = 0;
+
+  /*  while (cur)
     {
         if (cur && cur->el && cur->el->get_base() && cur->el->get_base()->id == id)
         {
@@ -206,7 +236,7 @@ InventoryElement ** InvList::find_id(enum Item_id id, int * count)
         }
         cur = cur->next;
     }
-
+*/
     if (!c)
     {
         free(a);
@@ -218,8 +248,9 @@ InventoryElement ** InvList::find_id(enum Item_id id, int * count)
             *count = c;
         return a;
     }
-}
 #endif
+    return nullptr;
+}
 
 InventoryElement * InvList::add(InventoryElement * el)
 {

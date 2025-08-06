@@ -15,20 +15,20 @@ class ListElement
     void disable()
     {
         enabled = false;
-    };
+    }
     void enable()
     {
         enabled = true;
-    };
+    }
     bool is_enabled()
     {
         return enabled;
-    };
+    }
     virtual void show(bool details = true);
     virtual bool tick()
     {
         return el->tick();
-    };
+    }
     ListElement(InventoryElement * entry);
     ListElement() : el(nullptr), next(nullptr)
     {
@@ -80,6 +80,7 @@ class KnownElement : public ListElement
 
 class ElementsList
 {
+    void remove_all();
   public:
     const char * name;
     int nr_elements;
@@ -87,6 +88,7 @@ class ElementsList
     ListElement * tail;
     ElementsList(const char * n);
     ElementsList();
+    virtual ~ElementsList() { remove_all(); }
     ListElement * find(void * what);
     bool virtual find_check(ListElement * el, void * what)
     {
@@ -96,12 +98,16 @@ class ElementsList
     void enable_all();
     void disable_all();
     ListElement * add(ListElement * el);
-    void remove(ListElement * el);
+    void remove(ListElement * el);    
     void tick();
 };
 
+typedef bool (*FindFunc)(InventoryElement * el, void * arg);
+
 class InvList : public ElementsList
 {
+    InventoryElement ** find_by_fun(FindFunc fun, void * arg, int * count);
+
   public:
     InvList(const char * n) : ElementsList(n)
     {
@@ -109,12 +115,10 @@ class InvList : public ElementsList
     InvList() : ElementsList("Inventory list")
     {
     }
-    //    bool virtual find_at_check(ListElement *el, void * pos) { return false; }
-    // InventoryElement ** find_form(enum Form f, int * count);
-
-    // FIXME jacek
-    // InventoryElement ** find_id(enum Item_id id, int * count);
-
+  //  bool virtual find_at_check(ListElement *el, void * pos) { return false; }
+    InventoryElement ** find_form(enum Form f, int * count);
+    InventoryElement ** find_class(enum Class_id cl, int * count);
+    InventoryElement ** find_id(int id, int * count);
     InventoryElement * add(InventoryElement * el);
     void remove(InventoryElement * el);
 };

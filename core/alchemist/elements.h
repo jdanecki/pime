@@ -16,12 +16,12 @@ enum Class_id
     Class_BaseAnimal,
     Class_BasePlant,
 
-    Class_Element,
+    Class_Element, // base: BaseElement
     Class_Ingredient,
     Class_Product,
 
-    Class_Plant,
-    Class_Animal,
+    Class_Plant,  // base: BasePlant -> Base
+    Class_Animal, // base: BaseAnimal->Base
     Class_Player,
     Class_Npc,
 };

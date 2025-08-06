@@ -110,7 +110,7 @@ int npc(menu_actions a)
         menu_entries--;
     }
 
-    menu_dialog = new Menu("NPC conversation", menu_entries + 1);
+    menu_dialog = new Menu("NPC conversation");
 
     Sentence * sentence = (Sentence *)list->head;
     while (sentence)
@@ -120,13 +120,13 @@ int npc(menu_actions a)
             switch (sentence->id)
             {
                 case NPC_Ask_do_you_know_inv_item:
-                    menu_dialog->add(sentence->text, sentence->id, sentence, player->hotbar[active_hotbar]);
+                    menu_dialog->add(sentence->text, sentence->id,  player->hotbar[active_hotbar], sentence);
                     break;
                 case NPC_Ask_do_you_know_item:
-                    menu_dialog->add(sentence->text, sentence->id, sentence, item_at);
+                    menu_dialog->add(sentence->text, sentence->id, item_at, sentence);
                     break;
                 default:
-                    menu_dialog->add(sentence->text, sentence->id, sentence, nullptr);
+                    menu_dialog->add(sentence->text, sentence->id, nullptr, sentence);
                     break;
             }
         }

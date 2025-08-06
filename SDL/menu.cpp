@@ -20,13 +20,15 @@ extern class Player * player;
 extern int active_hotbar;
 extern NetClient * client;
 
-Menu * menu_music;
+//Menu * menu_music;
 Menu * menu_main;
 Menu * menu_help;
 Menu * current_menu;
 Menu * menu_inventory_categories;
+Menu * menu_inventory_elements;
 Menu * menu_inventory;
-Menu * menu_inventory_categories2;
+Menu * menu_inventory_elements_form;
+Menu * menu_inventory_class;
 
 Menu * menu_npc;
 Menu * menu_dialog;
@@ -35,88 +37,65 @@ Menu * menu_action;
 void load(char with_player);
 void save(char with_player);
 
-Menu::Menu(const char * n, int opt)
+Menu::Menu(const char * n)
 {
-    name = n;
-    options = opt;
-    menu_pos = 0;
-    added = 0;
-    entries = new Menu_entry *[options];
-    show_texture = false;
+    name = n;            
+    entries = new ElementsList(n);
+    menu_pos = dynamic_cast<Menu_entry*>(entries->head);
+    index = 0;
 }
 
 Menu::~Menu()
 {
-    delete[] entries;
+    delete entries;
 }
 
 void Menu::add(const char * e, enum menu_actions a)
-{
-    assert(added < options);
-    entries[added] = new Menu_entry(e, a, 0, nullptr, nullptr);
-    added++;
+{    
+    entries->add(new Menu_entry(e, a, nullptr, 0, nullptr));
 }
 
-void Menu::add(const char * e, enum menu_actions a, int val)
+void Menu::add(const char *e, menu_actions a, int v)
 {
-    assert(added < options);
-    entries[added] = new Menu_entry(e, a, val, nullptr, nullptr);
-    added++;
+    entries->add(new Menu_entry(e, a, nullptr, v, nullptr));
 }
 
-void Menu::add(const char * e, enum menu_actions a, SDL_Texture * t, int index, int item_id)
+void Menu::add(const char * e, enum Npc_say a,  InventoryElement * p_el, Sentence * s)
 {
-    // FIXME why is index here?
-    assert(added < options);
-    entries[index] = new Menu_entry(e, a, item_id, nullptr, t);
-    added++;
-}
-
-void Menu::add(const char * e, enum Npc_say a, Sentence * s, InventoryElement * p_el)
-{
-    assert(added < options);
     enum menu_actions conv = (enum menu_actions)((int)MENU_NPC_CONV + (int)a);
-    entries[added] = new Menu_entry(e, conv, s, p_el);
-    added++;
+    entries->add(new Menu_entry(e, conv, p_el, 0, s));
 }
 
-void Menu::add(const char * e, enum menu_actions a, int val, InventoryElement * p_el)
-{
-    assert(added < options);
-    entries[added] = new Menu_entry(e, a, val, p_el, nullptr);
-    added++;
-}
 void Menu::add(const char * e, enum menu_actions a, InventoryElement * p_el)
-{
-    assert(added < options);
-    entries[added] = new Menu_entry(e, a, 0, p_el, nullptr);
-    added++;
-    show_texture = false;
+{    
+    entries->add(new Menu_entry(e, a, p_el, 0, nullptr));
 }
 
 int Menu::get_val(int v)
 {
+    //FIXME
+    /*
     for (int i = 0; i < added; i++)
     {
         if (entries[i]->action == v)
             return entries[i]->value;
-    }
+    }*/
     return 0;
 }
 
 int Menu::get_val()
 {
-    return entries[menu_pos]->value;
+    return menu_pos->value;
 }
 
 Sentence * Menu::get_sentence()
 {
-    return entries[menu_pos]->sentence;
+    return menu_pos->sentence;
 }
 
 InventoryElement * Menu::get_el()
 {
-    return entries[menu_pos]->el;
+    return menu_pos->el;
 }
 
 void Menu::show()
@@ -133,20 +112,21 @@ void Menu::show()
     else
         game_size = window_height;
 
-    int menu_opt_size = game_size / (options + 3);
+    int menu_entries = entries->nr_elements;
+    int menu_opt_size = game_size / ( menu_entries+ 3);
     int mody;
     int mody2;
-    // printf("options = %d\n", options);
+    // printf("menu_entries = %d\n", menu_entries);
 
-    if (options % 2)
+    if (menu_entries % 2)
     {
-        mody = (game_size / 2) - ((menu_opt_size * (options / 2) + menu_opt_size / 2));
-        mody2 = (game_size / 2) + ((menu_opt_size * (options / 2) + menu_opt_size / 2));
+        mody = (game_size / 2) - ((menu_opt_size * (menu_entries / 2) + menu_opt_size / 2));
+        mody2 = (game_size / 2) + ((menu_opt_size * (menu_entries / 2) + menu_opt_size / 2));
     }
     else
     {
-        mody = (game_size / 2) - (menu_opt_size * (options / 2));
-        mody2 = (game_size / 2) + (menu_opt_size * (options / 2));
+        mody = (game_size / 2) - (menu_opt_size * (menu_entries / 2));
+        mody2 = (game_size / 2) + (menu_opt_size * (menu_entries / 2));
     }
 
     int modx = int((game_size / 2)) - (0.4 * game_size);
@@ -156,18 +136,18 @@ void Menu::show()
     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 100);
     SDL_RenderFillRect(renderer, &rect);
 
-    int mody3 = mody + (((menu_pos + 1) * menu_opt_size) - (menu_opt_size));
-    int mody4 = mody + ((menu_pos + 1) * menu_opt_size);
+    int mody3 = mody + (((index + 1) * menu_opt_size) - (menu_opt_size));
+    int mody4 = mody + ((index + 1) * menu_opt_size);
 
     // THIS IS THE SELECT
-    // if (options < 10)
+    // if (added < 10)
     {
         draw_rectangle(modx, mody3, modx2 - modx, mody4 - mody3, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255}, SDL_Color{}, SDL_Color{});
         draw_rectangle(modx, mody3, modx2 - modx, mody4 - mody3, SDL_Color{}, SDL_Color{}, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255});
     }
     /* else
      {
-         if (options % 2)
+         if (added % 2)
          {
              draw_rectangle(modx, game_size / 2 - menu_opt_size / 2, modx2 - modx, menu_opt_size, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255}, SDL_Color{}, SDL_Color{});
              draw_rectangle(modx, game_size / 2 - menu_opt_size / 2, modx2 - modx, menu_opt_size, SDL_Color{}, SDL_Color{}, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255});
@@ -179,7 +159,7 @@ void Menu::show()
          }
      }
  */
-    //  if (options < 10)
+    //  if (added < 10)
     {
         SDL_Rect rect3 = {modx, mody - menu_opt_size, modx2 - modx, mody4 - mody3};
         SDL_SetRenderDrawColor(renderer, 150, 0, 150, 100);
@@ -188,17 +168,19 @@ void Menu::show()
     }
     /*else
     {
-        SDL_Rect rect3 = {modx, mody + (-menu_pos + options / 2) * menu_opt_size - menu_opt_size, modx2 - modx, menu_opt_size};
+        SDL_Rect rect3 = {modx, mody + (-menu_pos + added / 2) * menu_opt_size - menu_opt_size, modx2 - modx, menu_opt_size};
         SDL_SetRenderDrawColor(renderer, 150, 0, 150, 100);
         SDL_RenderFillRect(renderer, &rect3);
-        write_text(modx, mody + (-menu_pos + options / 2) * menu_opt_size - menu_opt_size, name, Yellow, game_size / 27, menu_opt_size);
+        write_text(modx, mody + (-menu_pos + added / 2) * menu_opt_size - menu_opt_size, name, Yellow, game_size / 27, menu_opt_size);
     }*/
-    for (i = 0; i < options; i++)
+    Menu_entry * menu_entry= (Menu_entry*)(entries->head);
+
+    for (i = 0; i < menu_entries; i++)
     {
         SDL_Rect rect;
         int text_y = mody + i * menu_opt_size;
         int text_x = modx;
-        //   if (options < 10)
+        //   if (added < 10)
         {
             rect.x = modx;
             rect.y = mody + i * menu_opt_size;
@@ -208,11 +190,12 @@ void Menu::show()
         /* else
          {
              rect.x = modx;
-             rect.y = mody + (i - menu_pos + options / 2) * menu_opt_size;
+             rect.y = mody + (i - menu_pos + added / 2) * menu_opt_size;
              rect.w = menu_opt_size;
              rect.h = menu_opt_size;
          }*/
-        if (entries[i]->texture)
+        //FIXME
+        /*if (entries[i]->texture)
         {
             SDL_RenderCopy(renderer, entries[i]->texture, NULL, &rect);
             text_x += menu_opt_size;
@@ -223,21 +206,21 @@ void Menu::show()
             // SDL_Texture *_texture = el[i]->get_texture();
             // SDL_RenderCopy(renderer, _texture, NULL, &rect);
             // text_x+=menu_opt_size;
-        }
-        //  if (options >= 10)
-        //    text_y = mody + (i - menu_pos + options / 2) * menu_opt_size;
+        }*/
+        //  if (added >= 10)
+        //    text_y = mody + (i - menu_pos + added / 2) * menu_opt_size;
 
-        if (entries[i])
-            write_text(text_x, text_y, entries[i]->entry, White, game_size / 27, menu_opt_size);
+        write_text(text_x, text_y, menu_entry->entry, White, game_size / 27, menu_opt_size);
+        menu_entry=(Menu_entry*)(menu_entry->next);
     }
 }
 
-Menu_entry::Menu_entry(const char * e, enum menu_actions a, int v, InventoryElement * _el, SDL_Texture * t)
-{
-    texture = t;
+Menu_entry::Menu_entry(const char * e, menu_actions a, InventoryElement * _el, int v, Sentence * s)
+{    
     action = a;
-    value = v;
     el = _el;
+    sentence = s;
+    value=v;
     if (el)
     {
         entry = new char[64];
@@ -245,25 +228,6 @@ Menu_entry::Menu_entry(const char * e, enum menu_actions a, int v, InventoryElem
         dynamic_entry = true;
     }
     else
-    {
-        entry = (char *)e;
-        dynamic_entry = false;
-    }
-}
-
-Menu_entry::Menu_entry(const char * e, menu_actions a, Sentence * s, InventoryElement * _el)
-{
-    texture = nullptr;
-    action = a;
-    el = _el;
-    sentence = s;
-    /* if (el)
-     {
-         entry = new char[64];
-         sprintf(entry, "%s", e);
-         dynamic_entry = true;
-     }
-     else*/
     {
         entry = (char *)e;
         dynamic_entry = false;
@@ -278,16 +242,16 @@ Menu_entry::~Menu_entry()
 
 void create_menus()
 {
-    menu_main = new Menu("Main", 4);
+    menu_main = new Menu("Main");
     menu_main->add("Exit", MENU_EXIT);
     // add("Save & Exit", MENU_SAVE_EXIT);
     // add("Save", MENU_SAVE);
     // add("Load", MENU_LOAD);
     menu_main->add("Help", MENU_HELP);
-    menu_main->add("Change music volume", MENU_MUSIC);
+   // menu_main->add("Change music volume", MENU_MUSIC);
     menu_main->add("Cancel", MENU_CANCEL);
 
-    menu_help = new Menu("Help 1", 20);
+    menu_help = new Menu("Help 1");
     menu_help->add("esc - main menu", MENU_CANCEL);
     menu_help->add("F1 - show item info", MENU_CANCEL);
     menu_help->add("F2 - show item info on server", MENU_CANCEL);
@@ -313,7 +277,7 @@ void create_menus()
     menu_help->add("a - Action", MENU_ACTION);
 
     //   menu_help->add("l - devmenu", MENU_CANCEL);
-    // menu_help->add("i - inventory", MENU_CANCEL);
+    menu_help->add("i - inventory", MENU_CANCEL);
     //  menu_help->add("v - clear statusline", MENU_CANCEL);
     //   menu_help->add("g - terrain break", MENU_CANCEL);
     //  menu_help->add("r - remove from hotbar", MENU_CANCEL);
@@ -321,56 +285,89 @@ void create_menus()
     //  menu_help->add("F5 - autoexplore", MENU_CANCEL);
     //  menu_help->add("F4 - item info at player", MENU_CANCEL);
 
-    menu_music = new Menu("Music", 3);
+  /*  menu_music = new Menu("Music", 3);
     menu_music->add("+5 Volume", MENU_LOUDER);
     menu_music->add("-5 Volume", MENU_QUIETER);
     menu_music->add("Cancel", MENU_CANCEL);
-
-    menu_inventory_categories = new Menu("Inventory categories", 4);
-    menu_inventory_categories->add("Solid form", MENU_INV_SOLID, Form_solid);
-    menu_inventory_categories->add("Liquid form", MENU_INV_LIGQUID, Form_liquid);
-    menu_inventory_categories->add("Gas form", MENU_INV_GAS, Form_gas);
+*/
+    menu_inventory_categories = new Menu("Inventory categories");
+    menu_inventory_categories->add("Elements", MENU_INV_ELEMENTS, Class_Element);
+    menu_inventory_categories->add("Ingredients", MENU_INV_INGREDIENTS, Class_Ingredient);
+    menu_inventory_categories->add("Products", MENU_INV_PRODUCT, Class_Product);
+    menu_inventory_categories->add("Plants", MENU_INV_PLANT, Class_Plant);
+    menu_inventory_categories->add("Animals", MENU_INV_ANIMAL, Class_Animal);
     menu_inventory_categories->add("Cancel", MENU_CANCEL);
 
-    menu_npc = new Menu("NPC", 3);
+    menu_inventory_elements = new Menu("Inventory elements");
+    menu_inventory_elements->add("Solid form", MENU_INV_SOLID, Form_solid);
+    menu_inventory_elements->add("Liquid form", MENU_INV_LIGQUID, Form_liquid);
+    menu_inventory_elements->add("Gas form", MENU_INV_GAS, Form_gas);
+    menu_inventory_elements->add("Cancel", MENU_CANCEL);
+
+    menu_npc = new Menu("NPC");
     menu_npc->add("Talk to NPC", MENU_NPC_SAY);
     menu_npc->add("Ask NPC", MENU_NPC_ASK);
     menu_npc->add("Cancel", MENU_CANCEL);
 
-    menu_action = new Menu("Action", 3);
+    menu_action = new Menu("Action");
     menu_action->add("Drink", MENU_DRINK);
     menu_action->add("Eat", MENU_EAT);
     menu_action->add("Cancel", MENU_CANCEL);
 }
 
-Menu * create_inv_category_menu(enum Form f)
+//create menu with selected form
+Menu * create_inv_form(enum Form f)
 {
     int count = 0;
-    InventoryElement ** elements_with_form = NULL; // player->inventory->find_form(f, &count);
+    InventoryElement ** elements_with_form = player->inventory->find_form(f, &count);
     if (!count)
         return nullptr;
 
-    if (menu_inventory_categories2)
+    if (menu_inventory_elements_form)
     {
-        delete menu_inventory_categories2;
+        delete menu_inventory_elements_form;
     }
     char * menu_name = new char[50];
     sprintf(menu_name, "Inventory: %s", Form_name[f]);
 
-    menu_inventory_categories2 = new Menu(menu_name, count);
+    menu_inventory_elements_form = new Menu(menu_name);
     // int menu_index = 0;
     for (int i = 0; i < count; i++)
     {
         // FIXME add texture
-        // menu_inventory_categories2->add(base_elements[i]->name, MENU_CATEGORIE, items_textures[i], menu_index, i);
-        menu_inventory_categories2->add("*", MENU_CATEGORIES, elements_with_form[i]);
+        // menu_inventory_categories2->add(base_elements[i]->name, MENU_CATEGORIES, items_textures[i], menu_index, i);
         //        menu_index++;
+        //fixme group elements with the same base id
+        menu_inventory_elements_form->add("*", MENU_ITEMS_GROUP, elements_with_form[i]);
+
     }
-    return menu_inventory_categories2;
+    return menu_inventory_elements_form;
 }
-// FIXME
-#if 0
-void create_inv_menu(Item_id id)
+
+Menu * create_inv_category_classes(enum Class_id c)
+{
+    int count = 0;
+    InventoryElement ** elements_with_class = player->inventory->find_class(c, &count);
+    if (!count)
+        return nullptr;
+
+    if (menu_inventory_class)
+    {
+        delete menu_inventory_class;
+    }
+    char * menu_name = new char[50];
+    sprintf(menu_name, "Inventory: %s", class_name[c]);
+
+    menu_inventory_class = new Menu(menu_name);
+    for (int i = 0; i < count; i++)
+    {
+        menu_inventory_class->add("*", MENU_CLASSES, elements_with_class[i]);
+    }
+    return menu_inventory_class;
+}
+
+// create menu for elements with the same base id
+void create_inv_menu(int id)
 {
     printf("szukam %d\n", id);
     int c = 0;
@@ -382,7 +379,7 @@ void create_inv_menu(Item_id id)
         if (menu_inventory)
             delete menu_inventory;
 
-        menu_inventory = new Menu("Which element?", c);
+        menu_inventory = new Menu("Which element?");
         Element ** el = (Element **)i_el;
         for (int i = 0; i < c; i++)
         {
@@ -395,19 +392,20 @@ void create_inv_menu(Item_id id)
     }
     current_menu = nullptr;
 }
-#endif
+
 void Menu::go_down()
 {
-    menu_pos++;
-    if (menu_pos == options)
-        menu_pos = 0;
+    menu_pos=(Menu_entry*)(menu_pos->next);
+    index++;
+    if (!menu_pos) {
+        menu_pos = (Menu_entry*)(entries->head);
+        index = 0;
+    }
 }
 
 void Menu::go_up()
 {
-    menu_pos--;
-    if (menu_pos < 0)
-        menu_pos = options - 1;
+    //FIXME add prev to list
 }
 
 int menu_interact(int key)
@@ -480,11 +478,12 @@ int menu_interact(int key)
     return current_menu ? 1 : 0;
 }
 
+//add item from menu to hotbar
 int Menu::handle_item(int i)
 {
     if (active_hotbar >= 0)
     {
-        InventoryElement * el = entries[i]->el;
+        InventoryElement * el = menu_pos->el;
 
         for (int h = 0; h < 10; h++)
         {
@@ -509,7 +508,7 @@ void action(menu_actions a)
 
 int Menu::interact()
 {
-    menu_actions a = entries[menu_pos]->action;
+    menu_actions a = menu_pos->action;
 
     if (a & MENU_ITEM)
         return menu_inventory->handle_item(a & ~MENU_ITEM);
@@ -519,11 +518,10 @@ int Menu::interact()
     }
 
     switch (a)
-    {
-            // FIXME - doesn't work for beings
-        case MENU_CATEGORIES:
-        { // FIXME don't use elements'id but c_id and type
-            // create_inv_menu((Item_id)(menu_inventory_categories2->get_val()));
+    {            
+        case MENU_ITEMS_GROUP:
+        {// get base id
+            //create_inv_menu((Item_id)(menu_inventory_elements_form->get_val()));
             return 0;
         }
             /*
@@ -555,10 +553,21 @@ int Menu::interact()
             d_craft.show ^= 1;
             return 1; // hide menu
 
+        case MENU_INV_ELEMENTS:
+            current_menu = menu_inventory_elements;
+            return 0;
+
         case MENU_INV_SOLID:
         case MENU_INV_LIGQUID:
         case MENU_INV_GAS:
-            current_menu = create_inv_category_menu((Form)menu_inventory_categories->get_val());
+            current_menu = create_inv_form((Form)menu_inventory_elements->get_val());
+            return 0;
+
+        case MENU_INV_INGREDIENTS:
+        case MENU_INV_PRODUCT:
+        case MENU_INV_PLANT:
+        case MENU_INV_ANIMAL:
+            current_menu = create_inv_category_classes((Class_id)menu_inventory_categories->get_val());
             return 0;
 
         case MENU_LOUDER:

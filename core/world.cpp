@@ -9,6 +9,7 @@ void remove_from_chunks(InventoryElement * object)
     world_table[object->location.chunk.map_y][object->location.chunk.map_x]->remove_object(object);
 }
 
+//FIXME do we stil need these get_*_at functions?
 // Being ** get_being_at(int chunk_x, int chunk_y, int x, int y)
 // {
 //     // TODO
@@ -82,6 +83,7 @@ Object ** get_object_at_ppos(Player * player)
 {
     return get_object_at(player->map_x, player->map_y, player->x, player->y);
 }
+
 
 Plant ** get_plant_at(int chunk_x, int chunk_y, int x, int y)
 {

@@ -55,8 +55,6 @@ class Renderable
             SDL_RenderCopy(renderer, texture, NULL, &img_rect);
     }
 };
-// FIXME remove Renderable class
-// core_class -> core_class_SDL { texture }
 
 class IngredientSDL : public Ingredient, public Renderable
 {
