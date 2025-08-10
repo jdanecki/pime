@@ -114,8 +114,8 @@ pub struct Server {
 impl Server {
     fn broadcast(&mut self, data: &[u8]) {
         let clients = self.clients.clone();
-    //    println!("SERV: clients.len={}", self.clients.len());
-       //  p self.clients.base.table.table.items
+        //    println!("SERV: clients.len={}", self.clients.len());
+        //  p self.clients.base.table.table.items
         for client in clients.keys() {
             self.send_to_reliable(data, client);
         }
@@ -135,13 +135,19 @@ impl Server {
         buf.extend_from_slice(&data);
         unsafe {
             if core::trace_network {
-                println!("SERV: send len={} local_seq={} remote_seq={}", 
-                12 + data.len(), client.local_seq_num, client.remote_seq_num );
-                    core::show_packet_type_name('S' as i8, data[0] as u8);
+                println!(
+                    "SERV: send len={} local_seq={} remote_seq={}",
+                    12 + data.len(),
+                    client.local_seq_num,
+                    client.remote_seq_num
+                );
+                core::show_packet_type_name('S' as i8, data[0] as u8);
             }
         }
 
-        client.not_confirmed_packets.insert(client.local_seq_num, data.to_vec());
+        client
+            .not_confirmed_packets
+            .insert(client.local_seq_num, data.to_vec());
         self.socket.send_to(&buf, to).unwrap();
     }
 }
@@ -171,7 +177,7 @@ impl<'a> From<&'a [u8]> for ClientEvent<'a> {
                 a: u32::from_le_bytes(value[1..5].try_into().unwrap()),
                 oid: usize::from_le_bytes(value[5..13].try_into().unwrap()),
             },
-             core::PACKET_PLAYER_ACTION_CRAFT => ClientEvent::Craft {
+            core::PACKET_PLAYER_ACTION_CRAFT => ClientEvent::Craft {
                 product_id: usize::from_le_bytes(value[1..9].try_into().unwrap()),
                 ingredients_num: 2/*((value.len()-1)/8)*/ as u32,
                 ingredients_ids: &value[9..],
@@ -204,7 +210,7 @@ pub fn init_server() -> Result<Server, Box<dyn Error>> {
         clients: HashMap::new(),
     })
 }
-    
+
 pub fn test_server() {
     generator::generate();
     //generator::show_world();
@@ -279,12 +285,20 @@ fn update_chunk_for_player(server: &mut Server, peer: &SocketAddr, coords: (u8, 
     data[2] = coords.1;
 
     unsafe {
-        let chunk = core::world_table[coords.1 as usize][coords.0 as usize].as_mut().unwrap();
+        let chunk = core::world_table[coords.1 as usize][coords.0 as usize]
+            .as_mut()
+            .unwrap();
         let table_ptr = chunk.table.as_mut_ptr() as *mut u8;
-        let table_slice = std::slice::from_raw_parts(table_ptr, (core::CHUNK_SIZE * core::CHUNK_SIZE * core::TILE_SIZE) as usize);
+        let table_slice = std::slice::from_raw_parts(
+            table_ptr,
+            (core::CHUNK_SIZE * core::CHUNK_SIZE * core::TILE_SIZE) as usize,
+        );
 
         let dest_ptr = data[3..].as_mut_ptr();
-        let dest_slice = std::slice::from_raw_parts_mut(dest_ptr, (core::CHUNK_SIZE * core::CHUNK_SIZE * core::TILE_SIZE) as usize);
+        let dest_slice = std::slice::from_raw_parts_mut(
+            dest_ptr,
+            (core::CHUNK_SIZE * core::CHUNK_SIZE * core::TILE_SIZE) as usize,
+        );
         dest_slice.clone_from_slice(table_slice);
     }
 
@@ -295,12 +309,14 @@ fn update_chunk_for_player(server: &mut Server, peer: &SocketAddr, coords: (u8, 
 fn create_objects_in_chunk_for_player(server: &mut Server, peer: &SocketAddr, coords: (u8, u8)) {
     let chunk;
     unsafe {
-        chunk = core::world_table[coords.1 as usize][coords.0 as usize].as_mut().unwrap();
+        chunk = core::world_table[coords.1 as usize][coords.0 as usize]
+            .as_mut()
+            .unwrap();
 
         let mut le = chunk.objects._base.head;
         while le != std::ptr::null_mut() {
             let mut data = vec![core::PACKET_OBJECT_CREATE];
-          //  println!("create_objects_in_chunk_for_player PACKET_OBJECT_CREATE");
+            //  println!("create_objects_in_chunk_for_player PACKET_OBJECT_CREATE");
             let obj = convert_types::convert_to_data(&*(*le).el);
             let obj_data = &bincode::serialize(&obj).unwrap()[..];
             //          println!("data {:?}", obj_data);
@@ -366,7 +382,7 @@ fn handle_network(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
                 }
             }
         } else {
-//            println!("SERV: handle_network END");
+            //            println!("SERV: handle_network END");
             break;
         }
     }
@@ -382,11 +398,14 @@ fn handle_packet(
     let seq = u32::from_le_bytes(packet[0..4].try_into().unwrap());
     let ack = u32::from_le_bytes(packet[4..8].try_into().unwrap());
     let acks = u32::from_le_bytes(packet[8..12].try_into().unwrap());
-        unsafe {
-            if core::trace_network {
-                println!("SERV: handle_packet seq={seq} remote_seq_num={} ack={ack}", client_data.remote_seq_num);
-            }
+    unsafe {
+        if core::trace_network {
+            println!(
+                "SERV: handle_packet seq={seq} remote_seq_num={} ack={ack}",
+                client_data.remote_seq_num
+            );
         }
+    }
     if seq > client_data.remote_seq_num {
         let diff = seq - client_data.remote_seq_num;
         client_data.acks_bitmap = (client_data.acks_bitmap << 1) | 1;
@@ -423,9 +442,9 @@ fn handle_packet(
     for d in to_resend {
         server.send_to_reliable(&d, peer);
     }
-    
+
     if packet.len() < 13 {
-         panic!("packet to short len={} {:?}", packet.len(), packet );
+        panic!("packet to short len={} {:?}", packet.len(), packet);
     }
 
     let packet = &packet[12..];
@@ -491,14 +510,12 @@ fn handle_packet(
                 let object = (*core::world_table[player._base.map_y as usize]
                     [player._base.map_x as usize])
                     .find_by_id(oid);
-                if object != std::ptr::null_mut()
-                {
+                if object != std::ptr::null_mut() {
                     if !player.action_on_object(a, object) {
                         let response = [core::PACKET_ACTION_FAILED];
                         server.send_to_reliable(&response, peer);
                     }
-                } 
-                else {
+                } else {
                     let response = [core::PACKET_ACTION_FAILED];
                     server.send_to_reliable(&response, peer);
                 }
@@ -508,9 +525,10 @@ fn handle_packet(
             println!("SERV: server action {a} on {oid}");
             unsafe {
                 let mut object = 0 as *mut core::InventoryElement;
-                if oid != 0 { 
-                     object = (*core::world_table[player._base.map_y as usize]
-                     [player._base.map_x as usize]).find_by_id(oid);
+                if oid != 0 {
+                    object = (*core::world_table[player._base.map_y as usize]
+                        [player._base.map_x as usize])
+                        .find_by_id(oid);
                 }
                 if !player.server_action_on_object(a, object) {
                     let response = [core::PACKET_ACTION_FAILED];
@@ -575,15 +593,14 @@ fn handle_packet(
         ClientEvent::RequestChunk { x, y } => unsafe {
             println!("SERV: RequestChunk: received {} {}", x, y);
             if !(x < 0 || x > core::WORLD_SIZE as i32 || y < 0 || y > core::WORLD_SIZE as i32) {
-                    if core::world_table[y as usize][x as usize] != std::ptr::null_mut() 
-                    {
-                        println!("SERV: update chunk for {} {}", x, y);
-                        update_chunk_for_player(server, peer, (x as u8, y as u8));
-                    }
+                if core::world_table[y as usize][x as usize] != std::ptr::null_mut() {
+                    println!("SERV: update chunk for {} {}", x, y);
+                    update_chunk_for_player(server, peer, (x as u8, y as u8));
+                }
             }
-         },
+        },
         //FIXME change id to get_id()
-        ClientEvent::Whatever =>  {} , //println!("player {} alive", player._base.id),
+        ClientEvent::Whatever => {} //println!("player {} alive", player._base.id),
     }
 }
 
@@ -594,7 +611,7 @@ fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>)
         let mut le = (*list)._base.head;
         while le != std::ptr::null_mut() {
             let mut data = vec![core::PACKET_OBJECT_CREATE];
-   //         println!("send_game_updates PACKET_OBJECT_CREATE");
+            //         println!("send_game_updates PACKET_OBJECT_CREATE");
             let obj = convert_types::convert_to_data(&*(*le).el);
             let obj_data = &bincode::serialize(&obj).unwrap()[..];
             //            println!("data {:?}", obj_data);
@@ -611,16 +628,23 @@ fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>)
         let el = std::ptr::addr_of_mut!(core::objects_to_update);
         let mut le = (*el)._base.head;
         while le != std::ptr::null_mut() {
-            let mut data = vec![core::PACKET_OBJECT_UPDATE];
-//            println!("send_game_updates PACKET_OBJECT_UPDATE");
-            let obj = convert_types::convert_to_data(&*(*le).el);
-            let obj_data = &bincode::serialize(&obj).unwrap()[..];
-            //            println!("data {:?}", obj_data);
-            data.extend_from_slice(obj_data);
+            if DESTROY_ITEMS
+                .iter()
+                .find(|(id, _)| *id == (*(*le).el).uid)
+                .is_none()
+            {
+                //
+                let mut data = vec![core::PACKET_OBJECT_UPDATE];
+                //            println!("send_game_updates PACKET_OBJECT_UPDATE");
+                let obj = convert_types::convert_to_data(&*(*le).el);
+                let obj_data = &bincode::serialize(&obj).unwrap()[..];
+                //            println!("data {:?}", obj_data);
+                data.extend_from_slice(obj_data);
+                server.broadcast(&data);
+            }
 
             le = (*le).next;
-//            println!("PACKET_OBJECT_UPDATE");
-            server.broadcast(&data);
+            //            println!("PACKET_OBJECT_UPDATE");
         }
         while (*el)._base.head != std::ptr::null_mut() {
             (*el).remove((*(*el)._base.head).el);
@@ -634,10 +658,10 @@ fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>)
 fn send_location_updates(server: &mut Server) {
     unsafe {
         if LOCATION_UPDATES.len() > 0 {
-          //  println!("SERV:send_location_updates len={}", LOCATION_UPDATES.len());
+            //  println!("SERV:send_location_updates len={}", LOCATION_UPDATES.len());
             for update in LOCATION_UPDATES.iter() {
                 let mut data = vec![core::PACKET_LOCATION_UPDATE];
-            //    println!("SERV: send_location_updates id={}", update.id);
+                //    println!("SERV: send_location_updates id={}", update.id);
                 data.extend_from_slice(&bincode::serialize(update).unwrap()[..]);
                 server.broadcast(&data);
             }
@@ -658,7 +682,6 @@ fn send_knowledge_updates(server: &mut Server) {
         }
     }
 }
-
 
 fn send_destroy_updates(server: &mut Server) {
     unsafe {
