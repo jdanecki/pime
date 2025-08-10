@@ -65,8 +65,8 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
             //println!("{:?}", region.rocks_types);
             for (rock, num) in region.rocks_types.iter() {
                 // TODO remove +1 for each object
-//                let prob = num * 10.0 + 1.0;
-                let prob = num * 3.0 + 1.0;
+                let prob = num * 10.0 + 1.0;
+//                let prob = num * 3.0 + 1.0;
 //                println!("element {prob} {:?}", rock);
                 do_times(prob, || {
                     chunk.add_object1(core::create_element(rock.get_base()
@@ -353,8 +353,8 @@ fn simulate(
 }
 
 fn create_terrains() -> Vec<Rc<TerrainType>> {
-    //let num = rand::random_range(10..20);
-    let num = rand::random_range(3..4);
+    let num = rand::random_range(10..20);
+    //let num = rand::random_range(3..4);
     let mut terrains = Vec::<Rc<TerrainType>>::with_capacity(num);
     for i in 0..num {
         terrains.push(Rc::new(TerrainType::new(i as u32)));

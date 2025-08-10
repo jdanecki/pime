@@ -491,17 +491,10 @@ fn handle_packet(
                 let object = (*core::world_table[player._base.map_y as usize]
                     [player._base.map_x as usize])
                     .find_by_id(oid);
-                if object != std::ptr::null_mut()
-                {
                     if !player.action_on_object(a, object) {
                         let response = [core::PACKET_ACTION_FAILED];
                         server.send_to_reliable(&response, peer);
                     }
-                } 
-                else {
-                    let response = [core::PACKET_ACTION_FAILED];
-                    server.send_to_reliable(&response, peer);
-                }
             }
         }
         ClientEvent::ServerActionOnObject { a, oid } => {
