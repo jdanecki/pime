@@ -20,6 +20,7 @@ impl ParseCallbacks for MacroCallback {
             "Product",
             "Ingredient",
             "Property",
+            "Scroll",
         ];
         let debug = vec![
             "Element",
@@ -28,6 +29,7 @@ impl ParseCallbacks for MacroCallback {
             "Product",
             "Ingredient",
             "InventoryElement",
+            "Scroll",
         ];
         if ser.contains(&info.name) {
             der.append(&mut vec![String::from("serde::Deserialize")]);

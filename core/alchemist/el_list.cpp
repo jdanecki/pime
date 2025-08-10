@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <cassert>
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -9,13 +10,15 @@
 ListElement::ListElement(InventoryElement * entry)
 {
     el = entry;
-    next = NULL;
+    next = nullptr;
+    prev = nullptr;
     enabled = true;
 }
 
 void ListElement::add(ListElement * entry)
 {
     next = entry;
+    entry->prev = this;
 }
 
 void ListElement::show(bool details)
@@ -110,10 +113,8 @@ void ElementsList::tick()
 
 ListElement * ElementsList::add(ListElement * entry)
 {
-    if (!entry)
-    {
-        printf("adding NULL pointer\n");
-    }
+    assert(entry);
+
     if (nr_elements)
     {
         tail->add(entry);
@@ -130,17 +131,16 @@ ListElement * ElementsList::add(ListElement * entry)
 
 void ElementsList::remove(ListElement * el)
 {
-    if (!head)
-        return;
+    assert(head);
+
     ListElement * cur = head;
     ListElement * tmp;
     if (head == el)
     {
         tmp = head->next;
-        if (!tail)
-        {
-            exit(0);
-        }
+        if (tmp) tmp->prev = nullptr;
+        assert(tail);
+
         if (tail == el) // only 1 element on the list
         {
             if (head == tail)
@@ -158,6 +158,7 @@ void ElementsList::remove(ListElement * el)
         if (cur->next == el)
         {
             tmp = cur->next;
+            if (tmp && tmp->next) tmp->next->prev = cur;
             cur->next = cur->next->next;
             if (tail == el)
             {
@@ -216,7 +217,7 @@ bool match_class(InventoryElement * el, void * arg)
 
 InventoryElement **InvList::find_class(Class_id cl, int *count)
 {
-    return find_by_fun(match_form, &cl, count);
+    return find_by_fun(match_class, &cl, count);
 }
 
 InventoryElement ** InvList::find_id(int id, int * count)

@@ -27,8 +27,11 @@ SDL_Texture * ObjectSDL::get_texture()
 
 ElementSDL::ElementSDL(Element data) : Element(data)
 {
-    el_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width.value, height.value);
-    SDL_SetTextureBlendMode(el_texture, SDL_BLENDMODE_BLEND);
+    w = width.value;
+    h = height.value;
+
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, w, h);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 
     start_width = width.value;
     /* value=0xff000000; //a
@@ -39,7 +42,7 @@ ElementSDL::ElementSDL(Element data) : Element(data)
     unsigned int * pixels;
     int pitch;
 
-    SDL_LockTexture(el_texture, NULL, (void **)&pixels, &pitch);
+    SDL_LockTexture(texture, NULL, (void **)&pixels, &pitch);
 
     Form f = get_form();
 
@@ -94,18 +97,13 @@ ElementSDL::ElementSDL(Element data) : Element(data)
             }
         }
     }
-    SDL_UnlockTexture(el_texture);
+    SDL_UnlockTexture(texture);
 }
 
 void ElementSDL::show(bool details)
 {
     Element::show(details);
     printf("scale=%0.2f %d %d\n", get_scale(), width.value, start_width);
-}
-
-SDL_Texture * ElementSDL::get_texture()
-{
-    return el_texture;
 }
 
 IngredientSDL::IngredientSDL(Ingredient data) : Ingredient(data)
@@ -124,4 +122,37 @@ ProductSDL::ProductSDL(Product data) : Product(data)
 SDL_Texture * ProductSDL::get_texture()
 {
     return prod_textures[get_id()];
+}
+
+ScrollSDL::ScrollSDL(Scroll data):Scroll(data)
+{
+    w = 32;
+    h = 32;
+
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, w, h);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    unsigned int * pixels;
+    int pitch;
+
+    SDL_LockTexture(texture, NULL, (void **)&pixels, &pitch);
+    for (int y = 0; y < h; ++y)
+    {
+        for (int x = 0; x < w; ++x)
+        {
+            if (x >= 2 && x < w - 2 && y >= 2 && y < w - 2)
+            {
+                pixels[y * w + x] = 0xFFDEB887;
+            }
+            else if (y < 4 || y >= w - 4)
+            {
+                pixels[y * w + x] = 0xFFA0522D;
+            }
+            else
+            {
+                pixels[y * w + x] = 0;
+            }
+        }
+    }
+
+    SDL_UnlockTexture(texture);
 }

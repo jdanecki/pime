@@ -56,12 +56,7 @@ SDL_Texture * create_npc_texture()
 
 NpcSDL::NpcSDL(Npc data) : Npc(data)
 {
-    this->texture = create_npc_texture();
-}
-
-SDL_Texture * NpcSDL::get_texture()
-{
-    return this->texture;
+    texture = create_npc_texture();
 }
 
 int npc(menu_actions a)

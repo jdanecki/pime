@@ -7,5 +7,6 @@ fn main() {
         main_loop(&mut server);
     }
 
-    println!("Hello, world!");
+   // println!("Hello, world!");
+   // test_server();
 }

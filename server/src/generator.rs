@@ -4,7 +4,6 @@ use std::hash::Hash;
 use std::rc::Rc;
 
 use crate::core;
-use crate::types::*;
 use crate::SEED;
 use rand::prelude::*;
 
@@ -20,17 +19,20 @@ pub fn get_world_data() -> Vec<u8> {
         .unwrap()
 }
 
+#[allow(dead_code)]
 pub fn show_world() {
     WORLD.with_borrow(|world| {
-        for t in &world.terrains {
+        println!("{:?}", world);
+        /*for t in &world.terrains {
             println!("{:#?}", t.base._base);
         }
+
         for p in &world.plants {
             println!("{:#?}", p.get_base());
         }
         for a in &world.animals {
             println!("{:#?}", a.get_base());
-        }
+        }*/
     });
 }
 
@@ -48,7 +50,8 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
             })
             .unwrap();
         unsafe {
-            println!("SERV: load_chunk map_x={} map_y={}  {:#?}", map_x, map_y, region);
+            println!("SERV: load_chunk map_x={} map_y={}", map_x, map_y);
+//            println!("SERV: load_chunk map_x={} map_y={}  {:#?}", map_x, map_y, region);
             let mut chunk = Box::new(core::chunk::new(map_x, map_y));
             for y in 0..core::CHUNK_SIZE as usize {
                 for x in 0..core::CHUNK_SIZE as usize {
@@ -59,20 +62,28 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
                     //chunk.table[y][x] = core::tile { tile: ((x + y)  % 10) as i32};
                 }
             }
+            //println!("{:?}", region.rocks_types);
             for (rock, num) in region.rocks_types.iter() {
                 // TODO remove +1 for each object
-                let prob = num * 10.0 + 1.0;
-                println!("element {prob}");
+//                let prob = num * 10.0 + 1.0;
+                let prob = num * 3.0 + 1.0;
+//                println!("element {prob} {:?}", rock);
                 do_times(prob, || {
                     chunk.add_object1(core::create_element(rock.get_base()
                         as *const core::BaseElementServer
                         as *mut core::BaseElementServer)
                         as *mut core::InventoryElement);
-                })
+
+                    chunk.add_object1(core::create_scroll(rock.get_base()
+                        as *const core::BaseElementServer
+                        as *mut core::BaseElementServer)
+                        as *mut core::InventoryElement);
+
+                });
             }
-            for (plant, num) in region.active_plants.iter() {
+/*            for (plant, num) in region.active_plants.iter() {
                 let prob = num / region.size as f32 + 1.0;
-                println!("plant {prob}");
+                //println!("plant {prob}");
                 do_times(prob, || {
                     chunk.add_object1(core::create_plant(
                         plant.get_base() as *const core::BasePlant as *mut core::BasePlant
@@ -81,14 +92,14 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
             }
             for (animal, num) in region.active_animals.iter() {
                 let prob = num / region.size as f32 + 1.0;
-                println!("animal {prob}");
+                //println!("animal {prob}");
                 do_times(prob, || {
                     chunk.add_object1(core::create_animal(animal.get_base()
                         as *const core::BaseAnimal
                         as *mut core::BaseAnimal)
                         as *mut core::InventoryElement);
-                })
-            }
+                });
+            }*/
             core::world_table[map_y as usize][map_x as usize] = Box::into_raw(chunk);
         }
     });
@@ -123,6 +134,7 @@ struct World {
 impl World {
     fn new() -> World {
         let terrains = create_terrains();
+//        println!("{:#?}", terrains);
         let plants = create_plants(&terrains);
         let animals = create_animals(&plants);
         let regions = create_regions(&terrains, &plants, &animals);
@@ -146,11 +158,12 @@ pub fn generate() {
     }
     let mut world = World::new();
 
-    println!("{:#?}", world.plants);
+    /*println!("{:#?}", world.plants);
     println!("{:#?}", world.animals);
     println!("{:#?}", world.regions[0]);
+    */
     simulate(&mut world.regions, &mut world.plants, &mut world.animals);
-    println!("{:#?}", world.regions[0]);
+    //println!("{:#?}", world.regions[0]);
     for _ in 0..10 {
         simulate(&mut world.regions, &mut world.plants, &mut world.animals);
         // for r in regions.iter() {
@@ -170,7 +183,7 @@ pub fn generate() {
         // println!("");
     }
     //    simulate(&mut regions);
-    println!("{:#?}", world.regions);
+   // println!("{:#?}", world.regions);
 
     WORLD.set(world);
     for y in 127..=129
@@ -179,7 +192,8 @@ pub fn generate() {
         {
              load_chunk(x, y);
         }
-    }
+    } 
+    //load_chunk(128,128);
 }
 
 fn simulate(
@@ -339,7 +353,8 @@ fn simulate(
 }
 
 fn create_terrains() -> Vec<Rc<TerrainType>> {
-    let num = rand::random_range(10..20);
+    //let num = rand::random_range(10..20);
+    let num = rand::random_range(3..4);
     let mut terrains = Vec::<Rc<TerrainType>>::with_capacity(num);
     for i in 0..num {
         terrains.push(Rc::new(TerrainType::new(i as u32)));

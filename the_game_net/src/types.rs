@@ -18,6 +18,7 @@ pub enum ObjectData {
     Animal { data: core::Animal },
     Ingredient { data: core::Ingredient },
     Product { data: core::Product },
+    Scroll { data: core::Scroll },
 }
 
 #[repr(C)]
@@ -58,6 +59,7 @@ pub enum BaseObjectData {
     Element { data: BaseElementData },
     Plant { data: BasePlantData },
     Animal { data: BaseAnimalData },
+    Scroll { data: BaseElementData },
 }
 
 #[no_mangle]

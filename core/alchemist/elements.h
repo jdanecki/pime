@@ -19,6 +19,7 @@ enum Class_id
     Class_Element, // base: BaseElement
     Class_Ingredient,
     Class_Product,
+    Class_Scroll,
 
     Class_Plant,  // base: BasePlant -> Base
     Class_Animal, // base: BaseAnimal->Base
@@ -42,7 +43,8 @@ extern const char * product_action_name[];
 enum Player_action
 {
     PLAYER_DRINK,
-    PLAYER_EAT
+    PLAYER_EAT,
+    PLAYER_READ,
 };
 
 extern const char * player_action_name[];
@@ -242,6 +244,36 @@ template <typename T> class SerializablePointer
     }
 };
 
+class Scroll : public InventoryElement
+{
+    SerializablePointer<BaseElement> base;
+  public:
+    BaseElement * get_base()
+    {
+        return base.get();
+    }
+    Scroll(BaseElement * b);
+    Class_id get_base_cid() override
+    {
+        return get_base()->c_id;
+    }
+    char * get_description() override
+    {
+        char * buf = new char[128];
+        sprintf(buf, "%s describing %s", get_class_name(), get_name());
+        return buf;
+    }
+    const char * get_name() override
+    {
+        return get_base()->get_name();
+    }
+    void show(bool details = true) override;
+    int get_id() override
+    {
+        return get_base()->id;
+    }
+};
+
 class Element : public InventoryElement
 {
     SerializablePointer<BaseElement> base;
@@ -279,17 +311,7 @@ class Element : public InventoryElement
     {
         return get_base()->c_id;
     }
-    bool action(Product_action action, Player * pl) override
-    {
-        printf("ELEMENT: %s %s\n", product_action_name[action], get_name());
-        return false;
-    }
-    char * get_description() override
-    {
-        char * buf = new char[128];
-        sprintf(buf, "%s: (%s) ", get_class_name(), get_name());
-        return buf;
-    }
+
     Property ** get_properties(int * count) override
     {
         // FIXME
@@ -343,7 +365,6 @@ enum Product_id
 
 extern const char * ingredient_name[];
 extern const char * product_name[];
-extern const char * items_name[];
 
 class Ingredient : public InventoryElement
 {

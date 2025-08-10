@@ -8,6 +8,11 @@ pub fn convert_to_data(el: &core::InventoryElement) -> ObjectData {
                 unsafe { &*(el as *const core::InventoryElement as *const core::Element) };
             ObjectData::Element { data: *element }
         }
+        core::Class_id_Class_Scroll => {
+            let scroll =
+                unsafe { &*(el as *const core::InventoryElement as *const core::Scroll) };
+            ObjectData::Scroll { data: *scroll }
+        }
         core::Class_id_Class_Ingredient => {
             let ingredient =
                 unsafe { &*(el as *const core::InventoryElement as *const core::Ingredient) };

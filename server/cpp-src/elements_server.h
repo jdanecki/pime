@@ -23,6 +23,7 @@ extern "C"
 {
     void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc);
     void notify_destroy(size_t id, ItemLocation location);
+    void notify_knowledge(size_t pl_id, Class_id cid, int id);
 }
 
 void destroy(InventoryElement * el);
@@ -40,7 +41,7 @@ class ElementServer : public Element
     Property smoothness;
     Property mass; // density*volume
 
-    ElementServer(BaseElementServer * base);
+    ElementServer(BaseElementServer * b);
     bool action(Product_action action, Player * pl) override;
     bool action_cut();
     bool action_hit();
@@ -50,6 +51,18 @@ class ElementServer : public Element
     bool action_eat();
     void show(bool details = true) override;
     bool can_pickup() override;
+};
+
+class ScrollServer : public Scroll
+{
+  public:
+    ScrollServer(BaseElementServer * base);
+    bool can_pickup() override
+    {
+        return true;
+    }
+    bool player_action(Player_action action, Player * pl) override;
+
 };
 
 class BeingServer
@@ -187,5 +200,6 @@ class ProductServer : public Product
 AnimalServer * create_animal(BaseAnimal * base);
 PlantServer * create_plant(BasePlant * base);
 ElementServer * create_element(BaseElementServer * base);
+ScrollServer * create_scroll(BaseElementServer * base);
 
 #endif

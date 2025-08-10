@@ -8,12 +8,10 @@
 
 class Renderable
 {
-    SDL_Texture * texture;
-    int w, h;
-
   protected:
+    int w, h;
     bool flip;
-
+    SDL_Texture * texture;
   public:
     Renderable()
     {
@@ -24,7 +22,7 @@ class Renderable
     }
     virtual SDL_Texture * get_texture()
     {
-        return NULL;
+        return texture;
     }
     virtual float get_scale()
     {
@@ -80,17 +78,20 @@ class ObjectSDL : public Object, public Renderable
 class ElementSDL : public Element, public Renderable
 {
     int start_width;
-    SDL_Texture * el_texture;
 
   public:
-    SDL_Texture * get_texture();
-
     ElementSDL(Element data);
     float get_scale() override
     {
         return 1.0 * width.value / start_width;
     }
     void show(bool details = true) override;
+};
+
+class ScrollSDL: public Scroll, public Renderable
+{
+  public:
+    ScrollSDL(Scroll data);
 };
 
 #endif

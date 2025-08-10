@@ -9,7 +9,7 @@ class ListElement
 
   public:
     InventoryElement * el;
-    ListElement * next;
+    ListElement * next, *prev;
 
     void add(ListElement * entry);
     void disable()
@@ -30,7 +30,7 @@ class ListElement
         return el->tick();
     }
     ListElement(InventoryElement * entry);
-    ListElement() : el(nullptr), next(nullptr)
+    ListElement() : el(nullptr), next(nullptr), prev(nullptr)
     {
         enable();
     }
@@ -69,6 +69,7 @@ class KnownElement : public ListElement
     void set_known()
     {
         known = true;
+        printf("learning %s %d\n", class_name[elid.c_id], elid.id);
     }
 
     bool check(void * what)

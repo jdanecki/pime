@@ -31,7 +31,7 @@ impl NetClient {
         buf.extend_from_slice(&self.my_acks_bitmap.to_le_bytes());
         buf.extend_from_slice(&data);
         unsafe {
-            if (core::trace_network) 
+            if core::trace_network 
             {
                 println!("SDL: send len={} local_seq={} remote_seq={}", 
                     12 + data.len(), self.local_seq_num, self.remote_seq_num );
@@ -67,7 +67,7 @@ pub extern "C" fn init(
     loop {
         let amt = client.socket.recv(&mut buf).unwrap();
         unsafe {
-            if (core::trace_network) 
+            if core::trace_network 
             {
                 println!("{:?}", buf[12]);
             }
@@ -80,7 +80,7 @@ pub extern "C" fn init(
                     usize::from_le_bytes(buf[1..9].try_into().unwrap()),
                     0, //i64::from_le_bytes(buf[9..17].try_into().unwrap()),
                 );
-            if (core::trace_network) {
+            if core::trace_network {
                 println!("RECEIVED {:?}", &buf[9..amt]);
             }
                 WORLD.set(
@@ -138,7 +138,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             let ack = u32::from_le_bytes(buf[4..8].try_into().unwrap());
             let acks = u32::from_le_bytes(buf[8..12].try_into().unwrap());
             unsafe {
-                if (core::trace_network)  {
+                if core::trace_network  {
                     println!("SDL: network_tick amt={amt} seq={seq} remote_seq_num={} ack={ack}", client.remote_seq_num);
                 }
             }
@@ -218,7 +218,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                 }
                 core::PACKET_CHUNK_UPDATE => {
                     unsafe {
-                        if (core::trace_network) {
+                        if core::trace_network {
                             println!("SDL: PACKET_CHUNK_UPDATE {}", amt);
                         }
                     }
@@ -231,7 +231,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                                 i32::from(value[2]),
                                 &mut *(&mut value[0] as *mut u8 as *mut core::chunk_table));
                                 unsafe {
-                                    if (core::trace_network) {
+                                    if core::trace_network {
                                         println!("SDL: PACKET_CHUNK_UPDATE OK");
                                     }
                                 }
@@ -272,6 +272,13 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                 },
                 core::PACKET_ACTION_FAILED => unsafe {
                     events::action_failed();
+                },
+                core::PACKET_KNOWLEDGE_UPDATE => unsafe {
+                    events::knowledge_update(
+                        usize::from_le_bytes(value[1..9].try_into().unwrap()),
+                        u32::from_le_bytes(value[9..13].try_into().unwrap()),
+                        i32::from_le_bytes(value[13..17].try_into().unwrap()),
+                    );
                 },
                 _ => {
                     println!("invalid packet type {:?}", value);

@@ -41,7 +41,7 @@ Menu::Menu(const char * n)
 {
     name = n;            
     entries = new ElementsList(n);
-    menu_pos = dynamic_cast<Menu_entry*>(entries->head);
+    menu_pos = nullptr;
     index = 0;
 }
 
@@ -53,22 +53,26 @@ Menu::~Menu()
 void Menu::add(const char * e, enum menu_actions a)
 {    
     entries->add(new Menu_entry(e, a, nullptr, 0, nullptr));
+    if (!menu_pos) menu_pos = dynamic_cast<Menu_entry*>(entries->head);
 }
 
 void Menu::add(const char *e, menu_actions a, int v)
 {
     entries->add(new Menu_entry(e, a, nullptr, v, nullptr));
+    if (!menu_pos) menu_pos = dynamic_cast<Menu_entry*>(entries->head);
 }
 
 void Menu::add(const char * e, enum Npc_say a,  InventoryElement * p_el, Sentence * s)
 {
     enum menu_actions conv = (enum menu_actions)((int)MENU_NPC_CONV + (int)a);
     entries->add(new Menu_entry(e, conv, p_el, 0, s));
+    if (!menu_pos) menu_pos = dynamic_cast<Menu_entry*>(entries->head);
 }
 
 void Menu::add(const char * e, enum menu_actions a, InventoryElement * p_el)
 {    
     entries->add(new Menu_entry(e, a, p_el, 0, nullptr));
+    if (!menu_pos) menu_pos = dynamic_cast<Menu_entry*>(entries->head);
 }
 
 int Menu::get_val(int v)
@@ -219,9 +223,9 @@ Menu_entry::Menu_entry(const char * e, menu_actions a, InventoryElement * _el, i
 {    
     action = a;
     el = _el;
-    sentence = s;
+    sentence = s;    
     value=v;
-    if (el)
+    if (el && !s)
     {
         entry = new char[64];
         sprintf(entry, "%s %s", e, el->get_name());
@@ -296,6 +300,7 @@ void create_menus()
     menu_inventory_categories->add("Products", MENU_INV_PRODUCT, Class_Product);
     menu_inventory_categories->add("Plants", MENU_INV_PLANT, Class_Plant);
     menu_inventory_categories->add("Animals", MENU_INV_ANIMAL, Class_Animal);
+    menu_inventory_categories->add("Scrolls", MENU_INV_SCROLL, Class_Scroll);
     menu_inventory_categories->add("Cancel", MENU_CANCEL);
 
     menu_inventory_elements = new Menu("Inventory elements");
@@ -312,6 +317,7 @@ void create_menus()
     menu_action = new Menu("Action");
     menu_action->add("Drink", MENU_DRINK);
     menu_action->add("Eat", MENU_EAT);
+    menu_action->add("Read", MENU_READ);
     menu_action->add("Cancel", MENU_CANCEL);
 }
 
@@ -405,7 +411,12 @@ void Menu::go_down()
 
 void Menu::go_up()
 {
-    //FIXME add prev to list
+    menu_pos=(Menu_entry*)(menu_pos->prev);
+    index--;
+    if (!menu_pos) {
+        menu_pos = (Menu_entry*)(entries->head);
+        index = 0;
+    }
 }
 
 int menu_interact(int key)
@@ -567,6 +578,7 @@ int Menu::interact()
         case MENU_INV_PRODUCT:
         case MENU_INV_PLANT:
         case MENU_INV_ANIMAL:
+        case MENU_INV_SCROLL:
             current_menu = create_inv_category_classes((Class_id)menu_inventory_categories->get_val());
             return 0;
 
@@ -595,6 +607,9 @@ int Menu::interact()
             return 0;
         case MENU_EAT:
             action_tile(PLAYER_EAT, player->map_x, player->map_y, player->x, player->y);
+            return 0;
+        case MENU_READ:
+            action_tile(PLAYER_READ, player->map_x, player->map_y, player->x, player->y);
             return 0;
 
         default:

@@ -20,6 +20,7 @@ impl ParseCallbacks for MacroCallback {
             "Product",
             "Ingredient",
             "Property",
+            "Scroll",
         ];
         let co_cl = vec![
             "InventoryElement",
@@ -28,6 +29,7 @@ impl ParseCallbacks for MacroCallback {
             "Animal",
             "Ingredient",
             "Product",
+            "Scroll",
         ];
         if ser.contains(&info.name) {
             der.append(&mut vec![String::from("serde::Serialize")]);

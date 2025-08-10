@@ -82,7 +82,9 @@ InventoryElement * el_from_data(const ObjectData * data)
             break;
         case ObjectData::Tag::Element:
             el = new ElementSDL(data->element.data);
-
+            break;
+        case ObjectData::Tag::Scroll:
+            el = new ScrollSDL(data->scroll.data);
             break;
         case ObjectData::Tag::Ingredient:
             el = new IngredientSDL(data->ingredient.data);
@@ -104,6 +106,11 @@ InventoryElement * el_from_data(const ObjectData * data)
 
 extern "C"
 {
+
+    void knowledge_update(size_t pl_id, Class_id cid, int id)
+    {
+        printf("knowledge update for %ld cid=%s id=%d\n", pl_id, class_name[cid], id);
+    }
 
     void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y, int thirst, int hunger)
     {
@@ -333,3 +340,4 @@ extern "C"
         print_status(1, "action failed");
     }
 }
+

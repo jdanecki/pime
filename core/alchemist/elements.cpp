@@ -44,13 +44,13 @@ const char * product_action_name[] = {
     "stab",
     "fire",
 };
-const char * player_action_name[] = {"drink", "eat"};
+const char * player_action_name[] = {"drink", "eat", "read"};
 
 const char * server_action_name[] = {"server show item", "server show chunk", "server trace network"};
 
 const char * object_names[] = {"wall"};
 const char * plant_phase_name[] = {"Seed", "Seedling", "Growing", "Flowers", "Fruits"};
-const char * class_name[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Plant", "Animal", "Player", "Npc"};
+const char * class_name[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Scroll", "Plant", "Animal", "Player", "Npc"};
 
 Base::Base(int index, Class_id c, const char * name) : name(name)
 {
@@ -75,13 +75,14 @@ BaseElement::BaseElement(Form f, Color color, int index) : Base(index, Class_Bas
 template <typename T> SerializablePointer<T>::SerializablePointer(T * p) : ptr(p)
 {
 }
-
+//called by networking.cpp:create_object
 Element::Element(BaseElement * b)
     //  : InventoryElement(Class_Element), base(b), length("length", 8 + rand() % 120), width("width", 8 + rand() % 120), height("height", 8 + rand() % 120),
     : InventoryElement(Class_Element), base(b), length("length", 3 + rand() % 30), width("width", 3 + rand() % 30), height("height", 3 + rand() % 30),
       volume("volume", length.value * width.value * height.value)
 {
 }
+//called by the_game_net/core.rs
 InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : c_id(c_id), uid(uid), location(location)
 {
 }
@@ -175,4 +176,14 @@ void Plant::init(BasePlant * b)
 Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)
 {
     init(b);
+}
+
+Scroll::Scroll(BaseElement *b) : InventoryElement(Class_Scroll), base(b)
+{
+
+}
+
+void Scroll::show(bool details)
+{
+    printf("%s: base=%s uid=%lx\n", get_class_name(), get_name(), uid);
 }
