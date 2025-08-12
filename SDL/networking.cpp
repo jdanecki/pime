@@ -110,6 +110,10 @@ extern "C"
     void knowledge_update(size_t pl_id, Class_id cid, int id)
     {
         printf("knowledge update for %ld cid=%s id=%d\n", pl_id, class_name[cid], id);
+        Player * p = players[pl_id];
+        if (!p)
+            return;
+        p->set_known(cid, id);
     }
 
     void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y, int thirst, int hunger)
@@ -340,4 +344,3 @@ extern "C"
         print_status(1, "action failed");
     }
 }
-

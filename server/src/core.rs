@@ -70,11 +70,27 @@ impl serde::Serialize for SerializablePointer<BaseAnimal> {
     }
 }
 
+impl serde::Serialize for SerializablePointer<Base> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_tuple(2)?;
+        unsafe {
+            state.serialize_element(&(*self.ptr).c_id)?;
+            state.serialize_element(&(*self.ptr).id)?;
+        }
+        state.end()
+    }
+}
+
+
 impl serde::Serialize for InventoryElement {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
+        //FIXME change this to 3
         let mut state = serializer.serialize_tuple(4)?;
         state.serialize_element(&self.c_id)?;
         state.serialize_element(&self.uid)?;

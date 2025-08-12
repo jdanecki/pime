@@ -70,19 +70,20 @@ const char * Base::get_name()
 
 BaseElement::BaseElement(Form f, Color color, int index) : Base(index, Class_BaseElement, create_name(5 - f)), form(f), color(color)
 {
+    printf("BaseElement index=%d name=%s\n", index, get_name());
 }
 
 template <typename T> SerializablePointer<T>::SerializablePointer(T * p) : ptr(p)
 {
 }
-//called by networking.cpp:create_object
+// called by networking.cpp:create_object
 Element::Element(BaseElement * b)
     //  : InventoryElement(Class_Element), base(b), length("length", 8 + rand() % 120), width("width", 8 + rand() % 120), height("height", 8 + rand() % 120),
     : InventoryElement(Class_Element), base(b), length("length", 3 + rand() % 30), width("width", 3 + rand() % 30), height("height", 3 + rand() % 30),
       volume("volume", length.value * width.value * height.value)
 {
 }
-//called by the_game_net/core.rs
+// called by the_game_net/core.rs
 InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : c_id(c_id), uid(uid), location(location)
 {
 }
@@ -148,6 +149,7 @@ BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(7)
     carnivorous = rand() % 2;
     swimming = rand() % 2;
     flying = rand() % 2;
+    printf("BaseAnimal index=%d name=%s\n", index, get_name());
 }
 
 Animal::Animal(BaseAnimal * b) : InventoryElement(Class_Animal), base(b)
@@ -159,6 +161,7 @@ BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(5))
 {
     flowers = rand() % 2;
     leaves = rand() % 2;
+    printf("BasePlant index=%d name=%s\n", index, get_name());
 }
 
 void Plant::init(BasePlant * b)
@@ -178,9 +181,9 @@ Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)
     init(b);
 }
 
-Scroll::Scroll(BaseElement *b) : InventoryElement(Class_Scroll), base(b)
+Scroll::Scroll(Base * b) : InventoryElement(Class_Scroll), base(b)
 {
-
+    printf("Scroll class=%s id=%d name=%s\n", class_name[b->c_id], b->id, b->get_name());
 }
 
 void Scroll::show(bool details)

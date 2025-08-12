@@ -56,13 +56,12 @@ class ElementServer : public Element
 class ScrollServer : public Scroll
 {
   public:
-    ScrollServer(BaseElementServer * base);
+    ScrollServer(Base * base);
     bool can_pickup() override
     {
         return true;
     }
     bool player_action(Player_action action, Player * pl) override;
-
 };
 
 class BeingServer
@@ -200,6 +199,6 @@ class ProductServer : public Product
 AnimalServer * create_animal(BaseAnimal * base);
 PlantServer * create_plant(BasePlant * base);
 ElementServer * create_element(BaseElementServer * base);
-ScrollServer * create_scroll(BaseElementServer * base);
+ScrollServer * create_scroll(Base * base);
 
 #endif

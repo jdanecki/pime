@@ -233,7 +233,7 @@ bool Player::check_known(InventoryElement * el)
     return k->is_known();
 }
 
-void Player::set_known(Class_id cid, int el_id)
+bool Player::set_known(Class_id cid, int el_id)
 {
     ElId i;
     i.c_id = cid;
@@ -245,7 +245,10 @@ void Player::set_known(Class_id cid, int el_id)
         KnownElement * n = new KnownElement(i.c_id, i.id);
         known_elements->add(n);
         n->set_known();
+        return true;
     }
+    else
+        return false;
 }
 
 Relations Player::find_relation(Player * who)

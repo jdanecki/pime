@@ -19,8 +19,8 @@ void destroy(InventoryElement * el)
 
 BaseElementServer::BaseElementServer(Form f, int index) : BaseElement(f, {rand() % 256, rand() % 256, rand() % 256}, index)
 {
-    printf("BaseElementServer index=%d name=%s\n", index, get_name());
-    solid = NULL;    
+
+    solid = NULL;
     density = nullptr;
     form = f;
     switch (f)
@@ -396,19 +396,18 @@ PlantServer * create_plant(BasePlant * base)
 
 ElementServer * create_element(BaseElementServer * base)
 {
- //   printf("create_element %s\n", base->get_name());
+    //   printf("create_element %s\n", base->get_name());
     return new ElementServer(base);
 }
 
-ScrollServer * create_scroll(BaseElementServer * base)
+ScrollServer * create_scroll(Base * base)
 {
-  //  printf("create_scroll: base=%s id=%d\n", base->get_name(), base->id);
-    ScrollServer *s=new ScrollServer(base);
+    //  printf("create_scroll: base=%s id=%d\n", base->get_name(), base->id);
+    ScrollServer * s = new ScrollServer(base);
     return s;
 }
 
-ElementServer::ElementServer(BaseElementServer * b) : Element(b), sharpness("sharpness", 0), smoothness("smoothness", 0), mass("mass",
-                                                      b->density->value * volume.value / 1000)
+ElementServer::ElementServer(BaseElementServer * b) : Element(b), sharpness("sharpness", 0), smoothness("smoothness", 0), mass("mass", b->density->value * volume.value / 1000)
 {
     if (b->form == Form_solid)
     {
@@ -578,20 +577,25 @@ bool BeingServer::grow()
     return alive;
 }
 
-ScrollServer::ScrollServer(BaseElementServer *b) : Scroll(b)
+ScrollServer::ScrollServer(Base * b) : Scroll(b)
 {
-
 }
 
-bool ScrollServer::player_action(Player_action action, Player *pl)
+bool ScrollServer::player_action(Player_action action, Player * pl)
 {
     printf("ScrollServer: %s %s\n", player_action_name[action], get_name());
 
     switch (action)
     {
         case PLAYER_READ:
-            pl->set_known(get_base_cid(), get_id());
-            notify_knowledge(pl->get_id(), get_base_cid(), get_id());
+            if (pl->set_known(get_base_cid(), get_id()))
+            {
+                notify_knowledge(pl->get_id(), get_base_cid(), get_id());
+            }
+            else
+            {
+                printf("ScrollServer: already known this item\n");
+            }
             destroy(this);
             break;
     }

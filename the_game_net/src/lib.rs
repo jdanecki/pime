@@ -331,6 +331,16 @@ pub extern "C" fn get_base_animal(id: i32) -> *mut core::BaseAnimal {
             .cast_mut()
     })
 }
+#[no_mangle]
+pub extern "C" fn get_base(c_id: u32, id: i32) -> *mut core::Base {
+    match c_id {
+        core::Class_id_Class_BaseElement => get_base_element(id) as *mut core::Base,
+        core::Class_id_Class_BasePlant => get_base_plant(id) as *mut core::Base,
+        core::Class_id_Class_BaseAnimal => get_base_animal(id) as *mut core::Base,
+        _ => panic!("get_base: wrong c_id"),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

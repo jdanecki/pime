@@ -246,13 +246,14 @@ template <typename T> class SerializablePointer
 
 class Scroll : public InventoryElement
 {
-    SerializablePointer<BaseElement> base;
+    SerializablePointer<Base> base;
+
   public:
-    BaseElement * get_base()
+    Base * get_base()
     {
         return base.get();
     }
-    Scroll(BaseElement * b);
+    Scroll(Base * b);
     Class_id get_base_cid() override
     {
         return get_base()->c_id;
