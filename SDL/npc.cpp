@@ -16,47 +16,10 @@ int get_tile_at(int chunk_x, int chunk_y, int x, int y)
     return world_table[chunk_y][chunk_x]->table[y][x].tile;
 }
 
-SDL_Texture * create_npc_texture()
-{
-    Color c = get_base_element(get_tile_at(player->map_x, player->map_y, 0, 0))->color; // FIXME
-    Uint8 mask_r = c.r;
-    Uint8 mask_g = c.g;
-    Uint8 mask_b = c.b;
-    SDL_Surface * surface = SDL_CreateRGBSurface(0, 32, 32, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-    SDL_BlitSurface(Texture.player_surface, NULL, surface, NULL);
-    SDL_LockSurface(surface);
-
-    SDL_PixelFormat * fmt = surface->format;
-    Uint32 * pixels = (Uint32 *)surface->pixels;
-
-    for (int y = 0; y < surface->h; ++y)
-    {
-        for (int x = 0; x < surface->w; ++x)
-        {
-            Uint32 * p = pixels + y * surface->w + x;
-            Uint8 r, g, b, a;
-            SDL_GetRGBA(*p, fmt, &r, &g, &b, &a);
-
-            if (r == g && g == b)
-            {
-                Uint8 gray = (r + g + b) / 3;
-                Uint8 nr = (mask_r * gray) / 255;
-                Uint8 ng = (mask_g * gray) / 255;
-                Uint8 nb = (mask_b * gray) / 255;
-                *p = SDL_MapRGBA(fmt, nr, ng, nb, a);
-            }
-        }
-    }
-
-    SDL_UnlockSurface(surface);
-    SDL_Texture * retval = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
-    return retval;
-}
-
 NpcSDL::NpcSDL(Npc data) : Npc(data)
 {
-    texture = create_npc_texture();
+    Color c = get_base_element(get_tile_at(player->map_x, player->map_y, 0, 0))->color; // FIXME
+    texture = add_texture_color(Player_textures.npc, c);
 }
 
 int npc(menu_actions a)
@@ -115,7 +78,7 @@ int npc(menu_actions a)
             switch (sentence->id)
             {
                 case NPC_Ask_do_you_know_inv_item:
-                    menu_dialog->add(sentence->text, sentence->id,  player->hotbar[active_hotbar], sentence);
+                    menu_dialog->add(sentence->text, sentence->id, player->hotbar[active_hotbar], sentence);
                     break;
                 case NPC_Ask_do_you_know_item:
                     menu_dialog->add(sentence->text, sentence->id, item_at, sentence);

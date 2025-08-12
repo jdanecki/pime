@@ -303,13 +303,13 @@ void draw_players()
             SDL_Rect img_rect;
             if (players[i]->get_id() == player->get_id())
                 img_rect = {8 * tile_dungeon_size, 8 * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
-            else //FIXME
+            else // FIXME
                 img_rect = {players[i]->x * tile_dungeon_size, players[i]->y * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
 
             if (players[i]->going_right)
-                SDL_RenderCopy(renderer, Texture.player, NULL, &img_rect);
+                SDL_RenderCopy(renderer, Player_textures.player, NULL, &img_rect);
             else
-                SDL_RenderCopyEx(renderer, Texture.player, NULL, &img_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                SDL_RenderCopyEx(renderer, Player_textures.player, NULL, &img_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
         }
     }
 
@@ -318,12 +318,12 @@ void draw_players()
     if (player->running)
     {
         SDL_Rect running_icon_rect = {(int)(game_size - (icon_size * 1.1)), 0, icon_size, icon_size};
-        SDL_RenderCopy(renderer, Texture.run_icon, NULL, &running_icon_rect);
+        SDL_RenderCopy(renderer, Player_textures.run_icon, NULL, &running_icon_rect);
     }
     if (player->sneaking)
     {
         SDL_Rect sneaking_icon_rect = {(int)(game_size - (icon_size * 1.1)), 0, icon_size, icon_size};
-        SDL_RenderCopy(renderer, Texture.sneak_icon, NULL, &sneaking_icon_rect);
+        SDL_RenderCopy(renderer, Player_textures.sneak_icon, NULL, &sneaking_icon_rect);
     }
 }
 
