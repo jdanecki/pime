@@ -100,7 +100,7 @@ void Player::stop_conversation()
 
 void Player::show(bool details)
 {
-    printf("%s %s\n", class_name[c_id], get_name());
+    printf("%s %s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), get_id(), map_x, map_y, x, y);
 
     if (talking_to)
     {

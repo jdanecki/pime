@@ -219,7 +219,7 @@ void key_pressed(int key)
             break;
 
         case SDLK_F5:
-            trace_network ^= true;
+            trace_network += 1;
             break;
         case SDLK_F6:
             server_action_tile(SERVER_TRACE_NETWORK, player->map_x, player->map_y, player->x, player->y);

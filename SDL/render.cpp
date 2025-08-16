@@ -294,17 +294,27 @@ bool draw_terrain()
 
 void draw_players()
 {
+    int player_world_x = player->map_x * CHUNK_SIZE + player->x;
+    int player_world_y = player->map_y * CHUNK_SIZE + player->y;
 
-    // render players
+    int left_top_world_x = player_world_x - CHUNK_SIZE / 2;
+    int left_top_world_y = player_world_y - CHUNK_SIZE / 2;
+
     for (int i = 0; i < PLAYER_NUM; i++)
     {
-        if (players[i] && player->map_x == players[i]->map_x && player->map_y == players[i]->map_y)
+        if (!players[i])
+            continue;
+
+        int pl_world_x = players[i]->map_x * CHUNK_SIZE + players[i]->x;
+        int pl_world_y = players[i]->map_y * CHUNK_SIZE + players[i]->y;
+
+        int screen_x = pl_world_x - left_top_world_x;
+        int screen_y = pl_world_y - left_top_world_y;
+
+        if (screen_x >= 0 && screen_x < CHUNK_SIZE && screen_y >= 0 && screen_y < CHUNK_SIZE)
         {
             SDL_Rect img_rect;
-            if (players[i]->get_id() == player->get_id())
-                img_rect = {8 * tile_dungeon_size, 8 * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
-            else // FIXME
-                img_rect = {players[i]->x * tile_dungeon_size, players[i]->y * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
+            img_rect = {screen_x * tile_dungeon_size, screen_y * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
 
             if (players[i]->going_right)
                 SDL_RenderCopy(renderer, Player_textures.player, NULL, &img_rect);

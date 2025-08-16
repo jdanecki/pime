@@ -31,7 +31,7 @@ extern "C" fn notify_destroy(id: usize, location: core::ItemLocation) {
 }
 
 #[no_mangle]
-extern "C" fn notify_knowledge(pl_id: usize, cid: core::Class_id, id: i32) {
+extern "C" fn notify_knowledge(pl_id: i32, cid: core::Class_id, id: i32) {
     unsafe {
         KNOWN_UPDATES.push((pl_id, cid, id));
     }
@@ -41,7 +41,7 @@ pub static mut SEED: i64 = 0;
 pub static mut LOCATION_UPDATES: Vec<types::LocationUpdateData> = vec![];
 
 pub static mut DESTROY_ITEMS: Vec<(usize, core::ItemLocation)> = vec![];
-pub static mut KNOWN_UPDATES: Vec<(usize, core::Class_id, i32)> = vec![];
+pub static mut KNOWN_UPDATES: Vec<(i32, core::Class_id, i32)> = vec![];
 
 pub enum ClientEvent<'a> {
     Move {
@@ -134,7 +134,7 @@ impl Server {
         buf.extend_from_slice(&client.acks_bitmap.to_le_bytes());
         buf.extend_from_slice(&data);
         unsafe {
-            if core::trace_network {
+            if core::trace_network > 0 {
                 println!(
                     "SERV: send len={} local_seq={} remote_seq={}",
                     12 + data.len(),
@@ -342,7 +342,7 @@ fn handle_network(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
                 panic!("SERV: PACKET to big!!!");
             }
             unsafe {
-                if core::trace_network {
+                if core::trace_network > 0  {
                     println!("SERV: handle_network amt={amt}");
                 }
             }
@@ -399,7 +399,7 @@ fn handle_packet(
     let ack = u32::from_le_bytes(packet[4..8].try_into().unwrap());
     let acks = u32::from_le_bytes(packet[8..12].try_into().unwrap());
     unsafe {
-        if core::trace_network {
+        if core::trace_network > 0 {
             println!(
                 "SERV: handle_packet seq={seq} remote_seq_num={} ack={ack}",
                 client_data.remote_seq_num
@@ -524,6 +524,7 @@ fn handle_packet(
                     object = (*core::world_table[player._base.map_y as usize]
                         [player._base.map_x as usize])
                         .find_by_id(oid);
+                    println!("SERV: object={:?}", object);
                 }
                 if !player.server_action_on_object(a, object) {
                     let response = [core::PACKET_ACTION_FAILED];
@@ -595,7 +596,7 @@ fn handle_packet(
             }
         },
         //FIXME change id to get_id()
-        ClientEvent::Whatever => {} //println!("player {} alive", player._base.id),
+        ClientEvent::Whatever => { } , // println!("player {} alive", player._base.id) },
     }
 }
 

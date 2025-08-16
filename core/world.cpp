@@ -9,17 +9,17 @@ void remove_from_chunks(InventoryElement * object)
     world_table[object->location.chunk.map_y][object->location.chunk.map_x]->remove_object(object);
 }
 
-//FIXME do we stil need these get_*_at functions?
-// Being ** get_being_at(int chunk_x, int chunk_y, int x, int y)
-// {
-//     // TODO
-//     /*for (int i = 0; i < 128; i++)
-//     {
-//         Being *b = world_table[chunk_y][chunk_x]->beings[i];
-//         if (b)
-//         {
-//             int b_x, b_y;
-//             b->get_posittion(&b_x, &b_y);
+// FIXME do we stil need these get_*_at functions?
+//  Being ** get_being_at(int chunk_x, int chunk_y, int x, int y)
+//  {
+//      // TODO
+//      /*for (int i = 0; i < 128; i++)
+//      {
+//          Being *b = world_table[chunk_y][chunk_x]->beings[i];
+//          if (b)
+//          {
+//              int b_x, b_y;
+//              b->get_posittion(&b_x, &b_y);
 
 //             if (b_x == x && b_y == y)
 //             {
@@ -84,7 +84,6 @@ Object ** get_object_at_ppos(Player * player)
     return get_object_at(player->map_x, player->map_y, player->x, player->y);
 }
 
-
 Plant ** get_plant_at(int chunk_x, int chunk_y, int x, int y)
 {
     // TODO
@@ -132,6 +131,8 @@ InventoryElement * get_item_at_ppos(Player * player)
     return get_item_at(player->map_x, player->map_y, player->x, player->y);
 }
 
+// FIXME do we need these functions
+#if 0
 void set_item_at(InventoryElement * item, int chunk_x, int chunk_y, int x, int y)
 {
     // TODO
@@ -149,3 +150,4 @@ void set_item_at_ppos(InventoryElement * item, Player * player)
 {
     set_item_at(item, player->map_x, player->map_y, player->x, player->y);
 }
+#endif

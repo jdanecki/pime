@@ -96,7 +96,7 @@ bool PlayerServer::server_action_on_object(Server_action a, InventoryElement * o
             world_table[map_y][map_x]->show();
             break;
         case SERVER_TRACE_NETWORK:
-            trace_network ^= true;
+            trace_network += 1;
             break;
     }
 

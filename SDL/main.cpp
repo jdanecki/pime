@@ -145,6 +145,7 @@ void loop()
     // int dst_map_y=player.map_y;
 
     print_status(0, "Welcome in game!");
+    current_npc = new NpcSDL(Npc());
 
     for (;;)
     {
@@ -155,10 +156,6 @@ void loop()
 
         // TODO disconnect
         network_tick(client);
-
-        // FIXME
-        if (!current_npc)
-            current_npc = new NpcSDL(Npc());
 
         /*if (auto_explore) {
             do_auto_explore();

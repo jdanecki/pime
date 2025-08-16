@@ -31,7 +31,7 @@ impl NetClient {
         buf.extend_from_slice(&self.my_acks_bitmap.to_le_bytes());
         buf.extend_from_slice(&data);
         unsafe {
-            if core::trace_network 
+            if core::trace_network > 0 && core::trace_network < 3
             {
                 println!("SDL: send len={} local_seq={} remote_seq={}", 
                     12 + data.len(), self.local_seq_num, self.remote_seq_num );
@@ -39,7 +39,7 @@ impl NetClient {
             }
         }
         self.not_confirmed_packets
-            .insert(self.local_seq_num, buf.to_vec());
+            .insert(self.local_seq_num, data.to_vec());
         self.socket.send(&buf).unwrap();
     }
 }
@@ -67,7 +67,7 @@ pub extern "C" fn init(
     loop {
         let amt = client.socket.recv(&mut buf).unwrap();
         unsafe {
-            if core::trace_network 
+            if core::trace_network > 0
             {
                 println!("{:?}", buf[12]);
             }
@@ -80,7 +80,7 @@ pub extern "C" fn init(
                     usize::from_le_bytes(buf[1..9].try_into().unwrap()),
                     0, //i64::from_le_bytes(buf[9..17].try_into().unwrap()),
                 );
-            if core::trace_network {
+            if core::trace_network > 0 {
                 println!("RECEIVED {:?}", &buf[9..amt]);
             }
                 WORLD.set(
@@ -138,8 +138,8 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             let ack = u32::from_le_bytes(buf[4..8].try_into().unwrap());
             let acks = u32::from_le_bytes(buf[8..12].try_into().unwrap());
             unsafe {
-                if core::trace_network  {
-                    println!("SDL: network_tick amt={amt} seq={seq} remote_seq_num={} ack={ack}", client.remote_seq_num);
+                if core::trace_network > 0  && core::trace_network < 3{
+                    println!("SDL: network_tick receive amt={amt} seq={seq} remote_seq_num={} ack={ack}", client.remote_seq_num);
                 }
             }
             if seq > client.remote_seq_num {
@@ -174,7 +174,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             let mut to_resend = vec![];
             for (&id, d) in client.not_confirmed_packets.iter() {
                 if id + 32 < ack {
-                    println!("SDL: PACKET NOT CONFIRMED {}", id);
+                    println!("SDL: PACKET NOT CONFIRMED id={id} ack={ack}");
                     to_resend.push(d.clone());
                     to_remove.push(id);
                 }
@@ -186,7 +186,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                 client.send(&d);
             }
             client.unsent_acks += 1;
-            if client.unsent_acks > 20 {
+            if client.unsent_acks > 5 {
                 client.send(&vec![core::PACKET_KEEP_ALIVE as u8]);
                 client.unsent_acks = 0;
             }
@@ -217,12 +217,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                     }
                 }
                 core::PACKET_CHUNK_UPDATE => {
-                    unsafe {
-                        if core::trace_network {
-                            println!("SDL: PACKET_CHUNK_UPDATE {}", amt);
-                        }
-                    }
-                    if amt == size_of::<core::chunk_table>() + 3 + 12 {
+                   if amt == size_of::<core::chunk_table>() + 3 + 12 {
                         unsafe {
                             events::update_chunk(
                                 //i32::from_le_bytes(value[1..5].try_into().unwrap()),
@@ -231,7 +226,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                                 i32::from(value[2]),
                                 &mut *(&mut value[0] as *mut u8 as *mut core::chunk_table));
                                 unsafe {
-                                    if core::trace_network {
+                                    if core::trace_network > 0 {
                                         println!("SDL: PACKET_CHUNK_UPDATE OK");
                                     }
                                 }
@@ -275,9 +270,9 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                 },
                 core::PACKET_KNOWLEDGE_UPDATE => unsafe {
                     events::knowledge_update(
-                        usize::from_le_bytes(value[1..9].try_into().unwrap()),
-                        u32::from_le_bytes(value[9..13].try_into().unwrap()),
-                        i32::from_le_bytes(value[13..17].try_into().unwrap()),
+                        i32::from_le_bytes(value[1..5].try_into().unwrap()),
+                        u32::from_le_bytes(value[5..9].try_into().unwrap()),
+                        i32::from_le_bytes(value[9..13].try_into().unwrap()),
                     );
                 },
                 _ => {

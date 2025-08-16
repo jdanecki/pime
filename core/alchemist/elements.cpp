@@ -70,7 +70,7 @@ const char * Base::get_name()
 
 BaseElement::BaseElement(Form f, Color color, int index) : Base(index, Class_BaseElement, create_name(5 - f)), form(f), color(color)
 {
-    printf("BaseElement index=%d name=%s\n", index, get_name());
+    //  printf("BaseElement index=%d name=%s\n", index, get_name());
 }
 
 template <typename T> SerializablePointer<T>::SerializablePointer(T * p) : ptr(p)
@@ -149,7 +149,7 @@ BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(7)
     carnivorous = rand() % 2;
     swimming = rand() % 2;
     flying = rand() % 2;
-    printf("BaseAnimal index=%d name=%s\n", index, get_name());
+    //   printf("BaseAnimal index=%d name=%s\n", index, get_name());
 }
 
 Animal::Animal(BaseAnimal * b) : InventoryElement(Class_Animal), base(b)
@@ -161,7 +161,7 @@ BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(5))
 {
     flowers = rand() % 2;
     leaves = rand() % 2;
-    printf("BasePlant index=%d name=%s\n", index, get_name());
+    //  printf("BasePlant index=%d name=%s\n", index, get_name());
 }
 
 void Plant::init(BasePlant * b)
@@ -183,7 +183,7 @@ Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)
 
 Scroll::Scroll(Base * b) : InventoryElement(Class_Scroll), base(b)
 {
-    printf("Scroll class=%s id=%d name=%s\n", class_name[b->c_id], b->id, b->get_name());
+    //  printf("Scroll class=%s id=%d name=%s\n", class_name[b->c_id], b->id, b->get_name());
 }
 
 void Scroll::show(bool details)

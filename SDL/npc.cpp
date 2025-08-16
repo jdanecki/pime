@@ -13,13 +13,36 @@ extern int active_hotbar;
 
 int get_tile_at(int chunk_x, int chunk_y, int x, int y)
 {
+    if (!world_table[chunk_y][chunk_x])
+    {
+        printf("missing tile\n");
+        return -1;
+    }
+
     return world_table[chunk_y][chunk_x]->table[y][x].tile;
 }
 
 NpcSDL::NpcSDL(Npc data) : Npc(data)
 {
-    Color c = get_base_element(get_tile_at(player->map_x, player->map_y, 0, 0))->color; // FIXME
-    texture = add_texture_color(Player_textures.npc, c);
+}
+
+SDL_Texture * NpcSDL::get_texture()
+{
+    if (!texture)
+        init();
+    return texture;
+}
+
+void NpcSDL::init()
+{
+    if (!texture)
+    {
+        int tile = get_tile_at(player->map_x, player->map_y, 0, 0);
+        if (tile < 0)
+            return;
+        Color c = get_base_element(tile)->color; // FIXME
+        texture = add_texture_color(Player_textures.npc, c);
+    }
 }
 
 int npc(menu_actions a)

@@ -10,8 +10,11 @@ extern int npc_say(Sentence * s, InventoryElement * el);
 
 class NpcSDL : public Npc, public Renderable
 {
+    void init();
+
   public:
     NpcSDL(Npc data);
+    SDL_Texture * get_texture();
 };
 
 extern NpcSDL * current_npc;

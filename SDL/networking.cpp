@@ -5,9 +5,10 @@
 #include "../core/world.h"
 #include "implementations/BeingSDL.h"
 #include "implementations/alchemistSDL.h"
-#include "text.h"
 #include <cstring>
 #include <stdio.h>
+
+void print_status(int l, const char * format, ...);
 
 #define PLAYER_NUM 16
 extern Player * players[PLAYER_NUM];
@@ -54,7 +55,7 @@ InventoryElement * remove_from_location(ItemLocation location, size_t id)
         {
             // printf("removed %ld from chunk %d %d\n", id, location.chunk.map_x, location.chunk.map_y);
             if (!world_table[location.chunk.map_y][location.chunk.map_x])
-                return nullptr;
+                return nullptr; // chunk not loaded yet
             el = world_table[location.chunk.map_y][location.chunk.map_x]->find_by_id(id);
             world_table[location.chunk.map_y][location.chunk.map_x]->remove_object(el);
             break;
@@ -107,9 +108,12 @@ InventoryElement * el_from_data(const ObjectData * data)
 extern "C"
 {
 
-    void knowledge_update(size_t pl_id, Class_id cid, int id)
+    void knowledge_update(int pl_id, Class_id cid, int id)
     {
-        printf("knowledge update for %ld cid=%s id=%d\n", pl_id, class_name[cid], id);
+        if (pl_id != player->get_id())
+            return;
+
+        printf("knowledge update for player %d cid=%s id=%d\n", pl_id, class_name[cid], id);
         Player * p = players[pl_id];
         if (!p)
             return;
@@ -277,7 +281,7 @@ extern "C"
             }
             case ItemLocation::Tag::Player:
             {
-                // printf("added %ld to player %ld\n", id, new_loc.player.id);
+                printf("added %ld to player %ld\n", id, new_loc.player.id);
                 players[new_loc.player.id]->pickup(el);
                 if ((int)new_loc.player.id == player->get_id())
                 {
@@ -330,8 +334,9 @@ extern "C"
             printf("SDL: destroy_object %ld", id);
             delete el;
         }
-        else
-            printf("SDL: deleting inexisting item %ld\n", id);
+        // else
+        //  item on not loaded chunk
+        //     printf("SDL: deleting inexisting item %ld\n", id);
     }
 
     void failed_craft()
