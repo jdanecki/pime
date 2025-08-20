@@ -261,22 +261,6 @@ fn add_player(
     //println!("{:?} , players {:?}", peer, players);
 }
 
-fn update_players(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
-    for (i, p) in players.iter().enumerate() {
-        let mut data = [0 as u8; 33];
-        data[0] = core::PACKET_PLAYER_UPDATE;
-        data[1..9].clone_from_slice(&i.to_le_bytes());
-        data[9..13].clone_from_slice(&p._base.map_x.to_le_bytes());
-        data[13..17].clone_from_slice(&p._base.map_y.to_le_bytes());
-        data[17..21].clone_from_slice(&p._base.x.to_le_bytes());
-        data[21..25].clone_from_slice(&p._base.y.to_le_bytes());
-        data[25..29].clone_from_slice(&p._base.thirst.to_le_bytes());
-        data[29..33].clone_from_slice(&p._base.hunger.to_le_bytes());
-
-        server.broadcast(&data);
-    }
-}
-
 fn update_chunk_for_player(server: &mut Server, peer: &SocketAddr, coords: (u8, u8)) {
     let mut data =
         vec![0 as u8; 3 + (core::CHUNK_SIZE * core::CHUNK_SIZE) as usize * size_of::<i32>()];
@@ -605,7 +589,6 @@ fn handle_packet(
 }
 
 fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
-    update_players(server, players);
     unsafe {
         let list = std::ptr::addr_of_mut!(core::objects_to_create);
         let mut le = (*list)._base.head;

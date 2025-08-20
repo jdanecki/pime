@@ -42,10 +42,8 @@ struct PlayerRelation
 class Player : public InventoryElement
 {
     int * padding; // FIXME
-    int id;
-
   protected:
-    char * name;
+    SerializableCString name;
 
   protected:
     ElementsList * known_elements;
@@ -53,10 +51,6 @@ class Player : public InventoryElement
     // FIXME
     // add list know players, npc's
   public:
-    int map_y;
-    int map_x;
-    int y;
-    int x;
     char running;
     char sneaking;
     char going_right;
@@ -76,7 +70,8 @@ class Player : public InventoryElement
     void drop(InventoryElement * item);
     InventoryElement * get_item_by_uid(size_t id);
     int get_id();
-    Player(int id);
+    // Player(int id);
+    Player(int id, SerializableCString&& name, ItemLocation location, int thirst, int hunger, int nutrition);
     int conversation(Player * who, Sentence * s, InventoryElement * el);
     void stop_conversation();
 
@@ -99,7 +94,7 @@ class Player : public InventoryElement
 
     const char * get_name()
     {
-        return name;
+        return name.str;
     }
 };
 

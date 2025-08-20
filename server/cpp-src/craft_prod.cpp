@@ -3,7 +3,7 @@
 typedef ProductServer * (*ProductFunction)(InventoryElement *, InventoryElement *);
 
 ProductFunction productFunctions[] = {
-    createAxe,
+    Axe::createAxe,
     createKnife,
     createPickAxe,
     createHut,
@@ -18,15 +18,5 @@ InventoryElement * craft_prod(int product_id, InventoryElement * el1, InventoryE
         return nullptr;
     InventoryElement * crafted = productFunctions[product_id](el1, el2);
 
-    if (crafted->craft())
-    {
-        crafted->show();
-        return crafted;
-    }
-    else
-    {
-        delete crafted;
-    }
-
-    return nullptr;
+    return crafted;
 }

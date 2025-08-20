@@ -23,40 +23,41 @@ bool check_and_load_chunk(int new_map_x, int new_map_y)
 
 void PlayerServer::move(int dx, int dy)
 {
-    int new_x = x + dx;
-    int new_y = y + dy;
-    int new_map_x = map_x;
-    int new_map_y = map_y;
+    // TODO
+    // int new_x = x + dx;
+    // int new_y = y + dy;
+    // int new_map_x = map_x;
+    // int new_map_y = map_y;
 
-    printf("SERV: player move dx=%d dy=%d\n", dx, dy);
+//     printf("SERV: player move dx=%d dy=%d\n", dx, dy);
 
-    if (!((new_x >= 0 && new_x < CHUNK_SIZE) && (new_y >= 0 && new_y < CHUNK_SIZE)))
-    {
-        if (new_x < 0 || new_x >= CHUNK_SIZE)
-        {
-            new_map_x += dx;
-            new_x += -CHUNK_SIZE * dx;
-            if (!check_and_load_chunk(new_map_x, new_map_y))
-                return;
-            goto move_player;
-        }
+//     if (!((new_x >= 0 && new_x < CHUNK_SIZE) && (new_y >= 0 && new_y < CHUNK_SIZE)))
+//     {
+//         if (new_x < 0 || new_x >= CHUNK_SIZE)
+//         {
+//             new_map_x += dx;
+//             new_x += -CHUNK_SIZE * dx;
+//             if (!check_and_load_chunk(new_map_x, new_map_y))
+//                 return;
+//             goto move_player;
+//         }
 
-        if (new_y < 0 || new_y >= CHUNK_SIZE)
-        {
-            new_map_y += dy;
-            new_y += -CHUNK_SIZE * dy;
-            if (!check_and_load_chunk(new_map_x, new_map_y))
-                return;
-        }
-    }
-move_player:
-    map_x = new_map_x;
-    map_y = new_map_y;
-    x = new_x;
-    y = new_y;
-    hunger--;
-    thirst--;
-    printf("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
+//         if (new_y < 0 || new_y >= CHUNK_SIZE)
+//         {
+//             new_map_y += dy;
+//             new_y += -CHUNK_SIZE * dy;
+//             if (!check_and_load_chunk(new_map_x, new_map_y))
+//                 return;
+//         }
+//     }
+// move_player:
+//     map_x = new_map_x;
+//     map_y = new_map_y;
+//     x = new_x;
+//     y = new_y;
+//     hunger--;
+//     thirst--;
+//     printf("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
 }
 
 bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement * object)

@@ -19,6 +19,7 @@ pub enum ObjectData {
     Ingredient { data: core::Ingredient },
     Product { data: core::Product },
     Scroll { data: core::Scroll },
+    Player { data: core::Player },
 }
 
 #[repr(C)]

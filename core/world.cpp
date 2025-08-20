@@ -9,6 +9,17 @@ void remove_from_chunks(InventoryElement * object)
     world_table[object->location.chunk.map_y][object->location.chunk.map_x]->remove_object(object);
 }
 
+void add_object_to_world(InventoryElement* object, ItemLocation location)
+{
+    switch (location.tag)
+    {
+        case ItemLocation::Tag::Chunk:
+            world_table[location.chunk.map_y][location.chunk.map_x]->add_object(object, location.chunk.x, location.chunk.y);
+        case ItemLocation::Tag::Player:
+            abort();
+    }
+}
+
 //FIXME do we stil need these get_*_at functions?
 // Being ** get_being_at(int chunk_x, int chunk_y, int x, int y)
 // {
@@ -54,10 +65,10 @@ Animal ** get_animal_at(int chunk_x, int chunk_y, int x, int y)
     }*/
     return NULL;
 }
-Animal ** get_animal_at_ppos(Player * player)
-{
-    return get_animal_at(player->map_x, player->map_y, player->x, player->y);
-}
+// Animal ** get_animal_at_ppos(Player * player)
+// {
+    // return get_animal_at(player->map_x, player->map_y, player->x, player->y);
+// }
 
 Object ** get_object_at(int chunk_x, int chunk_y, int x, int y)
 {
@@ -79,10 +90,10 @@ Object ** get_object_at(int chunk_x, int chunk_y, int x, int y)
     return NULL;
 }
 
-Object ** get_object_at_ppos(Player * player)
-{
-    return get_object_at(player->map_x, player->map_y, player->x, player->y);
-}
+// Object ** get_object_at_ppos(Player * player)
+// {
+//     return get_object_at(player->map_x, player->map_y, player->x, player->y);
+// }
 
 
 Plant ** get_plant_at(int chunk_x, int chunk_y, int x, int y)
@@ -105,10 +116,10 @@ Plant ** get_plant_at(int chunk_x, int chunk_y, int x, int y)
     return NULL;
 }
 
-Plant ** get_plant_at_ppos(Player * player)
-{
-    return get_plant_at(player->map_x, player->map_y, player->x, player->y);
-}
+// Plant ** get_plant_at_ppos(Player * player)
+// {
+//     return get_plant_at(player->map_x, player->map_y, player->x, player->y);
+// }
 
 InventoryElement * get_item_at(int chunk_x, int chunk_y, int x, int y)
 {
@@ -129,7 +140,7 @@ InventoryElement * get_item_at(int chunk_x, int chunk_y, int x, int y)
 
 InventoryElement * get_item_at_ppos(Player * player)
 {
-    return get_item_at(player->map_x, player->map_y, player->x, player->y);
+    return get_item_at(player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y);
 }
 
 void set_item_at(InventoryElement * item, int chunk_x, int chunk_y, int x, int y)
@@ -143,9 +154,4 @@ void set_item_at(InventoryElement * item, int chunk_x, int chunk_y, int x, int y
             break;
         }
     }*/
-}
-
-void set_item_at_ppos(InventoryElement * item, Player * player)
-{
-    set_item_at(item, player->map_x, player->map_y, player->x, player->y);
 }

@@ -19,6 +19,7 @@ struct ObjectData {
     Ingredient,
     Product,
     Scroll,
+    Player,
   };
 
   struct InvElement_Body {
@@ -49,6 +50,10 @@ struct ObjectData {
     Scroll data;
   };
 
+  struct Player_Body {
+    Player data;
+  };
+
   Tag tag;
   union {
     InvElement_Body inv_element;
@@ -58,6 +63,7 @@ struct ObjectData {
     Ingredient_Body ingredient;
     Product_Body product;
     Scroll_Body scroll;
+    Player_Body player;
   };
 };
 
@@ -133,4 +139,4 @@ void send_packet_request_chunk(NetClient *client, int32_t x, int32_t y);
 
 ObjectData foo();
 
-} // extern "C"
+}  // extern "C"

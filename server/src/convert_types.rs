@@ -9,8 +9,7 @@ pub fn convert_to_data(el: &core::InventoryElement) -> ObjectData {
             ObjectData::Element { data: *element }
         }
         core::Class_id_Class_Scroll => {
-            let scroll =
-                unsafe { &*(el as *const core::InventoryElement as *const core::Scroll) };
+            let scroll = unsafe { &*(el as *const core::InventoryElement as *const core::Scroll) };
             ObjectData::Scroll { data: *scroll }
         }
         core::Class_id_Class_Ingredient => {
@@ -30,6 +29,10 @@ pub fn convert_to_data(el: &core::InventoryElement) -> ObjectData {
         core::Class_id_Class_Animal => {
             let animal = unsafe { &*(el as *const core::InventoryElement as *const core::Animal) };
             ObjectData::Animal { data: *animal }
+        }
+        core::Class_id_Class_Player => {
+            let player = unsafe { &*(el as *const core::InventoryElement as *const core::Player) };
+            ObjectData::Player { data: *player }
         }
         _ => {
             println!("WRONG CLASS ID {}", el.c_id);

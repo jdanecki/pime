@@ -16,6 +16,7 @@ enum Chunk_state
 extern Chunk_state loaded_chunks[WORLD_SIZE][WORLD_SIZE];
 
 void remove_from_chunks(InventoryElement * object);
+void add_object_to_world(InventoryElement* object, ItemLocation location);
 
 int get_tile_at(int chunk_x, int chunk_y, int x, int y);
 

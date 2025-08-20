@@ -100,6 +100,8 @@ InventoryElement * el_from_data(const ObjectData * data)
         case ObjectData::Tag::Animal:
             el = new AnimalSDL(data->animal.data);
             break;
+            ObjectData::Tag::Player:
+            el = new Player(data->player.data);
     }
     return el;
 }

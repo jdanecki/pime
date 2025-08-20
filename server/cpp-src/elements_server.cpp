@@ -97,7 +97,7 @@ bool AnimalServer::action(Product_action action, Player * pl)
     }
     if (crafted)
     {
-        world_table[pl->map_y][pl->map_x]->add_object(crafted, pl->x, pl->y);
+        add_object_to_world(crafted, pl->location);
         objects_to_create.add(crafted);
         printf("crafted meat\n");
         destroy(this);

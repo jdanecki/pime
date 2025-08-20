@@ -30,6 +30,7 @@ impl ParseCallbacks for MacroCallback {
             "Ingredient",
             "Product",
             "Scroll",
+            "Player",
         ];
         if ser.contains(&info.name) {
             der.append(&mut vec![String::from("serde::Serialize")]);

@@ -83,6 +83,22 @@ impl serde::Serialize for InventoryElement {
     }
 }
 
+impl serde::Serialize for Player {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_tuple(6)?;
+        state.serialize_element(&self.id)?;
+        state.serialize_element(&self.name)?;
+        state.serialize_element(&self._base.location)?;
+        state.serialize_element(&self.thirst)?;
+        state.serialize_element(&self.hunger)?;
+        state.serialize_element(&self.nutrition)?;
+        state.end()
+    }
+}
+
 // impl serde::Serialize for Property {
 //     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
 //     where

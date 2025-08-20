@@ -1,19 +1,14 @@
-#include "axe_handle.h"
+#include "tools.h"
 #include <cstdlib>
 
 AxeHandle::AxeHandle(InventoryElement * from) : IngredientServer(from, ING_AXE_HANDLE, Form_solid)
 {
 }
 
-bool AxeHandle::check_ing()
+IngredientServer * AxeHandle::createAxeHandle(InventoryElement * from)
 {
-    if (el->get_base_cid() == Class_BaseElement)
-        return true;
+    if (from->get_base_cid() == Class_BaseElement)
+        return new AxeHandle(from);
     else
-        return false;
-}
-
-IngredientServer * createAxeHandle(InventoryElement * from)
-{
-    return new AxeHandle(from);
+        return nullptr;
 }

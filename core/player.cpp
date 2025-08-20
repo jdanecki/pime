@@ -11,7 +11,7 @@ void Player::pickup(InventoryElement * item)
 
     ItemLocation location;
     location.tag = ItemLocation::Tag::Player;
-    location.player.id = id;
+    location.player.id = uid;
     item->location = location;
 }
 
@@ -34,35 +34,44 @@ InventoryElement * Player::get_item_by_uid(size_t id)
 
 int Player::get_id()
 {
-    return id;
+    return uid;
 }
 
-Player::Player(int id) : InventoryElement(Class_Player), id(id)
+// Player::Player(int id) : InventoryElement(Class_Player), id(id), name(new char[16])
+// {
+    // hunger = 500;
+    // thirst = 250;
+    // map_x = WORLD_CENTER;
+    // map_y = WORLD_CENTER;
+    // inventory = new InvList("inventory");
+    // relations = nullptr;
+    // // direction = direction::right;
+
+    // x = 8;
+    // y = 8;
+
+    // for (int i = 0; i < 10; i++)
+    // {
+    //     hotbar[i] = NULL;
+    //     craftbar[i] = 0;
+    // }
+    // in_conversation = false;
+    // talking_to = nullptr;
+    // welcomed = false;
+    // sprintf((char*)name.str, "%s%d", "Player", id);
+
+    // known_elements = new ElementsList("known elements");
+// }
+
+Player::Player(int id, SerializableCString&& name, 
+               ItemLocation location,
+       int thirst, int hunger, int nutrition) : 
+        InventoryElement(Class_Player, id, location), name(name),
+        thirst(thirst), hunger(hunger), nutrition(nutrition) 
 {
-    hunger = 500;
-    thirst = 250;
-    map_x = WORLD_CENTER;
-    map_y = WORLD_CENTER;
-    inventory = new InvList("inventory");
-    relations = nullptr;
-    // direction = direction::right;
-
-    x = 8;
-    y = 8;
-
-    for (int i = 0; i < 10; i++)
-    {
-        hotbar[i] = NULL;
-        craftbar[i] = 0;
-    }
-    in_conversation = false;
-    talking_to = nullptr;
-    welcomed = false;
-    name = new char[16];
-    sprintf((char *)name, "%s%d", "Player", id);
-
-    known_elements = new ElementsList("known elements");
+    
 }
+    
 
 int Player::conversation(Player * who, Sentence * s, InventoryElement * el)
 {

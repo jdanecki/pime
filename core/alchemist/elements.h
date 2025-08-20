@@ -413,10 +413,6 @@ class Ingredient : public InventoryElement
         sprintf(buf, "%s: (%s)", get_class_name(), ingredient_name[id]);
         return buf;
     }
-    virtual bool check_ing()
-    {
-        return false;
-    }
     bool action(Product_action action, Player * pl)
     {
         printf("ING: %s %s\n", product_action_name[action], get_name());
