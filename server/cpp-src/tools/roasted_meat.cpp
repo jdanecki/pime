@@ -1,4 +1,4 @@
-#include "roasted_meat.h"
+#include "tools.h"
 
 Roasted_meat::Roasted_meat(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_ROASTED_MEAT, Form_solid)
 {

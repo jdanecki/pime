@@ -1,4 +1,4 @@
-#include "stick.h"
+#include "tools.h"
 
 Stick::Stick(InventoryElement * from) : IngredientServer(from, ING_STICK, Form_solid)
 {

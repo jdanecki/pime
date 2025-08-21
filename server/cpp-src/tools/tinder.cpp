@@ -1,4 +1,4 @@
-#include "tinder.h"
+#include "tools.h"
 
 Tinder::Tinder(InventoryElement * from) : IngredientServer(from, ING_TINDER, Form_solid)
 {

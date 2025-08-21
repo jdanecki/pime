@@ -1,4 +1,4 @@
-#include "HEADER.h"
+#include "tools.h"
 
 CLASS_NAME::CLASS_NAME(InventoryElement * from) : IngredientServer(from, ING, Form_solid)
 {

@@ -1,4 +1,4 @@
-#include "fruit_salad.h"
+#include "tools.h"
 
 Fruit_salad::Fruit_salad(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_FRUIT_SALAD, Form_solid)
 {

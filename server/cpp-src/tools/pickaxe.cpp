@@ -1,4 +1,4 @@
-#include "pickaxe.h"
+#include "tools.h"
 
 PickAxe::PickAxe(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_PICKAXE, Form_solid)
 {

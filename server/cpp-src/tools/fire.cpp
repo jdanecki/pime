@@ -1,4 +1,4 @@
-#include "fire.h"
+#include "tools.h"
 
 Fire::Fire(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_FIRE, Form_solid)
 {

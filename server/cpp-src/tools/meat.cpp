@@ -1,7 +1,7 @@
-#include "meat.h"
-#include "../networking.h"
-#include "../world_server.h"
-#include "../craft_prod.h"
+#include "tools.h"
+#include "tools.h"
+#include "tools.h"
+#include "tools.h"
 
 Meat::Meat(InventoryElement * from) : IngredientServer(from, ING_MEAT, Form_solid)
 {

@@ -1,4 +1,4 @@
-#include "knife.h"
+#include "tools.h"
 
 Knife::Knife(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_KNIFE, Form_solid)
 {
