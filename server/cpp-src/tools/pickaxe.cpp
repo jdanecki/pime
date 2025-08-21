@@ -13,7 +13,7 @@ bool PickAxe::check_ing()
     int id2 = ings[1]->get_id();
 
     if ((id1 == ING_PICKAXE_BLADE && id2 == ING_PICKAXE_HANDLE) || (id1 == ING_PICKAXE_HANDLE && id2 == ING_PICKAXE_BLADE))
-        return true;
+        return new PickAxe(el1, el2);
     printf(" wrong ingredients\n");
     return nullptr;
 }

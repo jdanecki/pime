@@ -11,7 +11,7 @@ bool Fire::check_ing()
     int id2 = ings[1]->get_id();
 
     if ((id1 == ING_TINDER && id2 == ING_STICK) || (id2 == ING_TINDER && id1 == ING_STICK))
-        return true;
+        return new Fire(el1, el2);
     printf(" wrong ingredients\n");
     return nullptr;
 }

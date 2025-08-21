@@ -8,7 +8,7 @@ Wall::Wall(InventoryElement * from) : IngredientServer(from, ING_WALL, Form_soli
 bool Wall::check_ing()
 {
     if ((el->get_base_cid() == Class_BaseElement) || (el->get_base_cid() == Class_BasePlant))
-        return true;
+        return new Wall(from);
     else
         return nullptr;
 }

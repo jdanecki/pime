@@ -7,7 +7,7 @@ Stick::Stick(InventoryElement * from) : IngredientServer(from, ING_STICK, Form_s
 bool Stick::check_ing()
 {
     if (el->get_base_cid() == Class_BasePlant)
-        return true;
+        return new Stick(from);
     else
         return nullptr;
 }

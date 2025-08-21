@@ -11,7 +11,7 @@ bool CLASS_NAME::check_ing()
     int id2 = ings[1]->get_id();
 
     if (id1 == ING_1 && id2 == ING_2)
-        return true;
+        return new CLASS_NAME(el1, el2);
     printf(" wrong ingredients\n");
     return nullptr;
 }

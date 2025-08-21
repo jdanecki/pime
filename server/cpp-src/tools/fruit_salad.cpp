@@ -11,7 +11,7 @@ bool Fruit_salad::check_ing()
     int id2 = ings[1]->get_id();
 
     if (id1 == ING_FRUIT && id2 == ING_FRUIT)
-        return true;
+        return new Fruit_salad(el1, el2);
     printf(" wrong ingredients\n");
     return nullptr;
 }
@@ -33,5 +33,5 @@ bool Fruit_salad::player_action(Player_action action, Player * pl)
             break;
     }
 
-    return true;
+        return new Fruit_salad(el1, el2);
 }

@@ -7,7 +7,7 @@ KnifeHandle::KnifeHandle(InventoryElement * from) : IngredientServer(from, ING_K
 bool KnifeHandle::check_ing()
 {
     if (el->get_base_cid() == Class_BaseElement)
-        return true;
+        return new KnifeHandle(from);
     else
         return nullptr;
 }

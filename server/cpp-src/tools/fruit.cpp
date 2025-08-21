@@ -7,7 +7,7 @@ Fruit::Fruit(InventoryElement * from) : IngredientServer(from, ING_FRUIT, Form_s
 bool Fruit::check_ing()
 {
     if (el->get_base_cid() == Class_BasePlant && dynamic_cast<Plant *>(el)->phase == Plant_fruits)
-        return true;
+        return new Fruit(from);
     else
         return nullptr;
 }

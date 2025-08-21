@@ -17,7 +17,7 @@ bool Roasted_meat::player_action(Player_action action, Player * pl)
             break;
     }
 
-    return true;
+        return new Roasted_meat(el1, el2);
 }
 
 bool Roasted_meat::check_ing()
@@ -26,7 +26,7 @@ bool Roasted_meat::check_ing()
     int id2 = ings[1]->get_id();
 
     if ((id1 == ING_MEAT && id2 == PROD_FIRE) || (id2 == ING_MEAT && id1 == PROD_FIRE))
-        return true;
+        return new Roasted_meat(el1, el2);
     printf(" wrong ingredients\n");
     return nullptr;
 }

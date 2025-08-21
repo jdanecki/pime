@@ -7,7 +7,7 @@ KnifeBlade::KnifeBlade(InventoryElement * from) : IngredientServer(from, ING_KNI
 bool KnifeBlade::check_ing()
 {
     if (el->get_base_cid() == Class_BaseElement)
-        return true;
+        return new KnifeBlade(from);
     else
         return nullptr;
 }
