@@ -5,7 +5,7 @@ AxeBlade::AxeBlade(InventoryElement * from) : IngredientServer(from, ING_AXE_BLA
 {
 }
 
-IngredientServer * AxeBlade::createAxeBlade(InventoryElement * from)
+IngredientServer * AxeBlade::AxeBlade::createAxeBlade(InventoryElement * from)
 {
     if (from->get_base_cid() == Class_BaseElement)
         return new AxeBlade(from);

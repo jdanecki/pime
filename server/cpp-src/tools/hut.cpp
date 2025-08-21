@@ -5,7 +5,7 @@ Hut::Hut(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el
     actions = ACT_NOTHING;
 }
 
-ProductServer * Hut::createHut(InventoryElement * el1, InventoryElement * el2)
+ProductServer * Hut::Hut::createHut(InventoryElement * el1, InventoryElement * el2)
 {
     int id1 = el1->get_id();
     int id2 = el2->get_id();

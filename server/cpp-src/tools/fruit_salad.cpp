@@ -16,7 +16,7 @@ bool Fruit_salad::check_ing()
     return nullptr;
 }
 
-ProductServer * createFruit_salad(InventoryElement * el1, InventoryElement * el2)
+ProductServer * Fruit_salad::createFruit_salad(InventoryElement * el1, InventoryElement * el2)
 {
     return new Fruit_salad(el1, el2);
 }

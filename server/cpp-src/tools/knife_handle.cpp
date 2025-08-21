@@ -12,7 +12,7 @@ bool KnifeHandle::check_ing()
         return nullptr;
 }
 
-IngredientServer * createKnifeHandle(InventoryElement * from)
+IngredientServer * KnifeHandle::createKnifeHandle(InventoryElement * from)
 {
     return new KnifeHandle(from);
 }

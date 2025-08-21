@@ -12,7 +12,7 @@ bool Tinder::check_ing()
         return nullptr;
 }
 
-IngredientServer * createTinder(InventoryElement * from)
+IngredientServer * Tinder::createTinder(InventoryElement * from)
 {
     return new Tinder(from);
 }

@@ -12,7 +12,7 @@ bool CLASS_NAME::check_ing()
         return nullptr;
 }
 
-IngredientServer * createCLASS_NAME(InventoryElement * from)
+IngredientServer * CLASS_NAME::createCLASS_NAME(InventoryElement * from)
 {
     return new CLASS_NAME(from);
 }

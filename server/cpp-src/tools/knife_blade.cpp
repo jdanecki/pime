@@ -12,7 +12,7 @@ bool KnifeBlade::check_ing()
         return nullptr;
 }
 
-IngredientServer * createKnifeBlade(InventoryElement * from)
+IngredientServer * KnifeBlade::createKnifeBlade(InventoryElement * from)
 {
     return new KnifeBlade(from);
 }

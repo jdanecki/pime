@@ -7,7 +7,7 @@ Axe::Axe(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el
     actions = ACT_HIT;
 }
 
-ProductServer * Axe::createAxe(InventoryElement * el1, InventoryElement * el2)
+ProductServer * Axe::Axe::createAxe(InventoryElement * el1, InventoryElement * el2)
 {
     int id1 = el1->get_id();
     int id2 = el2->get_id();

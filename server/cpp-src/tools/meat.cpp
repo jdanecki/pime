@@ -27,7 +27,7 @@ bool Meat::action(Product_action action, Player * pl)
     return nullptr;
 }
 
-IngredientServer * Meat::createMeat(InventoryElement * from)
+IngredientServer * Meat::Meat::createMeat(InventoryElement * from)
 {
     if (from->get_cid() == Class_Animal)
         return new Meat(from);

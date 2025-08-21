@@ -13,7 +13,7 @@ bool Wall::check_ing()
         return nullptr;
 }
 
-IngredientServer * createWall(InventoryElement * from)
+IngredientServer * Wall::createWall(InventoryElement * from)
 {
     return new Wall(from);
 }

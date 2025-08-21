@@ -12,7 +12,7 @@ bool Stick::check_ing()
         return nullptr;
 }
 
-IngredientServer * createStick(InventoryElement * from)
+IngredientServer * Stick::createStick(InventoryElement * from)
 {
     return new Stick(from);
 }

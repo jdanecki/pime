@@ -5,7 +5,7 @@ PickAxeBlade::PickAxeBlade(InventoryElement * from) : IngredientServer(from, ING
 {
 }
 
-IngredientServer * createPickAxeBlade(InventoryElement * from)
+IngredientServer * PickAxeBlade::createPickAxeBlade(InventoryElement * from)
 {
     return new PickAxeBlade(from);
 }

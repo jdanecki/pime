@@ -12,7 +12,7 @@ bool Fruit::check_ing()
         return nullptr;
 }
 
-IngredientServer * createFruit(InventoryElement * from)
+IngredientServer * Fruit::createFruit(InventoryElement * from)
 {
     return new Fruit(from);
 }
