@@ -125,11 +125,13 @@ void Solid::show()
 {
     printf("      *** Solid ***\n");
 
+    tooling.show();
     stretching.show(); // rozciąganie
     squeezing.show();  // ściskanie
     bending.show();    // zginanie
     // fragility->show();  // kruchość
     solubility.show(); // rozpuszczalność
+    hardness.show();
 }
 
 const char * Form_name[]{"unknown", "solid", "liquid", "gas"};

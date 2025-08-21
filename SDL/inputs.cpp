@@ -239,13 +239,6 @@ void key_pressed(int key)
 
 void mouse_pressed(SDL_MouseButtonEvent & event)
 {
-    /*   switch (event.button.button)
-    {
-        case 1: break;
-        case 2: break;
-        case 3: break;
-    }
- */
     int x = 0;
     int y = 0;
 

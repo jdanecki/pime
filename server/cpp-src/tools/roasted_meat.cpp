@@ -8,13 +8,6 @@ Roasted_meat::Roasted_meat(InventoryElement * el1, InventoryElement * el2) : Pro
 
 bool Roasted_meat::player_action(Player_action action, Player * pl)
 {
-    bool res = InventoryElement::player_action(action, pl);
-    if (res)
-    {
-        objects_to_update.add(this);
-        return res;
-    }
-
     printf("ROASTED_MEAT: %s %s\n", player_action_name[action], get_name());
 
     switch (action)

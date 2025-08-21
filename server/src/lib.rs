@@ -8,6 +8,14 @@ mod core;
 mod generator;
 mod types;
 
+pub static mut SEED: i64 = 0;
+pub static mut LOCATION_UPDATES: Vec<types::LocationUpdateData> = vec![];
+
+pub static mut DESTROY_ITEMS: Vec<(usize, core::ItemLocation)> = vec![];
+pub static mut KNOWN_UPDATES: Vec<(i32, core::Class_id, i32)> = vec![];
+pub static mut CHECKED_UPDATES: Vec<(i32, usize)> = vec![];
+
+
 #[no_mangle]
 extern "C" fn update_location(
     id: usize,
@@ -37,11 +45,13 @@ extern "C" fn notify_knowledge(pl_id: i32, cid: core::Class_id, id: i32) {
     }
 }
 
-pub static mut SEED: i64 = 0;
-pub static mut LOCATION_UPDATES: Vec<types::LocationUpdateData> = vec![];
+#[no_mangle]
+extern "C" fn notify_checked(pl_id: i32, el: usize) {
+    unsafe {
+        CHECKED_UPDATES.push((pl_id, el));
+    }
+}
 
-pub static mut DESTROY_ITEMS: Vec<(usize, core::ItemLocation)> = vec![];
-pub static mut KNOWN_UPDATES: Vec<(i32, core::Class_id, i32)> = vec![];
 
 pub enum ClientEvent<'a> {
     Move {
@@ -649,6 +659,7 @@ fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>)
     send_location_updates(server);
     send_knowledge_updates(server);
     send_destroy_updates(server);
+    send_checked_updates(server);
 }
 
 fn send_location_updates(server: &mut Server) {
@@ -662,6 +673,19 @@ fn send_location_updates(server: &mut Server) {
                 server.broadcast(&data);
             }
             LOCATION_UPDATES.clear();
+        }
+    }
+}
+
+fn send_checked_updates(server: &mut Server) {
+    unsafe {
+        if CHECKED_UPDATES.len() > 0 {
+            for update in CHECKED_UPDATES.iter() {
+                let mut data = vec![core::PACKET_CHECKED_UPDATE];
+                data.extend_from_slice(&bincode::serialize(update).unwrap()[..]);
+                server.broadcast(&data);
+            }
+            CHECKED_UPDATES.clear();
         }
     }
 }

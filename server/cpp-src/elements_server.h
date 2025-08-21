@@ -12,6 +12,7 @@ extern "C"
     void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc);
     void notify_destroy(size_t id, ItemLocation location);
     void notify_knowledge(size_t pl_id, Class_id cid, int id);
+    void notify_checked(size_t pl_id, size_t el);
 }
 
 void destroy(InventoryElement * el);

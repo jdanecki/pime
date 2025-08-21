@@ -193,13 +193,6 @@ void PlantServer::show(bool details)
 
 bool PlantServer::player_action(Player_action action, Player * pl)
 {
-    bool res = InventoryElement::player_action(action, pl);
-    if (res)
-    {
-        objects_to_update.add(this);
-        return res;
-    }
-
     printf("PLANT_SERVER: %s %s\n", player_action_name[action], get_name());
 }
 
@@ -436,12 +429,7 @@ bool ElementServer::action_hit()
 
 bool ElementServer::player_action(Player_action action, Player * pl)
 {
-    bool res = InventoryElement::player_action(action, pl);
-    if (res)
-    {
-        objects_to_update.add(this);
-        return res;
-    }
+    bool res = false;
 
     printf("ELEMENT_SERVER: %s %s\n", player_action_name[action], get_name());
     switch (action)
@@ -542,12 +530,6 @@ ScrollServer::ScrollServer(Base * b) : Scroll(b)
 
 bool ScrollServer::player_action(Player_action action, Player * pl)
 {
-    bool res = InventoryElement::player_action(action, pl);
-    if (res)
-    {
-        objects_to_update.add(this);
-        return res;
-    }
     printf("ScrollServer: %s %s\n", player_action_name[action], get_name());
 
     switch (action)

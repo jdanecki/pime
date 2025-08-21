@@ -275,6 +275,13 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                         i32::from_le_bytes(value[9..13].try_into().unwrap()),
                     );
                 },
+                core::PACKET_CHECKED_UPDATE => unsafe {
+                    events::checked_update(
+                        i32::from_le_bytes(value[1..5].try_into().unwrap()),
+                        usize::from_le_bytes(value[5..13].try_into().unwrap()),
+                    );
+                },
+
                 _ => {
                     println!("invalid packet type {:?}", value);
                 }

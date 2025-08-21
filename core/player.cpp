@@ -62,6 +62,7 @@ Player::Player(int id) : InventoryElement(Class_Player), id(id)
     sprintf((char *)name, "%s%d", "Player", id);
 
     known_elements = new ElementsList("known elements");
+    checked_element = 0;
 }
 
 int Player::conversation(Player * who, Sentence * s, InventoryElement * el)
@@ -245,6 +246,17 @@ bool Player::set_known(Class_id cid, int el_id)
         KnownElement * n = new KnownElement(i.c_id, i.id);
         known_elements->add(n);
         n->set_known();
+        return true;
+    }
+    else
+        return false;
+}
+
+bool Player::set_checked(size_t el)
+{
+    if (el != checked_element)
+    {
+        checked_element = el;
         return true;
     }
     else

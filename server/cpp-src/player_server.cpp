@@ -76,7 +76,23 @@ bool PlayerServer::action_on_object(Player_action a, InventoryElement * object)
     if (!object)
         return false;
     printf("%s action: %s on %s\n", get_name(), player_action_name[a], object->get_name());
-    object->player_action(a, this);
+    switch (a)
+    {
+        case PLAYER_CHECK:
+            printf("checking %s:\n", object->get_name());
+            if (set_checked(object->uid))
+            {
+                notify_checked(get_id(), object->uid);
+            }
+            else
+            {
+                printf("%s: already checked this item\n", object->get_name());
+            }
+            break;
+        default:
+            object->player_action(a, this);
+            break;
+    }
     return true;
 }
 

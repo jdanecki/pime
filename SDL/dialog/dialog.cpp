@@ -93,7 +93,7 @@ Dialog::Dialog(SDL_Rect rect, SDL_Color background_color)
 {
     this->rect = rect;
     this->background_color = background_color;
-};
+}
 
 DialogElement * Dialog::get_element_from_id(int id, enum DialogElementType c_id)
 {

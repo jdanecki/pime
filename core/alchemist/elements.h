@@ -99,14 +99,12 @@ class InventoryElement
     Class_id c_id;
     size_t uid;
     ItemLocation location;
-    bool checked;
 
-    InventoryElement(Class_id c_id, size_t uid, ItemLocation location, bool checked);
+    InventoryElement(Class_id c_id, size_t uid, ItemLocation location);
     InventoryElement(Class_id c_id)
     {
         this->c_id = c_id;
         uid = (size_t)this;
-        checked = false;
     }
 
     virtual bool action(Product_action action, Player * pl)
@@ -117,21 +115,11 @@ class InventoryElement
     virtual bool player_action(Player_action action, Player * pl)
     {
         printf("INV: %s %s\n", player_action_name[action], get_name());
-        bool res = false;
-        switch (action)
-        {
-            case PLAYER_CHECK:
-                checked = true;
-                printf("checking %s: checked=%d\n", get_name(), checked);
-                res = true;
-                break;
-        }
-
-        return res;
+        return false;
     }
     virtual void show(bool details = true)
     {
-        printf("%s\n", get_class_name());
+        printf("%s: uid=%lx\n", get_class_name(), uid);
     }
     virtual bool tick()
     {
@@ -283,10 +271,15 @@ class Scroll : public InventoryElement
     {
         return get_base()->get_name();
     }
-    void show(bool details = true) override;
     int get_id() override
     {
         return get_base()->id;
+    }
+    void show(bool details) override
+    {
+        InventoryElement::show(details);
+        if (details)
+            get_base()->show(details);
     }
 };
 
@@ -544,7 +537,8 @@ class Animal : public InventoryElement
 
     void show(bool details = true) override
     {
-        printf("Animal %s uid=%lx\n", get_name(), uid);
+        InventoryElement::show(details);
+
         if (details)
             get_base()->show(details);
     }

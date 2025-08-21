@@ -64,6 +64,7 @@ class Player : public InventoryElement
     InvList * inventory;
     InventoryElement * hotbar[10];
     ElementsList * known_elements;
+    size_t checked_element;
 
     int craftbar[10];
     bool in_conversation;
@@ -87,6 +88,7 @@ class Player : public InventoryElement
     char * get_el_description(InventoryElement * el);
 
     virtual bool check_known(InventoryElement * el);
+
     bool set_known(Class_id cid, int el_id);
 
     bool conversation_started()
@@ -100,6 +102,7 @@ class Player : public InventoryElement
     {
         return name;
     }
+    bool set_checked(size_t el);
 };
 
 #endif

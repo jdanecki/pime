@@ -107,7 +107,6 @@ InventoryElement * el_from_data(const ObjectData * data)
 
 extern "C"
 {
-
     void knowledge_update(int pl_id, Class_id cid, int id)
     {
         if (pl_id != player->get_id())
@@ -120,6 +119,17 @@ extern "C"
         p->set_known(cid, id);
     }
 
+    void checked_update(int pl_id, size_t el)
+    {
+        if (pl_id != player->get_id())
+            return;
+
+        printf("checked update for player %d el=%lx\n", pl_id, el);
+        Player * p = players[pl_id];
+        if (!p)
+            return;
+        p->set_checked(el);
+    }
     void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y, int thirst, int hunger)
     {
         if (id >= 0 && id < PLAYER_NUM)
@@ -197,7 +207,6 @@ extern "C"
                 case Class_Element:
                 {
                     Element * element = dynamic_cast<Element *>(el);
-                    printf("element: %d %d\n", element->checked, data->element.data.checked);
                     *element = data->element.data;
                     break;
                 }

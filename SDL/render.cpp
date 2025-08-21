@@ -51,7 +51,7 @@ void draw_texts()
         }
         print_status(1, t);
         delete[] t;
-        if (item->checked)
+        if (player->checked_element == item->uid)
         {
             ty += 30;
             int count = 0;

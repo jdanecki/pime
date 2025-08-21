@@ -115,12 +115,13 @@ Element::Element(BaseElement * b)
 {
 }
 // called by the_game_net/core.rs
-InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location, bool checked) : c_id(c_id), uid(uid), location(location), checked(checked)
+InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : c_id(c_id), uid(uid), location(location)
 {
 }
 void Element::show(bool details)
 {
-    printf("%s: base=%s form=%s uid=%lx\n", get_class_name(), get_name(), get_form_name(), uid);
+    InventoryElement::show(details);
+    printf("form=%s\n", get_form_name());
     if (!details)
         return;
     length.show();
@@ -144,7 +145,8 @@ Ingredient::Ingredient(Ingredient_id i) : InventoryElement(Class_Ingredient), qu
 
 void Ingredient::show(bool details)
 {
-    printf("%s -> class:%s id=%d\n", get_name(), get_class_name(), id);
+    InventoryElement::show(details);
+    printf("name=%s id=%d\n", get_name(), id);
     if (!details)
         return;
     quality.show();
@@ -164,7 +166,8 @@ Product::Product(Product_id i) : InventoryElement(Class_Product), quality("quali
 
 void Product::show(bool details)
 {
-    printf("%s -> class:%s id=%d\n", get_name(), get_class_name(), id);
+    InventoryElement::show(details);
+    printf("name=%s id=%d\n", get_name(), id);
     if (!details)
         return;
     quality.show();
@@ -221,9 +224,4 @@ Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)
 Scroll::Scroll(Base * b) : InventoryElement(Class_Scroll), base(b)
 {
     //  printf("Scroll class=%s id=%d name=%s\n", class_name[b->c_id], b->id, b->get_name());
-}
-
-void Scroll::show(bool details)
-{
-    printf("%s: base=%s uid=%lx\n", get_class_name(), get_name(), uid);
 }
