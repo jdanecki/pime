@@ -5,15 +5,10 @@ Log::Log(InventoryElement * from) : IngredientServer(from, ING_LOG, Form_solid)
 {
 }
 
-bool Log::check_ing()
+IngredientServer * Log::createLog(InventoryElement * from)
 {
-    if (el->get_base_cid() == Class_BasePlant)
-        return true;
+    if (from->get_base_cid() == Class_BasePlant)
+        return new Log(from);
     else
-        return false;
-}
-
-IngredientServer * createLog(InventoryElement * from)
-{
-    return new Log(from);
+        return nullptr;
 }
