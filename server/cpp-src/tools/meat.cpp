@@ -22,9 +22,9 @@ bool Meat::action(Product_action action, Player * pl)
             // break;
         }
         default:
-            return false;
+            return nullptr;
     }
-    return false;
+    return nullptr;
 }
 
 IngredientServer * Meat::createMeat(InventoryElement * from)

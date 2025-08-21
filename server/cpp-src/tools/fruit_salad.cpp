@@ -13,7 +13,7 @@ bool Fruit_salad::check_ing()
     if (id1 == ING_FRUIT && id2 == ING_FRUIT)
         return true;
     printf(" wrong ingredients\n");
-    return false;
+    return nullptr;
 }
 
 ProductServer * createFruit_salad(InventoryElement * el1, InventoryElement * el2)

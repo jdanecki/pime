@@ -13,7 +13,7 @@ bool Fire::check_ing()
     if ((id1 == ING_TINDER && id2 == ING_STICK) || (id2 == ING_TINDER && id1 == ING_STICK))
         return true;
     printf(" wrong ingredients\n");
-    return false;
+    return nullptr;
 }
 
 ProductServer * createFire(InventoryElement * el1, InventoryElement * el2)

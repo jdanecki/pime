@@ -9,7 +9,7 @@ bool CLASS_NAME::check_ing()
     if ((el->get_base_cid() == Class_BaseElement) || (el->get_base_cid() == Class_BasePlant))
         return true;
     else
-        return false;
+        return nullptr;
 }
 
 IngredientServer * createCLASS_NAME(InventoryElement * from)

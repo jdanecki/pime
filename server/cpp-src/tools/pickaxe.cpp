@@ -15,7 +15,7 @@ bool PickAxe::check_ing()
     if ((id1 == ING_PICKAXE_BLADE && id2 == ING_PICKAXE_HANDLE) || (id1 == ING_PICKAXE_HANDLE && id2 == ING_PICKAXE_BLADE))
         return true;
     printf(" wrong ingredients\n");
-    return false;
+    return nullptr;
 }
 
 ProductServer * createPickAxe(InventoryElement * el1, InventoryElement * el2)

@@ -13,7 +13,7 @@ bool CLASS_NAME::check_ing()
     if (id1 == ING_1 && id2 == ING_2)
         return true;
     printf(" wrong ingredients\n");
-    return false;
+    return nullptr;
 }
 
 ProductServer * createCLASS_NAME(InventoryElement * el1, InventoryElement * el2)

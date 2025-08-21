@@ -10,7 +10,7 @@ bool Wall::check_ing()
     if ((el->get_base_cid() == Class_BaseElement) || (el->get_base_cid() == Class_BasePlant))
         return true;
     else
-        return false;
+        return nullptr;
 }
 
 IngredientServer * createWall(InventoryElement * from)

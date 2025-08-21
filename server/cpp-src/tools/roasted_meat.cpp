@@ -28,7 +28,7 @@ bool Roasted_meat::check_ing()
     if ((id1 == ING_MEAT && id2 == PROD_FIRE) || (id2 == ING_MEAT && id1 == PROD_FIRE))
         return true;
     printf(" wrong ingredients\n");
-    return false;
+    return nullptr;
 }
 
 ProductServer * createRoasted_meat(InventoryElement * el1, InventoryElement * el2)

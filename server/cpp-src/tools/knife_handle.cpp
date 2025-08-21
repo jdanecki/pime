@@ -9,7 +9,7 @@ bool KnifeHandle::check_ing()
     if (el->get_base_cid() == Class_BaseElement)
         return true;
     else
-        return false;
+        return nullptr;
 }
 
 IngredientServer * createKnifeHandle(InventoryElement * from)
