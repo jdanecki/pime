@@ -20,6 +20,44 @@ void add_object_to_world(InventoryElement* object, ItemLocation location)
     }
 }
 
+void show_chunk(ItemLocation loc)
+{
+    switch (loc.tag)
+    {
+        case ItemLocation::Tag::Chunk :
+            world_table[loc.chunk.map_y][loc.chunk.map_x]->show();
+            break;
+    }
+}
+
+InventoryElement* find_in_world(ItemLocation* loc, size_t uid)
+{
+    switch (loc->tag)
+    {
+        case ItemLocation::Tag::Chunk:
+            return world_table[loc->chunk.map_y][loc->chunk.map_y]->find_by_id(uid);
+        case ItemLocation::Tag::Player:
+            abort();
+            return nullptr;
+    }
+}
+
+int get_world_x(ItemLocation loc)
+{
+    return loc.chunk.map_x * CHUNK_SIZE + loc.chunk.x;    
+}
+int get_world_y(ItemLocation loc)
+{
+    return  loc.chunk.map_y * CHUNK_SIZE + loc.chunk.y;
+}
+
+int get_tile_at(ItemLocation loc)
+{
+    return world_table[loc.chunk.map_y][loc.chunk.map_x]->table[loc.chunk.y][loc.chunk.x].tile;
+}
+
+
+
 //FIXME do we stil need these get_*_at functions?
 // Being ** get_being_at(int chunk_x, int chunk_y, int x, int y)
 // {
@@ -121,15 +159,18 @@ Plant ** get_plant_at(int chunk_x, int chunk_y, int x, int y)
 //     return get_plant_at(player->map_x, player->map_y, player->x, player->y);
 // }
 
-InventoryElement * get_item_at(int chunk_x, int chunk_y, int x, int y)
+InventoryElement * get_item_at(ItemLocation loc)
 {
-    chunk * ch = world_table[chunk_y][chunk_x];
+    if (loc.tag == ItemLocation::Tag::Player)
+        abort();
+    
+    chunk * ch = world_table[loc.chunk.map_y][loc.chunk.map_x];
     if (!ch)
         return nullptr;
     ListElement * le = ch->objects.head;
     while (le)
     {
-        if (le->el->get_x() == x && le->el->get_y() == y)
+        if (le->el->get_x() == loc.chunk.x && le->el->get_y() == loc.chunk.y)
         {
             return le->el;
         }
@@ -140,7 +181,7 @@ InventoryElement * get_item_at(int chunk_x, int chunk_y, int x, int y)
 
 InventoryElement * get_item_at_ppos(Player * player)
 {
-    return get_item_at(player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y);
+    return get_item_at(player->location);
 }
 
 void set_item_at(InventoryElement * item, int chunk_x, int chunk_y, int x, int y)

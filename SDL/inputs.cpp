@@ -207,26 +207,25 @@ void key_pressed(int key)
             break;
         }
         case SDLK_F2:
-            server_action_tile(SERVER_SHOW_ITEM, player->map_x, player->map_y, player->x, player->y);
+            server_action_tile(SERVER_SHOW_ITEM, player->location);
             break;
 
         case SDLK_F3:
-            if (world_table[player->map_y][player->map_x])
-                world_table[player->map_y][player->map_x]->show();
+            show_chunk(player->location);
             break;
         case SDLK_F4:
-            server_action_tile(SERVER_SHOW_CHUNK, player->map_x, player->map_y, player->x, player->y);
+            server_action_tile(SERVER_SHOW_CHUNK, player->location);
             break;
 
         case SDLK_F5:
             trace_network ^= true;
             break;
         case SDLK_F6:
-            server_action_tile(SERVER_TRACE_NETWORK, player->map_x, player->map_y, player->x, player->y);
+            server_action_tile(SERVER_TRACE_NETWORK, player->location);
             break;
 
         case SDLK_RETURN:
-            use_tile(player->map_x, player->map_y, player->x, player->y);
+            use_tile(player->location);
             break;
         case SDLK_c:
             d_craft.show ^= 1;
@@ -295,7 +294,7 @@ void mouse_pressed(SDL_MouseButtonEvent & event)
                 }
             }*/
         }
-        use_tile(player->map_x, player->map_y, tile_x, tile_y);
+        use_tile(player->location);
     }
     printf("mouse %d,%d %d %d,%d\n", event.x, event.y, event.button, tile_x, tile_y);
 }

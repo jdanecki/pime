@@ -1,4 +1,3 @@
-use std::borrow::{Borrow, BorrowMut};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::error::Error;
@@ -31,10 +30,13 @@ impl NetClient {
         buf.extend_from_slice(&self.my_acks_bitmap.to_le_bytes());
         buf.extend_from_slice(&data);
         unsafe {
-            if core::trace_network 
-            {
-                println!("SDL: send len={} local_seq={} remote_seq={}", 
-                    12 + data.len(), self.local_seq_num, self.remote_seq_num );
+            if core::trace_network {
+                println!(
+                    "SDL: send len={} local_seq={} remote_seq={}",
+                    12 + data.len(),
+                    self.local_seq_num,
+                    self.remote_seq_num
+                );
                 core::show_packet_type_name('S' as i8, data[0] as u8);
             }
         }
@@ -51,7 +53,7 @@ pub extern "C" fn init(
 ) -> *mut NetClient {
     let mut ip;
     unsafe {
-        let a = core::Player::new(1);
+        // let a = core::Player::new(1);
         ip = CStr::from_ptr(server_ip).to_str().unwrap().to_owned();
         ip.push(':');
         ip.push_str(CStr::from_ptr(port).to_str().unwrap())
@@ -67,8 +69,7 @@ pub extern "C" fn init(
     loop {
         let amt = client.socket.recv(&mut buf).unwrap();
         unsafe {
-            if core::trace_network 
-            {
+            if core::trace_network {
                 println!("{:?}", buf[12]);
             }
         }
@@ -80,14 +81,14 @@ pub extern "C" fn init(
                     usize::from_le_bytes(buf[1..9].try_into().unwrap()),
                     0, //i64::from_le_bytes(buf[9..17].try_into().unwrap()),
                 );
-            if core::trace_network {
-                println!("RECEIVED {:?}", &buf[9..amt]);
-            }
+                if core::trace_network {
+                    println!("RECEIVED {:?}", &buf[9..amt]);
+                }
                 WORLD.set(
                     bincode::deserialize::<World>(&buf[9..amt]).expect("failed to create world"),
                 );
                 WORLD.with_borrow(|world| {
-//                    println!("{:#?}", world);
+                    //                    println!("{:#?}", world);
                 });
                 break;
             };
@@ -138,8 +139,11 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             let ack = u32::from_le_bytes(buf[4..8].try_into().unwrap());
             let acks = u32::from_le_bytes(buf[8..12].try_into().unwrap());
             unsafe {
-                if core::trace_network  {
-                    println!("SDL: network_tick amt={amt} seq={seq} remote_seq_num={} ack={ack}", client.remote_seq_num);
+                if core::trace_network {
+                    println!(
+                        "SDL: network_tick amt={amt} seq={seq} remote_seq_num={} ack={ack}",
+                        client.remote_seq_num
+                    );
                 }
             }
             if seq > client.remote_seq_num {
@@ -194,9 +198,9 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             //println!("{:?}", &buf);
             let value = &mut buf[12..];
 
-            //FIXME 
+            //FIXME
             unsafe {
-                    core::show_packet_type_name('C' as i8 , value[0] as u8);
+                core::show_packet_type_name('C' as i8, value[0] as u8);
             }
             match value[0] {
                 core::PACKET_PLAYER_UPDATE => {
@@ -229,15 +233,16 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                                 //i32::from_le_bytes(value[5..9].try_into().unwrap()),
                                 i32::from(value[1]),
                                 i32::from(value[2]),
-                                &mut *(&mut value[0] as *mut u8 as *mut core::chunk_table));
-                                unsafe {
-                                    if core::trace_network {
-                                        println!("SDL: PACKET_CHUNK_UPDATE OK");
-                                    }
+                                &mut *(&mut value[0] as *mut u8 as *mut core::chunk_table),
+                            );
+                            unsafe {
+                                if core::trace_network {
+                                    println!("SDL: PACKET_CHUNK_UPDATE OK");
                                 }
+                            }
                         }
                     } else {
-                            println!("SDL: PACKET_CHUNK_UPDATE BAD");
+                        println!("SDL: PACKET_CHUNK_UPDATE BAD");
                     }
                 }
                 core::PACKET_OBJECT_UPDATE => unsafe {

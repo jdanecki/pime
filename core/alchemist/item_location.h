@@ -27,4 +27,11 @@ struct ItemLocation
         Player_Body player;
     };
 
+    static ItemLocation center()
+    {
+        ItemLocation l;
+        l.tag = ItemLocation::Tag::Chunk;
+        l.chunk = {128, 128, 0, 0};
+        return l;
+    }
 };

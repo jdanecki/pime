@@ -94,7 +94,7 @@ bool PlayerServer::server_action_on_object(Server_action a, InventoryElement * o
                 object->show(true);
             break;
         case SERVER_SHOW_CHUNK:
-            world_table[map_y][map_x]->show();
+            show_chunk(location);
             break;
         case SERVER_TRACE_NETWORK:
             trace_network ^= true;
@@ -177,6 +177,6 @@ bool PlayerServer::pickup(InventoryElement * item)
     return true;
 }
 
-PlayerServer::PlayerServer(int id) : Player(id)
+PlayerServer::PlayerServer(int id) : Player(id, SerializableCString("player"), ItemLocation::center(), 0, 0, 0)
 {
 }

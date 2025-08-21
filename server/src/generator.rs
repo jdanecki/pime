@@ -51,7 +51,7 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
             .unwrap();
         unsafe {
             println!("SERV: load_chunk map_x={} map_y={}", map_x, map_y);
-//            println!("SERV: load_chunk map_x={} map_y={}  {:#?}", map_x, map_y, region);
+            //            println!("SERV: load_chunk map_x={} map_y={}  {:#?}", map_x, map_y, region);
             let mut chunk = Box::new(core::chunk::new(map_x, map_y));
             for y in 0..core::CHUNK_SIZE as usize {
                 for x in 0..core::CHUNK_SIZE as usize {
@@ -65,9 +65,9 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
             //println!("{:?}", region.rocks_types);
             for (rock, num) in region.rocks_types.iter() {
                 // TODO remove +1 for each object
-//                let prob = num * 10.0 + 1.0;
+                //                let prob = num * 10.0 + 1.0;
                 let prob = num * 3.0 + 1.0;
-//                println!("element {prob} {:?}", rock);
+                //                println!("element {prob} {:?}", rock);
                 do_times(prob, || {
                     chunk.add_object1(core::create_element(rock.get_base()
                         as *const core::BaseElementServer
@@ -78,10 +78,9 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
                         as *const core::BaseElementServer
                         as *mut core::BaseElementServer)
                         as *mut core::InventoryElement);
-
                 });
             }
-/*            for (plant, num) in region.active_plants.iter() {
+            /*            for (plant, num) in region.active_plants.iter() {
                 let prob = num / region.size as f32 + 1.0;
                 //println!("plant {prob}");
                 do_times(prob, || {
@@ -134,7 +133,7 @@ struct World {
 impl World {
     fn new() -> World {
         let terrains = create_terrains();
-//        println!("{:#?}", terrains);
+        //        println!("{:#?}", terrains);
         let plants = create_plants(&terrains);
         let animals = create_animals(&plants);
         let regions = create_regions(&terrains, &plants, &animals);
@@ -183,16 +182,14 @@ pub fn generate() {
         // println!("");
     }
     //    simulate(&mut regions);
-   // println!("{:#?}", world.regions);
+    // println!("{:#?}", world.regions);
 
     WORLD.set(world);
-    for y in 127..=129
-    {
-        for x in 127..=129
-        {
-             load_chunk(x, y);
+    for y in 127..=129 {
+        for x in 127..=129 {
+            load_chunk(x, y);
         }
-    } 
+    }
     //load_chunk(128,128);
 }
 
@@ -631,6 +628,7 @@ impl PlantType {
         }
     }
 
+    #[allow(dead_code)]
     pub fn get_base(&self) -> &core::BasePlant {
         &self.base
     }
@@ -708,6 +706,7 @@ impl AnimalType {
         }
         animal
     }
+    #[allow(dead_code)]
     pub fn get_base(&self) -> &core::BaseAnimal {
         &self.base
     }

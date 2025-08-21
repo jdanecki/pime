@@ -4,15 +4,11 @@ KnifeBlade::KnifeBlade(InventoryElement * from) : IngredientServer(from, ING_KNI
 {
 }
 
-bool KnifeBlade::check_ing()
-{
-    if (el->get_base_cid() == Class_BaseElement)
-        return new KnifeBlade(from);
-    else
-        return nullptr;
-}
 
 IngredientServer * KnifeBlade::createKnifeBlade(InventoryElement * from)
 {
-    return new KnifeBlade(from);
+    if (from->get_base_cid() == Class_BaseElement)
+        return new KnifeBlade(from);
+    else
+        return nullptr;
 }

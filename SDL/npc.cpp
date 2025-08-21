@@ -11,14 +11,9 @@ extern Player * player;
 NpcSDL * current_npc;
 extern int active_hotbar;
 
-int get_tile_at(int chunk_x, int chunk_y, int x, int y)
-{
-    return world_table[chunk_y][chunk_x]->table[y][x].tile;
-}
-
 SDL_Texture * create_npc_texture()
 {
-    Color c = get_base_element(get_tile_at(player->map_x, player->map_y, 0, 0))->color; // FIXME
+    Color c = get_base_element(get_tile_at(player->location))->color; // FIXME
     Uint8 mask_r = c.r;
     Uint8 mask_g = c.g;
     Uint8 mask_b = c.b;

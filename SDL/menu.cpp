@@ -603,13 +603,13 @@ int Menu::interact()
             return 0;
 
         case MENU_DRINK:
-            action_tile(PLAYER_DRINK, player->map_x, player->map_y, player->x, player->y);
+            action_tile(PLAYER_DRINK, player->location);
             return 0;
         case MENU_EAT:
-            action_tile(PLAYER_EAT, player->map_x, player->map_y, player->x, player->y);
+            action_tile(PLAYER_EAT, player->location);
             return 0;
         case MENU_READ:
-            action_tile(PLAYER_READ, player->map_x, player->map_y, player->x, player->y);
+            action_tile(PLAYER_READ, player->location);
             return 0;
 
         default:

@@ -156,10 +156,6 @@ void loop()
         // TODO disconnect
         network_tick(client);
 
-        // FIXME
-        if (!current_npc)
-            current_npc = new NpcSDL(Npc());
-
         /*if (auto_explore) {
             do_auto_explore();
         } */

@@ -4,15 +4,10 @@ Stick::Stick(InventoryElement * from) : IngredientServer(from, ING_STICK, Form_s
 {
 }
 
-bool Stick::check_ing()
+IngredientServer * Stick::createStick(InventoryElement * from)
 {
-    if (el->get_base_cid() == Class_BasePlant)
+    if (from->get_base_cid() == Class_BasePlant)
         return new Stick(from);
     else
         return nullptr;
-}
-
-IngredientServer * Stick::createStick(InventoryElement * from)
-{
-    return new Stick(from);
 }

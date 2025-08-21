@@ -21,14 +21,14 @@ void put_element()
     }
 }
 
-void use_tile(int map_x, int map_y, int x, int y)
+void use_tile(ItemLocation loc)
 {
-    InventoryElement * object = get_item_at(map_x, map_y, x, y);
+    InventoryElement * object = get_item_at(loc);
     if (!object)
     {
         if (InventoryElement * item = player->hotbar[active_hotbar])
         {
-            send_packet_item_used_on_tile(client, item->uid, map_x, map_y, x, y);
+            send_packet_item_used_on_tile(client, item->uid, loc);
             printf("plant seed\n");
         }
 
@@ -104,9 +104,9 @@ void use_tile(int map_x, int map_y, int x, int y)
         }*/
 }
 
-void action_tile(Player_action a, int map_x, int map_y, int x, int y)
+void action_tile(Player_action a, ItemLocation loc)
 {
-    InventoryElement * object = get_item_at(map_x, map_y, x, y);
+    InventoryElement * object = get_item_at(loc);
     if (!object)
     {
         printf("SDL: nothing on tile\n");
@@ -117,9 +117,9 @@ void action_tile(Player_action a, int map_x, int map_y, int x, int y)
     send_packet_action_on_object(client, a, object->uid);
 }
 
-void server_action_tile(Server_action a, int map_x, int map_y, int x, int y)
+void server_action_tile(Server_action a, ItemLocation loc)
 {
-    InventoryElement * object = get_item_at(map_x, map_y, x, y);
+    InventoryElement * object = get_item_at(loc);
     if (object)
     {
         printf("SDL: server action %s on %s\n", server_action_name[a], object->get_name());

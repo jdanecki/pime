@@ -1,9 +1,22 @@
 #include "craft_ing.h"
+#include "tools/tools.h"
 
 typedef IngredientServer * (*IngredientFunction)(InventoryElement *);
 
 IngredientFunction ingredientFunctions[] = {
-    createAxeBlade, createAxeHandle, createKnifeBlade, createKnifeHandle, createPickAxeBlade, createPickAxeHandle, createWall, createMeat, createLog, createTinder, createStick, createFruit};
+    AxeBlade::createAxeBlade, 
+    AxeHandle::createAxeHandle, 
+    KnifeBlade::createKnifeBlade, 
+    KnifeHandle::createKnifeHandle, 
+    PickaxeBlade::createPickaxeBlade, 
+    PickaxeHandle::createPickaxeHandle, 
+    Wall::createWall, 
+    Meat::createMeat,
+    Log::createLog,
+    Tinder::createTinder, 
+    Stick::createStick, 
+    Fruit::createFruit
+};
 
 InventoryElement * craft_ing(int product_id, InventoryElement * el)
 {
@@ -11,15 +24,5 @@ InventoryElement * craft_ing(int product_id, InventoryElement * el)
         return nullptr;
     InventoryElement * crafted = ingredientFunctions[product_id](el);
 
-    if (crafted->craft())
-    {
-        crafted->show();
-        return crafted;
-    }
-    else
-    {
-        delete crafted;
-    }
-
-    return nullptr;
+    return crafted;
 }

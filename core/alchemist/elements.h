@@ -146,15 +146,6 @@ class InventoryElement
     {
         return nullptr;
     }
-
-#ifndef CORE_FOR_CLIENT
-
-    virtual bool craft()
-    {
-        printf("missing craft function\n");
-        return false;
-    }
-#endif
     int get_x()
     {
         return location.chunk.x;

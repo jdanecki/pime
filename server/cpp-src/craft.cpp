@@ -1,8 +1,6 @@
 #include "craft.h"
 
 #include "networking.h"
-#include "tools/axe.h"
-#include "tools/knife.h"
 #include "world_server.h"
 #include "craft_ing.h"
 #include "craft_prod.h"
@@ -51,20 +49,7 @@ bool craft_entry(int product_id, int ingredients_num, const size_t * ingredients
         }
 
         crafted = craft_prod(product_id, el1, el2);
-    }
-    if (crafted)
-    {
-        world_table[player->map_y][player->map_x]->add_object(crafted, player->x, player->y);
-        objects_to_create.add(crafted);
-        printf("crafted\n");
-
-        // FIXME share this with client
-        // player->set_known(crafted);
-        return true;
-    }
-    else
-    {
-        printf("failed to craft\n");
+        return crafted != nullptr;
     }
     return false;
 }

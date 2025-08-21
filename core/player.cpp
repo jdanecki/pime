@@ -69,7 +69,8 @@ Player::Player(int id, SerializableCString&& name,
         InventoryElement(Class_Player, id, location), name(name),
         thirst(thirst), hunger(hunger), nutrition(nutrition) 
 {
-    
+    for (int i = 0; i < 10; i++)
+        hotbar[i] = nullptr;
 }
     
 

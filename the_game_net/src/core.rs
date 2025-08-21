@@ -200,7 +200,7 @@ impl<'de> serde::Deserialize<'de> for Player {
                 let id = seq
                     .next_element()?
                     .ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
-                let name = seq
+                let name: SerializableCString = seq
                     .next_element()?
                     .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
                 let location = seq
@@ -215,7 +215,16 @@ impl<'de> serde::Deserialize<'de> for Player {
                 let nutrition = seq
                     .next_element()?
                     .ok_or_else(|| serde::de::Error::invalid_length(5, &self))?;
-                Ok(unsafe { Player::new1(id, name, location, thirst, hunger, nutrition) })
+                Ok(unsafe {
+                    Player::new(
+                        id,
+                        Box::<SerializableCString>::into_raw(Box::new(name)),
+                        location,
+                        thirst,
+                        hunger,
+                        nutrition,
+                    )
+                })
             }
         }
 

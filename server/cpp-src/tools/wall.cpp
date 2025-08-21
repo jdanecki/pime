@@ -5,15 +5,10 @@ Wall::Wall(InventoryElement * from) : IngredientServer(from, ING_WALL, Form_soli
 {
 }
 
-bool Wall::check_ing()
+IngredientServer * Wall::createWall(InventoryElement * from)
 {
-    if ((el->get_base_cid() == Class_BaseElement) || (el->get_base_cid() == Class_BasePlant))
+    if ((from->get_base_cid() == Class_BaseElement) || (from->get_base_cid() == Class_BasePlant))
         return new Wall(from);
     else
         return nullptr;
-}
-
-IngredientServer * Wall::createWall(InventoryElement * from)
-{
-    return new Wall(from);
 }

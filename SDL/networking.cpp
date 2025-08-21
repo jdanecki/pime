@@ -100,8 +100,9 @@ InventoryElement * el_from_data(const ObjectData * data)
         case ObjectData::Tag::Animal:
             el = new AnimalSDL(data->animal.data);
             break;
-            ObjectData::Tag::Player:
+        case ObjectData::Tag::Player:
             el = new Player(data->player.data);
+            break;
     }
     return el;
 }
@@ -116,30 +117,31 @@ extern "C"
 
     void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y, int thirst, int hunger)
     {
-        if (id >= 0 && id < PLAYER_NUM)
-        {
-            if (!players[id])
-            {
-                players[id] = new Player(id);
-            }
-            /*for (int i = 0; i < 25; i++)
-            {
-                printf("%d, ", data[i]);
-            }*/
-            Player * p = players[id];
-            p->map_x = map_x;
-            p->map_y = map_y;
+        // DEPRECATED
+        // if (id >= 0 && id < PLAYER_NUM)
+        // {
+        //     if (!players[id])
+        //     {
+        //         players[id] = new Player(id);
+        //     }
+        //     /*for (int i = 0; i < 25; i++)
+        //     {
+        //         printf("%d, ", data[i]);
+        //     }*/
+        //     Player * p = players[id];
+        //     p->map_x = map_x;
+        //     p->map_y = map_y;
 
-            // FIXME when more chunks added
-            if (x != p->x)
-                p->going_right = p->x > x ? 0 : 1;
-            p->x = x;
-            p->y = y;
-            p->thirst = thirst;
-            p->hunger = hunger;
+        //     // FIXME when more chunks added
+        //     if (x != p->x)
+        //         p->going_right = p->x > x ? 0 : 1;
+        //     p->x = x;
+        //     p->y = y;
+        //     p->thirst = thirst;
+        //     p->hunger = hunger;
 
-            //  printf("updated player %ld: %d %d %d %d\n", id, map_x, map_y, x, y);
-        }
+        //     //  printf("updated player %ld: %d %d %d %d\n", id, map_x, map_y, x, y);
+        // }
     }
 
     void update_chunk(int32_t x, int32_t y, const chunk_table * data)
@@ -164,7 +166,7 @@ extern "C"
     void got_id(uintptr_t id, int64_t seed)
     {
         // my_id = id;
-        players[id] = new Player(id);
+        players[id] = new Player(id, SerializableCString("player"), ItemLocation::center(), 0, 0, 0);
         player = players[id];
 
         printf("seed: %ld\n", seed);

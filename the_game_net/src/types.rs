@@ -9,6 +9,7 @@ pub struct LocationUpdateData {
     pub new: core::ItemLocation,
 }
 
+#[allow(dead_code)]
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Deserialize)]
 pub enum ObjectData {

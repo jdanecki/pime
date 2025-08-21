@@ -162,7 +162,6 @@ class IngredientServer : public Ingredient
 
   public:
     InventoryElement * el;
-    bool craft() override;
     IngredientServer(InventoryElement * from, Ingredient_id i, Form f);
     bool action(Product_action action, Player * pl) override;
     bool can_pickup() override
@@ -176,7 +175,6 @@ class ProductServer : public Product
   public:
     int ing_count;
     InventoryElement ** ings;
-    bool craft() override;
 
     void init(Product_id i, int c, Form f);
     ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id i, Form f);

@@ -89,7 +89,7 @@ impl serde::Serialize for Player {
         S: serde::Serializer,
     {
         let mut state = serializer.serialize_tuple(6)?;
-        state.serialize_element(&self.id)?;
+        state.serialize_element(&self._base.uid)?;
         state.serialize_element(&self.name)?;
         state.serialize_element(&self._base.location)?;
         state.serialize_element(&self.thirst)?;

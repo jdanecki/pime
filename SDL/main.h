@@ -19,6 +19,7 @@
 #include "inputs.h"
 #include "menu.h"
 #include "networking.h"
+#include "../core/player.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <termios.h>

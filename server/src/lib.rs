@@ -1,3 +1,5 @@
+use core::add_object_to_world;
+use core::find_in_world;
 use std::collections::HashMap;
 use std::error::Error;
 use std::net::SocketAddr;
@@ -223,14 +225,14 @@ pub fn main_loop(server: &mut Server) {
         unsafe {
             core::update();
         }
-        send_game_updates(server, &mut players);
+        send_game_updates(server);
         std::thread::sleep(std::time::Duration::from_millis(core::TICK_DELAY));
     }
 }
 
 fn add_player(
     server: &mut Server,
-    mut peer: std::net::SocketAddr,
+    peer: std::net::SocketAddr,
     players: &mut Vec<core::PlayerServer>,
 ) {
     server.clients.insert(peer, ClientData::new(players.len()));
@@ -247,16 +249,17 @@ fn add_player(
     server.socket.send_to(&response, &peer).unwrap();
 
     unsafe {
-        let mut p = core::PlayerServer::new(players.len() as i32);
-        let axe = Box::into_raw(Box::new(core::Axe::new(
-            std::ptr::null_mut(),
-            std::ptr::null_mut(),
-        ))) as *mut core::InventoryElement;
-        (*core::world_table[128][128]).add_object1(axe);
-        p.pickup(axe);
+        let p = core::PlayerServer::new(players.len() as i32);
+        // FIXME
+        // let axe = Box::into_raw(Box::new(core::Axe::new(
+        //     std::ptr::null_mut(),
+        //     std::ptr::null_mut(),
+        // ))) as *mut core::InventoryElement;
+        // (*core::world_table[128][128]).add_object1(axe);
+        // p.pickup(axe);
         players.push(p);
-        update_chunk_for_player(server, &mut peer, (128, 128));
-        core::objects_to_create.add(axe);
+        // update_chunk_for_player(server, &mut peer, (128, 128));
+        // core::objects_to_create.add(axe);
     }
     //println!("{:?} , players {:?}", peer, players);
 }
@@ -443,9 +446,10 @@ fn handle_packet(
         ClientEvent::Pickup { id } => {
             println!("SERV: player picking up {id}");
             unsafe {
-                let item = (*core::world_table[player._base.map_y as usize]
-                    [player._base.map_x as usize])
-                    .find_by_id(id);
+                let item = find_in_world(
+                    &mut player._base._base.location as *mut core::ItemLocation,
+                    id,
+                );
                 if item != std::ptr::null_mut() {
                     if !player.pickup(item) {
                         let response = [core::PACKET_ACTION_FAILED];
@@ -464,8 +468,7 @@ fn handle_packet(
                 let item = player._base.get_item_by_uid(id);
                 if item != std::ptr::null_mut() {
                     let loc = (*item).location;
-                    (*core::world_table[player._base.map_y as usize][player._base.map_x as usize])
-                        .add_object(item, player._base.x, player._base.y);
+                    add_object_to_world(item, player._base._base.location);
                     player._base.drop(item);
                     core::update_location((*item).uid, loc, (*item).location);
                     //let mut buf = vec![core::PACKET_PLAYER_ACTION_DROP];
@@ -479,9 +482,10 @@ fn handle_packet(
             println!("SERV: player used {iid} on {oid}");
             unsafe {
                 let item = player._base.get_item_by_uid(iid);
-                let object = (*core::world_table[player._base.map_y as usize]
-                    [player._base.map_x as usize])
-                    .find_by_id(oid);
+                let object = find_in_world(
+                    &mut player._base._base.location as *mut core::ItemLocation,
+                    oid,
+                );
                 if !player.use_item_on_object(item, object) {
                     let response = [core::PACKET_ACTION_FAILED];
                     server.send_to_reliable(&response, peer);
@@ -491,9 +495,10 @@ fn handle_packet(
         ClientEvent::ActionOnObject { a, oid } => {
             println!("SERV: player action {a} on {oid}");
             unsafe {
-                let object = (*core::world_table[player._base.map_y as usize]
-                    [player._base.map_x as usize])
-                    .find_by_id(oid);
+                let object = find_in_world(
+                    &mut player._base._base.location as *mut core::ItemLocation,
+                    oid,
+                );
                 if object != std::ptr::null_mut() {
                     if !player.action_on_object(a, object) {
                         let response = [core::PACKET_ACTION_FAILED];
@@ -510,9 +515,10 @@ fn handle_packet(
             unsafe {
                 let mut object = 0 as *mut core::InventoryElement;
                 if oid != 0 {
-                    object = (*core::world_table[player._base.map_y as usize]
-                        [player._base.map_x as usize])
-                        .find_by_id(oid);
+                    object = find_in_world(
+                        &mut player._base._base.location as *mut core::ItemLocation,
+                        oid,
+                    );
                 }
                 if !player.server_action_on_object(a, object) {
                     let response = [core::PACKET_ACTION_FAILED];
@@ -588,7 +594,7 @@ fn handle_packet(
     }
 }
 
-fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
+fn send_game_updates(server: &mut Server) {
     unsafe {
         let list = std::ptr::addr_of_mut!(core::objects_to_create);
         let mut le = (*list)._base.head;

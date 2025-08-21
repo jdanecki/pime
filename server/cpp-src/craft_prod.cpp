@@ -1,15 +1,16 @@
 #include "craft_prod.h"
+#include "tools/tools.h"
 
 typedef ProductServer * (*ProductFunction)(InventoryElement *, InventoryElement *);
 
 ProductFunction productFunctions[] = {
     Axe::createAxe,
-    createKnife,
-    createPickAxe,
-    createHut,
-    createFire,
-    createRoasted_meat,
-    createFruit_salad,
+    Knife::createKnife,
+    Pickaxe::createPickaxe,
+    Hut::createHut,
+    Fire::createFire,
+    RoastedMeat::createRoastedMeat,
+    FruitSalad::createFruitSalad,
 };
 
 InventoryElement * craft_prod(int product_id, InventoryElement * el1, InventoryElement * el2)

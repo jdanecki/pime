@@ -4,15 +4,10 @@ KnifeHandle::KnifeHandle(InventoryElement * from) : IngredientServer(from, ING_K
 {
 }
 
-bool KnifeHandle::check_ing()
+IngredientServer * KnifeHandle::createKnifeHandle(InventoryElement * from)
 {
-    if (el->get_base_cid() == Class_BaseElement)
+    if (from->get_base_cid() == Class_BaseElement)
         return new KnifeHandle(from);
     else
         return nullptr;
-}
-
-IngredientServer * KnifeHandle::createKnifeHandle(InventoryElement * from)
-{
-    return new KnifeHandle(from);
 }

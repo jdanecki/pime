@@ -34,10 +34,10 @@ GENERATE_PRODUCT(Fire,)
 GENERATE_INGREDIENT(Stick,)
 GENERATE_INGREDIENT(Tinder,)
 
-GENERATE_PRODUCT(RoastedMeat,)
+GENERATE_PRODUCT(RoastedMeat, bool player_action(Player_action,Player*);)
 GENERATE_INGREDIENT(Meat, bool action(Product_action,Player*);)
 
-GENERATE_PRODUCT(FruitSalad,)
+GENERATE_PRODUCT(FruitSalad, bool player_action(Player_action,Player*);)
 GENERATE_INGREDIENT(Fruit,)
 
 GENERATE_PRODUCT(Hut,)

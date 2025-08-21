@@ -319,23 +319,6 @@ bool IngredientServer::action(Product_action action, Player * pl)
     return false;
 }
 
-bool IngredientServer::craft()
-{
-    // FIXME
-    // if (req_form != el->get_form())
-    // {
-    //     printf("form != %d\n", req_form);
-    //     return false;
-    // }
-    if (!check_ing())
-        return false;
-
-    quality = Property("quality", rand() % 100);
-    resilience = Property("resilience", rand() % 100);
-    usage = Property("usage", rand() % 100);
-    return true;
-}
-
 void ProductServer::init(Product_id i, int c, Form f)
 {
     id = i;
@@ -362,26 +345,6 @@ ProductServer::ProductServer(InventoryElement ** from, int count, Product_id i, 
 void ProductServer::show(bool details)
 {
     Product::show(details);
-}
-
-bool ProductServer::craft() // executed only on server
-{
-    for (int i = 0; i < ing_count; i++)
-    {
-        // TODO fixme
-        // if (req_form != ings[i]->get_form())
-        // {
-        //     printf("form != %d for inq[%d]\n", req_form, i);
-        //     return false;
-        // }
-    }
-    if (!check_ing())
-        return false;
-
-    quality = Property("quality", rand() % 100);
-    resilience = Property("resilience", rand() % 100);
-    usage = Property("usage", rand() % 100);
-    return true;
 }
 
 AnimalServer * create_animal(BaseAnimal * base)

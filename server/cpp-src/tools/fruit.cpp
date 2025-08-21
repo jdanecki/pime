@@ -4,15 +4,10 @@ Fruit::Fruit(InventoryElement * from) : IngredientServer(from, ING_FRUIT, Form_s
 {
 }
 
-bool Fruit::check_ing()
+IngredientServer * Fruit::createFruit(InventoryElement * from)
 {
-    if (el->get_base_cid() == Class_BasePlant && dynamic_cast<Plant *>(el)->phase == Plant_fruits)
+    if (from->get_base_cid() == Class_BasePlant && dynamic_cast<Plant *>(from)->phase == Plant_fruits)
         return new Fruit(from);
     else
         return nullptr;
-}
-
-IngredientServer * Fruit::createFruit(InventoryElement * from)
-{
-    return new Fruit(from);
 }

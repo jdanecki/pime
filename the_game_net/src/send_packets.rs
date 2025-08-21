@@ -46,23 +46,21 @@ pub extern "C" fn send_packet_server_action_on_object(client: &mut NetClient, a:
     client.send(&buf);
 }
 
-
 #[no_mangle]
 pub extern "C" fn send_packet_item_used_on_tile(
     client: &mut NetClient,
     iid: usize,
-    map_x: i32,
-    map_y: i32,
-    x: i32,
-    y: i32,
+    location: core::ItemLocation,
 ) {
-    let mut buf = vec![core::PACKET_PLAYER_ACTION_USE_ITEM_ON_TILE];
-    buf.extend_from_slice(&iid.to_le_bytes());
-    buf.extend_from_slice(&map_x.to_le_bytes());
-    buf.extend_from_slice(&map_y.to_le_bytes());
-    buf.extend_from_slice(&x.to_le_bytes());
-    buf.extend_from_slice(&y.to_le_bytes());
-    client.send(&buf);
+    if let core::ItemLocation::Chunk { map_x, map_y, x, y } = location {
+        let mut buf = vec![core::PACKET_PLAYER_ACTION_USE_ITEM_ON_TILE];
+        buf.extend_from_slice(&iid.to_le_bytes());
+        buf.extend_from_slice(&map_x.to_le_bytes());
+        buf.extend_from_slice(&map_y.to_le_bytes());
+        buf.extend_from_slice(&x.to_le_bytes());
+        buf.extend_from_slice(&y.to_le_bytes());
+        client.send(&buf);
+    }
 }
 
 #[no_mangle]
