@@ -70,6 +70,7 @@ extern "C" fn foo() -> ObjectData {
             location: core::ItemLocation::Player { id: 1 },
             vtable_: todo!(),
             c_id: todo!(),
+            checked: false,
         },
     }
 }

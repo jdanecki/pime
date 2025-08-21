@@ -329,6 +329,7 @@ void create_menus()
     menu_action->add("Drink", MENU_DRINK);
     menu_action->add("Eat", MENU_EAT);
     menu_action->add("Read", MENU_READ);
+    menu_action->add("Check", MENU_CHECK);
     menu_action->add("Cancel", MENU_CANCEL);
 
     menu_knowledge = new Menu("Knowledge");
@@ -681,13 +682,16 @@ int Menu::interact()
             return 0;
 
         case MENU_DRINK:
-            action_tile(PLAYER_DRINK, player->map_x, player->map_y, player->x, player->y);
+            action_tile(PLAYER_DRINK);
             return 0;
         case MENU_EAT:
-            action_tile(PLAYER_EAT, player->map_x, player->map_y, player->x, player->y);
+            action_tile(PLAYER_EAT);
             return 0;
         case MENU_READ:
-            action_tile(PLAYER_READ, player->map_x, player->map_y, player->x, player->y);
+            action_tile(PLAYER_READ);
+            return 0;
+        case MENU_CHECK:
+            action_tile(PLAYER_CHECK);
             return 0;
 
         default:

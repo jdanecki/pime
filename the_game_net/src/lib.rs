@@ -62,7 +62,7 @@ pub extern "C" fn init(
     buf[12] = core::PACKET_JOIN_REQUEST;
     client.socket.send(&buf).unwrap();
 
-    let mut buf = [0; 4096];
+    let mut buf = [0; 8192];
     let mut time_to_resend = 50;
     loop {
         let amt = client.socket.recv(&mut buf).unwrap();
@@ -73,7 +73,7 @@ pub extern "C" fn init(
             }
         }
         let buf = &buf[12..];
-
+        let amt = amt-12;
         if buf[0] == core::PACKET_PLAYER_ID {
             unsafe {
                 events::got_id(

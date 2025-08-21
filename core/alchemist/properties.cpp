@@ -33,10 +33,12 @@ void Edible::show()
 }
 
 Solid::Solid()
+    : tooling("tooling", 1 + rand() % 100), stretching("stretching", 1 + rand() % 10000), squeezing("squezzing", 1 + rand() % 20000), bending("bending", 1 + rand() % 100),
+      solubility("solubility", 1 + rand() % 100), hardness("hardness", 1 + rand() % 100)
 {
-    tooling = new Property("tooling", 1 + rand() % 100);
-    // 1 - trudna - potrzebne narzędzia
-    // 100 - łatwe - obróbka ręczna
+    // tooling
+    //  1 - trudna - potrzebne narzędzia
+    //  100 - łatwe - obróbka ręczna
     /*
      *  stal sztabka	niska
         kamień	niska
@@ -46,15 +48,15 @@ Solid::Solid()
         pajęczyna	wysoka
         glina	wysoka
       */
-    stretching = new Property("stretching", 1 + rand() % 10000);
-    // wytrzymałość
-    //  styropian: 1
-    //  beton:     5
-    //  cyna:     14
-    //  drewno:   800
-    //  diament: 1800
-    //  żelazo:  3800
-    //  stal:   10000
+    // stretching
+    //  wytrzymałość
+    //   styropian: 1
+    //   beton:     5
+    //   cyna:     14
+    //   drewno:   800
+    //   diament: 1800
+    //   żelazo:  3800
+    //   stal:   10000
     /*
         kamień	niska - kruszy się
         glina	niska
@@ -65,13 +67,13 @@ Solid::Solid()
         stal sztabka	wysoka
       */
 
-    squeezing = new Property("squezzing", 1 + rand() % 20000);
-    // wytrzymałość
-    //  styropian:     1
-    //  beton:        50
-    //  kość:        150
-    //  kamień: 100-5000
-    //  diament:   17000
+    // squeezing
+    //  wytrzymałość
+    //   styropian:     1
+    //   beton:        50
+    //   kość:        150
+    //   kamień: 100-5000
+    //   diament:   17000
     /*
         kamień	niska
         stal sztabka	niska
@@ -87,7 +89,7 @@ Solid::Solid()
     //  < 100 kruche
     //  > spręzyste
 
-    bending = new Property("bending", 1 + rand() % 100);
+    // bending = new Property("bending", 1 + rand() % 100);
     // 1 trudno  zginalne
     // 100 łatwo
     /*
@@ -100,10 +102,10 @@ Solid::Solid()
         pajęczyna	wysoka
       */
 
-    solubility = new Property("solubility", 1 + rand() % 100);
-    // rozpuszczalność
+    // solubility = new Property("solubility", 1 + rand() % 100);
+    //  rozpuszczalność
 
-    hardness = new Property("hardness", 1 + rand() % 100);
+    // hardness = new Property("hardness", 1 + rand() % 100);
     /*
         kamień	wysoka
         drewno	średnia
@@ -117,22 +119,17 @@ Solid::Solid()
 
 Solid::~Solid()
 {
-    delete stretching;
-    delete squeezing;
-    delete bending;
-    // delete fragility;
-    delete solubility;
 }
 
 void Solid::show()
 {
     printf("      *** Solid ***\n");
 
-    stretching->show(); // rozciąganie
-    squeezing->show();  // ściskanie
-    bending->show();    // zginanie
+    stretching.show(); // rozciąganie
+    squeezing.show();  // ściskanie
+    bending.show();    // zginanie
     // fragility->show();  // kruchość
-    solubility->show(); // rozpuszczalność
+    solubility.show(); // rozpuszczalność
 }
 
 const char * Form_name[]{"unknown", "solid", "liquid", "gas"};

@@ -1,4 +1,5 @@
 #include "fruit_salad.h"
+#include "../networking.h"
 
 Fruit_salad::Fruit_salad(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_FRUIT_SALAD, Form_solid)
 {
@@ -23,6 +24,13 @@ ProductServer * createFruit_salad(InventoryElement * el1, InventoryElement * el2
 
 bool Fruit_salad::player_action(Player_action action, Player * pl)
 {
+    bool res = InventoryElement::player_action(action, pl);
+    if (res)
+    {
+        objects_to_update.add(this);
+        return res;
+    }
+
     printf("FRUIT_SALAD: %s %s\n", player_action_name[action], get_name());
 
     switch (action)

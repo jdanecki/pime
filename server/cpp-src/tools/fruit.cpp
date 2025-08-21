@@ -1,4 +1,5 @@
 #include "fruit.h"
+#include "../networking.h"
 
 Fruit::Fruit(InventoryElement * from) : IngredientServer(from, ING_FRUIT, Form_solid)
 {

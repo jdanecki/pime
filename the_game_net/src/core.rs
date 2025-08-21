@@ -205,8 +205,11 @@ impl<'de> serde::Deserialize<'de> for InventoryElement {
                     .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
                 let location = seq
                     .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(2, &self))?;
+                let checked = seq
+                    .next_element()?
                     .ok_or_else(|| serde::de::Error::invalid_length(3, &self))?;
-                Ok(unsafe { InventoryElement::new(c_id, id, location) })
+                Ok(unsafe { InventoryElement::new(c_id, id, location, checked) })
             }
         }
 

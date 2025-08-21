@@ -101,9 +101,9 @@ void use_tile(int map_x, int map_y, int x, int y)
         }*/
 }
 
-void action_tile(Player_action a, int map_x, int map_y, int x, int y)
+void action_tile(Player_action a)
 {
-    InventoryElement * object = get_item_at(map_x, map_y, x, y);
+    InventoryElement * object = get_item_at(player->map_x, player->map_y, player->x, player->y);
     if (!object)
     {
         printf("SDL: nothing on tile\n");

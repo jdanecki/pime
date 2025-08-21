@@ -11,15 +11,6 @@ impl std::fmt::Debug for SerializableCString {
         f.write_str(unsafe { CStr::from_ptr(self.str_).to_str().unwrap() })
     }
 }
-impl serde::Serialize for BaseElementServer {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        self._base.serialize(serializer)
-    }
-}
-
 impl serde::Serialize for SerializableCString {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -90,11 +81,11 @@ impl serde::Serialize for InventoryElement {
     where
         S: serde::Serializer,
     {
-        //FIXME change this to 3
         let mut state = serializer.serialize_tuple(4)?;
         state.serialize_element(&self.c_id)?;
         state.serialize_element(&self.uid)?;
         state.serialize_element(&self.location)?;
+        state.serialize_element(&self.checked)?;
         state.end()
     }
 }

@@ -44,7 +44,7 @@ const char * product_action_name[] = {
     "stab",
     "fire",
 };
-const char * player_action_name[] = {"drink", "eat", "read"};
+const char * player_action_name[] = {"drink", "eat", "read", "check"};
 
 const char * server_action_name[] = {"server show item", "server show chunk", "server trace network"};
 
@@ -68,9 +68,40 @@ const char * Base::get_name()
     return name.str;
 }
 
-BaseElement::BaseElement(Form f, Color color, int index) : Base(index, Class_BaseElement, create_name(5 - f)), form(f), color(color)
+BaseElement::BaseElement(Form f, int index) : Base(index, Class_BaseElement, create_name(5 - f)), form(f), color({rand() % 256, rand() % 256, rand() % 256}), density("", 0)
 {
     //  printf("BaseElement index=%d name=%s\n", index, get_name());
+
+    switch (form)
+    {
+        case Form_solid:
+            density = Property("density", 50 + rand() % 2000);
+            break;
+        case Form_liquid:
+            density = Property("density", 500 + rand() % 500);
+            break;
+        case Form_gas:
+            density = Property("density", 1);
+            break;
+    }
+}
+
+void BaseElement::show(bool details)
+{
+    Base::show(details);
+    printf("BaseElement form=%s\n", Form_name[form]);
+    if (!details)
+        return;
+    density.show(); // gęstość
+    printf("   form = %s\n", Form_name[form]);
+    switch (form)
+    {
+        case Form_solid:
+            solid.show();
+            break;
+        default:
+            break;
+    }
 }
 
 template <typename T> SerializablePointer<T>::SerializablePointer(T * p) : ptr(p)
@@ -80,11 +111,11 @@ template <typename T> SerializablePointer<T>::SerializablePointer(T * p) : ptr(p
 Element::Element(BaseElement * b)
     //  : InventoryElement(Class_Element), base(b), length("length", 8 + rand() % 120), width("width", 8 + rand() % 120), height("height", 8 + rand() % 120),
     : InventoryElement(Class_Element), base(b), length("length", 3 + rand() % 30), width("width", 3 + rand() % 30), height("height", 3 + rand() % 30),
-      volume("volume", length.value * width.value * height.value)
+      volume("volume", length.value * width.value * height.value), sharpness("sharpness", 0), smoothness("smoothness", 0), mass("mass", b->density.value * volume.value / 1000)
 {
 }
 // called by the_game_net/core.rs
-InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : c_id(c_id), uid(uid), location(location)
+InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location, bool checked) : c_id(c_id), uid(uid), location(location), checked(checked)
 {
 }
 void Element::show(bool details)
@@ -97,6 +128,12 @@ void Element::show(bool details)
     height.show();
     volume.show();
 
+    if (details)
+    {
+        sharpness.show();
+        smoothness.show();
+        mass.show();
+    }
     get_base()->show(details);
 }
 

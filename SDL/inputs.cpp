@@ -246,7 +246,6 @@ void mouse_pressed(SDL_MouseButtonEvent & event)
         case 3: break;
     }
  */
-    InventoryElement * el = player->hotbar[active_hotbar];
     int x = 0;
     int y = 0;
 
@@ -257,47 +256,7 @@ void mouse_pressed(SDL_MouseButtonEvent & event)
         d_craft.press(x, y);
         return;
     }
-
-    int tile_dungeon_size;
-    int width = window_width - PANEL_WINDOW;
-
-    if (width < window_height)
-    {
-        tile_dungeon_size = width / (CHUNK_SIZE);
-    }
-    else
-    {
-        tile_dungeon_size = window_height / (CHUNK_SIZE);
-    }
-
-    int tile_x = x / tile_dungeon_size;
-    int tile_y = y / tile_dungeon_size;
-
-    if (tile_x < CHUNK_SIZE && tile_y < CHUNK_SIZE)
-    {
-        if (el)
-        {
-            // if (el->use(player->map_x, player->map_y, tile_x, tile_y)) break;
-            // if (plant_with_seed(el, player->map_x, player->map_y, tile_x, tile_y)) break;
-            //  TODO
-            /*if ((Element *)el && (Element *)el->get_base() && ((Element *)el)->get_base()->id == ID_WATER)
-            {
-                if (Plant ** pp = get_plant_at(player->map_x, player->map_y, tile_x, tile_y))
-                {
-                    if (Plant * p = *pp)
-                    {
-                        p->water += 100;
-                        player->inventory->remove(el);
-                        player->hotbar[active_hotbar]=NULL;
-                        free(el);
-                        break;
-                    }
-                }
-            }*/
-        }
-        use_tile(player->map_x, player->map_y, tile_x, tile_y);
-    }
-    printf("mouse %d,%d %d %d,%d\n", event.x, event.y, event.button, tile_x, tile_y);
+    printf("mouse %d,%d %d \n", event.x, event.y, event.button);
 }
 
 Uint64 handle_keyboard_state(const Uint8 * keys)

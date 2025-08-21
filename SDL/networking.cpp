@@ -197,6 +197,7 @@ extern "C"
                 case Class_Element:
                 {
                     Element * element = dynamic_cast<Element *>(el);
+                    printf("element: %d %d\n", element->checked, data->element.data.checked);
                     *element = data->element.data;
                     break;
                 }

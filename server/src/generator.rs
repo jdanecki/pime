@@ -69,15 +69,15 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
 //                println!("element {prob} {:?}", rock);
                 do_times(prob, || {
                     chunk.add_object1(core::create_element(rock.get_base()
-                        as *const core::BaseElementServer
-                        as *mut core::BaseElementServer)
+                        as *const core::BaseElement
+                        as *mut core::BaseElement)
                         as *mut core::InventoryElement);
                 });
                 let prob_scroll=2.0; 
                 do_times(prob, || {
                     chunk.add_object1(core::create_scroll(rock.get_base()
-                        as *const core::BaseElementServer
-                        as *mut core::BaseElementServer as *mut core::Base)
+                        as *const core::BaseElement
+                        as *mut core::BaseElement as *mut core::Base)
                         as *mut core::InventoryElement);
                 });
             }
@@ -570,7 +570,7 @@ impl std::fmt::Debug for Region {
 pub struct TerrainType {
     #[serde(skip)]
     id: u32,
-    base: core::BaseElementServer,
+    base: core::BaseElement,
 }
 
 impl TerrainType {
@@ -578,7 +578,7 @@ impl TerrainType {
         self.id
     }
 
-    pub fn get_base(&self) -> &core::BaseElementServer {
+    pub fn get_base(&self) -> &core::BaseElement {
         &self.base
     }
 
@@ -591,7 +591,7 @@ impl TerrainType {
         };
         TerrainType {
             id,
-            base: unsafe { core::BaseElementServer::new(f, id as i32) },
+            base: unsafe { core::BaseElement::new(f, id as i32) },
         }
     }
 }

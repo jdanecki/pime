@@ -39,18 +39,21 @@ void draw_texts()
     sprintf(text, "%d,%d/%d,%d", left_chunk_x, top_chunk_y, right_chunk_x, bottom_chunk_y);
     write_text(tx, window_height - 150, text, White, 15, 30);
 
-    ty += 25;
-
     InventoryElement * item = get_item_at_ppos(player);
     if (item)
     {
-
+        Class_id el_cid = item->get_cid();
         char * t = player->get_el_description(item);
-        if (t)
+        if (!t)
         {
-            write_text(tx, ty, t, White, 15, 30);
-            delete[] t;
-            ty += 25;
+            t = new char[256];
+            sprintf(t, "It looks like %s %s ", el_cid == Class_Element ? item->get_form_name() : " ", item->get_class_name());
+        }
+        print_status(1, t);
+        delete[] t;
+        if (item->checked)
+        {
+            ty += 30;
             int count = 0;
             Property ** props = item->get_properties(&count);
             char buf[64];
@@ -60,34 +63,10 @@ void draw_texts()
                 {
                     sprintf(buf, "%s: %u", props[i]->name.str, props[i]->value);
                     write_text(tx, ty, buf, White, 15, 30);
-                    ty += 25;
+                    ty += 27;
                 }
                 delete props;
             }
-            Class_id el_cid = item->get_cid();
-            if (el_cid == Class_Element)
-            {
-                sprintf(buf, "it has %s form", item->get_form_name());
-                write_text(tx, ty, buf, White, 15, 30);
-            }
-        }
-        else
-        {
-            t = new char[256];
-            sprintf(t, "It looks like %s", item->get_class_name());
-            write_text(tx, ty, t, White, 15, 30);
-            Class_id el_cid = item->get_cid();
-            ty += 25;
-            if (el_cid == Class_Element)
-            {
-                sprintf(t, "it has %s form", item->get_form_name());
-                write_text(tx, ty, t, White, 15, 30);
-                ty += 25;
-            }
-            if (el_cid != Class_Ingredient && el_cid != Class_Product)
-                write_text(tx, ty, "I don't know what it's exactly", White, 15, 30);
-
-            delete[] t;
         }
     }
 }

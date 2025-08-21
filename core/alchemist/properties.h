@@ -26,18 +26,20 @@ class Property
     }
     unsigned int decrease(unsigned int by)
     {
-        if (value > by) {
-            value-=by;
+        if (value > by)
+        {
+            value -= by;
         }
-        else value = 0;
+        else
+            value = 0;
         return value;
     }
 };
 
 class Edible
 { // FIXME should be changed to being property
-  // when more npc's are added
-  // can be eaten by humans or animals
+    // when more npc's are added
+    // can be eaten by humans or animals
   public:
     Property * irrigation;
     Property * poison;
@@ -51,13 +53,13 @@ class Edible
 class Solid
 {
   public:
-    Property * tooling;    // obróbka
-    Property * stretching; // rozciągalność
-    Property * squeezing;  // ściskalność
-    Property * bending;    // elastyczność
-    //  Property * fragility;  // kruchosc
-    Property * solubility; // rozpuszczalnosc
-    Property * hardness;   // twardość
+    Property tooling;    // obróbka
+    Property stretching; // rozciągalność
+    Property squeezing;  // ściskalność
+    Property bending;    // elastyczność
+    //  Property fragility;  // kruchosc
+    Property solubility; // rozpuszczalnosc
+    Property hardness;   // twardość
     Solid();
     ~Solid();
     void show();

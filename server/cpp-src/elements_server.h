@@ -4,18 +4,6 @@
 #include "../../core/alchemist/elements.h"
 #include "../../core//player.h"
 
-class BaseElementServer : public BaseElement
-{
-  public:
-    Property * density;
-    Solid * solid;
-
-    BaseElementServer(Form f, int index);
-    ~BaseElementServer();
-    int foo(int a);
-    void show(bool details = true);
-};
-
 void to_bytes_binding(InventoryElement * el, unsigned char * buf);
 unsigned int get_packet_size_binding(InventoryElement * el);
 
@@ -35,13 +23,8 @@ constexpr static const unsigned long TICK_DELAY = 100;
 
 class ElementServer : public Element
 {
-
   public:
-    Property sharpness;
-    Property smoothness;
-    Property mass; // density*volume
-
-    ElementServer(BaseElementServer * b);
+    ElementServer(BaseElement * b);
     bool action(Product_action action, Player * pl) override;
     bool action_cut();
     bool action_hit();
@@ -154,6 +137,7 @@ class PlantServer : public Plant, public BeingServer
     {
         return true;
     }
+    bool player_action(Player_action action, Player * pl);
 };
 
 class IngredientServer : public Ingredient
@@ -198,7 +182,7 @@ class ProductServer : public Product
 
 AnimalServer * create_animal(BaseAnimal * base);
 PlantServer * create_plant(BasePlant * base);
-ElementServer * create_element(BaseElementServer * base);
+ElementServer * create_element(BaseElement * base);
 ScrollServer * create_scroll(Base * base);
 
 #endif

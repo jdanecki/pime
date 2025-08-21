@@ -36,6 +36,7 @@ enum menu_actions
     MENU_DRINK,
     MENU_EAT,
     MENU_READ,
+    MENU_CHECK,
 
     MENU_KNOWLEDGE,
     MENU_KNOWLEDGE_ELEMENTS,
