@@ -237,19 +237,15 @@ void key_pressed(int key)
     }
 }
 
-void mouse_pressed(SDL_MouseButtonEvent & event)
+void mouse_pressed(SDL_MouseButtonEvent * event)
 {
-    int x = 0;
-    int y = 0;
-
-    SDL_GetMouseState(&x, &y);
-    hotbar.press(x, y, event.button == 3 ? true : false);
+    hotbar.press(event->x, event->y, event->button);
     if (d_craft.show)
     {
-        d_craft.press(x, y);
+        d_craft.press(event->x, event->y, event->button);
         return;
     }
-    printf("mouse %d,%d %d \n", event.x, event.y, event.button);
+    printf("mouse %d,%d %d \n", event->x, event->y, event->button);
 }
 
 Uint64 handle_keyboard_state(const Uint8 * keys)
@@ -349,7 +345,7 @@ bool handle_SDL_events()
 
         if (event.type == SDL_MOUSEBUTTONDOWN)
         {
-            mouse_pressed(event.button);
+            mouse_pressed(&event.button);
         }
     }
     const Uint8 * currentKeyState = SDL_GetKeyboardState(NULL);

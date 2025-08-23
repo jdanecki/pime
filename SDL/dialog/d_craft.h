@@ -13,7 +13,7 @@ class DCraft : public Dialog
     DCraft();
     void update();
     void draw(SDL_Renderer * renderer);
-    void press(int x, int y);
+    bool press(int x, int y, int button);
 };
 
 extern DCraft d_craft;

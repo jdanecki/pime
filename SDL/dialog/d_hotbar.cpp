@@ -4,14 +4,14 @@
 
 extern int active_hotbar;
 
-void change_active_hotbar(int id)
+void change_active_hotbar(DialogButton * button)
 {
-    active_hotbar = id;
+    active_hotbar = button->id;
 }
 
-void change_craftbar(int id)
+void change_craftbar(DialogButton * button)
 {
-    player->craftbar[id] ^= 1;
+    player->craftbar[button->id] ^= 1;
 }
 
 DHotbar::DHotbar() : Dialog({550, 490, 500, 50}, {0, 0, 0, 0})
@@ -19,11 +19,11 @@ DHotbar::DHotbar() : Dialog({550, 490, 500, 50}, {0, 0, 0, 0})
     for (int i = 0; i < 10; i++)
     {
         if (i == active_hotbar)
-            this->add_box(i, {i * 50, 0, 50, 50}, {255, 255, 255, 255}, false);
+            add(new DialogBox(i, {i * 50, 0, 50, 50}, {255, 255, 255, 255}, false));
         else
-            this->add_box(i, {i * 50, 0, 50, 50}, {125, 125, 125, 255}, false);
-        this->add_image(i, {i * 50 + 2, 2, 50 - 4, 50 - 4});
-        this->add_button(i, {i * 50 + 2, 2, 50 - 4, 50 - 4}, 0, {0, 0, 0, 0}, {0, 0, 0, 0}, "", &change_active_hotbar, &change_craftbar);
+            add(new DialogBox(i, {i * 50, 0, 50, 50}, {125, 125, 125, 255}, false));
+        add(new DialogImage(i, {i * 50 + 2, 2, 50 - 4, 50 - 4}));
+        add(new DialogButton(i, {i * 50 + 2, 2, 50 - 4, 50 - 4}, 0, {0, 0, 0, 0}, {0, 0, 0, 0}, "", change_active_hotbar, change_craftbar));
     }
 }
 
@@ -32,7 +32,7 @@ void DHotbar::update()
     for (int i = 0; i < 10; i++)
     {
         // IMAGES
-        DialogImage * img = dynamic_cast<DialogImage *>(this->get_element_from_id(i, DialogElementType::Image));
+        DialogImage * img = dynamic_cast<DialogImage *>(get_element_from_id(i, DialogElementType::Image));
         img->texture = NULL;
         if (player->hotbar[i])
         {
@@ -40,7 +40,7 @@ void DHotbar::update()
             img->texture = r->get_texture();
         }
         // SELECTION
-        DialogBox * b = dynamic_cast<DialogBox *>(this->get_element_from_id(i, DialogElementType::Box));
+        DialogBox * b = dynamic_cast<DialogBox *>(get_element_from_id(i, DialogElementType::Box));
         if (i == active_hotbar)
             b->color = {255, 255, 255, 255};
         else if (player->craftbar[i] == 1)
