@@ -1,35 +1,36 @@
 #include "properties.h"
 #include <stdlib.h>
+#include "../clan.h"
 
 SerializableCString::SerializableCString(const char * ptr) : str(ptr)
 {
 }
 
-Edible::Edible()
-{
-    caloric = new Property("caloric", rand() % 1000);
-    ;
-    irrigation = new Property("irrigation", rand() % 500);
-    poison = new Property("poison", 0);
-    if (rand() % 100 < 10)
-    { // 10%
-        poison->value = 1 + rand() % 250;
-    }
+Edible::Edible():
+    irrigation("irrigation", rand() % 500),
+    poison("poison", 1 + rand() % 250),
+    caloric("caloric", rand() % 1000)
+{    
+    set_random();
 }
 
 Edible::~Edible()
 {
-    delete irrigation;
-    delete poison;
-    delete caloric;
 }
 
 void Edible::show()
 {
     printf("      *** Edible ***\n");
-    caloric->show();
-    irrigation->show();
-    poison->show();
+    printf("eating by: %d -> ", eating_by);
+    for (int i=0; i < 5; i++)
+    {
+        if (eating_by & (1 << i))
+            printf("%s ", clan_names[i]);
+    }
+    puts("");
+    caloric.show();
+    irrigation.show();
+    poison.show();
 }
 
 Solid::Solid()

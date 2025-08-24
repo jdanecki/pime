@@ -303,3 +303,14 @@ void InvList::remove(InventoryElement * el)
         cur = cur->next;
     }
 }
+
+void ElementsList::copy_elements(ElementsList * dst)
+{
+    ListElement * cur = head;
+    while(cur) {
+        dst->copy(cur);
+        cur = cur->next;
+    }
+}
+
+

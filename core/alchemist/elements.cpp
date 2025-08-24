@@ -1,9 +1,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include "elements.h"
 
 #include "../tiles.h"
-#include "elements.h"
 #include "names.h"
 
 ElementsList * base_list;
@@ -56,11 +56,14 @@ Base::Base(int index, Class_id c, const char * name) : name(name)
 {
     id = index;
     c_id = c;
+    edible.eating_by = 1; // only by animals
 }
 
 void Base::show(bool details)
 {
     printf("Base name=%s class:%s id=%d \n", get_name(), class_name[c_id], id);
+    if (details)
+        edible.show();
 }
 
 const char * Base::get_name()
@@ -113,11 +116,14 @@ Element::Element(BaseElement * b)
     : InventoryElement(Class_Element), base(b), length("length", 3 + rand() % 30), width("width", 3 + rand() % 30), height("height", 3 + rand() % 30),
       volume("volume", length.value * width.value * height.value), sharpness("sharpness", 0), smoothness("smoothness", 0), mass("mass", b->density.value * volume.value / 1000)
 {
+
 }
 // called by the_game_net/core.rs
 InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : c_id(c_id), uid(uid), location(location)
 {
+
 }
+
 void Element::show(bool details)
 {
     InventoryElement::show(details);
@@ -181,6 +187,7 @@ void Animal::init(BaseAnimal * b)
 {
     c_id = Class_Animal;
     size = 0;
+
 }
 
 BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(7))
@@ -190,6 +197,7 @@ BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(7)
     swimming = rand() % 2;
     flying = rand() % 2;
     //   printf("BaseAnimal index=%d name=%s\n", index, get_name());
+    edible.set_random();
 }
 
 Animal::Animal(BaseAnimal * b) : InventoryElement(Class_Animal), base(b)
@@ -202,6 +210,7 @@ BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(5))
     flowers = rand() % 2;
     leaves = rand() % 2;
     //  printf("BasePlant index=%d name=%s\n", index, get_name());
+    edible.set_random();
 }
 
 void Plant::init(BasePlant * b)

@@ -172,6 +172,13 @@ bool do_key_question_mark(char k)
     return false;
 }
 
+void move_player(int dx, int dy)
+{
+    send_packet_move(client, dx, dy);
+    InventoryElement * el = get_item_at_ppos(player);
+    if (el)
+        printf("there is something here: %s", el->get_class_name());
+}
 bool do_key_main(char k)
 {
     if (k >= '0' && k <= '9')
@@ -224,16 +231,16 @@ bool do_key_main(char k)
             put_element();
             break;
         case 'w':
-            send_packet_move(client, 0, -1);
+            move_player(0, -1);
             break;
         case 's':
-            send_packet_move(client, 0, 1);
+            move_player(0, 1);
             break;
         case 'a':
-            send_packet_move(client, -1, 0);
+            move_player(-1, 0);
             break;
         case 'd':
-            send_packet_move(client, 1, 0);
+            move_player(1, 0);
             break;
     }
     return false;

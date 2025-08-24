@@ -67,7 +67,7 @@ extern "C"
     }
     void SDL_UnlockTexture(SDL_Texture * texture)
     {
-        delete texture->pixels;
+        delete (char*) texture->pixels;
     }
     int SDL_QueryTexture(SDL_Texture * texture, Uint32 * format, int * access, int * w, int * h)
     {

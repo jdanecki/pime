@@ -35,7 +35,11 @@ impl ParseCallbacks for MacroCallback {
         ];
         let copy = vec![
             "BaseElement",
+            "BaseAnimal",
+            "BasePlant",
             "Solid",
+            "Base",
+            "Edible"
         ];
         if ser.contains(&info.name) {
             der.append(&mut vec![String::from("serde::Deserialize")]);

@@ -64,6 +64,8 @@ class Base
   public:
     Class_id c_id;
     int id;
+    Edible edible;
+
     SerializableCString name;
     Base(int index, Class_id c, const char * name);
     virtual void show(bool details = true);
@@ -84,6 +86,7 @@ class BaseElement : public Base
     Color color;
     Property density;
     Solid solid;
+
 
     BaseElement(Form f, int index);
     void show(bool details = true);
@@ -145,10 +148,7 @@ class InventoryElement
     {
         return c_id;
     }
-    virtual Edible * get_edible()
-    {
-        return nullptr;
-    }
+
 
 #ifndef CORE_FOR_CLIENT
 
@@ -426,12 +426,6 @@ class Ingredient : public InventoryElement
         return id;
     }
     Ingredient(Ingredient_id i);
-
-    Edible * get_edible()
-    { // FIXME
-        return nullptr;
-        // return el->get_edible();
-    }
 
     void show(bool details = true);
 

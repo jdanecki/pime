@@ -90,6 +90,8 @@ class KnownElement : public ListElement
 class ElementsList
 {
     void remove_all();
+   protected:    
+    void virtual copy(ListElement *el) {}
 
   public:
     const char * name;
@@ -113,6 +115,8 @@ class ElementsList
     ListElement * add(ListElement * el);
     void remove(ListElement * el);
     void tick();
+    void copy_elements(ElementsList * dst);
+    
 };
 
 typedef bool (*FindFunc)(InventoryElement * el, void * arg);

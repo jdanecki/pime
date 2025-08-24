@@ -63,6 +63,11 @@ Player::Player(int id) : InventoryElement(Class_Player), id(id)
 
     known_elements = new ElementsList("known elements");
     checked_element = 0;
+
+    clan = get_random_clan();
+    player_skills = new Skills();
+    clan->skills->copy_elements(player_skills);
+
 }
 
 int Player::conversation(Player * who, Sentence * s, InventoryElement * el)
@@ -101,8 +106,9 @@ void Player::stop_conversation()
 
 void Player::show(bool details)
 {
-    printf("%s %s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), get_id(), map_x, map_y, x, y);
-
+    printf("%s %s clan=%s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan_names[clan->id],
+        get_id(), map_x, map_y, x, y);
+    player_skills->show(true);
     if (talking_to)
     {
         printf("%s is talking to %s\n", get_name(), talking_to->get_name());

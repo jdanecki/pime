@@ -2,6 +2,7 @@
 #define PROPERTIES_H
 
 #include <cstdio>
+#include <stdlib.h>
 
 /// <div rustbindgen nodebug></div>
 class SerializableCString
@@ -37,16 +38,16 @@ class Property
 };
 
 class Edible
-{ // FIXME should be changed to being property
-    // when more npc's are added
-    // can be eaten by humans or animals
+{
   public:
-    Property * irrigation;
-    Property * poison;
-    Property * caloric;
+    Property  irrigation;
+    Property  poison;
+    Property  caloric;
+    int eating_by; // bit value 1 means edible for clanId, we use bits 0-4
 
     Edible();
     ~Edible();
+    void set_random() { eating_by = rand() % 16; }
     void show();
 };
 

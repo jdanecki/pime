@@ -61,6 +61,9 @@ void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc)
 {
 }
 
+void notify_knowledge(size_t pl_id, Class_id cid, int id) {}
+void notify_checked(size_t pl_id, size_t el) {} 
+
 void help()
 {
     printf("%sESC/e/?- clear screen/Exit/Help\n", colorWhite);
@@ -143,7 +146,7 @@ void show()
 }
 void add_new_element()
 {
-    Element * el = create_element(new BaseElement(Form_solid, Color{0, 0, 0}, 0));
+    Element * el = create_element(new BaseElement(Form_solid, 0));
     elements->add(el);
     printf("new Element %s found\n", el->get_name());
 }
@@ -367,7 +370,7 @@ void craft_entry()
     if (target)
     {
         player->inventory->add(target);
-        player->set_known(target);
+        player->set_known(target->get_base_cid(), target->get_id());
         printf("%s added to inventory\n", target->get_name());
     }
 }
@@ -400,7 +403,7 @@ void use()
     InventoryElement * el = select_element(player->inventory);
     if (!el)
         return;
-    Product * product = dynamic_cast<Product *>(el);
+    ProductServer * product = dynamic_cast<ProductServer *>(el);
     if (!product)
     {
         printf("You can't use %s, make product from it\n", el->get_name());
@@ -441,7 +444,7 @@ void use()
     if (!obj)
         return;
 
-    product->use(obj);
+    product->use(obj, player);
 
     //  player->inventory->remove(el);
 }

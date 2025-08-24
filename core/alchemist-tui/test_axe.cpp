@@ -3,8 +3,8 @@
 
 Axe * test_axe()
 {
-    Element * element1 = new Element(new BaseElement(Form_solid, Color{0, 0, 0}, 0));
-    Element * element2 = new Element(new BaseElement(Form_solid, Color{0, 0, 0}, 0));
+    Element * element1 = new Element(new BaseElement(Form_solid, 0));
+    Element * element2 = new Element(new BaseElement(Form_solid, 0));
     printf("element1 = %s\n", element1->get_name());
     printf("element2 = %s\n", element2->get_name());
 

@@ -194,6 +194,7 @@ void PlantServer::show(bool details)
 bool PlantServer::player_action(Player_action action, Player * pl)
 {
     printf("PLANT_SERVER: %s %s\n", player_action_name[action], get_name());
+    return false;
 }
 
 bool PlantServer::grow()

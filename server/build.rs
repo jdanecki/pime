@@ -33,7 +33,11 @@ impl ParseCallbacks for MacroCallback {
             "InventoryElement",
             "Scroll",
             "BaseElement",
+            "BaseAnimal",
+            "BasePlant",
             "Solid",
+            "Base",
+            "Edible"
         ];
         if ser.contains(&info.name) {
             der.append(&mut vec![String::from("serde::Serialize")]);
