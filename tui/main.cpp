@@ -8,7 +8,10 @@ Player * players[PLAYER_NUM];
 Player * player;
 extern int trace_network;
 bool use_network = true;
+bool show_received;
 int active_hotbar = 0;
+unsigned int max_recv;
+unsigned long max_time;
 
 bool finish;
 
@@ -99,6 +102,7 @@ void help()
     printf("i/I - pickup/drop item at player location\n");
     printf("q - quit\n");
     printf("t/T - trace network in client/server\n");
+    printf("r - show counter received packets per tick\n");
     printf("wasd - move player\n");
 }
 
@@ -177,7 +181,7 @@ void move_player(int dx, int dy)
     send_packet_move(client, dx, dy);
     InventoryElement * el = get_item_at_ppos(player);
     if (el)
-        printf("there is something here: %s", el->get_class_name());
+        printf("\nthere is something here: %s\n", el->get_class_name());
 }
 bool do_key_main(char k)
 {
@@ -214,6 +218,10 @@ bool do_key_main(char k)
         case 'n':
             use_network ^= true;
             break;
+        case 'r':
+            show_received ^= true;
+            break;
+
         case 'i':
         {
             InventoryElement * el = get_item_at_ppos(player);
@@ -258,22 +266,75 @@ bool do_key(char k)
     return false;
 }
 
+bool check_chunk(int cx, int cy)
+{
+    if (cx < 0 || cy < 0 || cx >= WORLD_SIZE || cy >= WORLD_SIZE)
+        return false;
+
+    chunk * ch = world_table[cy][cx];
+    if (!ch)
+    {
+        if (loaded_chunks[cy][cx] == CHUNK_NOT_LOADED)
+        {
+            send_packet_request_chunk(client, cx, cy);
+            loaded_chunks[cy][cx] = CHUNK_LOADING;
+            return false;
+        }
+        else
+        {
+            printf("waiting for chunk %d %d\n", cx, cy);
+            return false;
+        }
+    }
+    else
+    {
+        loaded_chunks[cy][cx] = CHUNK_LOADED;
+    }
+    return true;
+}
+
+unsigned long get_time_usec()
+{
+    struct timespec t;
+
+    clock_gettime(CLOCK_MONOTONIC_RAW, &t);
+    return (t.tv_sec * 1000000 + t.tv_nsec / 1000);
+}
+
 void loop()
 {
     print_status(0, "Welcome in PIME - TUI version for debug!");
+    unsigned int total_recv=0;
 
     for (;;)
     {
-        printf("\r%c: ", submenu ? submenu : '#');
+        printf("\r%s@[%d,%d][%d,%d] %c: ", player->get_name(),
+            player->map_x, player->map_y, player->x, player->y,
+            submenu ? submenu : '#');
         char c = check_key();
         if (c)
         {
             if (do_key(c))
                 break;
         }
+        unsigned long start=get_time_usec();
+        unsigned int recv = 0;
+
         if (use_network)
-            network_tick(client);
-        usleep(20000);
+        {
+            recv=network_tick(client);
+        }
+        total_recv += recv;
+
+        unsigned long stop=get_time_usec();
+        if (recv > max_recv) max_recv = recv;
+        if (stop - start > max_time) max_time = stop - start;
+        if (recv && show_received) printf("recv: %u/%u max=%u time=%lu us/%lu ms\n", recv, total_recv, max_recv, stop-start, max_time / 1000);
+
+        check_chunk(player->map_x, player->map_y);
+        long w = 20000 - (stop - start) ;
+        if (w > 0 && ! c)
+            usleep(w);
     }
 }
 

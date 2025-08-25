@@ -272,13 +272,13 @@ extern "C"
         {
             case ItemLocation::Tag::Chunk:
             {
-                /*     printf("SDL: update item location %s:%s on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
+                     /*printf("SDL: update item location %s:%s on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
                          el->get_class_name(), el->get_name(),
                          old_loc.chunk.map_x, old_loc.chunk.map_y,
                          old_loc.chunk.x, old_loc.chunk.y,
                          new_loc.chunk.map_x, new_loc.chunk.map_y,
                          new_loc.chunk.x, new_loc.chunk.y);
-                  */
+*/
                 ItemLocation old_l;
                 ItemLocation new_l;
                 old_l.chunk.x = old_loc.chunk.x;

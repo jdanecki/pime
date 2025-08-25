@@ -257,7 +257,7 @@ InventoryElement * InvList::add(InventoryElement * el)
 {
     ListElement * entry = new ListElement(el);
     ElementsList::add(entry);
-    // printf("elements=%d\n", nr_elements);
+  //  printf("%s elements=%d %s\n", name, nr_elements, el->get_class_name());
     return el;
 }
 

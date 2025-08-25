@@ -216,15 +216,15 @@ class Object : public InventoryElement
     BaseElement * base;
     enum object_types type;
 
-    Form get_form()
+    Form get_form() override
     {
         return Form_solid;
     }
-    const char * get_form_name()
+    const char * get_form_name() override
     {
         return Form_name[Form_solid];
     }
-    const char * get_name()
+    const char * get_name() override
     {
         return object_names[type];
     }

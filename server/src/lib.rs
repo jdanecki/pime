@@ -2,6 +2,9 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::net::SocketAddr;
 use std::net::UdpSocket;
+use nix::libc::{FIONREAD, c_int};
+use std::os::unix::io::AsRawFd;
+use std::mem::MaybeUninit;
 
 mod convert_types;
 mod core;
@@ -121,6 +124,7 @@ pub struct Server {
     clients: HashMap<SocketAddr, ClientData>,
 }
 
+static mut total_sent: usize =0;
 impl Server {
     fn broadcast(&mut self, data: &[u8]) {
         let clients = self.clients.clone();
@@ -159,6 +163,9 @@ impl Server {
             .not_confirmed_packets
             .insert(client.local_seq_num, data.to_vec());
         self.socket.send_to(&buf, to).unwrap();
+        unsafe {
+            total_sent += 1;
+        }
     }
 }
 
@@ -226,15 +233,27 @@ pub fn test_server() {
     //generator::show_world();
 }
 
+//static mut max_recv: u32 = 0;
+
 pub fn main_loop(server: &mut Server) {
     let mut players: Vec<core::PlayerServer> = vec![];
     loop {
-        handle_network(server, &mut players);
+        let mut recv = handle_network(server, &mut players);
         unsafe {
+            /*if recv != 0 {
+                if recv > max_recv
+                {
+                    max_recv = recv;
+                }
+                println!("recv={} / {}", recv, max_recv);
+            }*/
             core::update();
         }
         send_game_updates(server, &mut players);
-        std::thread::sleep(std::time::Duration::from_millis(core::TICK_DELAY));
+/*        unsafe {
+            println!("packets sent {} recv {}", total_sent, total_recv);
+        }
+  */      std::thread::sleep(std::time::Duration::from_millis(core::TICK_DELAY));
     }
 }
 
@@ -338,11 +357,45 @@ fn create_objects_in_chunk_for_player(server: &mut Server, peer: &SocketAddr, co
     }
 }
 
-fn handle_network(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
+fn get_pending_bytes(socket: &UdpSocket) -> std::io::Result<usize> {
+    let fd = socket.as_raw_fd();
+    let mut bytes: c_int = 0;
+
+    let res = unsafe {
+        nix::libc::ioctl(fd, FIONREAD, &mut bytes)
+    };
+
+    if res < 0 {
+        Err(std::io::Error::last_os_error())
+    } else {
+        Ok(bytes as usize)
+    }
+}
+
+static mut max_pending: usize =0;
+static mut total_recv : usize =0;
+
+fn handle_network(server: &mut Server, players: &mut Vec<core::PlayerServer>) -> u32 {
     let mut buf = [0; 100];
+    let mut cnt = 0;
     loop {
+            if let Ok(pending) = get_pending_bytes(&server.socket) {
+                unsafe {
+                    if pending > max_pending
+                        {
+                            println!("Bufor kernela zawiera {} max={}", pending, max_pending);
+                            max_pending=pending;
+                        }
+                    }
+                }
+
         if let Ok((amt, src)) = server.socket.recv_from(&mut buf) {
+            cnt +=1;
+            unsafe {
+                total_recv += 1;
+            }
             if amt == 0 {
+                panic!("SERV: PACKET empty!!!");
                 break;
             }
             if amt < 12 {
@@ -396,6 +449,7 @@ fn handle_network(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
             break;
         }
     }
+    cnt
 }
 
 fn handle_packet(
@@ -430,7 +484,7 @@ fn handle_packet(
         panic!("Shouldn't ever receive 2 packets with same seq_num");
     }
     // Detect packet loss
-    for i in 0..31 {
+    for i in 0..32 {
         if (acks & (1 << i)) > 0 {
             client_data.not_confirmed_packets.remove(&(ack - i));
         }
@@ -442,6 +496,12 @@ fn handle_packet(
     for (&id, d) in client_data.not_confirmed_packets.iter() {
         if id + 32 < ack {
             println!("SERV: PACKET NOT CONFIRMED id={id} ack={ack}");
+                    unsafe {
+                        core::trace_network=1;
+                        core::show_packet_type_name('S' as i8, d[0] as u8);
+                        core::trace_network=0;
+                    }
+
             to_resend.push(d.clone());
             to_remove.push(id);
         }
@@ -449,10 +509,10 @@ fn handle_packet(
     for i in to_remove {
         client_data.not_confirmed_packets.remove(&i);
     }
-    for d in to_resend {
+   /* for d in to_resend {
         server.send_to_reliable(&d, peer);
     }
-
+*/
     if packet.len() < 13 {
         panic!("packet to short len={} {:?}", packet.len(), packet);
     }
@@ -633,6 +693,10 @@ fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>)
 
         let el = std::ptr::addr_of_mut!(core::objects_to_update);
         let mut le = (*el)._base.head;
+        if core::objects_to_update._base.nr_elements != 0 
+        {
+            println!("objects_to_update: {}", core::objects_to_update._base.nr_elements);
+        }
         while le != std::ptr::null_mut() {
             if DESTROY_ITEMS
                 .iter()
@@ -648,13 +712,16 @@ fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>)
                 data.extend_from_slice(obj_data);
                 server.broadcast(&data);
             }
-
+            let mut cur = le;
             le = (*le).next;
+            (*el).remove((*cur).el);
             //            println!("PACKET_OBJECT_UPDATE");
+
         }
-        while (*el)._base.head != std::ptr::null_mut() {
-            (*el).remove((*(*el)._base.head).el);
-        }
+//        while (*el)._base.head != std::ptr::null_mut() {
+  //          (*el).remove((*(*el)._base.head).el);
+    //    }
+//        println!("objects_to_update after: {}", core::objects_to_update._base.nr_elements);
     }
     send_location_updates(server);
     send_knowledge_updates(server);
@@ -665,7 +732,7 @@ fn send_game_updates(server: &mut Server, players: &mut Vec<core::PlayerServer>)
 fn send_location_updates(server: &mut Server) {
     unsafe {
         if LOCATION_UPDATES.len() > 0 {
-            //  println!("SERV:send_location_updates len={}", LOCATION_UPDATES.len());
+            println!("SERV:send_location_updates len={}", LOCATION_UPDATES.len());
             for update in LOCATION_UPDATES.iter() {
                 let mut data = vec![core::PACKET_LOCATION_UPDATE];
                 //    println!("SERV: send_location_updates id={}", update.id);

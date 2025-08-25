@@ -3,7 +3,8 @@
 #include <cstring>
 #include "elements.h"
 
-#include "../tiles.h"
+//#include "../tiles.h"
+#include "el_list.h"
 #include "names.h"
 
 ElementsList * base_list;
