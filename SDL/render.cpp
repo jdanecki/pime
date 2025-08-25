@@ -36,7 +36,7 @@ void draw_texts()
     sprintf(text, "Hunger=%d Thirst=%d", player->hunger, player->thirst);
     write_text(tx, ty, text, (player->hunger < 100 || player->thirst < 100) ? Red : White, 15, 30);
 
-    sprintf(text, "%d,%d/%d,%d", left_chunk_x, top_chunk_y, right_chunk_x, bottom_chunk_y);
+    sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), clan_names[player->clan->id], player->map_x, player->map_y, player->x, player->y);
     write_text(tx, window_height - 150, text, White, 15, 30);
 
     InventoryElement * item = get_item_at_ppos(player);
@@ -154,6 +154,33 @@ void draw_maps()
 }
 #endif
 
+chunk * check_chunk(int cx, int cy)
+{
+    if (cx < 0 || cy < 0 || cx >= WORLD_SIZE || cy >= WORLD_SIZE)
+        return nullptr;
+
+    chunk * ch = world_table[cy][cx];
+    if (!ch)
+    {
+        if (loaded_chunks[cy][cx] == CHUNK_NOT_LOADED)
+        {
+            send_packet_request_chunk(client, cx, cy);
+            loaded_chunks[cy][cx] = CHUNK_LOADING;
+            return nullptr;
+        }
+        else
+        {
+            printf("waiting for chunk %d %d\n", cx, cy);
+            return nullptr;
+        }
+    }
+    else
+    {
+        loaded_chunks[cy][cx] = CHUNK_LOADED;
+    }
+    return ch;
+}
+
 bool draw_terrain()
 {
     width = window_width - PANEL_WINDOW;
@@ -186,28 +213,9 @@ bool draw_terrain()
     {
         for (int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
         {
-            if (cx < 0 || cy < 0 || cx >= WORLD_SIZE || cy >= WORLD_SIZE)
-                return false;
+            chunk * ch=check_chunk(cx, cy);
+           if (!ch) return false;
 
-            chunk * ch = world_table[cy][cx];
-            if (!ch)
-            {
-                if (loaded_chunks[cy][cx] == CHUNK_NOT_LOADED)
-                {
-                    send_packet_request_chunk(client, cx, cy);
-                    loaded_chunks[cy][cx] = CHUNK_LOADING;
-                    return false;
-                }
-                else
-                {
-                    printf("waiting for chunk %d %d\n", cx, cy);
-                    return false;
-                }
-            }
-            else
-            {
-                loaded_chunks[cy][cx] = CHUNK_LOADED;
-            }
             for (int ty = 0; ty < CHUNK_SIZE; ++ty)
             {
                 for (int tx = 0; tx < CHUNK_SIZE; ++tx)

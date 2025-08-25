@@ -5,6 +5,9 @@ use std::error::Error;
 use std::ffi::CStr;
 use std::net::UdpSocket;
 use std::rc::Rc;
+use nix::libc::{FIONREAD, c_int};
+use std::os::unix::io::AsRawFd;
+use std::mem::MaybeUninit;
 
 mod core;
 mod events;
@@ -21,6 +24,8 @@ pub struct NetClient {
     unsent_acks: u32,
     not_confirmed_packets: HashMap<u32, Vec<u8>>,
 }
+
+static mut total_sent : usize = 0;
 
 impl NetClient {
     fn send(&mut self, data: &[u8]) {
@@ -41,6 +46,9 @@ impl NetClient {
         self.not_confirmed_packets
             .insert(self.local_seq_num, data.to_vec());
         self.socket.send(&buf).unwrap();
+        unsafe {
+            total_sent += 1;
+        }
     }
 }
 
@@ -129,11 +137,47 @@ fn init_internal(server_ip: &str) -> Result<NetClient, Box<dyn Error>> {
 //     a.socket.send(&[1, 2, 3]).expect("foo");
 // }
 
+fn get_pending_bytes(socket: &UdpSocket) -> std::io::Result<usize> {
+    let fd = socket.as_raw_fd();
+    let mut bytes: c_int = 0;
+
+    let res = unsafe {
+        nix::libc::ioctl(fd, FIONREAD, &mut bytes)
+    };
+
+    if res < 0 {
+        Err(std::io::Error::last_os_error())
+    } else {
+        Ok(bytes as usize)
+    }
+}
+
+
+static mut max_pending: usize =0;
+static mut total_resv : usize = 0;
+static mut prev_resv : usize = 0;
+static mut prev_send :usize = 0;
+
 #[no_mangle]
-pub extern "C" fn network_tick(client: &mut NetClient) {
+pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
     let mut buf = [0; 2048];
+    let mut cnt=0;
     loop {
+        if let Ok(pending) = get_pending_bytes(&client.socket) {
+            unsafe {
+                if pending > max_pending
+                {
+                        println!("Bufor kernela zawiera {} max={}", pending, max_pending);
+                        max_pending=pending;
+                }
+            }
+        }
         if let Ok((amt, src)) = client.socket.recv_from(&mut buf) {
+            cnt +=1;
+            unsafe {
+                total_resv +=1;
+            }
+
             let seq = u32::from_le_bytes(buf[0..4].try_into().unwrap());
             let ack = u32::from_le_bytes(buf[4..8].try_into().unwrap());
             let acks = u32::from_le_bytes(buf[8..12].try_into().unwrap());
@@ -175,6 +219,12 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             for (&id, d) in client.not_confirmed_packets.iter() {
                 if id + 32 < ack {
                     println!("SDL: PACKET NOT CONFIRMED id={id} ack={ack}");
+                    unsafe {
+                        core::trace_network=1;
+                        core::show_packet_type_name('S' as i8, d[0] as u8);
+                        core::trace_network=0;
+                    }
+
                     to_resend.push(d.clone());
                     to_remove.push(id);
                 }
@@ -182,11 +232,12 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             for i in to_remove {
                 client.not_confirmed_packets.remove(&i);
             }
-            for d in to_resend {
+         /*   for d in to_resend {
                 client.send(&d);
-            }
+            }*/
+
             client.unsent_acks += 1;
-            if client.unsent_acks > 5 {
+            if client.unsent_acks > 20 {
                 client.send(&vec![core::PACKET_KEEP_ALIVE as u8]);
                 client.unsent_acks = 0;
             }
@@ -290,6 +341,15 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             break;
         }
     }
+    unsafe {
+        if prev_send != total_sent || prev_resv != total_resv
+        {
+            println!("sent {} recv {}", total_sent, total_resv);
+            prev_send = total_sent;
+            prev_resv = total_resv;
+        }
+    }
+    cnt
 }
 
 pub fn add(left: u64, right: u64) -> u64 {
