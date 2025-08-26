@@ -143,7 +143,7 @@ impl Server {
                     client.local_seq_num,
                     client.remote_seq_num
                 );
-                core::show_packet_type_name('S' as i8, data[0] as u8);
+                core::show_packet_type_name('S' as std::os::raw::c_char, data[0] as u8);
             }
         }
 
@@ -226,7 +226,7 @@ pub fn main_loop(server: &mut Server) {
             core::update();
         }
         send_game_updates(server);
-        std::thread::sleep(std::time::Duration::from_millis(core::TICK_DELAY));
+        std::thread::sleep(std::time::Duration::from_millis(core::TICK_DELAY as u64));
     }
 }
 
@@ -338,7 +338,7 @@ fn handle_network(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
                 Some(data) => {
                     let id = data.id;
                     unsafe {
-                        core::show_packet_type_name('S' as i8, buf[12] as u8);
+                        core::show_packet_type_name('S' as std::os::raw::c_char, buf[12] as u8);
                     }
                     if buf[12] == core::PACKET_JOIN_REQUEST {
                         let mut response = vec![0; 13];

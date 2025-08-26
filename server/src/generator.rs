@@ -148,7 +148,7 @@ impl World {
 
 pub fn generate() {
     unsafe {
-        SEED = core::time(std::ptr::null_mut());
+        SEED = core::time(std::ptr::null_mut()) as i64;
         println!("{}", SEED);
         core::srand(SEED as u32);
         println!("{}", core::rand());
