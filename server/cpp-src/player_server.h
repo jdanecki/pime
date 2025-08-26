@@ -2,8 +2,9 @@
 #define SERVER_PLAYER_H
 
 #include "../../core/player.h"
+#include "networking.h"
 
-class PlayerServer : public Player
+class PlayerServer : public Player, public Networked
 {
   public:
     void move(int dx, int dy);

@@ -8,4 +8,10 @@ extern InvList objects_to_update_reliable;
 
 extern InvList objects_to_create;
 
+class Networked
+{
+    public:
+    Networked();
+};
+
 #endif
