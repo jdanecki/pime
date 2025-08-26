@@ -1,5 +1,5 @@
 #![allow(warnings)]
-include!(concat!(env!("OUT_DIR"), "/core_bindings.rs"));
+include!("core_bindings.rs");
 
 include!("../../core/alchemist/item_location.rs");
 

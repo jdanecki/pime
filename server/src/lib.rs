@@ -2,8 +2,11 @@ use core::add_object_to_world;
 use core::find_in_world;
 use std::collections::HashMap;
 use std::error::Error;
+use std::mem::MaybeUninit;
 use std::net::SocketAddr;
 use std::net::UdpSocket;
+
+use types::ObjectData;
 
 mod convert_types;
 mod core;
@@ -225,7 +228,7 @@ pub fn main_loop(server: &mut Server) {
         unsafe {
             core::update();
         }
-        send_game_updates(server);
+        // send_game_updates(server);
         std::thread::sleep(std::time::Duration::from_millis(core::TICK_DELAY as u64));
     }
 }
@@ -249,7 +252,9 @@ fn add_player(
     server.socket.send_to(&response, &peer).unwrap();
 
     unsafe {
-        let p = core::PlayerServer::new(players.len() as i32);
+        // let p = core::PlayerServer::new(players.len() as i32);
+        let p = core::create_player(players.len() as i32);
+        players.push(MaybeUninit::uninit().assume_init());
         // FIXME
         // let axe = Box::into_raw(Box::new(core::Axe::new(
         //     std::ptr::null_mut(),
@@ -257,7 +262,7 @@ fn add_player(
         // ))) as *mut core::InventoryElement;
         // (*core::world_table[128][128]).add_object1(axe);
         // p.pickup(axe);
-        players.push(p);
+        // players.push(p);
         // update_chunk_for_player(server, &mut peer, (128, 128));
         // core::objects_to_create.add(axe);
     }
@@ -306,7 +311,9 @@ fn create_objects_in_chunk_for_player(server: &mut Server, peer: &SocketAddr, co
             //  println!("create_objects_in_chunk_for_player PACKET_OBJECT_CREATE");
             let obj = convert_types::convert_to_data(&*(*le).el);
             let obj_data = &bincode::serialize(&obj).unwrap()[..];
-            //          println!("data {:?}", obj_data);
+            if let ObjectData::Player { data } = obj {
+                println!("data {} {:?}", obj_data.len(), obj_data);
+            }
             data.extend_from_slice(obj_data);
 
             le = (*le).next;

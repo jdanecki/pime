@@ -4,7 +4,7 @@
 #include "../../core/player.h"
 #include "networking.h"
 
-class PlayerServer : public Player, public Networked
+class PlayerServer : public Player
 {
   public:
     void move(int dx, int dy);
@@ -16,5 +16,7 @@ class PlayerServer : public Player, public Networked
 
     PlayerServer(int id);
 };
+
+PlayerServer* create_player(int id);
 
 #endif

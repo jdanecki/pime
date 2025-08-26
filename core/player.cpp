@@ -69,6 +69,7 @@ Player::Player(int id, SerializableCString&& name,
         InventoryElement(Class_Player, id, location), name(name),
         thirst(thirst), hunger(hunger), nutrition(nutrition) 
 {
+    printf("player %d\n", this->c_id);
     for (int i = 0; i < 10; i++)
         hotbar[i] = nullptr;
 }

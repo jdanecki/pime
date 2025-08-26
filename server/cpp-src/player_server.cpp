@@ -3,6 +3,7 @@
 #include "networking.h"
 #include "world_server.h"
 #include "../../core/packet_types.h"
+#include <cstdio>
 
 bool check_and_load_chunk(int new_map_x, int new_map_y)
 {
@@ -179,4 +180,11 @@ bool PlayerServer::pickup(InventoryElement * item)
 
 PlayerServer::PlayerServer(int id) : Player(id, SerializableCString("player"), ItemLocation::center(), 0, 0, 0)
 {
+    objects_to_create.add(this);
+    printf("player contrs %d\n", this->c_id);
+}
+
+PlayerServer* create_player(int id)
+{
+    return new PlayerServer(id);
 }
