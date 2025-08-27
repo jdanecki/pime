@@ -3,7 +3,7 @@
 
 #include "alchemist/elements.h"
 #include "alchemist/npc_talk.h"
-#include <stdint.h>
+
 #include "clan.h"
 #include "alchemist/skills.h"
 

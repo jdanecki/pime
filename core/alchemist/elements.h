@@ -3,7 +3,6 @@
 
 #include "names.h"
 #include <cstddef>
-#include <cstdio>
 #include <cstdlib>
 #include <stdint.h>
 #include "properties.h"
