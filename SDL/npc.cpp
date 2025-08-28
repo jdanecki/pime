@@ -40,8 +40,13 @@ void NpcSDL::init()
         int tile = get_tile_at(player->map_x, player->map_y, 0, 0);
         if (tile < 0)
             return;
-        Color c = get_base_element(tile)->color; // FIXME
-        texture = add_texture_color(Player_textures.npc, c);
+        BaseElement * b=get_base_element(tile);
+        if (b) {
+            Color c = b->color; // FIXME
+            texture = add_texture_color(Player_textures.npc, c);
+        }  else {
+            texture = add_texture_color(Player_textures.npc, {125, 125, 125});
+        }
     }
 }
 

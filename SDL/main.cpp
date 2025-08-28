@@ -170,13 +170,16 @@ void loop()
 
 int main(int argc, char * argv[])
 {
+    const char * ip;
     if (argc < 2)
     {
         printf("usage: ./pime_SDL <ip> [port]\n");
-        return 1;
+        printf("using localhost 127.0.0.1\n");
+        ip = "127.0.0.1";
+    } 
+    else {
+        ip = argv[1];
     }
-    const char * ip;
-    ip = argv[1];
     const char * port;
     if (argc < 3)
     {

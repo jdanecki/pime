@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.10)
+project(server_enet)
+
+find_package(PkgConfig)
+
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch")
+set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
+set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
+
+add_definitions(-DCORE_FOR_CLIENT)
+
+set(CORE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../core)
+set(CORE_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/core)
+
+add_subdirectory(${CORE_SOURCE_DIR} ${CORE_BINARY_DIR})
+
+add_executable(server_enet
+    server.cpp 
+)
+
+target_link_libraries(server_enet
+    pime enet 
+)
+

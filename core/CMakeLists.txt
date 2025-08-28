@@ -19,6 +19,7 @@ add_library(pime SHARED
     alchemist/npc_talk.cpp
     alchemist/properties.cpp
     alchemist/skills.cpp
+    CMakeLists.txt
 	)
 
 target_link_libraries(pime)

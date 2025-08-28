@@ -32,12 +32,12 @@ void set_terminal()
     ioctl(0, TCXONC, 1);
 }
 
-int setup(const char * ip, const char * port)
+NetClient * setup(const char * ip, const char * port)
 {
     set_terminal();
 
     client = init(ip, port);
-    return 0;
+    return client;
 }
 
 void print_status(int l, const char * format, ...)
@@ -340,13 +340,18 @@ void loop()
 
 int main(int argc, char * argv[])
 {
+    const char * ip;
+
     if (argc < 2)
     {
         printf("usage: ./pime_SDL <ip> [port]\n");
-        return 1;
+        printf("using localhost 127.0.0.1\n");
+        ip = "127.0.0.1";
     }
-    const char * ip;
-    ip = argv[1];
+    else 
+    {
+        ip = argv[1];
+    }
     const char * port;
     if (argc < 3)
     {
@@ -357,7 +362,8 @@ int main(int argc, char * argv[])
         port = argv[2];
     }
     if (setup(ip, port))
-        return 1;
-    loop();
+    {
+        loop();
+    }
     tcsetattr(0, TCSANOW, &old_stdin);
 }
