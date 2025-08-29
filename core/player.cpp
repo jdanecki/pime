@@ -226,9 +226,10 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
 
 char * Player::get_el_description(InventoryElement * el)
 {
-    if (check_known(el))
+    // FIXME
+    // if (check_known(el))
         return el->get_description();
-    else
+    // else
         return nullptr;
 }
 

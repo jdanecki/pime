@@ -222,13 +222,13 @@ pub fn test_server() {
 }
 
 pub fn main_loop(server: &mut Server) {
-    let mut players: Vec<core::PlayerServer> = vec![];
+    let mut players: Vec<*mut core::PlayerServer> = vec![];
     loop {
         handle_network(server, &mut players);
         unsafe {
             core::update();
         }
-        // send_game_updates(server);
+        send_game_updates(server);
         std::thread::sleep(std::time::Duration::from_millis(core::TICK_DELAY as u64));
     }
 }
@@ -236,7 +236,7 @@ pub fn main_loop(server: &mut Server) {
 fn add_player(
     server: &mut Server,
     peer: std::net::SocketAddr,
-    players: &mut Vec<core::PlayerServer>,
+    players: &mut Vec<*mut core::PlayerServer>,
 ) {
     server.clients.insert(peer, ClientData::new(players.len()));
 
@@ -254,7 +254,7 @@ fn add_player(
     unsafe {
         // let p = core::PlayerServer::new(players.len() as i32);
         let p = core::create_player(players.len() as i32);
-        players.push(MaybeUninit::uninit().assume_init());
+        players.push(p);
         // FIXME
         // let axe = Box::into_raw(Box::new(core::Axe::new(
         //     std::ptr::null_mut(),
@@ -265,6 +265,8 @@ fn add_player(
         // players.push(p);
         // update_chunk_for_player(server, &mut peer, (128, 128));
         // core::objects_to_create.add(axe);
+        update_chunk_for_player(server, &peer, (128, 128));
+        core::add_object_to_world(p as *mut core::InventoryElement, (*p)._base._base.location);
     }
     //println!("{:?} , players {:?}", peer, players);
 }
@@ -322,7 +324,7 @@ fn create_objects_in_chunk_for_player(server: &mut Server, peer: &SocketAddr, co
     }
 }
 
-fn handle_network(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
+fn handle_network(server: &mut Server, players: &mut Vec<*mut core::PlayerServer>) {
     let mut buf = [0; 100];
     loop {
         if let Ok((amt, src)) = server.socket.recv_from(&mut buf) {
@@ -360,7 +362,7 @@ fn handle_network(server: &mut Server, players: &mut Vec<core::PlayerServer>) {
                         update_chunk_for_player(server, &src, (128, 128))
                     } else {
                         if id < players.len() {
-                            handle_packet(server, &mut players[id], &buf, &src);
+                            handle_packet(server, unsafe { &mut *players[id] }, &buf, &src);
                         } else {
                             println!("invalid player idx {}", id);
                         }

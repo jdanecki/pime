@@ -197,6 +197,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
 
             //println!("{:?}", &buf);
             let value = &mut buf[12..];
+            let amt = amt - 12;
 
             //FIXME
             unsafe {
@@ -226,7 +227,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                             println!("SDL: PACKET_CHUNK_UPDATE {}", amt);
                         }
                     }
-                    if amt == size_of::<core::chunk_table>() + 3 + 12 {
+                    if amt == size_of::<core::chunk_table>() + 3 {
                         unsafe {
                             events::update_chunk(
                                 //i32::from_le_bytes(value[1..5].try_into().unwrap()),

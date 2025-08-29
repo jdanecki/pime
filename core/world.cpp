@@ -14,7 +14,9 @@ void add_object_to_world(InventoryElement* object, ItemLocation location)
     switch (location.tag)
     {
         case ItemLocation::Tag::Chunk:
-            world_table[location.chunk.map_y][location.chunk.map_x]->add_object(object, location.chunk.x, location.chunk.y);
+            if (world_table[location.chunk.map_y][location.chunk.map_x])
+                world_table[location.chunk.map_y][location.chunk.map_x]->add_object(object, location.chunk.x, location.chunk.y);
+            break;
         case ItemLocation::Tag::Player:
             abort();
     }

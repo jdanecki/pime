@@ -85,7 +85,6 @@ Element::Element(BaseElement * b)
 //called by the_game_net/core.rs
 InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : c_id(c_id), uid(uid), location(location)
 {
-        printf("created %d\n", c_id);
 }
 void Element::show(bool details)
 {

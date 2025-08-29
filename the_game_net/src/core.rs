@@ -197,7 +197,7 @@ impl<'de> serde::Deserialize<'de> for Player {
             where
                 V: SeqAccess<'de>,
             {
-                let id = seq
+                let id: usize = seq
                     .next_element()?
                     .ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
                 let name: SerializableCString = seq
@@ -217,7 +217,7 @@ impl<'de> serde::Deserialize<'de> for Player {
                     .ok_or_else(|| serde::de::Error::invalid_length(5, &self))?;
                 Ok(unsafe {
                     Player::new(
-                        id,
+                        id as i32,
                         Box::<SerializableCString>::into_raw(Box::new(name)),
                         location,
                         thirst,

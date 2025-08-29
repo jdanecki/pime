@@ -31,6 +31,7 @@ add_executable(pime_SDL
     
     implementations/alchemistSDL.cpp
     implementations/BeingSDL.cpp
+    implementations/playerSDL.cpp
 
     ${NETWORK_STUB}
 )

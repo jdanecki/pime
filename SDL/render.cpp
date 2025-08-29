@@ -285,6 +285,9 @@ bool draw_terrain()
                         r->render(&img_rect);
                     }
                 }
+                else {
+                    printf("unrenderable %d\n", o->get_cid());
+                }
                 el = el->next;
             }
         }
