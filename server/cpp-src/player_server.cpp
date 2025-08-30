@@ -195,3 +195,8 @@ PlayerServer* create_player(int id)
 {
     return new PlayerServer(id);
 }
+
+Npc* create_npc()
+{
+    return new Npc(ItemLocation::center());
+}

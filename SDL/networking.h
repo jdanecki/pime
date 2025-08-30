@@ -7,6 +7,7 @@ class NetClient
 
 #include "../core/world.h"
 #include "../core/player.h"
+#include "../core/npc.h"
 #include "networking_gen.h"
 
 class UdpSocket

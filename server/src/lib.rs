@@ -5,6 +5,8 @@ use std::error::Error;
 use std::mem::MaybeUninit;
 use std::net::SocketAddr;
 use std::net::UdpSocket;
+use std::ptr::slice_from_raw_parts_mut;
+use std::slice;
 
 use types::ObjectData;
 
@@ -362,7 +364,16 @@ fn handle_network(server: &mut Server, players: &mut Vec<*mut core::PlayerServer
                         update_chunk_for_player(server, &src, (128, 128))
                     } else {
                         if id < players.len() {
-                            handle_packet(server, unsafe { &mut *players[id] }, &buf, &src);
+                            handle_packet(
+                                server,
+                                unsafe {
+                                    slice::from_raw_parts_mut(players[id], 1)
+                                        .get_mut(0)
+                                        .unwrap()
+                                },
+                                &buf,
+                                &src,
+                            );
                         } else {
                             println!("invalid player idx {}", id);
                         }

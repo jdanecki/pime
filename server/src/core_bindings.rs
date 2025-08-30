@@ -4647,6 +4647,28 @@ impl Networked {
     }
 }
 #[repr(C)]
+#[derive(serde :: Serialize, Copy, Clone)]
+pub struct Npc {
+    pub _base: Player,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of Npc"][::std::mem::size_of::<Npc>() - 240usize];
+    ["Alignment of Npc"][::std::mem::align_of::<Npc>() - 8usize];
+};
+extern "C" {
+    #[link_name = "\u{1}_ZN3NpcC1E12ItemLocation"]
+    pub fn Npc_Npc(this: *mut Npc, location: ItemLocation);
+}
+impl Npc {
+    #[inline]
+    pub unsafe fn new(location: ItemLocation) -> Self {
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        Npc_Npc(__bindgen_tmp.as_mut_ptr(), location);
+        __bindgen_tmp.assume_init()
+    }
+}
+#[repr(C)]
 pub struct PlayerServer {
     pub _base: Player,
 }
@@ -4760,6 +4782,10 @@ impl PlayerServer {
 extern "C" {
     #[link_name = "\u{1}_Z13create_playeri"]
     pub fn create_player(id: ::std::os::raw::c_int) -> *mut PlayerServer;
+}
+extern "C" {
+    #[link_name = "\u{1}_Z10create_npcv"]
+    pub fn create_npc() -> *mut Npc;
 }
 extern "C" {
     #[link_name = "\u{1}_Z11craft_entryiiPKmP6Player"]

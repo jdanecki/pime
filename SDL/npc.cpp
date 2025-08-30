@@ -51,6 +51,8 @@ SDL_Texture * create_npc_texture()
 
 NpcSDL::NpcSDL(Npc data) : Npc(data)
 {
+    w = 32;
+    h = 32;
     texture = create_npc_texture();
 }
 

@@ -4,6 +4,7 @@ use std::hash::Hash;
 use std::rc::Rc;
 
 use crate::core;
+use crate::core::InventoryElement;
 use crate::SEED;
 use rand::prelude::*;
 
@@ -80,6 +81,7 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
                         as *mut core::InventoryElement);
                 });
             }
+            chunk.add_object1(core::create_npc() as *mut core::InventoryElement);
             /*            for (plant, num) in region.active_plants.iter() {
                 let prob = num / region.size as f32 + 1.0;
                 //println!("plant {prob}");

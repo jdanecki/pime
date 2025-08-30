@@ -1,10 +1,11 @@
 #include "../elements_server.h"
+#include "../networking.h"
 
 #ifndef TOOLS_H
 #define TOOLS_H
 
 #define GENERATE_PRODUCT(name, body) \
-class name : public ProductServer \
+class name : public ProductServer, public Networked \
 { \
     name(InventoryElement * el1, InventoryElement * el2); \
   public: \
@@ -13,7 +14,7 @@ class name : public ProductServer \
 }; \
 
 #define GENERATE_INGREDIENT(name, body) \
-class name : public IngredientServer \
+class name : public IngredientServer, public Networked \
 { \
     name(InventoryElement * from); \
   public: \

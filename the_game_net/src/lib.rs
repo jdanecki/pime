@@ -4,6 +4,7 @@ use std::error::Error;
 use std::ffi::CStr;
 use std::net::UdpSocket;
 use std::rc::Rc;
+use std::sync::{Arc, Mutex, RwLock};
 
 mod core;
 mod events;
@@ -51,6 +52,7 @@ pub extern "C" fn init(
     server_ip: *const std::os::raw::c_char,
     port: *const std::os::raw::c_char,
 ) -> *mut NetClient {
+    OBJECTS.write().unwrap().replace(HashMap::new());
     let mut ip;
     unsafe {
         // let a = core::Player::new(1);
@@ -312,6 +314,31 @@ struct World {
 
 thread_local! {
 static WORLD: RefCell<World> = panic!("world not created yet");
+}
+
+struct CorePointer(*mut core::InventoryElement);
+unsafe impl Send for CorePointer {}
+unsafe impl Sync for CorePointer {}
+
+static OBJECTS: RwLock<Option<HashMap<usize, CorePointer>>> = RwLock::new(None);
+
+#[no_mangle]
+pub extern "C" fn get_object_by_id(uid: usize) -> *mut core::InventoryElement {
+    match OBJECTS.read().unwrap().as_ref().unwrap().get(&uid) {
+        Some(obj) => obj.0,
+        None => std::ptr::null_mut(),
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn register_object(o: *mut core::InventoryElement) {
+    let uid = unsafe { (*o).uid };
+    OBJECTS
+        .write()
+        .unwrap()
+        .as_mut()
+        .unwrap()
+        .insert(uid, CorePointer(o));
 }
 
 #[no_mangle]

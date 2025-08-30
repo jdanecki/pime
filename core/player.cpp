@@ -69,9 +69,22 @@ Player::Player(int id, SerializableCString&& name,
         InventoryElement(Class_Player, id, location), name(name),
         thirst(thirst), hunger(hunger), nutrition(nutrition) 
 {
-    printf("player %d\n", this->c_id);
+    hunger = 500;
+    thirst = 250;
+    inventory = new InvList("inventory");
+    relations = nullptr;
+
     for (int i = 0; i < 10; i++)
-        hotbar[i] = nullptr;
+    {
+        hotbar[i] = NULL;
+        craftbar[i] = 0;
+    }
+    in_conversation = false;
+    talking_to = nullptr;
+    welcomed = false;
+
+    known_elements = new ElementsList("known elements");
+    printf("player %d\n", this->c_id);
 }
     
 

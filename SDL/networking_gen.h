@@ -20,6 +20,7 @@ struct ObjectData {
     Product,
     Scroll,
     Player,
+    Npc,
   };
 
   struct InvElement_Body {
@@ -54,6 +55,10 @@ struct ObjectData {
     Player data;
   };
 
+  struct Npc_Body {
+    Npc data;
+  };
+
   Tag tag;
   union {
     InvElement_Body inv_element;
@@ -64,6 +69,7 @@ struct ObjectData {
     Product_Body product;
     Scroll_Body scroll;
     Player_Body player;
+    Npc_Body npc;
   };
 };
 
@@ -78,6 +84,10 @@ extern "C" {
 NetClient *init(const char *server_ip, const char *port);
 
 void network_tick(NetClient *client);
+
+InventoryElement *get_object_by_id(uintptr_t uid);
+
+void register_object(InventoryElement *o);
 
 BaseElement *get_base_element(int32_t id);
 

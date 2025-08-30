@@ -3,6 +3,7 @@
 
 #include "../../core/player.h"
 #include "networking.h"
+#include "../../core/npc.h"
 
 class PlayerServer : public Player
 {
@@ -18,5 +19,7 @@ class PlayerServer : public Player
 };
 
 PlayerServer* create_player(int id);
+
+Npc* create_npc();
 
 #endif

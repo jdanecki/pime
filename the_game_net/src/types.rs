@@ -21,6 +21,7 @@ pub enum ObjectData {
     Product { data: core::Product },
     Scroll { data: core::Scroll },
     Player { data: core::Player },
+    Npc { data: core::Npc },
 }
 
 #[repr(C)]

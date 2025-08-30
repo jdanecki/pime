@@ -19,8 +19,10 @@ bool craft_entry(int product_id, int ingredients_num, const size_t * ingredients
     {
         printf("crafting ingredient %d\n", product_id);
         if (ingredients_num < 1)
+        {
+            printf("too many to craft ingredient\n");
             return false;
-
+        }
         InventoryElement * el = player->get_item_by_uid(ingredients_ids[0]);
         if (!el)
         {
@@ -49,7 +51,9 @@ bool craft_entry(int product_id, int ingredients_num, const size_t * ingredients
         }
 
         crafted = craft_prod(product_id, el1, el2);
-        return crafted != nullptr;
     }
-    return false;
+    if (crafted)
+        add_object_to_world(crafted, player->location);
+
+    return crafted != nullptr;
 }

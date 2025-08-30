@@ -11,6 +11,7 @@ void remove_from_chunks(InventoryElement * object)
 
 void add_object_to_world(InventoryElement* object, ItemLocation location)
 {
+    object->location = location;
     switch (location.tag)
     {
         case ItemLocation::Tag::Chunk:
@@ -37,7 +38,7 @@ InventoryElement* find_in_world(ItemLocation* loc, size_t uid)
     switch (loc->tag)
     {
         case ItemLocation::Tag::Chunk:
-            return world_table[loc->chunk.map_y][loc->chunk.map_y]->find_by_id(uid);
+            return world_table[loc->chunk.map_y][loc->chunk.map_x]->find_by_id(uid);
         case ItemLocation::Tag::Player:
             abort();
             return nullptr;

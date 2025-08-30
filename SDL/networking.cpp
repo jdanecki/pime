@@ -1,6 +1,7 @@
 #include "networking.h"
 #include "../core/alchemist/elements.h"
 #include "implementations/playerSDL.h"
+#include "npc.h"
 #include "../core/tiles.h"
 #include "../core/world.h"
 #include "implementations/BeingSDL.h"
@@ -50,23 +51,20 @@ void update_hotbar()
 
 InventoryElement * remove_from_location(ItemLocation location, size_t id)
 {
-    InventoryElement * el;
+    InventoryElement * el = get_object_by_id(id);
+    if (!el)
+        return nullptr;
     switch (location.tag)
     {
         case ItemLocation::Tag::Chunk:
         {
-            // printf("removed %ld from chunk %d %d\n", id, location.chunk.map_x, location.chunk.map_y);
-            if (!world_table[location.chunk.map_y][location.chunk.map_x])
-                return nullptr;
-            el = world_table[location.chunk.map_y][location.chunk.map_x]->find_by_id(id);
-            world_table[location.chunk.map_y][location.chunk.map_x]->remove_object(el);
+            remove_from_chunks(el);
             break;
         }
         case ItemLocation::Tag::Player:
         {
-            // printf("removed %ld from player %ld\n", id, location.player.id);
-            el = players[location.player.id]->get_item_by_uid(id);
-            players[location.player.id]->drop(el);
+            Player* p = (Player*)get_object_by_id(location.player.id);
+            p->drop(el);
             if ((int)location.player.id == player->get_id())
             {
                 update_hotbar();
@@ -78,7 +76,7 @@ InventoryElement * remove_from_location(ItemLocation location, size_t id)
 
 InventoryElement * el_from_data(const ObjectData * data)
 {
-    printf("CREATING OBJECT\n");
+    printf("CREATING OBJECT %d\n", data->tag);
     InventoryElement * el = nullptr;
     switch (data->tag)
     {
@@ -111,6 +109,15 @@ InventoryElement * el_from_data(const ObjectData * data)
                 player = (Player*)el;
             }
             break;
+        case ObjectData::Tag::Npc:
+            el = new NpcSDL(data->npc.data);
+            el->c_id = Class_Npc;
+            
+            printf("createing NPC");
+            break;
+        default:
+            printf("UNKNOWN TYPE %d\n", data->tag);
+            abort();
     }
     return el;
 }
@@ -295,7 +302,9 @@ extern "C"
             case ItemLocation::Tag::Player:
             {
                 // printf("added %ld to player %ld\n", id, new_loc.player.id);
-                players[new_loc.player.id]->pickup(el);
+                Player* p = (Player*)get_object_by_id(new_loc.player.id);
+                if (p)
+                    p->pickup(el);
                 if ((int)new_loc.player.id == player->get_id())
                 {
                     update_hotbar(); // FIXME - remove only one element
@@ -309,7 +318,8 @@ extern "C"
         InventoryElement * el = el_from_data(data);
         if (el)
         {
-    add_object_to_world(el, el->location);
+            register_object(el);
+            add_object_to_world(el, el->location);
             // switch (el->location.tag)
             // {
             //     case ItemLocation::Tag::Chunk:
