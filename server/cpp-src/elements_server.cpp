@@ -85,7 +85,7 @@ bool AnimalServer::grow()
     else
     {
         size = 1.0 * age->value / max_age->value;
-        objects_to_update.add(this);
+        notify_update(this);
         //   printf("%s:%s growing size=%f %d/%d \n", get_class_name(), get_name(), size, age->value, max_age->value);
     }
     return ret;
@@ -185,6 +185,16 @@ PlantServer::PlantServer(BasePlant * base) : Plant(base)
     }
 }
 
+void PlantServer::change_phase(Plant_phase p)
+{
+    notify_update(this);
+    if (phase != p)
+    {
+        //   printf("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
+    }
+    phase = p;
+}
+    
 void PlantServer::show(bool details)
 {
     Plant::show(details);
@@ -226,7 +236,6 @@ bool PlantServer::grow()
             grown = true;
             change_phase(Plant_fruits);
         }
-        objects_to_update.add(this);
         return !grown;
     }
     if (age->value >= flowers_time)
@@ -235,7 +244,6 @@ bool PlantServer::grow()
         {
             change_phase(Plant_flowers);
         }
-        objects_to_update.add(this);
         return !grown;
     }
     if (age->value >= growing_time)
@@ -244,7 +252,6 @@ bool PlantServer::grow()
         {
             change_phase(Plant_growing);
         }
-        objects_to_update.add(this);
 
         return !grown;
     }
@@ -254,7 +261,6 @@ bool PlantServer::grow()
         {
             change_phase(Plant_seedling);
         }
-        objects_to_update.add(this);
         return !grown;
     }
     return !grown;
@@ -354,7 +360,7 @@ bool ElementServer::action(Product_action action, Player * pl)
     }
     else
     {
-        objects_to_update.add(this);
+        notify_update(this);
     }
     return res;
 }
@@ -416,7 +422,7 @@ bool ElementServer::player_action(Player_action action, Player * pl)
     }
     else
     {
-        objects_to_update.add(this);
+        notify_update(this);
     }
     return res;
 }

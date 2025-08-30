@@ -6,6 +6,8 @@ use std::net::UdpSocket;
 use std::rc::Rc;
 use std::sync::{Arc, Mutex, RwLock};
 
+use types::ObjectData;
+
 mod core;
 mod events;
 mod send_packets;
@@ -139,7 +141,7 @@ fn init_internal(server_ip: &str) -> Result<NetClient, Box<dyn Error>> {
 
 #[no_mangle]
 pub extern "C" fn network_tick(client: &mut NetClient) {
-    let mut buf = [0; 2048];
+    let mut buf = [0; 8096];
     loop {
         if let Ok((amt, src)) = client.socket.recv_from(&mut buf) {
             let seq = u32::from_le_bytes(buf[0..4].try_into().unwrap());
@@ -261,9 +263,11 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                     }
                 }
                 core::PACKET_OBJECT_UPDATE => unsafe {
-                    events::update_object(
-                        &bincode::deserialize(&value[1..amt]).expect("bad object update"),
-                    );
+                    let updates: Vec<ObjectData> = bincode::deserialize(&value[1..amt])
+                        .expect(&format!("bad object update size {}", amt));
+                    for u in updates {
+                        events::update_object(&u);
+                    }
                 },
                 core::PACKET_LOCATION_UPDATE => unsafe {
                     events::update_item_location(
@@ -358,6 +362,12 @@ pub extern "C" fn register_object(o: *mut core::InventoryElement) {
         .as_mut()
         .unwrap()
         .insert(uid, CorePointer(o));
+}
+
+#[no_mangle]
+pub extern "C" fn deregister_object(o: *mut core::InventoryElement) {
+    let uid = unsafe { (*o).uid };
+    OBJECTS.write().unwrap().as_mut().unwrap().remove(&uid);
 }
 
 #[no_mangle]

@@ -6,7 +6,8 @@ Chunk_state loaded_chunks[WORLD_SIZE][WORLD_SIZE];
 
 void remove_from_chunks(InventoryElement * object)
 {
-    world_table[object->location.chunk.map_y][object->location.chunk.map_x]->remove_object(object);
+    if (world_table[object->location.chunk.map_y][object->location.chunk.map_x])
+        world_table[object->location.chunk.map_y][object->location.chunk.map_x]->remove_object(object);
 }
 
 void add_object_to_world(InventoryElement* object, ItemLocation location)

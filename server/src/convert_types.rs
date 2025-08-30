@@ -1,48 +1,45 @@
 use crate::core;
 use crate::types::*;
 
-pub fn convert_to_data(el: &core::InventoryElement) -> ObjectData {
-    match el.c_id {
+pub fn convert_to_data(el: *const core::InventoryElement) -> ObjectData {
+    match unsafe { (*el).c_id } {
         core::Class_id_Class_Element => {
-            let element =
-                unsafe { &*(el as *const core::InventoryElement as *const core::Element) };
+            let element = unsafe { &*(el as *const core::Element) };
             ObjectData::Element { data: *element }
         }
         core::Class_id_Class_Scroll => {
-            let scroll = unsafe { &*(el as *const core::InventoryElement as *const core::Scroll) };
+            let scroll = unsafe { &*(el as *const core::Scroll) };
             ObjectData::Scroll { data: *scroll }
         }
         core::Class_id_Class_Ingredient => {
-            let ingredient =
-                unsafe { &*(el as *const core::InventoryElement as *const core::Ingredient) };
+            let ingredient = unsafe { &*(el as *const core::Ingredient) };
             ObjectData::Ingredient { data: *ingredient }
         }
         core::Class_id_Class_Product => {
-            let product =
-                unsafe { &*(el as *const core::InventoryElement as *const core::Product) };
+            let product = unsafe { &*(el as *const core::Product) };
             ObjectData::Product { data: *product }
         }
         core::Class_id_Class_Plant => {
-            let plant = unsafe { &*(el as *const core::InventoryElement as *const core::Plant) };
+            let plant = unsafe { &*(el as *const core::Plant) };
             ObjectData::Plant { data: *plant }
         }
         core::Class_id_Class_Animal => {
-            let animal = unsafe { &*(el as *const core::InventoryElement as *const core::Animal) };
+            let animal = unsafe { &*(el as *const core::Animal) };
             ObjectData::Animal { data: *animal }
         }
         core::Class_id_Class_Player => {
             println!("PLAYERRRRRRRRRRRRRRRRR");
-            let player = unsafe { &*(el as *const core::InventoryElement as *const core::Player) };
+            let player = unsafe { &*(el as *const core::Player) };
             println!("{}", size_of::<ObjectData>());
             ObjectData::Player { data: *player }
         }
         core::Class_id_Class_Npc => {
-            let npc = unsafe { &*(el as *const core::InventoryElement as *const core::Npc) };
+            let npc = unsafe { &*(el as *const core::Npc) };
             println!(" NPC {:?}", npc._base._base.c_id);
             ObjectData::Npc { data: *npc }
         }
         _ => {
-            println!("WRONG CLASS ID {}", el.c_id);
+            println!("WRONG CLASS ID {}", unsafe { (*el).c_id });
             println!("{:?}", el);
             panic!();
         }

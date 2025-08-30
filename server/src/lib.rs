@@ -6,7 +6,7 @@ use std::net::SocketAddr;
 use std::net::UdpSocket;
 use std::slice;
 
-use types::ObjectData;
+use convert_types::convert_to_data;
 
 mod convert_types;
 mod core;
@@ -15,10 +15,17 @@ mod types;
 
 pub static mut SEED: i64 = 0;
 pub static mut LOCATION_UPDATES: Vec<types::LocationUpdateData> = vec![];
+pub static mut OBJECT_UPDATES: Vec<types::ObjectData> = vec![];
 
 pub static mut DESTROY_ITEMS: Vec<(usize, core::ItemLocation)> = vec![];
 pub static mut KNOWN_UPDATES: Vec<(i32, core::Class_id, i32)> = vec![];
 pub static mut CHECKED_UPDATES: Vec<(i32, usize)> = vec![];
+
+#[no_mangle]
+extern "C" fn notify_update(el: *const core::InventoryElement) {
+    let data = convert_to_data(el);
+    unsafe { OBJECT_UPDATES.push(data) }
+}
 
 #[no_mangle]
 extern "C" fn update_location(
@@ -124,7 +131,6 @@ pub struct Server {
     clients: HashMap<SocketAddr, ClientData>,
 }
 
-static mut total_sent: usize = 0;
 impl Server {
     fn broadcast(&mut self, data: &[u8]) {
         let clients = self.clients.clone();
@@ -163,9 +169,6 @@ impl Server {
             .not_confirmed_packets
             .insert(client.local_seq_num, data.to_vec());
         self.socket.send_to(&buf, to).unwrap();
-        unsafe {
-            total_sent += 1;
-        }
     }
 }
 
@@ -238,7 +241,11 @@ pub fn test_server() {
 pub fn main_loop(server: &mut Server) {
     let mut players: Vec<*mut core::PlayerServer> = vec![];
     loop {
+        // let start = std::time::Instant::now();
         let _recv = handle_network(server, &mut players);
+        // let net = start.elapsed();
+
+        // let start = std::time::Instant::now();
         unsafe {
             /*if recv != 0 {
                 if recv > max_recv
@@ -249,8 +256,17 @@ pub fn main_loop(server: &mut Server) {
             }*/
             core::update();
         }
+        // let update = start.elapsed();
+        // let start = std::time::Instant::now();
         send_game_updates(server);
-        std::thread::sleep(std::time::Duration::from_millis(core::TICK_DELAY as u64));
+        // let send = start.elapsed();
+        // println!(
+        //     "net {:5?} update {:5?} send {:5?}",
+        //     net.as_millis(),
+        //     update.as_millis(),
+        //     send.as_millis()
+        // );
+        std::thread::sleep(std::time::Duration::from_millis(20));
     }
 }
 
@@ -344,10 +360,8 @@ fn create_objects_in_chunk_for_player(server: &mut Server, peer: &SocketAddr, co
 
 fn handle_network(server: &mut Server, players: &mut Vec<*mut core::PlayerServer>) {
     let mut buf = [0; 100];
-    let mut cnt = 0;
     loop {
         if let Ok((amt, src)) = server.socket.recv_from(&mut buf) {
-            cnt += 1;
             if amt == 0 {
                 panic!("SERV: PACKET empty!!!");
             }
@@ -652,29 +666,17 @@ fn send_game_updates(server: &mut Server) {
             (*list).remove((*(*list)._base.head).el);
         }
 
-        let el = std::ptr::addr_of_mut!(core::objects_to_update);
-        let mut le = (*el)._base.head;
-        while le != std::ptr::null_mut() {
-            if DESTROY_ITEMS
-                .iter()
-                .find(|(id, _)| *id == (*(*le).el).uid)
-                .is_none()
-            {
-                //
-                let mut data = vec![core::PACKET_OBJECT_UPDATE];
-                //            println!("send_game_updates PACKET_OBJECT_UPDATE");
-                let obj = convert_types::convert_to_data(&*(*le).el);
-                let obj_data = &bincode::serialize(&obj).unwrap()[..];
-                //            println!("data {:?}", obj_data);
-                data.extend_from_slice(obj_data);
-                server.broadcast(&data);
-            }
-
-            le = (*le).next;
-            //            println!("PACKET_OBJECT_UPDATE");
-        }
-        while (*el)._base.head != std::ptr::null_mut() {
-            (*el).remove((*(*el)._base.head).el);
+        if OBJECT_UPDATES.len() > 0 {
+            let mut data = vec![core::PACKET_OBJECT_UPDATE];
+            let obj_data = &bincode::serialize(&OBJECT_UPDATES[..]).unwrap()[..];
+            println!(
+                "sending {} updates size {}",
+                OBJECT_UPDATES.len(),
+                obj_data.len()
+            );
+            data.extend_from_slice(obj_data);
+            server.broadcast(&data);
+            OBJECT_UPDATES.clear();
         }
     }
     send_location_updates(server);

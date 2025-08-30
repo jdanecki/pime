@@ -64,7 +64,8 @@ InventoryElement * remove_from_location(ItemLocation location, size_t id)
         case ItemLocation::Tag::Player:
         {
             Player* p = (Player*)get_object_by_id(location.player.id);
-            p->drop(el);
+            if (p)
+                p->drop(el);
             if ((int)location.player.id == player->get_id())
             {
                 update_hotbar();
@@ -368,10 +369,16 @@ extern "C"
 
     void destroy_object(uintptr_t id, ItemLocation location)
     {
-        InventoryElement * el = remove_from_location(location, id);
+        InventoryElement * el = get_object_by_id(id);
         if (el)
         {
+            InventoryElement* removed = remove_from_location(location, id);
+            if (removed == nullptr)
+            {
+                abort();
+            }
             printf("SDL: destroy_object %ld", id);
+            deregister_object(el);
             delete el;
         }
         // else
