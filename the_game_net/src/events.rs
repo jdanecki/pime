@@ -11,5 +11,6 @@ extern "C" {
     pub fn destroy_object(id: usize, location: core::ItemLocation);
     pub fn failed_craft();
     pub fn action_failed();
-    pub fn knowledge_update(pl_id: usize, cid: core::Class_id, id: i32);
+    pub fn knowledge_update(pl_id: i32, cid: core::Class_id, id: i32);
+    pub fn checked_update(pl_id: i32, el: usize);
 }

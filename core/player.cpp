@@ -84,7 +84,12 @@ Player::Player(int id, SerializableCString&& name,
     welcomed = false;
 
     known_elements = new ElementsList("known elements");
-    printf("player %d\n", this->c_id);
+    checked_element = 0;
+
+    clan = get_random_clan();
+    player_skills = new Skills();
+    clan->skills->copy_elements(player_skills);
+
 }
     
 
@@ -124,8 +129,9 @@ void Player::stop_conversation()
 
 void Player::show(bool details)
 {
-    printf("%s %s\n", class_name[c_id], get_name());
-
+    printf("%s %s clan=%s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan_names[clan->id],
+        get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
+    player_skills->show(true);
     if (talking_to)
     {
         printf("%s is talking to %s\n", get_name(), talking_to->get_name());
@@ -258,7 +264,7 @@ bool Player::check_known(InventoryElement * el)
     return k->is_known();
 }
 
-void Player::set_known(Class_id cid, int el_id)
+bool Player::set_known(Class_id cid, int el_id)
 {
     ElId i;
     i.c_id = cid;
@@ -270,7 +276,21 @@ void Player::set_known(Class_id cid, int el_id)
         KnownElement * n = new KnownElement(i.c_id, i.id);
         known_elements->add(n);
         n->set_known();
+        return true;
     }
+    else
+        return false;
+}
+
+bool Player::set_checked(size_t el)
+{
+    if (el != checked_element)
+    {
+        checked_element = el;
+        return true;
+    }
+    else
+        return false;
 }
 
 Relations Player::find_relation(Player * who)

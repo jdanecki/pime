@@ -30,14 +30,14 @@ ElementSDL::ElementSDL(Element data) : Element(data)
     w = width.value;
     h = height.value;
 
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, w, h);
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, w, h);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 
     start_width = width.value;
     /* value=0xff000000; //a
-     value = 0xffff0000; //r
+     value = 0xffff0000; //b
      value = 0xff00ff00; //g
-     value = 0xff0000ff; //b
+     value = 0xff0000ff; //r
     */
     unsigned int * pixels;
     int pitch;
@@ -72,26 +72,25 @@ ElementSDL::ElementSDL(Element data) : Element(data)
             unsigned char r2 = (unsigned char)(get_base()->color.r * inter + base * (1.0 - inter));
             unsigned char g2 = (unsigned char)(get_base()->color.g * inter + base * (1.0 - inter));
             unsigned char b2 = (unsigned char)(get_base()->color.b * inter + base * (1.0 - inter));
-            c |= (r2 << 16) | (g2 << 8) | b2;
+            c |= (b2 << 16) | (g2 << 8) | r2;
 
             switch (f)
             {
                 case Form_solid:
                 {
                     offset = 0.2f * sinf(angle * 5.0f + (float)(rand() % 100) / 50.0f);
-                    pixels[y * width.value + x] = (distance <= 1.0f + offset) ? c : 0; // 0x40ffffff;
+                    pixels[y * width.value + x] = (distance <= 1.0f + offset) ? c : 0;
                     break;
                 }
                 case Form_liquid:
                     offset = 1.0f + 0.3f * sinf(angle * 6 + rand() % 100 / 50.0f);
-                    c &= 0xff0f0fff;
+                    c &= 0xffff0f0f;
 
-                    pixels[y * width.value + x] = (distance <= offset) ? c : 0; // 0x40ffff00;
+                    pixels[y * width.value + x] = (distance <= offset) ? c : 0;
                     break;
                 case Form_gas:
                     c |= 0xffff00 | get_base()->color.b;
-                    ;
-                    c = 0xffffffff;
+                    c = 0xffffffff; // FIXME - add gas elements on server
                     pixels[y * width.value + x] = (distance <= 1.0f) ? c : 0;
                     break;
             }
@@ -103,7 +102,7 @@ ElementSDL::ElementSDL(Element data) : Element(data)
 void ElementSDL::show(bool details)
 {
     Element::show(details);
-    printf("scale=%0.2f %d %d\n", get_scale(), width.value, start_width);
+    //  printf("scale=%0.2f %d %d\n", get_scale(), width.value, start_width);
 }
 
 IngredientSDL::IngredientSDL(Ingredient data) : Ingredient(data)
@@ -124,35 +123,32 @@ SDL_Texture * ProductSDL::get_texture()
     return prod_textures[get_id()];
 }
 
-ScrollSDL::ScrollSDL(Scroll data):Scroll(data)
+ScrollSDL::ScrollSDL(Scroll data) : Scroll(data)
 {
     w = 32;
     h = 32;
+    Base * b = get_base();
+    Color c;
 
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, w, h);
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    unsigned int * pixels;
-    int pitch;
-
-    SDL_LockTexture(texture, NULL, (void **)&pixels, &pitch);
-    for (int y = 0; y < h; ++y)
+    switch (b->c_id)
     {
-        for (int x = 0; x < w; ++x)
+        case Class_BaseElement:
         {
-            if (x >= 2 && x < w - 2 && y >= 2 && y < w - 2)
-            {
-                pixels[y * w + x] = 0xFFDEB887;
-            }
-            else if (y < 4 || y >= w - 4)
-            {
-                pixels[y * w + x] = 0xFFA0522D;
-            }
-            else
-            {
-                pixels[y * w + x] = 0;
-            }
+            BaseElement * el = get_base_element(b->id);
+            c = el->color;
+            break;
         }
+        case Class_BaseAnimal:
+            c.r = 186;
+            c.g = 89;
+            c.b = 89;
+            break;
+        case Class_BasePlant:
+            c.r = 0;
+            c.g = 128;
+            c.b = 0;
+            break;
     }
 
-    SDL_UnlockTexture(texture);
+    texture = add_texture_color(scroll_surface, c);
 }

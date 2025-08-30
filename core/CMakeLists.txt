@@ -11,12 +11,14 @@ add_library(pime SHARED
     tiles.cpp 
     npc.cpp
     packet_types.cpp
+    clan.cpp
 
     alchemist/elements.cpp
 	alchemist/names.cpp
 	alchemist/el_list.cpp
     alchemist/npc_talk.cpp
     alchemist/properties.cpp
+    alchemist/skills.cpp
 	)
 
 target_link_libraries(pime)

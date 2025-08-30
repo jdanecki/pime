@@ -18,10 +18,10 @@ enum object_textures_enum
     TEXTURE_wall_max
 };
 
-struct textures
+struct player_textures
 {
     SDL_Texture * player;
-    SDL_Surface * player_surface;
+    SDL_Surface * npc;
     SDL_Texture * run_icon;
     SDL_Texture * sneak_icon;
 };
@@ -33,13 +33,15 @@ extern SDL_Texture * ing_textures[ING_COUNT];
 extern SDL_Texture * prod_textures[PROD_COUNT];
 extern SDL_Texture * animal_textures[BASE_ANIMALS];
 extern SDL_Texture * plant_textures[BASE_PLANTS];
+extern SDL_Surface * scroll_surface;
 
 extern SDL_Texture * object_textures[TEXTURE_wall_max];
 extern SDL_Texture * up_mask;
 extern SDL_Texture * down_mask;
-extern struct textures Texture;
+extern struct player_textures Player_textures;
 
 void load_textures();
 SDL_Texture * load_texture(const char * texture_name);
+SDL_Texture * add_texture_color(SDL_Surface * s, Color c);
 
 #endif

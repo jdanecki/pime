@@ -11,15 +11,6 @@ impl std::fmt::Debug for SerializableCString {
         f.write_str(unsafe { CStr::from_ptr(self.str_).to_str().unwrap() })
     }
 }
-impl serde::Serialize for BaseElementServer {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        self._base.serialize(serializer)
-    }
-}
-
 impl serde::Serialize for SerializableCString {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -70,15 +61,30 @@ impl serde::Serialize for SerializablePointer<BaseAnimal> {
     }
 }
 
+impl serde::Serialize for SerializablePointer<Base> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_tuple(2)?;
+        unsafe {
+            state.serialize_element(&(*self.ptr).c_id)?;
+            state.serialize_element(&(*self.ptr).id)?;
+        }
+        state.end()
+    }
+}
+
+
 impl serde::Serialize for InventoryElement {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
-        let mut state = serializer.serialize_tuple(4)?;
+        let mut state = serializer.serialize_tuple(3)?;
         state.serialize_element(&self.c_id)?;
         state.serialize_element(&self.uid)?;
-        state.serialize_element(&self.location)?;
+        state.serialize_element(&self.location)?;        
         state.end()
     }
 }

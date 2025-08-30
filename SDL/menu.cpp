@@ -20,26 +20,28 @@ extern class Player * player;
 extern int active_hotbar;
 extern NetClient * client;
 
-//Menu * menu_music;
+// Menu * menu_music;
 Menu * menu_main;
 Menu * menu_help;
+Menu * menu_debug;
 Menu * current_menu;
 Menu * menu_inventory_categories;
 Menu * menu_inventory_elements;
 Menu * menu_inventory;
 Menu * menu_inventory_elements_form;
 Menu * menu_inventory_class;
-
 Menu * menu_npc;
 Menu * menu_dialog;
 Menu * menu_action;
+Menu * menu_knowledge;
+Menu * menu_known_items;
 
 void load(char with_player);
 void save(char with_player);
 
 Menu::Menu(const char * n)
 {
-    name = n;            
+    name = n;
     entries = new ElementsList(n);
     menu_pos = nullptr;
     index = 0;
@@ -51,33 +53,37 @@ Menu::~Menu()
 }
 
 void Menu::add(const char * e, enum menu_actions a)
-{    
+{
     entries->add(new Menu_entry(e, a, nullptr, 0, nullptr));
-    if (!menu_pos) menu_pos = dynamic_cast<Menu_entry*>(entries->head);
+    if (!menu_pos)
+        menu_pos = dynamic_cast<Menu_entry *>(entries->head);
 }
 
-void Menu::add(const char *e, menu_actions a, int v)
+void Menu::add(const char * e, menu_actions a, int v)
 {
     entries->add(new Menu_entry(e, a, nullptr, v, nullptr));
-    if (!menu_pos) menu_pos = dynamic_cast<Menu_entry*>(entries->head);
+    if (!menu_pos)
+        menu_pos = dynamic_cast<Menu_entry *>(entries->head);
 }
 
-void Menu::add(const char * e, enum Npc_say a,  InventoryElement * p_el, Sentence * s)
+void Menu::add(const char * e, enum Npc_say a, InventoryElement * p_el, Sentence * s)
 {
     enum menu_actions conv = (enum menu_actions)((int)MENU_NPC_CONV + (int)a);
     entries->add(new Menu_entry(e, conv, p_el, 0, s));
-    if (!menu_pos) menu_pos = dynamic_cast<Menu_entry*>(entries->head);
+    if (!menu_pos)
+        menu_pos = dynamic_cast<Menu_entry *>(entries->head);
 }
 
 void Menu::add(const char * e, enum menu_actions a, InventoryElement * p_el)
-{    
+{
     entries->add(new Menu_entry(e, a, p_el, 0, nullptr));
-    if (!menu_pos) menu_pos = dynamic_cast<Menu_entry*>(entries->head);
+    if (!menu_pos)
+        menu_pos = dynamic_cast<Menu_entry *>(entries->head);
 }
 
 int Menu::get_val(int v)
 {
-    //FIXME
+    // FIXME
     /*
     for (int i = 0; i < added; i++)
     {
@@ -117,7 +123,7 @@ void Menu::show()
         game_size = window_height;
 
     int menu_entries = entries->nr_elements;
-    int menu_opt_size = game_size / ( menu_entries+ 3);
+    int menu_opt_size = game_size / (menu_entries + 3);
     int mody;
     int mody2;
     // printf("menu_entries = %d\n", menu_entries);
@@ -177,13 +183,14 @@ void Menu::show()
         SDL_RenderFillRect(renderer, &rect3);
         write_text(modx, mody + (-menu_pos + added / 2) * menu_opt_size - menu_opt_size, name, Yellow, game_size / 27, menu_opt_size);
     }*/
-    Menu_entry * menu_entry= (Menu_entry*)(entries->head);
+    Menu_entry * menu_entry = (Menu_entry *)(entries->head);
 
     for (i = 0; i < menu_entries; i++)
     {
-        SDL_Rect rect;
+        //  SDL_Rect rect;
         int text_y = mody + i * menu_opt_size;
         int text_x = modx;
+#if 0
         //   if (added < 10)
         {
             rect.x = modx;
@@ -213,18 +220,18 @@ void Menu::show()
         }*/
         //  if (added >= 10)
         //    text_y = mody + (i - menu_pos + added / 2) * menu_opt_size;
-
+#endif
         write_text(text_x, text_y, menu_entry->entry, White, game_size / 27, menu_opt_size);
-        menu_entry=(Menu_entry*)(menu_entry->next);
+        menu_entry = (Menu_entry *)(menu_entry->next);
     }
 }
 
 Menu_entry::Menu_entry(const char * e, menu_actions a, InventoryElement * _el, int v, Sentence * s)
-{    
+{
     action = a;
     el = _el;
-    sentence = s;    
-    value=v;
+    sentence = s;
+    value = v;
     if (el && !s)
     {
         entry = new char[64];
@@ -252,20 +259,11 @@ void create_menus()
     // add("Save", MENU_SAVE);
     // add("Load", MENU_LOAD);
     menu_main->add("Help", MENU_HELP);
-   // menu_main->add("Change music volume", MENU_MUSIC);
+    // menu_main->add("Change music volume", MENU_MUSIC);
     menu_main->add("Cancel", MENU_CANCEL);
 
-    menu_help = new Menu("Help 1");
+    menu_help = new Menu("Help");
     menu_help->add("esc - main menu", MENU_CANCEL);
-    menu_help->add("F1 - show item info", MENU_CANCEL);
-    menu_help->add("F2 - show item info on server", MENU_CANCEL);
-
-    menu_help->add("F3 - show chunk info", MENU_CANCEL);
-    menu_help->add("F4 - show chunk info on server", MENU_CANCEL);
-
-    menu_help->add("F5 - trace network", MENU_CANCEL);
-    menu_help->add("F6 - trace network on server", MENU_CANCEL);
-    menu_help->add("F11 - resize", MENU_CANCEL);
 
     menu_help->add("1-9,0 - hotbar", MENU_CANCEL);
     menu_help->add("enter - use item", MENU_CANCEL);
@@ -276,24 +274,37 @@ void create_menus()
     menu_help->add("minus - deselect hotbar", MENU_CANCEL);
     menu_help->add("shift/control - sneak/run", MENU_CANCEL);
     menu_help->add("arrows - move", MENU_CANCEL);
-    menu_help->add("n - NPC", MENU_CANCEL);
+    menu_help->add("n - NPC", MENU_NPC);
     menu_help->add("c - Craft", MENU_CRAFT);
     menu_help->add("a - Action", MENU_ACTION);
+    menu_help->add("i - inventory", MENU_INVENTORY);
+    menu_help->add("k - knowledge", MENU_KNOWLEDGE);
 
     //   menu_help->add("l - devmenu", MENU_CANCEL);
-    menu_help->add("i - inventory", MENU_CANCEL);
     //  menu_help->add("v - clear statusline", MENU_CANCEL);
     //   menu_help->add("g - terrain break", MENU_CANCEL);
     //  menu_help->add("r - remove from hotbar", MENU_CANCEL);
-
     //  menu_help->add("F5 - autoexplore", MENU_CANCEL);
     //  menu_help->add("F4 - item info at player", MENU_CANCEL);
 
-  /*  menu_music = new Menu("Music", 3);
-    menu_music->add("+5 Volume", MENU_LOUDER);
-    menu_music->add("-5 Volume", MENU_QUIETER);
-    menu_music->add("Cancel", MENU_CANCEL);
-*/
+    menu_help->add("Debug options", MENU_DEBUG);
+
+    menu_debug = new Menu("Help - debug");
+    menu_debug->add("F1 - show item info", MENU_CANCEL);
+    menu_debug->add("F2 - show item info on server", MENU_CANCEL);
+
+    menu_debug->add("F3 - show chunk info", MENU_CANCEL);
+    menu_debug->add("F4 - show chunk info on server", MENU_CANCEL);
+
+    menu_debug->add("F5 - trace network", MENU_CANCEL);
+    menu_debug->add("F6 - trace network on server", MENU_CANCEL);
+    menu_debug->add("F11 - resize", MENU_CANCEL);
+
+    /*  menu_music = new Menu("Music", 3);
+      menu_music->add("+5 Volume", MENU_LOUDER);
+      menu_music->add("-5 Volume", MENU_QUIETER);
+      menu_music->add("Cancel", MENU_CANCEL);
+  */
     menu_inventory_categories = new Menu("Inventory categories");
     menu_inventory_categories->add("Elements", MENU_INV_ELEMENTS, Class_Element);
     menu_inventory_categories->add("Ingredients", MENU_INV_INGREDIENTS, Class_Ingredient);
@@ -318,10 +329,16 @@ void create_menus()
     menu_action->add("Drink", MENU_DRINK);
     menu_action->add("Eat", MENU_EAT);
     menu_action->add("Read", MENU_READ);
+    menu_action->add("Check", MENU_CHECK);
     menu_action->add("Cancel", MENU_CANCEL);
+
+    menu_knowledge = new Menu("Knowledge");
+    menu_knowledge->add("Elements", MENU_KNOWLEDGE_ELEMENTS, Class_BaseElement);
+    menu_knowledge->add("Plants", MENU_KNOWLEDGE_PLANTS, Class_BasePlant);
+    menu_knowledge->add("Animals", MENU_KNOWLEDGE_ANIMALS, Class_BaseAnimal);
 }
 
-//create menu with selected form
+// create menu with selected form
 Menu * create_inv_form(enum Form f)
 {
     int count = 0;
@@ -343,9 +360,8 @@ Menu * create_inv_form(enum Form f)
         // FIXME add texture
         // menu_inventory_categories2->add(base_elements[i]->name, MENU_CATEGORIES, items_textures[i], menu_index, i);
         //        menu_index++;
-        //fixme group elements with the same base id
+        // fixme group elements with the same base id
         menu_inventory_elements_form->add("*", MENU_ITEMS_GROUP, elements_with_form[i]);
-
     }
     return menu_inventory_elements_form;
 }
@@ -370,6 +386,37 @@ Menu * create_inv_category_classes(enum Class_id c)
         menu_inventory_class->add("*", MENU_CLASSES, elements_with_class[i]);
     }
     return menu_inventory_class;
+}
+
+Menu * create_knowledge_classes(enum Class_id c)
+{
+    if (!player->known_elements->nr_elements)
+        return nullptr;
+
+    ListElement * cur = player->known_elements->head;
+    if (menu_known_items)
+    {
+        delete menu_known_items;
+    }
+    char * menu_name = new char[50];
+    sprintf(menu_name, "Knowledge: %s", class_name[c]);
+    menu_known_items = new Menu(menu_name);
+
+    while (cur)
+    {
+        KnownElement * el = dynamic_cast<KnownElement *>(cur);
+
+        if (el->check_class(c))
+        {
+            Base * base = get_base(c, el->get_id());
+            menu_known_items->add(base->get_name(), MENU_CANCEL);
+        }
+        cur = cur->next;
+    }
+    if (menu_known_items->entries->nr_elements)
+        return menu_known_items;
+    else
+        return nullptr;
 }
 
 // create menu for elements with the same base id
@@ -401,20 +448,22 @@ void create_inv_menu(int id)
 
 void Menu::go_down()
 {
-    menu_pos=(Menu_entry*)(menu_pos->next);
+    menu_pos = (Menu_entry *)(menu_pos->next);
     index++;
-    if (!menu_pos) {
-        menu_pos = (Menu_entry*)(entries->head);
+    if (!menu_pos)
+    {
+        menu_pos = (Menu_entry *)(entries->head);
         index = 0;
     }
 }
 
 void Menu::go_up()
 {
-    menu_pos=(Menu_entry*)(menu_pos->prev);
+    menu_pos = (Menu_entry *)(menu_pos->prev);
     index--;
-    if (!menu_pos) {
-        menu_pos = (Menu_entry*)(entries->head);
+    if (!menu_pos)
+    {
+        menu_pos = (Menu_entry *)(entries->head);
         index = 0;
     }
 }
@@ -482,14 +531,21 @@ int menu_interact(int key)
                 current_menu = menu_action;
             else if (current_menu == menu_action)
                 current_menu = NULL;
-
+            return 1;
+        }
+        case SDLK_k:
+        {
+            if (!current_menu)
+                current_menu = menu_knowledge;
+            else if (current_menu == menu_knowledge)
+                current_menu = NULL;
             return 1;
         }
     }
     return current_menu ? 1 : 0;
 }
 
-//add item from menu to hotbar
+// add item from menu to hotbar
 int Menu::handle_item(int i)
 {
     if (active_hotbar >= 0)
@@ -529,10 +585,10 @@ int Menu::interact()
     }
 
     switch (a)
-    {            
+    {
         case MENU_ITEMS_GROUP:
-        {// get base id
-            //create_inv_menu((Item_id)(menu_inventory_elements_form->get_val()));
+        { // get base id
+            // create_inv_menu((Item_id)(menu_inventory_elements_form->get_val()));
             return 0;
         }
             /*
@@ -560,9 +616,32 @@ int Menu::interact()
         case MENU_HELP:
             current_menu = menu_help;
             return 0;
+
+        case MENU_DEBUG:
+            current_menu = menu_debug;
+            return 0;
+
+        case MENU_INVENTORY:
+            current_menu = menu_inventory_categories;
+            return 0;
+
+        case MENU_KNOWLEDGE:
+            current_menu = menu_knowledge;
+            return 0;
+
+        case MENU_KNOWLEDGE_ANIMALS:
+        case MENU_KNOWLEDGE_ELEMENTS:
+        case MENU_KNOWLEDGE_PLANTS:
+            current_menu = create_knowledge_classes((Class_id)menu_knowledge->get_val());
+            return 0;
+
         case MENU_CRAFT:
             d_craft.show ^= 1;
             return 1; // hide menu
+
+        case MENU_NPC:
+            current_menu = menu_npc;
+            return 0;
 
         case MENU_INV_ELEMENTS:
             current_menu = menu_inventory_elements;
@@ -610,6 +689,9 @@ int Menu::interact()
             return 0;
         case MENU_READ:
             action_tile(PLAYER_READ, player->location);
+            return 0;
+        case MENU_CHECK:
+            action_tile(PLAYER_CHECK, player->location);
             return 0;
 
         default:

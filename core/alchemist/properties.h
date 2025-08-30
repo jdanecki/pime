@@ -2,6 +2,7 @@
 #define PROPERTIES_H
 
 #include <cstdio>
+#include <stdlib.h>
 
 /// <div rustbindgen nodebug></div>
 class SerializableCString
@@ -26,38 +27,40 @@ class Property
     }
     unsigned int decrease(unsigned int by)
     {
-        if (value > by) {
-            value-=by;
+        if (value > by)
+        {
+            value -= by;
         }
-        else value = 0;
+        else
+            value = 0;
         return value;
     }
 };
 
 class Edible
-{ // FIXME should be changed to being property
-  // when more npc's are added
-  // can be eaten by humans or animals
+{
   public:
-    Property * irrigation;
-    Property * poison;
-    Property * caloric;
+    Property  irrigation;
+    Property  poison;
+    Property  caloric;
+    int eating_by; // bit value 1 means edible for clanId, we use bits 0-4
 
     Edible();
     ~Edible();
+    void set_random() { eating_by = rand() % 16; }
     void show();
 };
 
 class Solid
 {
   public:
-    Property * tooling;    // obróbka
-    Property * stretching; // rozciągalność
-    Property * squeezing;  // ściskalność
-    Property * bending;    // elastyczność
-    //  Property * fragility;  // kruchosc
-    Property * solubility; // rozpuszczalnosc
-    Property * hardness;   // twardość
+    Property tooling;    // obróbka
+    Property stretching; // rozciągalność
+    Property squeezing;  // ściskalność
+    Property bending;    // elastyczność
+    //  Property fragility;  // kruchosc
+    Property solubility; // rozpuszczalnosc
+    Property hardness;   // twardość
     Solid();
     ~Solid();
     void show();

@@ -9,7 +9,7 @@ class ListElement
 
   public:
     InventoryElement * el;
-    ListElement * next, *prev;
+    ListElement *next, *prev;
 
     void add(ListElement * entry);
     void disable()
@@ -77,11 +77,22 @@ class KnownElement : public ListElement
         ElId * i = (ElId *)what;
         return (elid.c_id == i->c_id && elid.id == i->id);
     }
+    bool check_class(Class_id id)
+    {
+        return elid.c_id == id;
+    }
+    int get_id()
+    {
+        return elid.id;
+    }
 };
 
 class ElementsList
 {
     void remove_all();
+   protected:    
+    void virtual copy(ListElement *el) {}
+
   public:
     const char * name;
     int nr_elements;
@@ -89,7 +100,10 @@ class ElementsList
     ListElement * tail;
     ElementsList(const char * n);
     ElementsList();
-    virtual ~ElementsList() { remove_all(); }
+    virtual ~ElementsList()
+    {
+        remove_all();
+    }
     ListElement * find(void * what);
     bool virtual find_check(ListElement * el, void * what)
     {
@@ -99,8 +113,10 @@ class ElementsList
     void enable_all();
     void disable_all();
     ListElement * add(ListElement * el);
-    void remove(ListElement * el);    
+    void remove(ListElement * el);
     void tick();
+    void copy_elements(ElementsList * dst);
+    
 };
 
 typedef bool (*FindFunc)(InventoryElement * el, void * arg);
@@ -116,7 +132,7 @@ class InvList : public ElementsList
     InvList() : ElementsList("Inventory list")
     {
     }
-  //  bool virtual find_at_check(ListElement *el, void * pos) { return false; }
+    //  bool virtual find_at_check(ListElement *el, void * pos) { return false; }
     InventoryElement ** find_form(enum Form f, int * count);
     InventoryElement ** find_class(enum Class_id cl, int * count);
     InventoryElement ** find_id(int id, int * count);

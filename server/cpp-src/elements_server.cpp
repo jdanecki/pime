@@ -17,57 +17,6 @@ void destroy(InventoryElement * el)
     delete el;
 }
 
-BaseElementServer::BaseElementServer(Form f, int index) : BaseElement(f, {rand() % 256, rand() % 256, rand() % 256}, index)
-{
-    printf("BaseElementServer index=%d name=%s\n", index, get_name());
-    solid = NULL;    
-    density = nullptr;
-    form = f;
-    switch (f)
-    {
-        case Form_solid:
-            solid = new Solid;
-            density = new Property("density", 50 + rand() % 2000);
-            break;
-        case Form_liquid:
-            density = new Property("density", 500 + rand() % 500);
-            break;
-        case Form_gas:
-            density = new Property("density", 1);
-            break;
-    }
-}
-
-BaseElementServer::~BaseElementServer()
-{
-    delete density;
-    if (solid)
-        delete solid;
-}
-
-int BaseElementServer::foo(int a)
-{
-    return a + 1;
-}
-
-void BaseElementServer::show(bool details)
-{
-    Base::show(details);
-    printf("BaseElement form=%s\n", Form_name[form]);
-    if (!details)
-        return;
-    density->show(); // gęstość
-    printf("   form = %s\n", Form_name[form]);
-    switch (form)
-    {
-        case Form_solid:
-            solid->show();
-            break;
-        default:
-            break;
-    }
-}
-
 AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
 {
     delay_for_move = max_delay_move;
@@ -242,6 +191,12 @@ void PlantServer::show(bool details)
     BeingServer::show(details);
 }
 
+bool PlantServer::player_action(Player_action action, Player * pl)
+{
+    printf("PLANT_SERVER: %s %s\n", player_action_name[action], get_name());
+    return false;
+}
+
 bool PlantServer::grow()
 {
     // unsigned long ms=get_time_ms();
@@ -357,21 +312,20 @@ PlantServer * create_plant(BasePlant * base)
     return new PlantServer(base);
 }
 
-ElementServer * create_element(BaseElementServer * base)
+ElementServer * create_element(BaseElement * base)
 {
- //   printf("create_element %s\n", base->get_name());
+    //   printf("create_element %s\n", base->get_name());
     return new ElementServer(base);
 }
 
-ScrollServer * create_scroll(BaseElementServer * base)
+ScrollServer * create_scroll(Base * base)
 {
-  //  printf("create_scroll: base=%s id=%d\n", base->get_name(), base->id);
-    ScrollServer *s=new ScrollServer(base);
+    //  printf("create_scroll: base=%s id=%d\n", base->get_name(), base->id);
+    ScrollServer * s = new ScrollServer(base);
     return s;
 }
 
-ElementServer::ElementServer(BaseElementServer * b) : Element(b), sharpness("sharpness", 0), smoothness("smoothness", 0), mass("mass",
-                                                      b->density->value * volume.value / 1000)
+ElementServer::ElementServer(BaseElement * b) : Element(b)
 {
     if (b->form == Form_solid)
     {
@@ -407,13 +361,13 @@ bool ElementServer::action(Product_action action, Player * pl)
 
 bool ElementServer::action_cut()
 {
-    BaseElementServer * b = (BaseElementServer *)get_base();
+    BaseElement * b = (BaseElement *)get_base();
     if (b->form == Form_solid)
     {
         //    if (b->solid->hardness < 50)
         {
             volume.value = length.decrease(1) * width.decrease(1) * height.decrease(1);
-            mass.value = b->density->value * volume.value / 1000;
+            mass.value = b->density.value * volume.value / 1000;
         }
 
         return true;
@@ -423,13 +377,13 @@ bool ElementServer::action_cut()
 
 bool ElementServer::action_hit()
 {
-    BaseElementServer * b = (BaseElementServer *)get_base();
+    BaseElement * b = (BaseElement *)get_base();
     if (b->form == Form_solid)
     {
         //    if (b->solid->hardness < 50)
         {
             volume.value = length.decrease(3) * width.decrease(3) * height.decrease(3);
-            mass.value = b->density->value * volume.value / 1000;
+            mass.value = b->density.value * volume.value / 1000;
         }
 
         return true;
@@ -439,8 +393,9 @@ bool ElementServer::action_hit()
 
 bool ElementServer::player_action(Player_action action, Player * pl)
 {
-    printf("ELEMENT_SERVER: %s %s\n", player_action_name[action], get_name());
     bool res = false;
+
+    printf("ELEMENT_SERVER: %s %s\n", player_action_name[action], get_name());
     switch (action)
     {
         case PLAYER_DRINK:
@@ -457,12 +412,10 @@ bool ElementServer::player_action(Player_action action, Player * pl)
 
     if (volume.value < 1)
     {
-        printf("player_action->destroy %s\n", get_name());
         destroy(this);
     }
     else
     {
-        printf("player_action->update %s\n", get_name());
         objects_to_update.add(this);
     }
     return res;
@@ -470,13 +423,13 @@ bool ElementServer::player_action(Player_action action, Player * pl)
 
 bool ElementServer::action_drink()
 {
-    BaseElementServer * b = (BaseElementServer *)get_base();
+    BaseElement * b = (BaseElement *)get_base();
     if (b->form == Form_liquid)
     {
         //    if (b->solid->hardness < 50)
         {
             volume.value = length.decrease(2) * width.decrease(2) * height.decrease(2);
-            mass.value = b->density->value * volume.value / 1000;
+            mass.value = b->density.value * volume.value / 1000;
             printf("drunk %s\n", get_name());
         }
         return true;
@@ -488,13 +441,13 @@ bool ElementServer::action_drink()
 
 bool ElementServer::action_eat()
 {
-    BaseElementServer * b = (BaseElementServer *)get_base();
+    BaseElement * b = (BaseElement *)get_base();
     if (b->form == Form_solid)
     {
         //    if (b->solid->hardness < 50)
         {
             volume.value = length.decrease(4) * width.decrease(4) * height.decrease(4);
-            mass.value = b->density->value * volume.value / 1000;
+            mass.value = b->density.value * volume.value / 1000;
             printf("ate %s\n", get_name());
         }
         return true;
@@ -507,12 +460,6 @@ bool ElementServer::action_eat()
 void ElementServer::show(bool details)
 {
     Element::show((details));
-    if (details)
-    {
-        sharpness.show();
-        smoothness.show();
-        mass.show();
-    }
 }
 
 bool ElementServer::can_pickup()
@@ -541,20 +488,25 @@ bool BeingServer::grow()
     return alive;
 }
 
-ScrollServer::ScrollServer(BaseElementServer *b) : Scroll(b)
+ScrollServer::ScrollServer(Base * b) : Scroll(b)
 {
-
 }
 
-bool ScrollServer::player_action(Player_action action, Player *pl)
+bool ScrollServer::player_action(Player_action action, Player * pl)
 {
     printf("ScrollServer: %s %s\n", player_action_name[action], get_name());
 
     switch (action)
     {
         case PLAYER_READ:
-            pl->set_known(get_base_cid(), get_id());
-            notify_knowledge(pl->get_id(), get_base_cid(), get_id());
+            if (pl->set_known(get_base_cid(), get_id()))
+            {
+                notify_knowledge(pl->get_id(), get_base_cid(), get_id());
+            }
+            else
+            {
+                printf("ScrollServer: already known this item\n");
+            }
             destroy(this);
             break;
     }

@@ -12,6 +12,7 @@ use serde::{Deserialize, Deserializer};
 use crate::get_base_animal;
 use crate::get_base_element;
 use crate::get_base_plant;
+use crate::get_base;
 
 impl<T> SerializablePointer<T> {
     pub fn new(p: *mut T) -> Self {
@@ -144,6 +145,40 @@ impl<'de> serde::Deserialize<'de> for SerializablePointer<BaseAnimal> {
     }
 }
 
+
+impl<'de> serde::Deserialize<'de> for SerializablePointer<Base> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        struct BaseVisitor;
+
+        impl<'de> Visitor<'de> for BaseVisitor {
+            type Value = SerializablePointer<Base>;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("struct SerializablePointer<Base>")
+            }
+
+            fn visit_seq<V>(self, mut seq: V) -> Result<SerializablePointer<Base>, V::Error>
+            where
+                V: SeqAccess<'de>,
+            {
+                let c_id = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
+                let id = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
+                Ok(unsafe { SerializablePointer::new(get_base(c_id, id)) })
+            }
+        }
+
+        deserializer.deserialize_tuple(2, BaseVisitor)
+     }
+}
+
+
 impl<'de> serde::Deserialize<'de> for InventoryElement {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -170,7 +205,7 @@ impl<'de> serde::Deserialize<'de> for InventoryElement {
                     .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
                 let location = seq
                     .next_element()?
-                    .ok_or_else(|| serde::de::Error::invalid_length(3, &self))?;
+                    .ok_or_else(|| serde::de::Error::invalid_length(2, &self))?;
                 Ok(unsafe { InventoryElement::new(c_id, id, location) })
             }
         }

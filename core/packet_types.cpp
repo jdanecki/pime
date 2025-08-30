@@ -25,15 +25,23 @@ const char * packet_type_names[]={
 "PACKET_SERVER_ACTION_ON_OBJECT",
 "PACKET_ACTION_FAILED",
 "PACKET_KNOWLEDGE_UPDATE",
+"PACKET_CHECKED_UPDATE",
 "PACKET_COUNT",
 };
 
-bool trace_network;
+int trace_network;
 
 void show_packet_type_name(char what, unsigned char i)
 {
+    trace_network %= 4;
+    switch (trace_network)
+    {
+        case 3: if (i == PACKET_PLAYER_UPDATE || i == PACKET_KEEP_ALIVE) return;
+        case 2: if (i == PACKET_PLAYER_UPDATE) return;
+        case 1: 
+            printf("%c %d -> %s\n", what, i, i < PACKET_COUNT ? packet_type_names[i] : "ERROR" ); break;
+        default: break;
+    }  
     assert(i < PACKET_COUNT);
-    if (trace_network)
-        printf("%c %d -> %s\n", what, i, packet_type_names[i]);
 }
 

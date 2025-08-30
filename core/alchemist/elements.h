@@ -45,6 +45,7 @@ enum Player_action
     PLAYER_DRINK,
     PLAYER_EAT,
     PLAYER_READ,
+    PLAYER_CHECK,
 };
 
 extern const char * player_action_name[];
@@ -63,6 +64,8 @@ class Base
   public:
     Class_id c_id;
     int id;
+    Edible edible;
+
     SerializableCString name;
     Base(int index, Class_id c, const char * name);
     virtual void show(bool details = true);
@@ -81,8 +84,12 @@ class BaseElement : public Base
   public:
     Form form; // solid, liquid, gas
     Color color;
+    Property density;
+    Solid solid;
 
-    BaseElement(Form f, Color color, int index);
+
+    BaseElement(Form f, int index);
+    void show(bool details = true);
 };
 
 class chunk;
@@ -94,7 +101,6 @@ class InventoryElement
   public:
     Class_id c_id;
     size_t uid;
-
     ItemLocation location;
 
     InventoryElement(Class_id c_id, size_t uid, ItemLocation location);
@@ -116,7 +122,7 @@ class InventoryElement
     }
     virtual void show(bool details = true)
     {
-        printf("%s\n", get_class_name());
+        printf("%s: uid=%lx\n", get_class_name(), uid);
     }
     virtual bool tick()
     {
@@ -142,10 +148,11 @@ class InventoryElement
     {
         return c_id;
     }
-    virtual Edible * get_edible()
-    {
-        return nullptr;
-    }
+// FIXME
+    // virtual Edible * get_edible()
+    // {
+    //     return nullptr;
+    // }
     int get_x()
     {
         return location.chunk.x;
@@ -237,13 +244,14 @@ template <typename T> class SerializablePointer
 
 class Scroll : public InventoryElement
 {
-    SerializablePointer<BaseElement> base;
+    SerializablePointer<Base> base;
+
   public:
-    BaseElement * get_base()
+    Base * get_base()
     {
         return base.get();
     }
-    Scroll(BaseElement * b);
+    Scroll(Base * b);
     Class_id get_base_cid() override
     {
         return get_base()->c_id;
@@ -258,10 +266,15 @@ class Scroll : public InventoryElement
     {
         return get_base()->get_name();
     }
-    void show(bool details = true) override;
     int get_id() override
     {
         return get_base()->id;
+    }
+    void show(bool details) override
+    {
+        InventoryElement::show(details);
+        if (details)
+            get_base()->show(details);
     }
 };
 
@@ -273,7 +286,10 @@ class Element : public InventoryElement
     Property length;
     Property width;
     Property height;
-    Property volume; // lenght*width*height
+    Property volume;     // lenght*width*height
+    Property sharpness;  // ostrość
+    Property smoothness; // gładkość
+    Property mass;       // density*volume
 
   public:
     BaseElement * get_base()
@@ -292,7 +308,7 @@ class Element : public InventoryElement
     }
     const char * get_form_name() override
     {
-        return Form_name[get_base()->form];
+        return Form_name[get_form()];
     }
     int get_id() override
     {
@@ -305,14 +321,34 @@ class Element : public InventoryElement
 
     Property ** get_properties(int * count) override
     {
-        // FIXME
-        Property ** props = new Property *[4];
+        *count = 7;
+        Form f = get_form();
+        if (f == Form_solid)
+            *count += 6;
+        Property ** props = new Property *[*count];
         props[0] = &length;
         props[1] = &width;
         props[2] = &height;
         props[3] = &volume;
-        *count = 4;
+        props[4] = &sharpness;
+        props[5] = &smoothness;
+        props[6] = &mass;
+        if (f)
+        {
+            props[7] = &get_base()->solid.tooling;
+            props[8] = &get_base()->solid.stretching;
+            props[9] = &get_base()->solid.squeezing;
+            props[10] = &get_base()->solid.bending;
+            props[11] = &get_base()->solid.solubility;
+            props[12] = &get_base()->solid.hardness;
+        }
         return props;
+    }
+    char * get_description() override
+    {
+        char * buf = new char[128];
+        sprintf(buf, "%s %s: (%s)", get_form_name(), get_class_name(), get_name());
+        return buf;
     }
 };
 
@@ -385,12 +421,6 @@ class Ingredient : public InventoryElement
         return id;
     }
     Ingredient(Ingredient_id i);
-
-    Edible * get_edible()
-    { // FIXME
-        return nullptr;
-        // return el->get_edible();
-    }
 
     void show(bool details = true);
 
@@ -492,7 +522,8 @@ class Animal : public InventoryElement
 
     void show(bool details = true) override
     {
-        printf("Animal %s uid=%lx\n", get_name(), uid);
+        InventoryElement::show(details);
+
         if (details)
             get_base()->show(details);
     }
@@ -619,6 +650,14 @@ class Plant : public InventoryElement
         char * buf = new char[128];
         sprintf(buf, "%s: (%s) %s", get_class_name(), get_name(), plant_phase_name[phase]);
         return buf;
+    }
+    Property ** get_properties(int * count)
+    {
+        Property ** props = new Property *[1];
+        props[0] = new Property(plant_phase_name[phase], phase);
+
+        *count = 1;
+        return props;
     }
 };
 

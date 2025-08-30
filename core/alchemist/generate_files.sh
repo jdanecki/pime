@@ -77,3 +77,18 @@ done
 
 echo "#endif" >> generated/npc_talk_generated.hpp
 
+echo -e "enum Skill_type\n{" > skills_type.h
+for s in `cat skills.txt`
+do
+     echo "SK_$s," >> skills_type.h
+done
+echo "};" >> skills_type.h
+
+echo -e "const char * skills_names[]=\n{" > skills_names.h
+for s in `cat skills.txt`
+do
+     echo \"$s\", >> skills_names.h
+done
+echo "};" >> skills_names.h
+
+

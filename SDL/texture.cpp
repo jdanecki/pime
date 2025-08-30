@@ -7,14 +7,14 @@
 #include <dirent.h>
 #include <stdio.h>
 
-struct textures Texture;
+struct player_textures Player_textures;
 
 int tiles_textures_count;
 SDL_Texture ** tiles_textures;
 
 SDL_Texture * ing_textures[ING_COUNT];
 SDL_Texture * prod_textures[PROD_COUNT];
-
+SDL_Surface * scroll_surface;
 SDL_Texture * animal_textures[BASE_ANIMALS];
 SDL_Texture * plant_textures[BASE_PLANTS];
 
@@ -97,11 +97,21 @@ int add_textures_from_dir(SDL_Texture ** to, int i, const char * dir_path)
 
 void load_textures()
 {
-    Texture.player_surface = IMG_Load("textures/player.png");
-    Texture.player = load_texture("textures/player.png");
+    Player_textures.npc = IMG_Load("textures/player.png");
+    // SDL_PIXELFORMAT_ABGR8888 for surface
+    // printf("surface format=%x %s rgba=%x argb=%x\n", surface->format->format, SDL_GetPixelFormatName(surface->format->format), SDL_PIXELFORMAT_RGBA8888, SDL_PIXELFORMAT_ARGB8888);
+    /*
+    bajt 0: R
+    bajt 1: G
+    bajt 2: B
+    bajt 3: A
+Bits:   [31..24]   [23..16]   [15..8]   [7..0]
+Field:     A          B          G        R
+*/
+    Player_textures.player = SDL_CreateTextureFromSurface(renderer, Player_textures.npc);
 
-    Texture.run_icon = load_texture("textures/gui/run_icon.png");
-    Texture.sneak_icon = load_texture("textures/gui/sneak_icon.png");
+    Player_textures.run_icon = load_texture("textures/gui/run_icon.png");
+    Player_textures.sneak_icon = load_texture("textures/gui/sneak_icon.png");
 
     int i = 0;
 
@@ -137,6 +147,9 @@ void load_textures()
 
     animal_textures[0] = load_texture("textures/animals/pig.png");
     animal_textures[1] = load_texture("textures/animals/boar.png");
+
+    scroll_surface = IMG_Load("textures/scroll.png");
+
 // FIXME
 #if 0
     object_textures[TEXTURE_stone_wall] = load_texture("textures/objects/stone_wall.png");
@@ -144,4 +157,44 @@ void load_textures()
     object_textures[TEXTURE_log1_wall] = load_texture("textures/objects/log1_wall.png");
     object_textures[TEXTURE_log2_wall] = load_texture("textures/objects/log2_wall.png");
 #endif
+}
+
+SDL_Texture * add_texture_color(SDL_Surface * s, Color c)
+{
+    unsigned char mask_r = c.r;
+    unsigned char mask_g = c.g;
+    unsigned char mask_b = c.b;
+
+    SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormat(0, 32, 32, 32, SDL_PIXELFORMAT_ABGR8888);
+    SDL_BlitSurface(s, NULL, surface, NULL);
+    SDL_LockSurface(surface);
+
+    unsigned int * pixels = (unsigned int *)surface->pixels;
+
+    for (int y = 0; y < surface->h; ++y)
+    {
+        for (int x = 0; x < surface->w; ++x)
+        {
+            unsigned int * pixel = pixels + y * surface->w + x;
+
+            unsigned char r = *pixel & 0xFF;
+            unsigned char g = (*pixel >> 8) & 0xFF;
+            unsigned char b = (*pixel >> 16) & 0xFF;
+            unsigned char a = (*pixel >> 24) & 0xFF;
+
+            if (r == g && g == b)
+            {
+                unsigned char gray = r;
+                unsigned char nr = (mask_r * gray) / 255;
+                unsigned char ng = (mask_g * gray) / 255;
+                unsigned char nb = (mask_b * gray) / 255;
+                *pixel = (a << 24) | (nb << 16) | (ng << 8) | nr;
+            }
+        }
+    }
+
+    SDL_UnlockSurface(s);
+    SDL_Texture * retval = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    return retval;
 }

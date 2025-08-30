@@ -66,28 +66,39 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
             //println!("{:?}", region.rocks_types);
             for (rock, num) in region.rocks_types.iter() {
                 // TODO remove +1 for each object
-                //                let prob = num * 10.0 + 1.0;
                 let prob = num * 3.0 + 1.0;
                 //                println!("element {prob} {:?}", rock);
                 do_times(prob, || {
                     chunk.add_object1(core::create_element(rock.get_base()
-                        as *const core::BaseElementServer
-                        as *mut core::BaseElementServer)
+                        as *const core::BaseElement
+                        as *mut core::BaseElement)
                         as *mut core::InventoryElement);
-
+                });
+                let prob_scroll = 2.0;
+                do_times(prob, || {
                     chunk.add_object1(core::create_scroll(rock.get_base()
-                        as *const core::BaseElementServer
-                        as *mut core::BaseElementServer)
+                        as *const core::BaseElement
+                        as *mut core::BaseElement
+                        as *mut core::Base)
                         as *mut core::InventoryElement);
                 });
             }
+
             chunk.add_object1(core::create_npc() as *mut core::InventoryElement);
-            /*            for (plant, num) in region.active_plants.iter() {
+
+            for (plant, num) in region.active_plants.iter() {
                 let prob = num / region.size as f32 + 1.0;
                 //println!("plant {prob}");
                 do_times(prob, || {
                     chunk.add_object1(core::create_plant(
                         plant.get_base() as *const core::BasePlant as *mut core::BasePlant
+                    ) as *mut core::InventoryElement);
+                });
+                let prob_scroll = 2.0;
+                do_times(prob_scroll, || {
+                    chunk.add_object1(core::create_scroll(
+                        plant.get_base() as *const core::BasePlant as *mut core::BasePlant
+                            as *mut core::Base,
                     ) as *mut core::InventoryElement);
                 });
             }
@@ -100,7 +111,15 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
                         as *mut core::BaseAnimal)
                         as *mut core::InventoryElement);
                 });
-            }*/
+                let prob_scroll = 2.0;
+                do_times(prob, || {
+                    chunk.add_object1(core::create_scroll(animal.get_base()
+                        as *const core::BaseAnimal
+                        as *mut core::BaseAnimal
+                        as *mut core::Base)
+                        as *mut core::InventoryElement);
+                });
+            }
             core::world_table[map_y as usize][map_x as usize] = Box::into_raw(chunk);
         }
     });
@@ -352,8 +371,8 @@ fn simulate(
 }
 
 fn create_terrains() -> Vec<Rc<TerrainType>> {
-    //let num = rand::random_range(10..20);
-    let num = rand::random_range(3..4);
+    let num = rand::random_range(10..20);
+    //let num = rand::random_range(3..4);
     let mut terrains = Vec::<Rc<TerrainType>>::with_capacity(num);
     for i in 0..num {
         terrains.push(Rc::new(TerrainType::new(i as u32)));
@@ -555,7 +574,7 @@ impl std::fmt::Debug for Region {
 pub struct TerrainType {
     #[serde(skip)]
     id: u32,
-    base: core::BaseElementServer,
+    base: core::BaseElement,
 }
 
 impl TerrainType {
@@ -563,7 +582,7 @@ impl TerrainType {
         self.id
     }
 
-    pub fn get_base(&self) -> &core::BaseElementServer {
+    pub fn get_base(&self) -> &core::BaseElement {
         &self.base
     }
 
@@ -576,7 +595,7 @@ impl TerrainType {
         };
         TerrainType {
             id,
-            base: unsafe { core::BaseElementServer::new(f, id as i32) },
+            base: unsafe { core::BaseElement::new(f, id as i32) },
         }
     }
 }

@@ -24,9 +24,10 @@ constexpr static const PacketType PACKET_PLAYER_ACTION_ON_OBJECT = 18;
 constexpr static const PacketType PACKET_SERVER_ACTION_ON_OBJECT = 19;
 constexpr static const PacketType PACKET_ACTION_FAILED = 20;
 constexpr static const PacketType PACKET_KNOWLEDGE_UPDATE = 21;
-constexpr static const PacketType PACKET_COUNT = 22;
+constexpr static const PacketType PACKET_CHECKED_UPDATE = 22;
+constexpr static const PacketType PACKET_COUNT = 23;
 
 extern const char * packet_type_names[];
 void show_packet_type_name(char what, unsigned char i);
-extern bool trace_network;
+extern int trace_network;
 #endif

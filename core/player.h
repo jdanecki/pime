@@ -4,6 +4,8 @@
 #include "alchemist/elements.h"
 #include "alchemist/npc_talk.h"
 #include <stdint.h>
+#include "clan.h"
+#include "alchemist/skills.h"
 
 /*enum class direction
 {
@@ -45,9 +47,6 @@ class Player : public InventoryElement
   protected:
     SerializableCString name;
 
-  protected:
-    ElementsList * known_elements;
-
     // FIXME
     // add list know players, npc's
   public:
@@ -60,6 +59,12 @@ class Player : public InventoryElement
     int nutrition;
     InvList * inventory;
     InventoryElement * hotbar[10];
+    ElementsList * known_elements;
+    size_t checked_element;
+    
+    Clan *clan;
+    Skills *player_skills;
+
     int craftbar[10];
     bool in_conversation;
     bool welcomed;
@@ -83,7 +88,8 @@ class Player : public InventoryElement
     char * get_el_description(InventoryElement * el);
 
     virtual bool check_known(InventoryElement * el);
-    void set_known(Class_id cid, int el_id);
+
+    bool set_known(Class_id cid, int el_id);
 
     bool conversation_started()
     {
@@ -96,6 +102,7 @@ class Player : public InventoryElement
     {
         return name.str;
     }
+    bool set_checked(size_t el);
 };
 
 #endif

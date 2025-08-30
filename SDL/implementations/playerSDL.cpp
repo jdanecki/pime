@@ -3,7 +3,7 @@
 
 SDL_Texture* PlayerSDL::get_texture()
 {
-    return Texture.player;
+    return Player_textures.player;
 }
 
 PlayerSDL::PlayerSDL(Player data) : Player(data) {}

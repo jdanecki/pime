@@ -12,6 +12,7 @@ class Renderable
     int w, h;
     bool flip;
     SDL_Texture * texture;
+
   public:
     Renderable()
     {
@@ -88,7 +89,7 @@ class ElementSDL : public Element, public Renderable
     void show(bool details = true) override;
 };
 
-class ScrollSDL: public Scroll, public Renderable
+class ScrollSDL : public Scroll, public Renderable
 {
   public:
     ScrollSDL(Scroll data);

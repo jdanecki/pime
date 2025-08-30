@@ -22,18 +22,25 @@ done
 
 echo -e "\nextern const char * packet_type_names[];
 void show_packet_type_name(char what, unsigned char i);
-extern bool trace_network;
+extern int trace_network;
 #endif" >> packet_types.h
 
 echo "};
 
-bool trace_network;
+int trace_network;
 
 void show_packet_type_name(char what, unsigned char i)
 {
+    trace_network %= 4;
+    switch (trace_network)
+    {
+        case 3: if (i == PACKET_PLAYER_UPDATE || i == PACKET_KEEP_ALIVE) return;
+        case 2: if (i == PACKET_PLAYER_UPDATE) return;
+        case 1: 
+            printf(\"%c %d -> %s\\n\", what, i, i < PACKET_COUNT ? packet_type_names[i] : \"ERROR\" ); break;
+        default: break;
+    }  
     assert(i < PACKET_COUNT);
-    if (trace_network)
-        printf(\"%c %d -> %s\\n\", what, i, packet_type_names[i]);
 }
 " >> packet_types.cpp
 

@@ -2,10 +2,8 @@ use core::add_object_to_world;
 use core::find_in_world;
 use std::collections::HashMap;
 use std::error::Error;
-use std::mem::MaybeUninit;
 use std::net::SocketAddr;
 use std::net::UdpSocket;
-use std::ptr::slice_from_raw_parts_mut;
 use std::slice;
 
 use types::ObjectData;
@@ -14,6 +12,13 @@ mod convert_types;
 mod core;
 mod generator;
 mod types;
+
+pub static mut SEED: i64 = 0;
+pub static mut LOCATION_UPDATES: Vec<types::LocationUpdateData> = vec![];
+
+pub static mut DESTROY_ITEMS: Vec<(usize, core::ItemLocation)> = vec![];
+pub static mut KNOWN_UPDATES: Vec<(i32, core::Class_id, i32)> = vec![];
+pub static mut CHECKED_UPDATES: Vec<(i32, usize)> = vec![];
 
 #[no_mangle]
 extern "C" fn update_location(
@@ -38,17 +43,18 @@ extern "C" fn notify_destroy(id: usize, location: core::ItemLocation) {
 }
 
 #[no_mangle]
-extern "C" fn notify_knowledge(pl_id: usize, cid: core::Class_id, id: i32) {
+extern "C" fn notify_knowledge(pl_id: i32, cid: core::Class_id, id: i32) {
     unsafe {
         KNOWN_UPDATES.push((pl_id, cid, id));
     }
 }
 
-pub static mut SEED: i64 = 0;
-pub static mut LOCATION_UPDATES: Vec<types::LocationUpdateData> = vec![];
-
-pub static mut DESTROY_ITEMS: Vec<(usize, core::ItemLocation)> = vec![];
-pub static mut KNOWN_UPDATES: Vec<(usize, core::Class_id, i32)> = vec![];
+#[no_mangle]
+extern "C" fn notify_checked(pl_id: i32, el: usize) {
+    unsafe {
+        CHECKED_UPDATES.push((pl_id, el));
+    }
+}
 
 pub enum ClientEvent<'a> {
     Move {
@@ -118,6 +124,7 @@ pub struct Server {
     clients: HashMap<SocketAddr, ClientData>,
 }
 
+static mut total_sent: usize = 0;
 impl Server {
     fn broadcast(&mut self, data: &[u8]) {
         let clients = self.clients.clone();
@@ -141,7 +148,7 @@ impl Server {
         buf.extend_from_slice(&client.acks_bitmap.to_le_bytes());
         buf.extend_from_slice(&data);
         unsafe {
-            if core::trace_network {
+            if core::trace_network > 0 {
                 println!(
                     "SERV: send len={} local_seq={} remote_seq={}",
                     12 + data.len(),
@@ -156,6 +163,9 @@ impl Server {
             .not_confirmed_packets
             .insert(client.local_seq_num, data.to_vec());
         self.socket.send_to(&buf, to).unwrap();
+        unsafe {
+            total_sent += 1;
+        }
     }
 }
 
@@ -223,11 +233,20 @@ pub fn test_server() {
     //generator::show_world();
 }
 
+//static mut max_recv: u32 = 0;
+
 pub fn main_loop(server: &mut Server) {
     let mut players: Vec<*mut core::PlayerServer> = vec![];
     loop {
-        handle_network(server, &mut players);
+        let _recv = handle_network(server, &mut players);
         unsafe {
+            /*if recv != 0 {
+                if recv > max_recv
+                {
+                    max_recv = recv;
+                }
+                println!("recv={} / {}", recv, max_recv);
+            }*/
             core::update();
         }
         send_game_updates(server);
@@ -315,9 +334,6 @@ fn create_objects_in_chunk_for_player(server: &mut Server, peer: &SocketAddr, co
             //  println!("create_objects_in_chunk_for_player PACKET_OBJECT_CREATE");
             let obj = convert_types::convert_to_data(&*(*le).el);
             let obj_data = &bincode::serialize(&obj).unwrap()[..];
-            if let ObjectData::Player { data } = obj {
-                println!("data {} {:?}", obj_data.len(), obj_data);
-            }
             data.extend_from_slice(obj_data);
 
             le = (*le).next;
@@ -328,19 +344,18 @@ fn create_objects_in_chunk_for_player(server: &mut Server, peer: &SocketAddr, co
 
 fn handle_network(server: &mut Server, players: &mut Vec<*mut core::PlayerServer>) {
     let mut buf = [0; 100];
+    let mut cnt = 0;
     loop {
         if let Ok((amt, src)) = server.socket.recv_from(&mut buf) {
+            cnt += 1;
             if amt == 0 {
-                break;
+                panic!("SERV: PACKET empty!!!");
             }
             if amt < 12 {
                 panic!("SERV: PACKET too short!!!");
             }
-            if amt > 99 {
-                panic!("SERV: PACKET to big!!!");
-            }
             unsafe {
-                if core::trace_network {
+                if core::trace_network > 0 {
                     println!("SERV: handle_network amt={amt}");
                 }
             }
@@ -406,7 +421,7 @@ fn handle_packet(
     let ack = u32::from_le_bytes(packet[4..8].try_into().unwrap());
     let acks = u32::from_le_bytes(packet[8..12].try_into().unwrap());
     unsafe {
-        if core::trace_network {
+        if core::trace_network > 0 {
             println!(
                 "SERV: handle_packet seq={seq} remote_seq_num={} ack={ack}",
                 client_data.remote_seq_num
@@ -427,7 +442,7 @@ fn handle_packet(
         panic!("Shouldn't ever receive 2 packets with same seq_num");
     }
     // Detect packet loss
-    for i in 0..31 {
+    for i in 0..32 {
         if (acks & (1 << i)) > 0 {
             client_data.not_confirmed_packets.remove(&(ack - i));
         }
@@ -439,6 +454,12 @@ fn handle_packet(
     for (&id, d) in client_data.not_confirmed_packets.iter() {
         if id + 32 < ack {
             println!("SERV: PACKET NOT CONFIRMED id={id} ack={ack}");
+            unsafe {
+                core::trace_network = 1;
+                core::show_packet_type_name('S' as i8, d[0] as u8);
+                core::trace_network = 0;
+            }
+
             to_resend.push(d.clone());
             to_remove.push(id);
         }
@@ -446,10 +467,10 @@ fn handle_packet(
     for i in to_remove {
         client_data.not_confirmed_packets.remove(&i);
     }
-    for d in to_resend {
-        server.send_to_reliable(&d, peer);
-    }
-
+    /* for d in to_resend {
+            server.send_to_reliable(&d, peer);
+        }
+    */
     if packet.len() < 13 {
         panic!("packet to short len={} {:?}", packet.len(), packet);
     }
@@ -524,9 +545,6 @@ fn handle_packet(
                         let response = [core::PACKET_ACTION_FAILED];
                         server.send_to_reliable(&response, peer);
                     }
-                } else {
-                    let response = [core::PACKET_ACTION_FAILED];
-                    server.send_to_reliable(&response, peer);
                 }
             }
         }
@@ -610,7 +628,7 @@ fn handle_packet(
             }
         },
         //FIXME change id to get_id()
-        ClientEvent::Whatever => {} //println!("player {} alive", player._base.id),
+        ClientEvent::Whatever => {} // println!("player {} alive", player._base.id) },
     }
 }
 
@@ -662,6 +680,7 @@ fn send_game_updates(server: &mut Server) {
     send_location_updates(server);
     send_knowledge_updates(server);
     send_destroy_updates(server);
+    send_checked_updates(server);
 }
 
 fn send_location_updates(server: &mut Server) {
@@ -675,6 +694,19 @@ fn send_location_updates(server: &mut Server) {
                 server.broadcast(&data);
             }
             LOCATION_UPDATES.clear();
+        }
+    }
+}
+
+fn send_checked_updates(server: &mut Server) {
+    unsafe {
+        if CHECKED_UPDATES.len() > 0 {
+            for update in CHECKED_UPDATES.iter() {
+                let mut data = vec![core::PACKET_CHECKED_UPDATE];
+                data.extend_from_slice(&bincode::serialize(update).unwrap()[..]);
+                server.broadcast(&data);
+            }
+            CHECKED_UPDATES.clear();
         }
     }
 }

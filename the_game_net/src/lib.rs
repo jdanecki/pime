@@ -22,6 +22,8 @@ pub struct NetClient {
     not_confirmed_packets: HashMap<u32, Vec<u8>>,
 }
 
+static mut total_sent: usize = 0;
+
 impl NetClient {
     fn send(&mut self, data: &[u8]) {
         let mut buf = Vec::with_capacity(12 + data.len());
@@ -31,7 +33,7 @@ impl NetClient {
         buf.extend_from_slice(&self.my_acks_bitmap.to_le_bytes());
         buf.extend_from_slice(&data);
         unsafe {
-            if core::trace_network {
+            if core::trace_network > 0 {
                 println!(
                     "SDL: send len={} local_seq={} remote_seq={}",
                     12 + data.len(),
@@ -42,8 +44,11 @@ impl NetClient {
             }
         }
         self.not_confirmed_packets
-            .insert(self.local_seq_num, buf.to_vec());
+            .insert(self.local_seq_num, data.to_vec());
         self.socket.send(&buf).unwrap();
+        unsafe {
+            total_sent += 1;
+        }
     }
 }
 
@@ -66,24 +71,24 @@ pub extern "C" fn init(
     buf[12] = core::PACKET_JOIN_REQUEST;
     client.socket.send(&buf).unwrap();
 
-    let mut buf = [0; 4096];
+    let mut buf = [0; 8192];
     let mut time_to_resend = 50;
     loop {
         let amt = client.socket.recv(&mut buf).unwrap();
         unsafe {
-            if core::trace_network {
+            if core::trace_network > 0 {
                 println!("{:?}", buf[12]);
             }
         }
         let buf = &buf[12..];
-
+        let amt = amt - 12;
         if buf[0] == core::PACKET_PLAYER_ID {
             unsafe {
                 events::got_id(
                     usize::from_le_bytes(buf[1..9].try_into().unwrap()),
                     0, //i64::from_le_bytes(buf[9..17].try_into().unwrap()),
                 );
-                if core::trace_network {
+                if core::trace_network > 0 {
                     println!("RECEIVED {:?}", &buf[9..amt]);
                 }
                 WORLD.set(
@@ -141,7 +146,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             let ack = u32::from_le_bytes(buf[4..8].try_into().unwrap());
             let acks = u32::from_le_bytes(buf[8..12].try_into().unwrap());
             unsafe {
-                if core::trace_network {
+                if core::trace_network > 0 {
                     println!(
                         "SDL: network_tick amt={amt} seq={seq} remote_seq_num={} ack={ack}",
                         client.remote_seq_num
@@ -180,7 +185,13 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             let mut to_resend = vec![];
             for (&id, d) in client.not_confirmed_packets.iter() {
                 if id + 32 < ack {
-                    println!("SDL: PACKET NOT CONFIRMED {}", id);
+                    println!("SDL: PACKET NOT CONFIRMED id={id} ack={ack}");
+                    unsafe {
+                        core::trace_network = 1;
+                        core::show_packet_type_name('S' as i8, d[0] as u8);
+                        core::trace_network = 0;
+                    }
+
                     to_resend.push(d.clone());
                     to_remove.push(id);
                 }
@@ -188,9 +199,10 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
             for i in to_remove {
                 client.not_confirmed_packets.remove(&i);
             }
-            for d in to_resend {
+            /*   for d in to_resend {
                 client.send(&d);
-            }
+            }*/
+
             client.unsent_acks += 1;
             if client.unsent_acks > 20 {
                 client.send(&vec![core::PACKET_KEEP_ALIVE as u8]);
@@ -225,7 +237,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                 }
                 core::PACKET_CHUNK_UPDATE => {
                     unsafe {
-                        if core::trace_network {
+                        if core::trace_network > 0 {
                             println!("SDL: PACKET_CHUNK_UPDATE {}", amt);
                         }
                     }
@@ -239,7 +251,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                                 &mut *(&mut value[0] as *mut u8 as *mut core::chunk_table),
                             );
                             unsafe {
-                                if core::trace_network {
+                                if core::trace_network > 0 {
                                     println!("SDL: PACKET_CHUNK_UPDATE OK");
                                 }
                             }
@@ -286,11 +298,18 @@ pub extern "C" fn network_tick(client: &mut NetClient) {
                 },
                 core::PACKET_KNOWLEDGE_UPDATE => unsafe {
                     events::knowledge_update(
-                        usize::from_le_bytes(value[1..9].try_into().unwrap()),
-                        u32::from_le_bytes(value[9..13].try_into().unwrap()),
-                        i32::from_le_bytes(value[13..17].try_into().unwrap()),
+                        i32::from_le_bytes(value[1..5].try_into().unwrap()),
+                        u32::from_le_bytes(value[5..9].try_into().unwrap()),
+                        i32::from_le_bytes(value[9..13].try_into().unwrap()),
                     );
                 },
+                core::PACKET_CHECKED_UPDATE => unsafe {
+                    events::checked_update(
+                        i32::from_le_bytes(value[1..5].try_into().unwrap()),
+                        usize::from_le_bytes(value[5..13].try_into().unwrap()),
+                    );
+                },
+
                 _ => {
                     println!("invalid packet type {:?}", value);
                 }
@@ -367,6 +386,16 @@ pub extern "C" fn get_base_animal(id: i32) -> *mut core::BaseAnimal {
             .cast_mut()
     })
 }
+#[no_mangle]
+pub extern "C" fn get_base(c_id: u32, id: i32) -> *mut core::Base {
+    match c_id {
+        core::Class_id_Class_BaseElement => get_base_element(id) as *mut core::Base,
+        core::Class_id_Class_BasePlant => get_base_plant(id) as *mut core::Base,
+        core::Class_id_Class_BaseAnimal => get_base_animal(id) as *mut core::Base,
+        _ => panic!("get_base: wrong c_id"),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

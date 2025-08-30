@@ -11,7 +11,6 @@ impl ParseCallbacks for MacroCallback {
         let mut der = vec![];
         let ser = vec![
             "Color",
-            "BaseElement",
             "BasePlant",
             "BaseAnimal",
             "Element",
@@ -22,23 +21,37 @@ impl ParseCallbacks for MacroCallback {
             "Property",
             "Scroll",
             "Npc",
+            "Solid",
+            "Property",
+            "BaseElement",
         ];
         let debug = vec![
             "Element",
             "Plant",
             "Animal",
-            "Product",
             "Ingredient",
+            "Product",
             "InventoryElement",
             "Scroll",
             "Player",
             "Npc",
+        ];
+        let copy = vec![
+            "BaseElement",
+            "BaseAnimal",
+            "BasePlant",
+            "Solid",
+            "Base",
+            "Edible",
         ];
         if ser.contains(&info.name) {
             der.append(&mut vec![String::from("serde::Deserialize")]);
         }
         if debug.contains(&info.name) {
             der.append(&mut vec![String::from("Debug, Clone, Copy")])
+        }
+        if copy.contains(&info.name) {
+            der.append(&mut vec![String::from("Clone, Copy")])
         }
         // if info.name == "Test" {
         //     vec!["PartialEq".into()]

@@ -9,6 +9,8 @@ pushd ../core/alchemist
 ./generate_files.sh
 popd
 
+./update_network_bindings.sh
+
 cd build
 cmake -DMULTI_USER=${MULTI_USER} ..
 

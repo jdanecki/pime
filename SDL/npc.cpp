@@ -18,7 +18,7 @@ SDL_Texture * create_npc_texture()
     Uint8 mask_g = c.g;
     Uint8 mask_b = c.b;
     SDL_Surface * surface = SDL_CreateRGBSurface(0, 32, 32, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-    SDL_BlitSurface(Texture.player_surface, NULL, surface, NULL);
+    SDL_BlitSurface(Player_textures.npc, NULL, surface, NULL);
     SDL_LockSurface(surface);
 
     SDL_PixelFormat * fmt = surface->format;
@@ -55,6 +55,7 @@ NpcSDL::NpcSDL(Npc data) : Npc(data)
     h = 32;
     texture = create_npc_texture();
 }
+
 
 int npc(menu_actions a)
 {
@@ -112,7 +113,7 @@ int npc(menu_actions a)
             switch (sentence->id)
             {
                 case NPC_Ask_do_you_know_inv_item:
-                    menu_dialog->add(sentence->text, sentence->id,  player->hotbar[active_hotbar], sentence);
+                    menu_dialog->add(sentence->text, sentence->id, player->hotbar[active_hotbar], sentence);
                     break;
                 case NPC_Ask_do_you_know_item:
                     menu_dialog->add(sentence->text, sentence->id, item_at, sentence);

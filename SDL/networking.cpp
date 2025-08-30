@@ -6,10 +6,10 @@
 #include "../core/world.h"
 #include "implementations/BeingSDL.h"
 #include "implementations/alchemistSDL.h"
-#include "text.h"
-#include <cstdlib>
 #include <cstring>
 #include <stdio.h>
+
+void print_status(int l, const char * format, ...);
 
 #define PLAYER_NUM 16
 extern Player * players[PLAYER_NUM];
@@ -124,12 +124,29 @@ InventoryElement * el_from_data(const ObjectData * data)
 
 extern "C"
 {
-
-    void knowledge_update(size_t pl_id, Class_id cid, int id)
+    void knowledge_update(int pl_id, Class_id cid, int id)
     {
-        printf("knowledge update for %ld cid=%s id=%d\n", pl_id, class_name[cid], id);
+        if (pl_id != player->get_id())
+            return;
+
+        printf("knowledge update for player %d cid=%s id=%d\n", pl_id, class_name[cid], id);
+        Player * p = players[pl_id];
+        if (!p)
+            return;
+        p->set_known(cid, id);
     }
 
+    void checked_update(int pl_id, size_t el)
+    {
+        if (pl_id != player->get_id())
+            return;
+
+        printf("checked update for player %d el=%lx\n", pl_id, el);
+        Player * p = players[pl_id];
+        if (!p)
+            return;
+        p->set_checked(el);
+    }
     void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y, int thirst, int hunger)
     {
         // DEPRECATED
@@ -282,13 +299,13 @@ extern "C"
         {
             case ItemLocation::Tag::Chunk:
             {
-                /*     printf("SDL: update item location %s:%s on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
+                     /*printf("SDL: update item location %s:%s on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
                          el->get_class_name(), el->get_name(),
                          old_loc.chunk.map_x, old_loc.chunk.map_y,
                          old_loc.chunk.x, old_loc.chunk.y,
                          new_loc.chunk.map_x, new_loc.chunk.map_y,
                          new_loc.chunk.x, new_loc.chunk.y);
-                  */
+*/
                 ItemLocation old_l;
                 ItemLocation new_l;
                 old_l.chunk.x = old_loc.chunk.x;
@@ -301,7 +318,6 @@ extern "C"
             }
             case ItemLocation::Tag::Player:
             {
-                // printf("added %ld to player %ld\n", id, new_loc.player.id);
                 Player* p = (Player*)get_object_by_id(new_loc.player.id);
                 if (p)
                     p->pickup(el);
@@ -358,8 +374,9 @@ extern "C"
             printf("SDL: destroy_object %ld", id);
             delete el;
         }
-        else
-            printf("SDL: deleting inexisting item %ld\n", id);
+        // else
+        //  item on not loaded chunk
+        //     printf("SDL: deleting inexisting item %ld\n", id);
     }
 
     void failed_craft()
@@ -372,4 +389,3 @@ extern "C"
         print_status(1, "action failed");
     }
 }
-

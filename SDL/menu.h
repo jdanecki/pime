@@ -13,10 +13,13 @@ enum menu_actions
     MENU_SAVE,
     MENU_LOAD,
     MENU_HELP,
+    MENU_DEBUG,
     MENU_REGAIN,
     MENU_LOUDER,
     MENU_QUIETER,
     MENU_MUSIC,
+
+    MENU_INVENTORY,
     MENU_INV_ELEMENTS,
     MENU_INV_INGREDIENTS,
     MENU_INV_PRODUCT,
@@ -33,10 +36,17 @@ enum menu_actions
     MENU_DRINK,
     MENU_EAT,
     MENU_READ,
+    MENU_CHECK,
+
+    MENU_KNOWLEDGE,
+    MENU_KNOWLEDGE_ELEMENTS,
+    MENU_KNOWLEDGE_PLANTS,
+    MENU_KNOWLEDGE_ANIMALS,
 
     MENU_ITEMS_GROUP,
     MENU_CLASSES,
 
+    MENU_NPC,
     MENU_NPC_SAY,
     MENU_NPC_ASK,
 
@@ -47,24 +57,25 @@ enum menu_actions
 
 class Menu_entry : public ListElement
 {
-  public:    
+  public:
     char * entry;
     bool dynamic_entry;
     enum menu_actions action;
     int value;
     InventoryElement * el;
-    Sentence * sentence;    
-    Menu_entry(const char * e, enum menu_actions a,  InventoryElement * _el, int v, Sentence * s);
+    Sentence * sentence;
+    Menu_entry(const char * e, enum menu_actions a, InventoryElement * _el, int v, Sentence * s);
     ~Menu_entry();
 };
 
 class Menu
 {
     int index;
+
   public:
-    const char * name;    
-    Menu_entry *menu_pos;
-    ElementsList *entries;
+    const char * name;
+    Menu_entry * menu_pos;
+    ElementsList * entries;
 
     Menu(const char * n);
     ~Menu();
@@ -88,7 +99,6 @@ class Menu
 extern Menu * menu_main;
 extern Menu * menu_energy;
 extern Menu * menu_help;
-extern Menu * menu_help2;
 extern Menu * current_menu;
 extern Menu * menu_npc;
 extern Menu * menu_dialog;

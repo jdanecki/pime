@@ -3,6 +3,7 @@
 
 Meat::Meat(InventoryElement * from) : IngredientServer(from, ING_MEAT, Form_solid)
 {
+
 }
 
 bool Meat::action(Product_action action, Player * pl)

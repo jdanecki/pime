@@ -61,80 +61,6 @@ void key_pressed(int key)
             sprintf(status_line, " ");
             break;
 
-        /*case SDLK_SEMICOLON:
-        {
-            InventoryElement * el = player.hotbar[active_hotbar];
-            if (el)
-                el->show(true);
-            InventoryElement ** at_ppos = get_item_at_ppos(&player);
-
-            if (at_ppos)
-            {
-                el = *at_ppos;
-                if (el)
-                    el->show(true);
-            }
-            Being ** b_at_ppos = get_being_at_ppos(&player);
-            if (b_at_ppos)
-            {
-                Being * b = *b_at_ppos;
-                if (b)
-                    b->show();
-            }
-            Plant ** p_at_ppos = get_plant_at_ppos(&player);
-            if (p_at_ppos)
-            {
-                Plant * p = *p_at_ppos;
-                if (p)
-                    p->show();
-            }
-            Animal ** a_at_ppos = get_animal_at_ppos(&player);
-            if (a_at_ppos)
-            {
-                Animal * a = *a_at_ppos;
-                if (a)
-                    a->show();
-            }
-            Object ** o_at_ppos = get_object_at_ppos(&player);
-            if (o_at_ppos)
-            {
-                Object * o = *o_at_ppos;
-                if (o)
-                    o->show();
-            }
-        }
-        break;
-
-        case SDLK_f:
-        {
-            InventoryElement * el = player.hotbar[active_hotbar];
-            if (el)
-            {
-                Edible * edible = el->get_edible();
-                if (edible)
-                {
-                    player.thirst+=edible->irrigation;
-                    player.hunger+=edible->caloric;
-                    player.inventory->remove(el);
-                    player.hotbar[active_hotbar]=NULL;
-                    sprintf(status_line, "eat");
-                    status_code = 1;
-                    if (edible->poison)
-                    {
-                        player.thirst-=edible->poison*10;
-                        player.hunger-=edible->poison*10;
-                        sprintf(status_line, "eat: GOT POISONED");
-                    }
-                }
-                else
-                {
-                    sprintf(status_line, "eat: not food");
-                    status_code = 0;
-                }
-            }
-
-            break;
-        }*/
         case SDLK_F11:
             update_window_size();
             break;
@@ -218,7 +144,7 @@ void key_pressed(int key)
             break;
 
         case SDLK_F5:
-            trace_network ^= true;
+            trace_network += 1;
             break;
         case SDLK_F6:
             server_action_tile(SERVER_TRACE_NETWORK, player->location);
@@ -236,67 +162,15 @@ void key_pressed(int key)
     }
 }
 
-void mouse_pressed(SDL_MouseButtonEvent & event)
+void mouse_pressed(SDL_MouseButtonEvent * event)
 {
-    /*   switch (event.button.button)
-    {
-        case 1: break;
-        case 2: break;
-        case 3: break;
-    }
- */
-    InventoryElement * el = player->hotbar[active_hotbar];
-    int x = 0;
-    int y = 0;
-
-    SDL_GetMouseState(&x, &y);
-    hotbar.press(x, y, event.button == 3 ? true : false);
+    hotbar.press(event->x, event->y, event->button);
     if (d_craft.show)
     {
-        d_craft.press(x, y);
+        d_craft.press(event->x, event->y, event->button);
         return;
     }
-
-    int tile_dungeon_size;
-    int width = window_width - PANEL_WINDOW;
-
-    if (width < window_height)
-    {
-        tile_dungeon_size = width / (CHUNK_SIZE);
-    }
-    else
-    {
-        tile_dungeon_size = window_height / (CHUNK_SIZE);
-    }
-
-    int tile_x = x / tile_dungeon_size;
-    int tile_y = y / tile_dungeon_size;
-
-    if (tile_x < CHUNK_SIZE && tile_y < CHUNK_SIZE)
-    {
-        if (el)
-        {
-            // if (el->use(player->map_x, player->map_y, tile_x, tile_y)) break;
-            // if (plant_with_seed(el, player->map_x, player->map_y, tile_x, tile_y)) break;
-            //  TODO
-            /*if ((Element *)el && (Element *)el->get_base() && ((Element *)el)->get_base()->id == ID_WATER)
-            {
-                if (Plant ** pp = get_plant_at(player->map_x, player->map_y, tile_x, tile_y))
-                {
-                    if (Plant * p = *pp)
-                    {
-                        p->water += 100;
-                        player->inventory->remove(el);
-                        player->hotbar[active_hotbar]=NULL;
-                        free(el);
-                        break;
-                    }
-                }
-            }*/
-        }
-        use_tile(player->location);
-    }
-    printf("mouse %d,%d %d %d,%d\n", event.x, event.y, event.button, tile_x, tile_y);
+    printf("mouse %d,%d %d \n", event->x, event->y, event->button);
 }
 
 Uint64 handle_keyboard_state(const Uint8 * keys)
@@ -396,7 +270,7 @@ bool handle_SDL_events()
 
         if (event.type == SDL_MOUSEBUTTONDOWN)
         {
-            mouse_pressed(event.button);
+            mouse_pressed(&event.button);
         }
     }
     const Uint8 * currentKeyState = SDL_GetKeyboardState(NULL);

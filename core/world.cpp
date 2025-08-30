@@ -62,17 +62,6 @@ int get_tile_at(ItemLocation loc)
 
 
 //FIXME do we stil need these get_*_at functions?
-// Being ** get_being_at(int chunk_x, int chunk_y, int x, int y)
-// {
-//     // TODO
-//     /*for (int i = 0; i < 128; i++)
-//     {
-//         Being *b = world_table[chunk_y][chunk_x]->beings[i];
-//         if (b)
-//         {
-//             int b_x, b_y;
-//             b->get_posittion(&b_x, &b_y);
-
 //             if (b_x == x && b_y == y)
 //             {
 //                 return &world_table[chunk_y][chunk_x]->beings[i];
@@ -136,7 +125,6 @@ Object ** get_object_at(int chunk_x, int chunk_y, int x, int y)
 //     return get_object_at(player->map_x, player->map_y, player->x, player->y);
 // }
 
-
 Plant ** get_plant_at(int chunk_x, int chunk_y, int x, int y)
 {
     // TODO
@@ -187,15 +175,4 @@ InventoryElement * get_item_at_ppos(Player * player)
     return get_item_at(player->location);
 }
 
-void set_item_at(InventoryElement * item, int chunk_x, int chunk_y, int x, int y)
-{
-    // TODO
-    /*for (int i = 0; i < 128; i++)
-    {
-        if (!world_table[chunk_y][chunk_x]->items[i])
-        {
-            world_table[chunk_y][chunk_x]->items[i] = item;
-            break;
-        }
-    }*/
-}
+// FIXME do we need these functions

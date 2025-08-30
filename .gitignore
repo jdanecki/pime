@@ -2,3 +2,8 @@ tags
 build
 doc
 core/alchemist/generated
+SDL/networking_gen.h
+core/packet_types.cpp
+core/packet_types.h
+core/alchemist/skills_names.h
+core/alchemist/skills_type.h

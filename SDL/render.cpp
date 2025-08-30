@@ -36,21 +36,24 @@ void draw_texts()
     sprintf(text, "Hunger=%d Thirst=%d", player->hunger, player->thirst);
     write_text(tx, ty, text, (player->hunger < 100 || player->thirst < 100) ? Red : White, 15, 30);
 
-    sprintf(text, "%d,%d/%d,%d", left_chunk_x, top_chunk_y, right_chunk_x, bottom_chunk_y);
+    sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), clan_names[player->clan->id], player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y);
     write_text(tx, window_height - 150, text, White, 15, 30);
-
-    ty += 25;
 
     InventoryElement * item = get_item_at_ppos(player);
     if (item)
     {
-
+        Class_id el_cid = item->get_cid();
         char * t = player->get_el_description(item);
-        if (t)
+        if (!t)
         {
-            write_text(tx, ty, t, White, 15, 30);
-            delete[] t;
-            ty += 25;
+            t = new char[256];
+            sprintf(t, "It looks like %s %s ", el_cid == Class_Element ? item->get_form_name() : " ", item->get_class_name());
+        }
+        print_status(1, t);
+        delete[] t;
+        if (player->checked_element == item->uid)
+        {
+            ty += 30;
             int count = 0;
             Property ** props = item->get_properties(&count);
             char buf[64];
@@ -60,34 +63,10 @@ void draw_texts()
                 {
                     sprintf(buf, "%s: %u", props[i]->name.str, props[i]->value);
                     write_text(tx, ty, buf, White, 15, 30);
-                    ty += 25;
+                    ty += 27;
                 }
                 delete props;
             }
-            Class_id el_cid = item->get_cid();
-            if (el_cid == Class_Element)
-            {
-                sprintf(buf, "it has %s form", item->get_form_name());
-                write_text(tx, ty, buf, White, 15, 30);
-            }
-        }
-        else
-        {
-            t = new char[256];
-            sprintf(t, "It looks like %s", item->get_class_name());
-            write_text(tx, ty, t, White, 15, 30);
-            Class_id el_cid = item->get_cid();
-            ty += 25;
-            if (el_cid == Class_Element)
-            {
-                sprintf(t, "it has %s form", item->get_form_name());
-                write_text(tx, ty, t, White, 15, 30);
-                ty += 25;
-            }
-            if (el_cid != Class_Ingredient && el_cid != Class_Product)
-                write_text(tx, ty, "I don't know what it's exactly", White, 15, 30);
-
-            delete[] t;
         }
     }
 }
@@ -175,6 +154,33 @@ void draw_maps()
 }
 #endif
 
+chunk * check_chunk(int cx, int cy)
+{
+    if (cx < 0 || cy < 0 || cx >= WORLD_SIZE || cy >= WORLD_SIZE)
+        return nullptr;
+
+    chunk * ch = world_table[cy][cx];
+    if (!ch)
+    {
+        if (loaded_chunks[cy][cx] == CHUNK_NOT_LOADED)
+        {
+            send_packet_request_chunk(client, cx, cy);
+            loaded_chunks[cy][cx] = CHUNK_LOADING;
+            return nullptr;
+        }
+        else
+        {
+            printf("waiting for chunk %d %d\n", cx, cy);
+            return nullptr;
+        }
+    }
+    else
+    {
+        loaded_chunks[cy][cx] = CHUNK_LOADED;
+    }
+    return ch;
+}
+
 bool draw_terrain()
 {
     width = window_width - PANEL_WINDOW;
@@ -207,28 +213,9 @@ bool draw_terrain()
     {
         for (int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
         {
-            if (cx < 0 || cy < 0 || cx >= WORLD_SIZE || cy >= WORLD_SIZE)
-                return false;
+            chunk * ch=check_chunk(cx, cy);
+           if (!ch) return false;
 
-            chunk * ch = world_table[cy][cx];
-            if (!ch)
-            {
-                if (loaded_chunks[cy][cx] == CHUNK_NOT_LOADED)
-                {
-                    send_packet_request_chunk(client, cx, cy);
-                    loaded_chunks[cy][cx] = CHUNK_LOADING;
-                    return false;
-                }
-                else
-                {
-                    printf("waiting for chunk %d %d\n", cx, cy);
-                    return false;
-                }
-            }
-            else
-            {
-                loaded_chunks[cy][cx] = CHUNK_LOADED;
-            }
             for (int ty = 0; ty < CHUNK_SIZE; ++ty)
             {
                 for (int tx = 0; tx < CHUNK_SIZE; ++tx)
@@ -302,12 +289,12 @@ void draw_players()
     if (player->running)
     {
         SDL_Rect running_icon_rect = {(int)(game_size - (icon_size * 1.1)), 0, icon_size, icon_size};
-        SDL_RenderCopy(renderer, Texture.run_icon, NULL, &running_icon_rect);
+        SDL_RenderCopy(renderer, Player_textures.run_icon, NULL, &running_icon_rect);
     }
     if (player->sneaking)
     {
         SDL_Rect sneaking_icon_rect = {(int)(game_size - (icon_size * 1.1)), 0, icon_size, icon_size};
-        SDL_RenderCopy(renderer, Texture.sneak_icon, NULL, &sneaking_icon_rect);
+        SDL_RenderCopy(renderer, Player_textures.sneak_icon, NULL, &sneaking_icon_rect);
     }
 }
 
