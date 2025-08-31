@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include "properties.h"
 #include "item_location.h"
+#include "serialization.h"
 
 enum Class_id
 {
@@ -86,7 +87,6 @@ class BaseElement : public Base
     Property density;
     Solid solid;
 
-
     BaseElement(Form f, int index);
     void show(bool details = true);
 };
@@ -147,7 +147,6 @@ class InventoryElement
     {
         return c_id;
     }
-
 
 #ifndef CORE_FOR_CLIENT
 
@@ -234,18 +233,6 @@ class Object : public InventoryElement
     }
 };
 
-template <typename T> class SerializablePointer
-{
-    T * ptr;
-
-  public:
-    SerializablePointer(T * p);
-    T * get()
-    {
-        return ptr;
-    }
-};
-
 class Scroll : public InventoryElement
 {
     SerializablePointer<Base> base;
@@ -300,6 +287,12 @@ class Element : public InventoryElement
     {
         return base.get();
     }
+#ifdef USE_ENET
+    void set_base(BaseElement * b)
+    {
+        base.set(b);
+    }
+#endif
     void show(bool details = true) override;
     Element(BaseElement * b);
     Form get_form() override

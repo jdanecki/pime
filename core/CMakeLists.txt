@@ -5,7 +5,13 @@ set(CMAKE_BUILD_TYPE Debug)
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 
-add_library(pime SHARED
+if(USE_ENET)
+    set(PIME_TARGET_NAME pime_enet)
+else()
+    set(PIME_TARGET_NAME pime)
+endif()
+
+add_library(${PIME_TARGET_NAME} SHARED
     world.cpp 
     player.cpp 
     tiles.cpp 
@@ -19,7 +25,11 @@ add_library(pime SHARED
     alchemist/npc_talk.cpp
     alchemist/properties.cpp
     alchemist/skills.cpp
-    CMakeLists.txt
+    alchemist/serialization.cpp
 	)
 
-target_link_libraries(pime)
+if(USE_ENET)
+    target_compile_definitions(${PIME_TARGET_NAME} PRIVATE USE_ENET)
+endif()
+
+

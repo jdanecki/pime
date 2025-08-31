@@ -74,7 +74,7 @@ InventoryElement * remove_from_location(ItemLocation location, size_t id)
     return el;
 }
 
-InventoryElement * el_from_data(const ObjectData * data)
+InventoryElement * el_from_data(ObjectData * data)
 {
     InventoryElement * el = nullptr;
     switch (data->tag)
@@ -82,8 +82,10 @@ InventoryElement * el_from_data(const ObjectData * data)
         case ObjectData::Tag::InvElement:
             break;
         case ObjectData::Tag::Element:
+        {
             el = new ElementSDL(data->element.data);
             break;
+        }
         case ObjectData::Tag::Scroll:
             el = new ScrollSDL(data->scroll.data);
             break;
@@ -272,12 +274,12 @@ extern "C"
         {
             case ItemLocation::Tag::Chunk:
             {
-                     /*printf("SDL: update item location %s:%s on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
-                         el->get_class_name(), el->get_name(),
-                         old_loc.chunk.map_x, old_loc.chunk.map_y,
-                         old_loc.chunk.x, old_loc.chunk.y,
-                         new_loc.chunk.map_x, new_loc.chunk.map_y,
-                         new_loc.chunk.x, new_loc.chunk.y);
+                /*printf("SDL: update item location %s:%s on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
+                    el->get_class_name(), el->get_name(),
+                    old_loc.chunk.map_x, old_loc.chunk.map_y,
+                    old_loc.chunk.x, old_loc.chunk.y,
+                    new_loc.chunk.map_x, new_loc.chunk.map_y,
+                    new_loc.chunk.x, new_loc.chunk.y);
 */
                 ItemLocation old_l;
                 ItemLocation new_l;
@@ -301,7 +303,7 @@ extern "C"
         }
     }
 
-    void create_object(const ObjectData * data)
+    void create_object(ObjectData * data)
     {
         InventoryElement * el = el_from_data(data);
         if (el)

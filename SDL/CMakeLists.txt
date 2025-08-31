@@ -16,8 +16,13 @@ add_definitions(-DCORE_FOR_CLIENT)
 
 set(CORE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../core)
 set(CORE_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/core)
+set(CORE_ENET_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/core-enet)
 
+set(USE_ENET OFF)
 add_subdirectory(${CORE_SOURCE_DIR} ${CORE_BINARY_DIR})
+
+set(USE_ENET ON)
+add_subdirectory(${CORE_SOURCE_DIR} ${CORE_ENET_BINARY_DIR})
 
 set(MULTI_USER 1)
 
@@ -40,7 +45,6 @@ set(SHARED_LIBRARIES
      SDL2 SDL2_image SDL2_ttf SDL2_mixer
     ${SDL_LDFLAGS} ${SDL2_MIXER_LDFLAGS}
     m 
-    pime
 )
 
 add_executable(pime_SDL ${SHARED_SOURCES})
@@ -65,11 +69,12 @@ if (MULTI_USER)
 endif()
 
 target_link_libraries(pime_SDL
-    ${SHARED_LIBRARIES} ${NETWORKING_LIB}
+    pime ${SHARED_LIBRARIES} ${NETWORKING_LIB}
 )
 
 add_executable(pime_SDL_enet ${SHARED_SOURCES} ../tui/enet/net.cpp)
+target_compile_definitions(pime_SDL_enet PRIVATE USE_ENET)
 target_link_libraries(pime_SDL_enet
-    ${SHARED_LIBRARIES} enet
+    pime_enet ${SHARED_LIBRARIES} enet
 )
 

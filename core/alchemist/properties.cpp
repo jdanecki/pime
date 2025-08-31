@@ -1,16 +1,10 @@
 #include "properties.h"
 #include <stdlib.h>
 #include "../clan.h"
+#include <cstring>
 
-SerializableCString::SerializableCString(const char * ptr) : str(ptr)
+Edible::Edible() : irrigation("irrigation", rand() % 500), poison("poison", 1 + rand() % 250), caloric("caloric", rand() % 1000)
 {
-}
-
-Edible::Edible():
-    irrigation("irrigation", rand() % 500),
-    poison("poison", 1 + rand() % 250),
-    caloric("caloric", rand() % 1000)
-{    
     set_random();
 }
 
@@ -22,7 +16,7 @@ void Edible::show()
 {
     printf("      *** Edible ***\n");
     printf("eating by: %d -> ", eating_by);
-    for (int i=0; i < 5; i++)
+    for (int i = 0; i < 5; i++)
     {
         if (eating_by & (1 << i))
             printf("%s ", clan_names[i]);

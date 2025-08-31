@@ -3,14 +3,7 @@
 
 #include <cstdio>
 #include <stdlib.h>
-
-/// <div rustbindgen nodebug></div>
-class SerializableCString
-{
-  public:
-    const char * str;
-    SerializableCString(const char * ptr);
-};
+#include "serialization.h"
 
 class Property
 {
@@ -40,14 +33,17 @@ class Property
 class Edible
 {
   public:
-    Property  irrigation;
-    Property  poison;
-    Property  caloric;
+    Property irrigation;
+    Property poison;
+    Property caloric;
     int eating_by; // bit value 1 means edible for clanId, we use bits 0-4
 
     Edible();
     ~Edible();
-    void set_random() { eating_by = rand() % 16; }
+    void set_random()
+    {
+        eating_by = rand() % 16;
+    }
     void show();
 };
 

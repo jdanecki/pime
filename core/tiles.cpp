@@ -53,5 +53,5 @@ void chunk::show()
 {
     printf("chunk[%d, %d] obj=%d bei=%d\n", map_x, map_y, objects.nr_elements, beings.nr_elements);
     if (objects.nr_elements)
-        objects.show(false);
+        objects.show(true);
 }
