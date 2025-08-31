@@ -1,22 +1,17 @@
-#include "hut.h"
+#include "tools.h"
 
 Hut::Hut(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_HUT, Form_solid)
 {
     actions = ACT_NOTHING;
 }
 
-bool Hut::check_ing()
+ProductServer * Hut::Hut::createHut(InventoryElement * el1, InventoryElement * el2)
 {
-    int id1 = ings[0]->get_id();
-    int id2 = ings[1]->get_id();
+    int id1 = el1->get_id();
+    int id2 = el2->get_id();
 
     if (id1 == ING_WALL && id2 == ING_WALL)
-        return true;
+        return new Hut(el1, el2);
     printf(" wrong ingredients\n");
-    return false;
-}
-
-ProductServer * createHut(InventoryElement * el1, InventoryElement * el2)
-{
-    return new Hut(el1, el2);
+    return nullptr;
 }

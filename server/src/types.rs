@@ -11,6 +11,7 @@ pub struct LocationUpdateData {
 
 #[repr(C)]
 #[derive(Serialize)]
+#[allow(dead_code)]
 pub enum ObjectData {
     InvElement { data: core::InventoryElement },
     Element { data: core::Element },
@@ -19,6 +20,8 @@ pub enum ObjectData {
     Ingredient { data: core::Ingredient },
     Product { data: core::Product },
     Scroll { data: core::Scroll },
+    Player { data: core::Player },
+    Npc { data: core::Npc },
 }
 
 #[repr(C)]
@@ -59,16 +62,4 @@ pub enum BaseObjectData {
     Element { data: BaseElementData },
     Plant { data: BasePlantData },
     Animal { data: BaseAnimalData },
-}
-
-#[no_mangle]
-extern "C" fn foo() -> ObjectData {
-    ObjectData::InvElement {
-        data: core::InventoryElement {
-            uid: 123,
-            location: core::ItemLocation::Player { id: 1 },
-            vtable_: todo!(),
-            c_id: todo!(),            
-        },
-    }
 }

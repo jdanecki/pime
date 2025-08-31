@@ -1,14 +1,7 @@
 #ifndef CRAFT_PROD_H
 #define CRAFT_PROD_H
 
-#include "../../core/alchemist/elements.h"
-#include "tools/axe.h"
-#include "tools/pickaxe.h"
-#include "tools/knife.h"
-#include "tools/hut.h"
-#include "tools/fire.h"
-#include "tools/roasted_meat.h"
-#include "tools/fruit_salad.h"
+#include "elements_server.h"
 
 InventoryElement * craft_prod(int product_id, InventoryElement * el1, InventoryElement * el2);
 

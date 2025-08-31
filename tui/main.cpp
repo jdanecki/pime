@@ -133,11 +133,10 @@ bool do_key_question_mark(char k)
             };
             break;
         case 'c':
-            if (world_table[player->map_y][player->map_x])
-                world_table[player->map_y][player->map_x]->show();
+            show_chunk(player->location);
             break;
         case 'C':
-            server_action_tile(SERVER_SHOW_CHUNK, player->map_x, player->map_y, player->x, player->y);
+            server_action_tile(SERVER_SHOW_CHUNK, player->location);
             break;
         case 'e':
         {
@@ -149,7 +148,7 @@ bool do_key_question_mark(char k)
             break;
         }
         case 'E':
-            server_action_tile(SERVER_SHOW_ITEM, player->map_x, player->map_y, player->x, player->y);
+            server_action_tile(SERVER_SHOW_ITEM, player->location);
             break;
         case 'h':
             help_question_mark();
@@ -204,7 +203,7 @@ bool do_key_main(char k)
     {
         case 'T':
         {
-            server_action_tile(SERVER_TRACE_NETWORK, player->map_x, player->map_y, player->x, player->y);
+            server_action_tile(SERVER_TRACE_NETWORK, player->location);
             break;
         }
         case 't':
@@ -304,36 +303,50 @@ unsigned long get_time_usec()
 void loop()
 {
     print_status(0, "Welcome in PIME - TUI version for debug!");
-    unsigned int total_recv=0;
+    unsigned int total_recv = 0;
+    static const char * name = nullptr;
+    if (!name)
+    {
+        if (!player->name.str[0])
+        {
+            name = (const char *)malloc(16);
+            strcpy((char *)name, "unknown");
+        }
+        else
+            name = player->get_name();
+    }
 
     for (;;)
     {
-        printf("\r%s@[%d,%d][%d,%d] %c: ", player->get_name(),
-            player->map_x, player->map_y, player->x, player->y,
-            submenu ? submenu : '#');
+        printf("\r%s@[%d,%d][%d,%d] %c: ", name, // player->get_name(),
+            player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y, submenu ? submenu : '#');
+
         char c = check_key();
         if (c)
         {
             if (do_key(c))
                 break;
         }
-        unsigned long start=get_time_usec();
+        unsigned long start = get_time_usec();
         unsigned int recv = 0;
 
         if (use_network)
         {
-            recv=network_tick(client);
+            recv = network_tick(client);
         }
         total_recv += recv;
 
-        unsigned long stop=get_time_usec();
-        if (recv > max_recv) max_recv = recv;
-        if (stop - start > max_time) max_time = stop - start;
-        if (recv && show_received) printf("recv: %u/%u max=%u time=%lu us/%lu ms\n", recv, total_recv, max_recv, stop-start, max_time / 1000);
+        unsigned long stop = get_time_usec();
+        if (recv > max_recv)
+            max_recv = recv;
+        if (stop - start > max_time)
+            max_time = stop - start;
+        if (recv && show_received)
+            printf("recv: %u/%u max=%u time=%lu us/%lu ms\n", recv, total_recv, max_recv, stop - start, max_time / 1000);
 
-        check_chunk(player->map_x, player->map_y);
-        long w = 20000 - (stop - start) ;
-        if (w > 0 && ! c)
+        check_chunk(player->location.chunk.map_x, player->location.chunk.map_y);
+        long w = 20000 - (stop - start);
+        if (w > 0 && !c)
             usleep(w);
     }
 }
@@ -348,7 +361,7 @@ int main(int argc, char * argv[])
         printf("using localhost 127.0.0.1\n");
         ip = "127.0.0.1";
     }
-    else 
+    else
     {
         ip = argv[1];
     }

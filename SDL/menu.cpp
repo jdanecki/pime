@@ -682,16 +682,16 @@ int Menu::interact()
             return 0;
 
         case MENU_DRINK:
-            action_tile(PLAYER_DRINK);
+            action_tile(PLAYER_DRINK, player->location);
             return 0;
         case MENU_EAT:
-            action_tile(PLAYER_EAT);
+            action_tile(PLAYER_EAT, player->location);
             return 0;
         case MENU_READ:
-            action_tile(PLAYER_READ);
+            action_tile(PLAYER_READ, player->location);
             return 0;
         case MENU_CHECK:
-            action_tile(PLAYER_CHECK);
+            action_tile(PLAYER_CHECK, player->location);
             return 0;
 
         default:

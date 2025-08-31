@@ -36,7 +36,8 @@ void draw_texts()
     sprintf(text, "Hunger=%d Thirst=%d", player->hunger, player->thirst);
     write_text(tx, ty, text, (player->hunger < 100 || player->thirst < 100) ? Red : White, 15, 30);
 
-    sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), clan_names[player->clan->id], player->map_x, player->map_y, player->x, player->y);
+    sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), clan_names[player->clan->id], player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
+        player->location.chunk.y);
     write_text(tx, window_height - 150, text, White, 15, 30);
 
     InventoryElement * item = get_item_at_ppos(player);
@@ -197,8 +198,8 @@ bool draw_terrain()
         tile_dungeon_size = window_height / (CHUNK_SIZE);
     }
 
-    int player_world_x = player->map_x * CHUNK_SIZE + player->x;
-    int player_world_y = player->map_y * CHUNK_SIZE + player->y;
+    int player_world_x = get_world_x(player->location);
+    int player_world_y = get_world_y(player->location);
 
     int left_top_world_x = player_world_x - CHUNK_SIZE / 2;
     int left_top_world_y = player_world_y - CHUNK_SIZE / 2;
@@ -213,8 +214,9 @@ bool draw_terrain()
     {
         for (int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
         {
-            chunk * ch=check_chunk(cx, cy);
-           if (!ch) return false;
+            chunk * ch = check_chunk(cx, cy);
+            if (!ch)
+                return false;
 
             for (int ty = 0; ty < CHUNK_SIZE; ++ty)
             {
@@ -233,7 +235,7 @@ bool draw_terrain()
                         SDL_Rect img_rect = {screen_x * tile_dungeon_size, screen_y * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
 
                         SDL_Texture * texture = tiles_textures[tile % tiles_textures_count];
-                        BaseElement * base=get_base_element(tile);
+                        BaseElement * base = get_base_element(tile);
                         if (base)
                             SDL_SetTextureColorMod(texture, base->color.r, base->color.g, base->color.b);
                         SDL_RenderCopy(renderer, texture, NULL, &img_rect);
@@ -274,6 +276,10 @@ bool draw_terrain()
                         r->render(&img_rect);
                     }
                 }
+                else
+                {
+                    printf("unrenderable %d\n", o->get_cid());
+                }
                 el = el->next;
             }
         }
@@ -283,35 +289,6 @@ bool draw_terrain()
 
 void draw_players()
 {
-    int player_world_x = player->map_x * CHUNK_SIZE + player->x;
-    int player_world_y = player->map_y * CHUNK_SIZE + player->y;
-
-    int left_top_world_x = player_world_x - CHUNK_SIZE / 2;
-    int left_top_world_y = player_world_y - CHUNK_SIZE / 2;
-
-    for (int i = 0; i < PLAYER_NUM; i++)
-    {
-        if (!players[i])
-            continue;
-
-        int pl_world_x = players[i]->map_x * CHUNK_SIZE + players[i]->x;
-        int pl_world_y = players[i]->map_y * CHUNK_SIZE + players[i]->y;
-
-        int screen_x = pl_world_x - left_top_world_x;
-        int screen_y = pl_world_y - left_top_world_y;
-
-        if (screen_x >= 0 && screen_x < CHUNK_SIZE && screen_y >= 0 && screen_y < CHUNK_SIZE)
-        {
-            SDL_Rect img_rect;
-            img_rect = {screen_x * tile_dungeon_size, screen_y * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
-
-            if (players[i]->going_right)
-                SDL_RenderCopy(renderer, Player_textures.player, NULL, &img_rect);
-            else
-                SDL_RenderCopyEx(renderer, Player_textures.player, NULL, &img_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
-        }
-    }
-
     // render GUI
     int icon_size = game_size / 10;
     if (player->running)

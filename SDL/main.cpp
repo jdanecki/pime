@@ -145,7 +145,6 @@ void loop()
     // int dst_map_y=player.map_y;
 
     print_status(0, "Welcome in game!");
-    current_npc = new NpcSDL(Npc());
 
     for (;;)
     {
@@ -176,8 +175,9 @@ int main(int argc, char * argv[])
         printf("usage: ./pime_SDL <ip> [port]\n");
         printf("using localhost 127.0.0.1\n");
         ip = "127.0.0.1";
-    } 
-    else {
+    }
+    else
+    {
         ip = argv[1];
     }
     const char * port;

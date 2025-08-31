@@ -1,18 +1,13 @@
-#include "knife_handle.h"
+#include "tools.h"
 
 KnifeHandle::KnifeHandle(InventoryElement * from) : IngredientServer(from, ING_KNIFE_HANDLE, Form_solid)
 {
 }
 
-bool KnifeHandle::check_ing()
+IngredientServer * KnifeHandle::createKnifeHandle(InventoryElement * from)
 {
-    if (el->get_base_cid() == Class_BaseElement)
-        return true;
+    if (from->get_base_cid() == Class_BaseElement)
+        return new KnifeHandle(from);
     else
-        return false;
-}
-
-IngredientServer * createKnifeHandle(InventoryElement * from)
-{
-    return new KnifeHandle(from);
+        return nullptr;
 }

@@ -148,14 +148,6 @@ class InventoryElement
         return c_id;
     }
 
-#ifndef CORE_FOR_CLIENT
-
-    virtual bool craft()
-    {
-        printf("missing craft function\n");
-        return false;
-    }
-#endif
     int get_x()
     {
         return location.chunk.x;
@@ -430,10 +422,6 @@ class Ingredient : public InventoryElement
         char * buf = new char[128];
         sprintf(buf, "%s: (%s)", get_class_name(), ingredient_name[id]);
         return buf;
-    }
-    virtual bool check_ing()
-    {
-        return false;
     }
     bool action(Product_action action, Player * pl)
     {

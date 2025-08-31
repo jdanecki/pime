@@ -9,6 +9,7 @@ pub struct LocationUpdateData {
     pub new: core::ItemLocation,
 }
 
+#[allow(dead_code)]
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Deserialize)]
 pub enum ObjectData {
@@ -19,6 +20,8 @@ pub enum ObjectData {
     Ingredient { data: core::Ingredient },
     Product { data: core::Product },
     Scroll { data: core::Scroll },
+    Player { data: core::Player },
+    Npc { data: core::Npc },
 }
 
 #[repr(C)]

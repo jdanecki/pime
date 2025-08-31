@@ -214,6 +214,58 @@ impl<'de> serde::Deserialize<'de> for InventoryElement {
     }
 }
 
+impl<'de> serde::Deserialize<'de> for Player {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        struct PlayerVisitor;
+
+        impl<'de> Visitor<'de> for PlayerVisitor {
+            type Value = Player;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("struct Player")
+            }
+
+            fn visit_seq<V>(self, mut seq: V) -> Result<Player, V::Error>
+            where
+                V: SeqAccess<'de>,
+            {
+                let id: usize = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
+                let name: SerializableCString = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
+                let location = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(2, &self))?;
+                let thirst = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(3, &self))?;
+                let hunger = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(4, &self))?;
+                let nutrition = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(5, &self))?;
+                Ok(unsafe {
+                    Player::new(
+                        id as i32,
+                        Box::<SerializableCString>::into_raw(Box::new(name)),
+                        location,
+                        thirst,
+                        hunger,
+                        nutrition,
+                    )
+                })
+            }
+        }
+
+        deserializer.deserialize_tuple(6, PlayerVisitor)
+    }
+}
 // impl<'de> serde::Deserialize<'de> for Property {
 //     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
 //     where

@@ -9,6 +9,7 @@ unsigned int get_packet_size_binding(InventoryElement * el);
 
 extern "C"
 {
+    void notify_update(const InventoryElement * el);
     void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc);
     void notify_destroy(size_t id, ItemLocation location);
     void notify_knowledge(size_t pl_id, Class_id cid, int id);
@@ -119,14 +120,7 @@ class PlantServer : public Plant, public BeingServer
         planted = 1;
         change_phase(Plant_seedling);
     }
-    void change_phase(Plant_phase p)
-    {
-        if (phase != p)
-        {
-            //   printf("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
-        }
-        phase = p;
-    }
+    void change_phase(Plant_phase p);
     bool action(Product_action action, Player * pl) override
     {
         Plant::action(action, pl);
@@ -146,7 +140,6 @@ class IngredientServer : public Ingredient
 
   public:
     InventoryElement * el;
-    bool craft() override;
     IngredientServer(InventoryElement * from, Ingredient_id i, Form f);
     bool action(Product_action action, Player * pl) override;
     bool can_pickup() override
@@ -160,7 +153,6 @@ class ProductServer : public Product
   public:
     int ing_count;
     InventoryElement ** ings;
-    bool craft() override;
 
     void init(Product_id i, int c, Form f);
     ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id i, Form f);

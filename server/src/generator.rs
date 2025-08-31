@@ -4,6 +4,7 @@ use std::hash::Hash;
 use std::rc::Rc;
 
 use crate::core;
+use crate::core::InventoryElement;
 use crate::SEED;
 use rand::prelude::*;
 
@@ -51,7 +52,7 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
             .unwrap();
         unsafe {
             println!("SERV: load_chunk map_x={} map_y={}", map_x, map_y);
-//            println!("SERV: load_chunk map_x={} map_y={}  {:#?}", map_x, map_y, region);
+            //            println!("SERV: load_chunk map_x={} map_y={}  {:#?}", map_x, map_y, region);
             let mut chunk = Box::new(core::chunk::new(map_x, map_y));
             for y in 0..core::CHUNK_SIZE as usize {
                 for x in 0..core::CHUNK_SIZE as usize {
@@ -65,36 +66,40 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
             //println!("{:?}", region.rocks_types);
             for (rock, num) in region.rocks_types.iter() {
                 // TODO remove +1 for each object
-                let prob = num * 10.0 + 1.0;
-//                println!("element {prob} {:?}", rock);
+                let prob = num * 3.0 + 1.0;
+                //                println!("element {prob} {:?}", rock);
                 do_times(prob, || {
                     chunk.add_object1(core::create_element(rock.get_base()
                         as *const core::BaseElement
                         as *mut core::BaseElement)
                         as *mut core::InventoryElement);
                 });
-                let prob_scroll=2.0; 
+                let prob_scroll = 2.0;
                 do_times(prob, || {
                     chunk.add_object1(core::create_scroll(rock.get_base()
                         as *const core::BaseElement
-                        as *mut core::BaseElement as *mut core::Base)
+                        as *mut core::BaseElement
+                        as *mut core::Base)
                         as *mut core::InventoryElement);
                 });
             }
+
+            chunk.add_object1(core::create_npc() as *mut core::InventoryElement);
+
             for (plant, num) in region.active_plants.iter() {
                 let prob = num / region.size as f32 + 1.0;
                 //println!("plant {prob}");
                 do_times(prob, || {
-                    chunk.add_object1(core::create_plant(plant.get_base() 
-                      as *const core::BasePlant as *mut core::BasePlant) 
-                      as *mut core::InventoryElement);
+                    chunk.add_object1(core::create_plant(
+                        plant.get_base() as *const core::BasePlant as *mut core::BasePlant
+                    ) as *mut core::InventoryElement);
                 });
-                let prob_scroll=2.0; 
+                let prob_scroll = 2.0;
                 do_times(prob_scroll, || {
-                    chunk.add_object1(core::create_scroll(plant.get_base() 
-                        as *const core::BasePlant 
-                        as *mut core::BasePlant as *mut core::Base) 
-                        as *mut core::InventoryElement);
+                    chunk.add_object1(core::create_scroll(
+                        plant.get_base() as *const core::BasePlant as *mut core::BasePlant
+                            as *mut core::Base,
+                    ) as *mut core::InventoryElement);
                 });
             }
             for (animal, num) in region.active_animals.iter() {
@@ -106,11 +111,12 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
                         as *mut core::BaseAnimal)
                         as *mut core::InventoryElement);
                 });
-                let prob_scroll=2.0; 
+                let prob_scroll = 2.0;
                 do_times(prob, || {
                     chunk.add_object1(core::create_scroll(animal.get_base()
                         as *const core::BaseAnimal
-                        as *mut core::BaseAnimal as *mut core::Base)
+                        as *mut core::BaseAnimal
+                        as *mut core::Base)
                         as *mut core::InventoryElement);
                 });
             }
@@ -148,7 +154,7 @@ struct World {
 impl World {
     fn new() -> World {
         let terrains = create_terrains();
-//        println!("{:#?}", terrains);
+        //        println!("{:#?}", terrains);
         let plants = create_plants(&terrains);
         let animals = create_animals(&plants);
         let regions = create_regions(&terrains, &plants, &animals);
@@ -163,7 +169,7 @@ impl World {
 
 pub fn generate() {
     unsafe {
-        SEED = core::time(std::ptr::null_mut());
+        SEED = core::time(std::ptr::null_mut()) as i64;
         println!("{}", SEED);
         core::srand(SEED as u32);
         println!("{}", core::rand());
@@ -197,16 +203,14 @@ pub fn generate() {
         // println!("");
     }
     //    simulate(&mut regions);
-   // println!("{:#?}", world.regions);
+    // println!("{:#?}", world.regions);
 
     WORLD.set(world);
-    for y in 127..=129
-    {
-        for x in 127..=129
-        {
-             load_chunk(x, y);
+    for y in 127..=129 {
+        for x in 127..=129 {
+            load_chunk(x, y);
         }
-    } 
+    }
     //load_chunk(128,128);
 }
 
@@ -645,6 +649,7 @@ impl PlantType {
         }
     }
 
+    #[allow(dead_code)]
     pub fn get_base(&self) -> &core::BasePlant {
         &self.base
     }
@@ -722,6 +727,7 @@ impl AnimalType {
         }
         animal
     }
+    #[allow(dead_code)]
     pub fn get_base(&self) -> &core::BaseAnimal {
         &self.base
     }

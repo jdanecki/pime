@@ -44,18 +44,16 @@ struct PlayerRelation
 class Player : public InventoryElement
 {
     int * padding; // FIXME
-    int id;
-
+#ifdef USE_ENET
+  public:
+#else
   protected:
-    char * name;
+#endif
+    SerializableCString name;
 
     // FIXME
     // add list know players, npc's
   public:
-    int map_y;
-    int map_x;
-    int y;
-    int x;
     char running;
     char sneaking;
     char going_right;
@@ -67,9 +65,9 @@ class Player : public InventoryElement
     InventoryElement * hotbar[10];
     ElementsList * known_elements;
     size_t checked_element;
-    
-    Clan *clan;
-    Skills *player_skills;
+
+    Clan * clan;
+    Skills * player_skills;
 
     int craftbar[10];
     bool in_conversation;
@@ -81,7 +79,8 @@ class Player : public InventoryElement
     void drop(InventoryElement * item);
     InventoryElement * get_item_by_uid(size_t id);
     int get_id();
-    Player(int id);
+    // Player(int id);
+    Player(int id, SerializableCString && name, ItemLocation location, int thirst, int hunger, int nutrition);
     int conversation(Player * who, Sentence * s, InventoryElement * el);
     void stop_conversation();
 
@@ -105,7 +104,7 @@ class Player : public InventoryElement
 
     const char * get_name()
     {
-        return name;
+        return name.str;
     }
     bool set_checked(size_t el);
 };

@@ -3,6 +3,7 @@
 #include "networking.h"
 #include "world_server.h"
 #include "../../core/packet_types.h"
+#include <cstdio>
 
 bool check_and_load_chunk(int new_map_x, int new_map_y)
 {
@@ -23,10 +24,12 @@ bool check_and_load_chunk(int new_map_x, int new_map_y)
 
 void PlayerServer::move(int dx, int dy)
 {
-    int new_x = x + dx;
-    int new_y = y + dy;
-    int new_map_x = map_x;
-    int new_map_y = map_y;
+    ItemLocation old = location;
+    // TODO cleanup
+    int new_x = location.chunk.x + dx;
+    int new_y = location.chunk.y + dy;
+    int new_map_x = location.chunk.map_x;
+    int new_map_y = location.chunk.map_y;
 
     printf("SERV: player move dx=%d dy=%d\n", dx, dy);
 
@@ -50,12 +53,18 @@ void PlayerServer::move(int dx, int dy)
         }
     }
 move_player:
-    map_x = new_map_x;
-    map_y = new_map_y;
-    x = new_x;
-    y = new_y;
+    if (old.chunk.map_x != new_map_x || old.chunk.map_y != new_map_y)
+    {
+        remove_from_chunks(this);
+    }
+    location.chunk.map_x = new_map_x;
+    location.chunk.map_y = new_map_y;
+    location.chunk.x = new_x;
+    location.chunk.y = new_y;
+    add_object_to_world(this, this->location);
     hunger--;
     thirst--;
+    update_location(get_uid(), old, location);
     printf("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
 }
 
@@ -109,7 +118,7 @@ bool PlayerServer::server_action_on_object(Server_action a, InventoryElement * o
                 object->show(true);
             break;
         case SERVER_SHOW_CHUNK:
-            world_table[map_y][map_x]->show();
+            show_chunk(location);
             break;
         case SERVER_TRACE_NETWORK:
             trace_network += 1;
@@ -192,6 +201,18 @@ bool PlayerServer::pickup(InventoryElement * item)
     return true;
 }
 
-PlayerServer::PlayerServer(int id) : Player(id)
+PlayerServer::PlayerServer(int id) : Player(id, SerializableCString("player"), ItemLocation::center(), 1, 2, 3)
 {
+    objects_to_create.add(this);
+    printf("player contrs %d\n", this->c_id);
+}
+
+PlayerServer * create_player(int id)
+{
+    return new PlayerServer(id);
+}
+
+Npc * create_npc()
+{
+    return new Npc(ItemLocation::center());
 }

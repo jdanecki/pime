@@ -1,11 +1,10 @@
-#include "pickaxe_handle.h"
-#include <cstdlib>
+#include "tools.h"
 
-PickAxeHandle::PickAxeHandle(InventoryElement * from) : IngredientServer(from, ING_PICKAXE_HANDLE, Form_solid)
+PickaxeHandle::PickaxeHandle(InventoryElement * from) : IngredientServer(from, ING_PICKAXE_HANDLE, Form_solid)
 {
 }
 
-IngredientServer * createPickAxeHandle(InventoryElement * from)
+IngredientServer * PickaxeHandle::createPickaxeHandle(InventoryElement * from)
 {
-    return new PickAxeHandle(from);
+    return new PickaxeHandle(from);
 }

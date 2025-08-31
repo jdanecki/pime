@@ -1,12 +1,11 @@
-#include "roasted_meat.h"
-#include "../networking.h"
+#include "tools.h"
 
-Roasted_meat::Roasted_meat(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_ROASTED_MEAT, Form_solid)
+RoastedMeat::RoastedMeat(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_ROASTED_MEAT, Form_solid)
 {
     actions = ACT_NOTHING;
 }
 
-bool Roasted_meat::player_action(Player_action action, Player * pl)
+bool RoastedMeat::player_action(Player_action action, Player * pl)
 {
     printf("ROASTED_MEAT: %s %s\n", player_action_name[action], get_name());
 
@@ -21,18 +20,13 @@ bool Roasted_meat::player_action(Player_action action, Player * pl)
     return true;
 }
 
-bool Roasted_meat::check_ing()
+ProductServer * RoastedMeat::createRoastedMeat(InventoryElement * el1, InventoryElement * el2)
 {
-    int id1 = ings[0]->get_id();
-    int id2 = ings[1]->get_id();
+    int id1 = el1->get_id();
+    int id2 = el2->get_id();
 
     if ((id1 == ING_MEAT && id2 == PROD_FIRE) || (id2 == ING_MEAT && id1 == PROD_FIRE))
-        return true;
+        return new RoastedMeat(el1, el2);
     printf(" wrong ingredients\n");
-    return false;
-}
-
-ProductServer * createRoasted_meat(InventoryElement * el1, InventoryElement * el2)
-{
-    return new Roasted_meat(el1, el2);
+    return nullptr;
 }

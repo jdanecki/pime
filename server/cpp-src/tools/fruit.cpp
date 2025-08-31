@@ -1,19 +1,13 @@
-#include "fruit.h"
-#include "../networking.h"
+#include "tools.h"
 
 Fruit::Fruit(InventoryElement * from) : IngredientServer(from, ING_FRUIT, Form_solid)
 {
 }
 
-bool Fruit::check_ing()
+IngredientServer * Fruit::createFruit(InventoryElement * from)
 {
-    if (el->get_base_cid() == Class_BasePlant && dynamic_cast<Plant *>(el)->phase == Plant_fruits)
-        return true;
+    if (from->get_base_cid() == Class_BasePlant && dynamic_cast<Plant *>(from)->phase == Plant_fruits)
+        return new Fruit(from);
     else
-        return false;
-}
-
-IngredientServer * createFruit(InventoryElement * from)
-{
-    return new Fruit(from);
+        return nullptr;
 }

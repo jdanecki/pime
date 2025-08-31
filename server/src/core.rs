@@ -1,5 +1,5 @@
 #![allow(warnings)]
-include!(concat!(env!("OUT_DIR"), "/core_bindings.rs"));
+include!("core_bindings.rs");
 
 include!("../../core/alchemist/item_location.rs");
 
@@ -85,6 +85,22 @@ impl serde::Serialize for InventoryElement {
         state.serialize_element(&self.c_id)?;
         state.serialize_element(&self.uid)?;
         state.serialize_element(&self.location)?;        
+        state.end()
+    }
+}
+
+impl serde::Serialize for Player {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_tuple(6)?;
+        state.serialize_element(&self._base.uid)?;
+        state.serialize_element(&self.name)?;
+        state.serialize_element(&self._base.location)?;
+        state.serialize_element(&self.thirst)?;
+        state.serialize_element(&self.hunger)?;
+        state.serialize_element(&self.nutrition)?;
         state.end()
     }
 }

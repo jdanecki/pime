@@ -11,7 +11,7 @@ void Player::pickup(InventoryElement * item)
 
     ItemLocation location;
     location.tag = ItemLocation::Tag::Player;
-    location.player.id = id;
+    location.player.id = uid;
     item->location = location;
 }
 
@@ -34,21 +34,42 @@ InventoryElement * Player::get_item_by_uid(size_t id)
 
 int Player::get_id()
 {
-    return id;
+    return uid;
 }
 
-Player::Player(int id) : InventoryElement(Class_Player), id(id)
+// Player::Player(int id) : InventoryElement(Class_Player), id(id), name(new char[16])
+// {
+// hunger = 500;
+// thirst = 250;
+// map_x = WORLD_CENTER;
+// map_y = WORLD_CENTER;
+// inventory = new InvList("inventory");
+// relations = nullptr;
+// // direction = direction::right;
+
+// x = 8;
+// y = 8;
+
+// for (int i = 0; i < 10; i++)
+// {
+//     hotbar[i] = NULL;
+//     craftbar[i] = 0;
+// }
+// in_conversation = false;
+// talking_to = nullptr;
+// welcomed = false;
+// sprintf((char*)name.str, "%s%d", "Player", id);
+
+// known_elements = new ElementsList("known elements");
+// }
+
+Player::Player(int id, SerializableCString && name, ItemLocation location, int thirst, int hunger, int nutrition)
+    : InventoryElement(Class_Player, id, location), name(name), thirst(thirst), hunger(hunger), nutrition(nutrition)
 {
     hunger = 500;
     thirst = 250;
-    map_x = WORLD_CENTER;
-    map_y = WORLD_CENTER;
     inventory = new InvList("inventory");
     relations = nullptr;
-    // direction = direction::right;
-
-    x = 8;
-    y = 8;
 
     for (int i = 0; i < 10; i++)
     {
@@ -58,8 +79,6 @@ Player::Player(int id) : InventoryElement(Class_Player), id(id)
     in_conversation = false;
     talking_to = nullptr;
     welcomed = false;
-    name = new char[16];
-    sprintf((char *)name, "%s%d", "Player", id);
 
     known_elements = new ElementsList("known elements");
     checked_element = 0;
@@ -67,7 +86,6 @@ Player::Player(int id) : InventoryElement(Class_Player), id(id)
     clan = get_random_clan();
     player_skills = new Skills();
     clan->skills->copy_elements(player_skills);
-
 }
 
 int Player::conversation(Player * who, Sentence * s, InventoryElement * el)
@@ -106,8 +124,7 @@ void Player::stop_conversation()
 
 void Player::show(bool details)
 {
-    printf("%s %s clan=%s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan_names[clan->id],
-        get_id(), map_x, map_y, x, y);
+    printf("%s %s clan=%s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan_names[clan->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
     player_skills->show(true);
     if (talking_to)
     {
@@ -222,10 +239,11 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
 
 char * Player::get_el_description(InventoryElement * el)
 {
-    if (check_known(el))
-        return el->get_description();
-    else
-        return nullptr;
+    // FIXME
+    // if (check_known(el))
+    return el->get_description();
+    // else
+    return nullptr;
 }
 
 bool Player::check_known(InventoryElement * el)

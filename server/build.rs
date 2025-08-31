@@ -21,6 +21,7 @@ impl ParseCallbacks for MacroCallback {
             "Ingredient",
             "Property",
             "Scroll",
+            "Npc",
             "Solid",
             "Property",
         ];
@@ -32,18 +33,23 @@ impl ParseCallbacks for MacroCallback {
             "Product",
             "InventoryElement",
             "Scroll",
+            "Player",
+            "Npc",
             "BaseElement",
             "BaseAnimal",
             "BasePlant",
             "Solid",
             "Base",
-            "Edible"
+            "Edible",
         ];
         if ser.contains(&info.name) {
             der.append(&mut vec![String::from("serde::Serialize")]);
         }
         if co_cl.contains(&info.name) {
             der.append(&mut vec![String::from("Copy, Clone")]);
+        }
+        if info.name == "InventoryElement" {
+            der.append(&mut vec![String::from("Debug")]);
         }
         // if info.name == "Test" {
         //     vec!["PartialEq".into()]
@@ -76,6 +82,35 @@ fn main() {
 
     let bindings = bindgen::Builder::default()
         .header("cpp-src/headers_wrapper.h")
+        // .allowlist_type("Player")
+        // .allowlist_file(".*packet_types.h")
+        // .allowlist_type("BaseElementServer")
+        // .allowlist_type("BasePlant")
+        // .allowlist_type("BaseAnimal")
+        // .allowlist_type("PlayerServer")
+        // .allowlist_type("Element")
+        // .allowlist_type("Ingredient")
+        // .allowlist_type("Product")
+        // .allowlist_type("Plant")
+        // .allowlist_type("Animal")
+        // .allowlist_type("Scroll")
+        // .allowlist_item("WORLD_SIZE")
+        // .allowlist_item("TILE_SIZE")
+        // .allowlist_item("CHUNK_SIZE")
+        // .allowlist_item("TICK_DELAY")
+        // .allowlist_var("world_table")
+        // .allowlist_var("objects_to_create")
+        // .allowlist_var("objects_to_update")
+        // .allowlist_function("update_location")
+        // .allowlist_function("time")
+        // .allowlist_function("srand")
+        // .allowlist_function("rand")
+        // .allowlist_function("craft_entry")
+        // .allowlist_function("update")
+        // .allowlist_function("add_object_to_world")
+        // .allowlist_function("find_in_world")
+        // .allowlist_function("create_element")
+        // .allowlist_function("create_scroll")
         .clang_arg("-xc++")
         .clang_arg("-std=c++14")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
@@ -83,7 +118,7 @@ fn main() {
         .generate()
         .expect("Unable to generate bindings");
 
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap()).join("core_bindings.rs");
+    let out_path = PathBuf::from("src/core_bindings.rs");
     bindings
         .write_to_file(out_path)
         .expect("Couldn't write bindings!");

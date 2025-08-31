@@ -64,6 +64,10 @@ extern "C"
         world_table[cy][cx] = ch;
     }
 
+    void notify_update(const InventoryElement * el)
+    {
+    }
+
     void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc)
     {
     }

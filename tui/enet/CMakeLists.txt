@@ -17,10 +17,13 @@ add_executable(pime_tui_enet
     net.cpp
     ../../SDL/networking.cpp 
     ../../SDL/player_actions.cpp
+  #  ../../SDL/npc.cpp
     ../sdl_stub.cpp
     
     ../implementations/alchemistSDL.cpp
     ../implementations/BeingSDL.cpp
+    ../implementations/playerSDL.cpp
+
 )
 
 target_link_libraries(pime_tui_enet

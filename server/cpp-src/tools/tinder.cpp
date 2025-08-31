@@ -1,18 +1,13 @@
-#include "tinder.h"
+#include "tools.h"
 
 Tinder::Tinder(InventoryElement * from) : IngredientServer(from, ING_TINDER, Form_solid)
 {
 }
 
-bool Tinder::check_ing()
+IngredientServer * Tinder::createTinder(InventoryElement * from)
 {
-    if ((el->get_base_cid() == Class_BaseElement) || (el->get_base_cid() == Class_BasePlant))
-        return true;
+    if ((from->get_base_cid() == Class_BaseElement) || (from->get_base_cid() == Class_BasePlant))
+        return new Tinder(from);
     else
-        return false;
-}
-
-IngredientServer * createTinder(InventoryElement * from)
-{
-    return new Tinder(from);
+        return nullptr;
 }

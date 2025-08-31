@@ -1,19 +1,14 @@
-#include "wall.h"
+#include "tools.h"
 // #include <cstdlib>
 
 Wall::Wall(InventoryElement * from) : IngredientServer(from, ING_WALL, Form_solid)
 {
 }
 
-bool Wall::check_ing()
+IngredientServer * Wall::createWall(InventoryElement * from)
 {
-    if ((el->get_base_cid() == Class_BaseElement) || (el->get_base_cid() == Class_BasePlant))
-        return true;
+    if ((from->get_base_cid() == Class_BaseElement) || (from->get_base_cid() == Class_BasePlant))
+        return new Wall(from);
     else
-        return false;
-}
-
-IngredientServer * createWall(InventoryElement * from)
-{
-    return new Wall(from);
+        return nullptr;
 }

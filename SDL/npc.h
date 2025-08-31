@@ -14,7 +14,6 @@ class NpcSDL : public Npc, public Renderable
 
   public:
     NpcSDL(Npc data);
-    SDL_Texture * get_texture();
 };
 
 extern NpcSDL * current_npc;

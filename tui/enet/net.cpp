@@ -141,6 +141,18 @@ unsigned int network_tick(NetClient * client)
 
     return recv;
 }
+InventoryElement * get_object_by_id(uintptr_t uid)
+{
+    return nullptr;
+}
+
+void register_object(InventoryElement * o)
+{
+}
+
+void deregister_object(InventoryElement * o)
+{
+}
 
 BaseElement * get_base_element(int32_t id)
 {
@@ -186,7 +198,7 @@ void send_packet_server_action_on_object(NetClient * client, int32_t a, uintptr_
 {
 }
 
-void send_packet_item_used_on_tile(NetClient * client, uintptr_t iid, int32_t map_x, int32_t map_y, int32_t x, int32_t y)
+void send_packet_item_used_on_tile(NetClient * client, uintptr_t iid, ItemLocation location)
 {
 }
 

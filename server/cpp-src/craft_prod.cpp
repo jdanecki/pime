@@ -1,15 +1,16 @@
 #include "craft_prod.h"
+#include "tools/tools.h"
 
 typedef ProductServer * (*ProductFunction)(InventoryElement *, InventoryElement *);
 
 ProductFunction productFunctions[] = {
-    createAxe,
-    createKnife,
-    createPickAxe,
-    createHut,
-    createFire,
-    createRoasted_meat,
-    createFruit_salad,
+    Axe::createAxe,
+    Knife::createKnife,
+    Pickaxe::createPickaxe,
+    Hut::createHut,
+    Fire::createFire,
+    RoastedMeat::createRoastedMeat,
+    FruitSalad::createFruitSalad,
 };
 
 InventoryElement * craft_prod(int product_id, InventoryElement * el1, InventoryElement * el2)
@@ -18,15 +19,5 @@ InventoryElement * craft_prod(int product_id, InventoryElement * el1, InventoryE
         return nullptr;
     InventoryElement * crafted = productFunctions[product_id](el1, el2);
 
-    if (crafted->craft())
-    {
-        crafted->show();
-        return crafted;
-    }
-    else
-    {
-        delete crafted;
-    }
-
-    return nullptr;
+    return crafted;
 }

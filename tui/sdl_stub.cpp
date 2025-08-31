@@ -67,7 +67,7 @@ extern "C"
     }
     void SDL_UnlockTexture(SDL_Texture * texture)
     {
-        delete (char*) texture->pixels;
+        delete (char *)texture->pixels;
     }
     int SDL_QueryTexture(SDL_Texture * texture, Uint32 * format, int * access, int * w, int * h)
     {
@@ -101,6 +101,14 @@ extern "C"
     {
         return 0;
     }
+    struct player_textures
+    {
+        SDL_Texture * player;
+        SDL_Surface * npc;
+        SDL_Texture * run_icon;
+        SDL_Texture * sneak_icon;
+    };
+    struct player_textures Player_textures;
 }
 
 SDL_Texture * add_texture_color(SDL_Surface * s, Color c)

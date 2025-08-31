@@ -1,18 +1,8 @@
-#include "meat.h"
-#include "../networking.h"
-#include "../world_server.h"
+#include "tools.h"
 #include "../craft_prod.h"
 
 Meat::Meat(InventoryElement * from) : IngredientServer(from, ING_MEAT, Form_solid)
 {
-
-}
-
-bool Meat::check_ing()
-{
-    if (el->get_cid() == Class_Animal)
-        return true;
-    return false;
 }
 
 bool Meat::action(Product_action action, Player * pl)
@@ -25,30 +15,21 @@ bool Meat::action(Product_action action, Player * pl)
     {
         case ACT_FIRE:
         {
-            Fire * fire = new Fire(nullptr, nullptr);
-            crafted = craft_prod((int)PROD_ROASTED_MEAT, this, fire);
-            delete fire;
-            break;
+            // TODO FIXME @jacek
+            // Fire * fire = new Fire(nullptr, nullptr);
+            crafted = craft_prod((int)PROD_ROASTED_MEAT, this, nullptr /*fire*/);
+            // delete fire;
+            // break;
         }
         default:
             return false;
     }
-    if (crafted)
-    {
-        world_table[pl->map_y][pl->map_x]->add_object(crafted, pl->x, pl->y);
-        objects_to_create.add(crafted);
-        printf("crafted\n");
-        destroy(this);
-        return true;
-    }
-    else
-    {
-        printf("failed to craft\n");
-    }
     return false;
 }
 
-IngredientServer * createMeat(InventoryElement * from)
+IngredientServer * Meat::Meat::createMeat(InventoryElement * from)
 {
-    return new Meat(from);
+    if (from->get_cid() == Class_Animal)
+        return new Meat(from);
+    return nullptr;
 }

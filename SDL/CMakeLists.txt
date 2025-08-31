@@ -38,6 +38,8 @@ set(SHARED_SOURCES
     inputs.cpp player_actions.cpp npc.cpp
     implementations/alchemistSDL.cpp
     implementations/BeingSDL.cpp
+    implementations/playerSDL.cpp
+
     ${NETWORK_STUB}
 )
 

@@ -20,6 +20,7 @@ impl ParseCallbacks for MacroCallback {
             "Ingredient",
             "Property",
             "Scroll",
+            "Npc",
             "Solid",
             "Property",
             "BaseElement",
@@ -32,6 +33,8 @@ impl ParseCallbacks for MacroCallback {
             "Product",
             "InventoryElement",
             "Scroll",
+            "Player",
+            "Npc",
         ];
         let copy = vec![
             "BaseElement",
@@ -39,7 +42,7 @@ impl ParseCallbacks for MacroCallback {
             "BasePlant",
             "Solid",
             "Base",
-            "Edible"
+            "Edible",
         ];
         if ser.contains(&info.name) {
             der.append(&mut vec![String::from("serde::Deserialize")]);

@@ -46,7 +46,7 @@ bool AnimalServer::action(Product_action action, Player * pl)
     }
     if (crafted)
     {
-        world_table[pl->map_y][pl->map_x]->add_object(crafted, pl->x, pl->y);
+        add_object_to_world(crafted, pl->location);
         objects_to_create.add(crafted);
         printf("crafted meat\n");
         destroy(this);
@@ -85,7 +85,7 @@ bool AnimalServer::grow()
     else
     {
         size = 1.0 * age->value / max_age->value;
-        objects_to_update.add(this);
+        notify_update(this);
         //   printf("%s:%s growing size=%f %d/%d \n", get_class_name(), get_name(), size, age->value, max_age->value);
     }
     return ret;
@@ -185,6 +185,16 @@ PlantServer::PlantServer(BasePlant * base) : Plant(base)
     }
 }
 
+void PlantServer::change_phase(Plant_phase p)
+{
+    notify_update(this);
+    if (phase != p)
+    {
+        //   printf("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
+    }
+    phase = p;
+}
+
 void PlantServer::show(bool details)
 {
     Plant::show(details);
@@ -226,7 +236,6 @@ bool PlantServer::grow()
             grown = true;
             change_phase(Plant_fruits);
         }
-        objects_to_update.add(this);
         return !grown;
     }
     if (age->value >= flowers_time)
@@ -235,7 +244,6 @@ bool PlantServer::grow()
         {
             change_phase(Plant_flowers);
         }
-        objects_to_update.add(this);
         return !grown;
     }
     if (age->value >= growing_time)
@@ -244,7 +252,6 @@ bool PlantServer::grow()
         {
             change_phase(Plant_growing);
         }
-        objects_to_update.add(this);
 
         return !grown;
     }
@@ -254,7 +261,6 @@ bool PlantServer::grow()
         {
             change_phase(Plant_seedling);
         }
-        objects_to_update.add(this);
         return !grown;
     }
     return !grown;
@@ -272,23 +278,6 @@ bool IngredientServer::action(Product_action action, Player * pl)
 {
     printf("ING_SERVER: %s %s\n", product_action_name[action], get_name());
     return false;
-}
-
-bool IngredientServer::craft()
-{
-    // FIXME
-    // if (req_form != el->get_form())
-    // {
-    //     printf("form != %d\n", req_form);
-    //     return false;
-    // }
-    if (!check_ing())
-        return false;
-
-    quality = Property("quality", rand() % 100);
-    resilience = Property("resilience", rand() % 100);
-    usage = Property("usage", rand() % 100);
-    return true;
 }
 
 void ProductServer::init(Product_id i, int c, Form f)
@@ -317,26 +306,6 @@ ProductServer::ProductServer(InventoryElement ** from, int count, Product_id i, 
 void ProductServer::show(bool details)
 {
     Product::show(details);
-}
-
-bool ProductServer::craft() // executed only on server
-{
-    for (int i = 0; i < ing_count; i++)
-    {
-        // TODO fixme
-        // if (req_form != ings[i]->get_form())
-        // {
-        //     printf("form != %d for inq[%d]\n", req_form, i);
-        //     return false;
-        // }
-    }
-    if (!check_ing())
-        return false;
-
-    quality = Property("quality", rand() % 100);
-    resilience = Property("resilience", rand() % 100);
-    usage = Property("usage", rand() % 100);
-    return true;
 }
 
 AnimalServer * create_animal(BaseAnimal * base)
@@ -391,7 +360,7 @@ bool ElementServer::action(Product_action action, Player * pl)
     }
     else
     {
-        objects_to_update.add(this);
+        notify_update(this);
     }
     return res;
 }
@@ -453,7 +422,7 @@ bool ElementServer::player_action(Player_action action, Player * pl)
     }
     else
     {
-        objects_to_update.add(this);
+        notify_update(this);
     }
     return res;
 }

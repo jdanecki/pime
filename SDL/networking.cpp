@@ -1,6 +1,7 @@
 #include "networking.h"
 #include "../core/alchemist/elements.h"
-#include "../core/player.h"
+#include "implementations/playerSDL.h"
+#include "npc.h"
 #include "../core/tiles.h"
 #include "../core/world.h"
 #include "implementations/BeingSDL.h"
@@ -13,6 +14,8 @@ void print_status(int l, const char * format, ...);
 #define PLAYER_NUM 16
 extern Player * players[PLAYER_NUM];
 extern Player * player;
+
+int my_id;
 
 InventoryElement * find_by_uid(size_t uid, int chunk_x, int chunk_y)
 {
@@ -48,23 +51,21 @@ void update_hotbar()
 
 InventoryElement * remove_from_location(ItemLocation location, size_t id)
 {
-    InventoryElement * el;
+    InventoryElement * el = get_object_by_id(id);
+    if (!el)
+        return nullptr;
     switch (location.tag)
     {
         case ItemLocation::Tag::Chunk:
         {
-            // printf("removed %ld from chunk %d %d\n", id, location.chunk.map_x, location.chunk.map_y);
-            if (!world_table[location.chunk.map_y][location.chunk.map_x])
-                return nullptr; // chunk not loaded yet
-            el = world_table[location.chunk.map_y][location.chunk.map_x]->find_by_id(id);
-            world_table[location.chunk.map_y][location.chunk.map_x]->remove_object(el);
+            remove_from_chunks(el);
             break;
         }
         case ItemLocation::Tag::Player:
         {
-            // printf("removed %ld from player %ld\n", id, location.player.id);
-            el = players[location.player.id]->get_item_by_uid(id);
-            players[location.player.id]->drop(el);
+            Player * p = (Player *)get_object_by_id(location.player.id);
+            if (p)
+                p->drop(el);
             if ((int)location.player.id == player->get_id())
             {
                 update_hotbar();
@@ -74,8 +75,9 @@ InventoryElement * remove_from_location(ItemLocation location, size_t id)
     return el;
 }
 
-InventoryElement * el_from_data(ObjectData * data)
+InventoryElement * el_from_data(const ObjectData * data)
 {
+    printf("CREATING OBJECT %d\n", (int)data->tag);
     InventoryElement * el = nullptr;
     switch (data->tag)
     {
@@ -103,6 +105,23 @@ InventoryElement * el_from_data(ObjectData * data)
         case ObjectData::Tag::Animal:
             el = new AnimalSDL(data->animal.data);
             break;
+        case ObjectData::Tag::Player:
+            el = new PlayerSDL(data->player.data);
+            if (my_id == (int)el->uid)
+            {
+                player = (Player *)el;
+            }
+            break;
+#ifndef USE_ENET
+        case ObjectData::Tag::Npc:
+            el = new NpcSDL(data->npc.data);
+            el->c_id = Class_Npc;
+            printf("creating NPC");
+            break;
+#endif
+        default:
+            printf("UNKNOWN TYPE %d\n", (int)data->tag);
+            abort();
     }
     return el;
 }
@@ -134,30 +153,31 @@ extern "C"
     }
     void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y, int thirst, int hunger)
     {
-        if (id >= 0 && id < PLAYER_NUM)
-        {
-            if (!players[id])
-            {
-                players[id] = new Player(id);
-            }
-            /*for (int i = 0; i < 25; i++)
-            {
-                printf("%d, ", data[i]);
-            }*/
-            Player * p = players[id];
-            p->map_x = map_x;
-            p->map_y = map_y;
+        // DEPRECATED
+        // if (id >= 0 && id < PLAYER_NUM)
+        // {
+        //     if (!players[id])
+        //     {
+        //         players[id] = new Player(id);
+        //     }
+        //     /*for (int i = 0; i < 25; i++)
+        //     {
+        //         printf("%d, ", data[i]);
+        //     }*/
+        //     Player * p = players[id];
+        //     p->map_x = map_x;
+        //     p->map_y = map_y;
 
-            // FIXME when more chunks added
-            if (x != p->x)
-                p->going_right = p->x > x ? 0 : 1;
-            p->x = x;
-            p->y = y;
-            p->thirst = thirst;
-            p->hunger = hunger;
+        //     // FIXME when more chunks added
+        //     if (x != p->x)
+        //         p->going_right = p->x > x ? 0 : 1;
+        //     p->x = x;
+        //     p->y = y;
+        //     p->thirst = thirst;
+        //     p->hunger = hunger;
 
-            //  printf("updated player %ld: %d %d %d %d\n", id, map_x, map_y, x, y);
-        }
+        //     //  printf("updated player %ld: %d %d %d %d\n", id, map_x, map_y, x, y);
+        // }
     }
 
     void update_chunk(int32_t x, int32_t y, const chunk_table * data)
@@ -181,9 +201,12 @@ extern "C"
 
     void got_id(uintptr_t id, int64_t seed)
     {
-        // my_id = id;
-        players[id] = new Player(id);
-        player = players[id];
+        my_id = id;
+        // players[id] = new Player(id, SerializableCString("player"), ItemLocation::center(), 0, 0, 0);
+        // player = players[id];
+        player = (Player *)calloc(sizeof(Player), 1);
+        player->location.chunk.map_x = 128;
+        player->location.chunk.map_y = 128;
 
         printf("seed: %ld\n", seed);
         srand(seed);
@@ -238,6 +261,12 @@ extern "C"
                     //      printf("%s size=%f\n", animal->get_name(), animal->size);
                     break;
                 }
+                case Class_Player:
+                {
+                    Player * player = dynamic_cast<Player *>(el);
+                    *player = data->player.data;
+                    break;
+                }
                 default:
                     break;
             }
@@ -261,13 +290,13 @@ extern "C"
         InventoryElement * el = remove_from_location(old_loc, id);
         if (!el)
         { // FIXME
-            /*printf("SDL: not found item %lu to remove on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
-                id,
-                old_loc.chunk.map_x, old_loc.chunk.map_y,
-                old_loc.chunk.x, old_loc.chunk.y,
-                new_loc.chunk.map_x, new_loc.chunk.map_y,
-                new_loc.chunk.x, new_loc.chunk.y);
-              */
+            // printf("SDL: not found item %lu to remove on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
+            //     id,
+            //     old_loc.chunk.map_x, old_loc.chunk.map_y,
+            //     old_loc.chunk.x, old_loc.chunk.y,
+            //     new_loc.chunk.map_x, new_loc.chunk.map_y,
+            //     new_loc.chunk.x, new_loc.chunk.y);
+
             return;
         }
         switch (new_loc.tag)
@@ -288,13 +317,14 @@ extern "C"
                 new_l.chunk.x = new_loc.chunk.x;
                 new_l.chunk.y = new_loc.chunk.y;
                 el->update_item_location(old_l, new_l);
-                world_table[new_loc.chunk.map_y][new_loc.chunk.map_x]->add_object(el, new_loc.chunk.x, new_loc.chunk.y);
+                add_object_to_world(el, new_loc);
                 break;
             }
             case ItemLocation::Tag::Player:
             {
-                printf("added %ld to player %ld\n", id, new_loc.player.id);
-                players[new_loc.player.id]->pickup(el);
+                Player * p = (Player *)get_object_by_id(new_loc.player.id);
+                if (p)
+                    p->pickup(el);
                 if ((int)new_loc.player.id == player->get_id())
                 {
                     update_hotbar(); // FIXME - remove only one element
@@ -303,32 +333,34 @@ extern "C"
         }
     }
 
-    void create_object(ObjectData * data)
+    void create_object(const ObjectData * data)
     {
         InventoryElement * el = el_from_data(data);
         if (el)
         {
-            switch (el->location.tag)
-            {
-                case ItemLocation::Tag::Chunk:
-                {
-                    int item_x = el->location.chunk.x;
-                    int item_y = el->location.chunk.y;
-                    int x = el->location.chunk.map_x;
-                    int y = el->location.chunk.map_y;
-                    if (world_table[y][x])
-                    {
-                        world_table[y][x]->add_object(el, item_x, item_y);
-                    }
-                    break;
-                }
-                case ItemLocation::Tag::Player:
-                {
-                    int p_id = el->location.player.id;
-                    players[p_id]->inventory->add(el);
-                    update_hotbar();
-                }
-            }
+            register_object(el);
+            add_object_to_world(el, el->location);
+            // switch (el->location.tag)
+            // {
+            //     case ItemLocation::Tag::Chunk:
+            //     {
+            //         int item_x = el->location.chunk.x;
+            //         int item_y = el->location.chunk.y;
+            //         int x = el->location.chunk.map_x;
+            //         int y = el->location.chunk.map_y;
+            //         if (world_table[y][x])
+            //         {
+            //             world_table[y][x]->add_object(el, item_x, item_y);
+            //         }
+            //         break;
+            //     }
+            //     case ItemLocation::Tag::Player:
+            //     {
+            //         int p_id = el->location.player.id;
+            //         players[p_id]->inventory->add(el);
+            //         update_hotbar();
+            //     }
+            // }
             // printf("created object: %s\n", el->get_name());
             // print_status(1, "created object: %s", el->get_name());
         }
@@ -340,10 +372,16 @@ extern "C"
 
     void destroy_object(uintptr_t id, ItemLocation location)
     {
-        InventoryElement * el = remove_from_location(location, id);
+        InventoryElement * el = get_object_by_id(id);
         if (el)
         {
+            InventoryElement * removed = remove_from_location(location, id);
+            if (removed == nullptr)
+            {
+                abort();
+            }
             printf("SDL: destroy_object %ld", id);
+            deregister_object(el);
             delete el;
         }
         // else

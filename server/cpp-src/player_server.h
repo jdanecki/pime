@@ -2,6 +2,8 @@
 #define SERVER_PLAYER_H
 
 #include "../../core/player.h"
+#include "networking.h"
+#include "../../core/npc.h"
 
 class PlayerServer : public Player
 {
@@ -15,5 +17,9 @@ class PlayerServer : public Player
 
     PlayerServer(int id);
 };
+
+PlayerServer * create_player(int id);
+
+Npc * create_npc();
 
 #endif

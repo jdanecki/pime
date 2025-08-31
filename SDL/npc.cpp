@@ -11,43 +11,63 @@ extern Player * player;
 NpcSDL * current_npc;
 extern int active_hotbar;
 
-int get_tile_at(int chunk_x, int chunk_y, int x, int y)
+SDL_Texture * create_npc_texture()
 {
-    if (!world_table[chunk_y][chunk_x])
+    BaseElement * b = get_base_element(get_tile_at(player->location));
+    Color c;
+    Uint8 mask_r;
+    Uint8 mask_g;
+    Uint8 mask_b;
+    if (b)
     {
-        printf("missing tile\n");
-        return -1;
+        c = b->color;
+        mask_r = c.r;
+        mask_g = c.g;
+        mask_b = c.b;
+    }
+    else
+    {
+        mask_r = c.r;
+        mask_g = c.g;
+        mask_b = c.b;
+    }
+    SDL_Surface * surface = SDL_CreateRGBSurface(0, 32, 32, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+    SDL_BlitSurface(Player_textures.npc, NULL, surface, NULL);
+    SDL_LockSurface(surface);
+
+    SDL_PixelFormat * fmt = surface->format;
+    Uint32 * pixels = (Uint32 *)surface->pixels;
+
+    for (int y = 0; y < surface->h; ++y)
+    {
+        for (int x = 0; x < surface->w; ++x)
+        {
+            Uint32 * p = pixels + y * surface->w + x;
+            Uint8 r, g, b, a;
+            SDL_GetRGBA(*p, fmt, &r, &g, &b, &a);
+
+            if (r == g && g == b)
+            {
+                Uint8 gray = (r + g + b) / 3;
+                Uint8 nr = (mask_r * gray) / 255;
+                Uint8 ng = (mask_g * gray) / 255;
+                Uint8 nb = (mask_b * gray) / 255;
+                *p = SDL_MapRGBA(fmt, nr, ng, nb, a);
+            }
+        }
     }
 
-    return world_table[chunk_y][chunk_x]->table[y][x].tile;
+    SDL_UnlockSurface(surface);
+    SDL_Texture * retval = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    return retval;
 }
 
 NpcSDL::NpcSDL(Npc data) : Npc(data)
 {
-}
-
-SDL_Texture * NpcSDL::get_texture()
-{
-    if (!texture)
-        init();
-    return texture;
-}
-
-void NpcSDL::init()
-{
-    if (!texture)
-    {
-        int tile = get_tile_at(player->map_x, player->map_y, 0, 0);
-        if (tile < 0)
-            return;
-        BaseElement * b=get_base_element(tile);
-        if (b) {
-            Color c = b->color; // FIXME
-            texture = add_texture_color(Player_textures.npc, c);
-        }  else {
-            texture = add_texture_color(Player_textures.npc, {125, 125, 125});
-        }
-    }
+    w = 32;
+    h = 32;
+    texture = create_npc_texture();
 }
 
 int npc(menu_actions a)

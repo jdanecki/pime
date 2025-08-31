@@ -1,13 +1,14 @@
-use std::borrow::{Borrow, BorrowMut};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::CStr;
 use std::net::UdpSocket;
 use std::rc::Rc;
+use std::sync::{Arc, Mutex, RwLock};
 use nix::libc::{FIONREAD, c_int};
 use std::os::unix::io::AsRawFd;
 use std::mem::MaybeUninit;
+use types::ObjectData;
 
 mod core;
 mod events;
@@ -25,7 +26,7 @@ pub struct NetClient {
     not_confirmed_packets: HashMap<u32, Vec<u8>>,
 }
 
-static mut total_sent : usize = 0;
+static mut total_sent: usize = 0;
 
 impl NetClient {
     fn send(&mut self, data: &[u8]) {
@@ -36,10 +37,13 @@ impl NetClient {
         buf.extend_from_slice(&self.my_acks_bitmap.to_le_bytes());
         buf.extend_from_slice(&data);
         unsafe {
-            if core::trace_network > 0 && core::trace_network < 3
-            {
-                println!("SDL: send len={} local_seq={} remote_seq={}", 
-                    12 + data.len(), self.local_seq_num, self.remote_seq_num );
+            if core::trace_network > 0 {
+                println!(
+                    "SDL: send len={} local_seq={} remote_seq={}",
+                    12 + data.len(),
+                    self.local_seq_num,
+                    self.remote_seq_num
+                );
                 core::show_packet_type_name('S' as i8, data[0] as u8);
             }
         }
@@ -57,9 +61,10 @@ pub extern "C" fn init(
     server_ip: *const std::os::raw::c_char,
     port: *const std::os::raw::c_char,
 ) -> *mut NetClient {
+    OBJECTS.write().unwrap().replace(HashMap::new());
     let mut ip;
     unsafe {
-        let a = core::Player::new(1);
+        // let a = core::Player::new(1);
         ip = CStr::from_ptr(server_ip).to_str().unwrap().to_owned();
         ip.push(':');
         ip.push_str(CStr::from_ptr(port).to_str().unwrap())
@@ -75,27 +80,26 @@ pub extern "C" fn init(
     loop {
         let amt = client.socket.recv(&mut buf).unwrap();
         unsafe {
-            if core::trace_network > 0
-            {
+            if core::trace_network > 0 {
                 println!("{:?}", buf[12]);
             }
         }
         let buf = &buf[12..];
-        let amt = amt-12;
+        let amt = amt - 12;
         if buf[0] == core::PACKET_PLAYER_ID {
             unsafe {
                 events::got_id(
                     usize::from_le_bytes(buf[1..9].try_into().unwrap()),
                     0, //i64::from_le_bytes(buf[9..17].try_into().unwrap()),
                 );
-            if core::trace_network > 0 {
-                println!("RECEIVED {:?}", &buf[9..amt]);
-            }
+                if core::trace_network > 0 {
+                    println!("RECEIVED {:?}", &buf[9..amt]);
+                }
                 WORLD.set(
                     bincode::deserialize::<World>(&buf[9..amt]).expect("failed to create world"),
                 );
                 WORLD.with_borrow(|world| {
-//                    println!("{:#?}", world);
+                    //                    println!("{:#?}", world);
                 });
                 break;
             };
@@ -152,7 +156,6 @@ fn get_pending_bytes(socket: &UdpSocket) -> std::io::Result<usize> {
     }
 }
 
-
 static mut max_pending: usize =0;
 static mut total_resv : usize = 0;
 static mut prev_resv : usize = 0;
@@ -160,7 +163,7 @@ static mut prev_send :usize = 0;
 
 #[no_mangle]
 pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
-    let mut buf = [0; 2048];
+    let mut buf = [0; 8096];
     let mut cnt=0;
     loop {
         if let Ok(pending) = get_pending_bytes(&client.socket) {
@@ -172,18 +175,21 @@ pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
                 }
             }
         }
+                   
         if let Ok((amt, src)) = client.socket.recv_from(&mut buf) {
             cnt +=1;
             unsafe {
                 total_resv +=1;
             }
-
             let seq = u32::from_le_bytes(buf[0..4].try_into().unwrap());
             let ack = u32::from_le_bytes(buf[4..8].try_into().unwrap());
             let acks = u32::from_le_bytes(buf[8..12].try_into().unwrap());
             unsafe {
-                if core::trace_network > 0  && core::trace_network < 3{
-                    println!("SDL: network_tick receive amt={amt} seq={seq} remote_seq_num={} ack={ack}", client.remote_seq_num);
+                if core::trace_network > 0 {
+                    println!(
+                        "SDL: network_tick amt={amt} seq={seq} remote_seq_num={} ack={ack}",
+                        client.remote_seq_num
+                    );
                 }
             }
             if seq > client.remote_seq_num {
@@ -220,9 +226,9 @@ pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
                 if id + 32 < ack {
                     println!("SDL: PACKET NOT CONFIRMED id={id} ack={ack}");
                     unsafe {
-                        core::trace_network=1;
+                        core::trace_network = 1;
                         core::show_packet_type_name('S' as i8, d[0] as u8);
-                        core::trace_network=0;
+                        core::trace_network = 0;
                     }
 
                     to_resend.push(d.clone());
@@ -232,7 +238,8 @@ pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
             for i in to_remove {
                 client.not_confirmed_packets.remove(&i);
             }
-         /*   for d in to_resend {
+            //FIXME should we uncomment it now?
+            /*   for d in to_resend {
                 client.send(&d);
             }*/
 
@@ -244,10 +251,11 @@ pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
 
             //println!("{:?}", &buf);
             let value = &mut buf[12..];
+            let amt = amt - 12;
 
-            //FIXME 
+            //FIXME
             unsafe {
-                    core::show_packet_type_name('C' as i8 , value[0] as u8);
+                core::show_packet_type_name('C' as i8, value[0] as u8);
             }
             match value[0] {
                 core::PACKET_PLAYER_UPDATE => {
@@ -268,28 +276,36 @@ pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
                     }
                 }
                 core::PACKET_CHUNK_UPDATE => {
-                   if amt == size_of::<core::chunk_table>() + 3 + 12 {
+                    unsafe {
+                        if core::trace_network > 0 {
+                            println!("SDL: PACKET_CHUNK_UPDATE {}", amt);
+                        }
+                    }
+                    if amt == size_of::<core::chunk_table>() + 3 {
                         unsafe {
                             events::update_chunk(
                                 //i32::from_le_bytes(value[1..5].try_into().unwrap()),
                                 //i32::from_le_bytes(value[5..9].try_into().unwrap()),
                                 i32::from(value[1]),
                                 i32::from(value[2]),
-                                &mut *(&mut value[0] as *mut u8 as *mut core::chunk_table));
-                                unsafe {
-                                    if core::trace_network > 0 {
-                                        println!("SDL: PACKET_CHUNK_UPDATE OK");
-                                    }
+                                &mut *(&mut value[0] as *mut u8 as *mut core::chunk_table),
+                            );
+                            unsafe {
+                                if core::trace_network > 0 {
+                                    println!("SDL: PACKET_CHUNK_UPDATE OK");
                                 }
+                            }
                         }
                     } else {
-                            println!("SDL: PACKET_CHUNK_UPDATE BAD");
+                        println!("SDL: PACKET_CHUNK_UPDATE BAD");
                     }
                 }
                 core::PACKET_OBJECT_UPDATE => unsafe {
-                    events::update_object(
-                        &bincode::deserialize(&value[1..amt]).expect("bad object update"),
-                    );
+                    let updates: Vec<ObjectData> = bincode::deserialize(&value[1..amt])
+                        .expect(&format!("bad object update size {}", amt));
+                    for u in updates {
+                        events::update_object(&u);
+                    }
                 },
                 core::PACKET_LOCATION_UPDATE => unsafe {
                     events::update_item_location(
@@ -298,8 +314,11 @@ pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
                 },
                 core::PACKET_OBJECT_CREATE => unsafe {
                     // println!("value {:?}", &value[1..amt]);
-                    let obj = bincode::deserialize(&value[1..amt])
-                        .expect("Failed to create item from data");
+                    let obj = bincode::deserialize(&value[1..amt]).expect(&format!(
+                        "Failed to create item from data amt {} {:?}",
+                        amt,
+                        &value[1..amt]
+                    ));
                     // println!("{:?}", obj);
                     events::create_object(&obj);
                     // events::create_object(
@@ -366,6 +385,37 @@ struct World {
 
 thread_local! {
 static WORLD: RefCell<World> = panic!("world not created yet");
+}
+
+struct CorePointer(*mut core::InventoryElement);
+unsafe impl Send for CorePointer {}
+unsafe impl Sync for CorePointer {}
+
+static OBJECTS: RwLock<Option<HashMap<usize, CorePointer>>> = RwLock::new(None);
+
+#[no_mangle]
+pub extern "C" fn get_object_by_id(uid: usize) -> *mut core::InventoryElement {
+    match OBJECTS.read().unwrap().as_ref().unwrap().get(&uid) {
+        Some(obj) => obj.0,
+        None => std::ptr::null_mut(),
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn register_object(o: *mut core::InventoryElement) {
+    let uid = unsafe { (*o).uid };
+    OBJECTS
+        .write()
+        .unwrap()
+        .as_mut()
+        .unwrap()
+        .insert(uid, CorePointer(o));
+}
+
+#[no_mangle]
+pub extern "C" fn deregister_object(o: *mut core::InventoryElement) {
+    let uid = unsafe { (*o).uid };
+    OBJECTS.write().unwrap().as_mut().unwrap().remove(&uid);
 }
 
 #[no_mangle]
