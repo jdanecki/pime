@@ -7,7 +7,14 @@
 
 #ifdef USE_ENET
 #include <enet/enet.h>
-typedef ENetHost NetClient;
+class NetClient
+{
+  public:
+    ENetHost * host;
+    ENetPeer * peer;
+    NetClient(ENetHost *host, ENetPeer *peer):host(host), peer(peer) {}
+};
+
 #include "networking_enet.h"
 #else
 class NetClient

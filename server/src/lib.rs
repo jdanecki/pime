@@ -294,7 +294,7 @@ fn add_player(
 
     unsafe {
         // let p = core::PlayerServer::new(players.len() as i32);
-        let p = core::create_player(players.len() as i32);
+        let p = core::create_player(players.len() as usize);
         players.push(p);
         // FIXME
         // let axe = Box::into_raw(Box::new(core::Axe::new(
@@ -379,7 +379,7 @@ fn handle_network(server: &mut Server, players: &mut Vec<*mut core::PlayerServer
             }
 
             match server.clients.get_mut(&src) {
-                Some(data) => {
+                Some(data) => { //client known already
                     let id = data.id;
                     unsafe {
                         core::show_packet_type_name('S' as std::os::raw::c_char, buf[12] as u8);
@@ -412,7 +412,7 @@ fn handle_network(server: &mut Server, players: &mut Vec<*mut core::PlayerServer
                         }
                     }
                 }
-                None => {
+                None => { //new connection from player
                     if buf[12] == core::PACKET_JOIN_REQUEST {
                         println!("connected");
                         add_player(server, src, players);

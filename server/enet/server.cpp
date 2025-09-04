@@ -6,7 +6,46 @@
 #include "../cpp-src/player_server.h"
 #include "../cpp-src/elements_server.h"
 
-InvList * players;
+struct Peer_id
+{
+    enum class Tag
+    {
+        Peer,
+        Id,
+    };
+    Tag tag;
+    union {
+        ENetPeer *peer;
+        unsigned long id;
+    };
+};
+Packet *packet_to_send;
+
+class PlayerClient : public ListElement
+{
+  public:
+    PlayerServer * player;
+    ENetPeer *peer;
+    PlayerClient(PlayerServer *player, ENetPeer * peer): player(player), peer(peer)
+    {
+        char hostname[64];
+        enet_address_get_host_ip(&peer->address, hostname, 64);
+        printf("new player uid=%ld host=%s port=%u\n",player->uid, hostname, peer->address.port);
+    }
+    bool check(void * what)
+    {
+        Peer_id * p=(Peer_id*) what;
+        switch(p->tag)
+        {
+            case Peer_id::Tag::Peer:  return p->peer == peer;
+            case Peer_id::Tag::Id:    return p->id == player->uid;
+        }
+        return false;
+    }
+
+};
+
+ElementsList * players;
 ENetHost * server;
 
 void print_status(int l, const char * format, ...)
@@ -19,7 +58,7 @@ void print_status(int l, const char * format, ...)
         vprintf(format, args);
     va_end(args);
     puts("");
-};
+}
 
 bool handle_packet(ENetPacket * packet, ENetPeer * peer)
 {
@@ -34,16 +73,34 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
     {
         case PACKET_JOIN_REQUEST:
         {
-            Packet * p = new PacketPlayerId(players->nr_elements);
+            delete p;
+            p = new PacketPlayerId(players->nr_elements);
             p->send(peer);
             enet_host_flush(server);
-            players->add(new PlayerServer(players->nr_elements));
+            PlayerClient *pl = new PlayerClient(new PlayerServer(players->nr_elements), peer);
+            players->add(pl);
+            add_object_to_world(pl->player, pl->player->location);
             delete p;
             p = new PacketChunkUpdate(128, 128);
             p->send(peer);
             enet_host_flush(server);
             delete p;
             break;
+        }
+        case PACKET_PLAYER_MOVE:
+        {
+            PacketPlayerMove * move = dynamic_cast<PacketPlayerMove *>(p);
+            Peer_id peer_id;
+            peer_id.tag = Peer_id::Tag::Peer;
+            peer_id.peer = peer;
+            PlayerClient *pl=(PlayerClient*) players->find(&peer_id);
+            pl->player->move(move->get_x(), move->get_y());
+            delete p;
+            if (packet_to_send)
+            {
+                packet_to_send->send(peer);
+                enet_host_flush(server);
+            }
         }
     }
     return false;
@@ -53,13 +110,14 @@ extern "C"
 
     void load_chunk(int cx, int cy)
     {
+        printf("load_chunk(%d, %d)\n", cx, cy);
         chunk * ch = new chunk(cx, cy);
 
         for (int y = 0; y < CHUNK_SIZE; y++)
             for (int x = 0; x < CHUNK_SIZE; x++)
                 ch->table[y][x].tile = 1;
         ElementServer * el = create_element(new BaseElement(Form_solid, 1));
-        el->show(true);
+      //  el->show(true);
         ch->add_object(el);
         world_table[cy][cx] = ch;
     }
@@ -70,6 +128,8 @@ extern "C"
 
     void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc)
     {
+        printf("update location id=%ld old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
+        packet_to_send = new PacketLocationUpdate(id, old_loc, new_loc);
     }
     void notify_destroy(size_t id, ItemLocation location)
     {

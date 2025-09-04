@@ -15,7 +15,7 @@ void print_status(int l, const char * format, ...);
 extern Player * players[PLAYER_NUM];
 extern Player * player;
 
-int my_id;
+size_t my_id;
 
 InventoryElement * find_by_uid(size_t uid, int chunk_x, int chunk_y)
 {
@@ -77,7 +77,7 @@ InventoryElement * remove_from_location(ItemLocation location, size_t id)
 
 InventoryElement * el_from_data(const ObjectData * data)
 {
-    printf("CREATING OBJECT %d\n", (int)data->tag);
+    printf("CREATING OBJECT for tag: %d\n", (int)data->tag);
     InventoryElement * el = nullptr;
     switch (data->tag)
     {
@@ -107,20 +107,30 @@ InventoryElement * el_from_data(const ObjectData * data)
             break;
         case ObjectData::Tag::Player:
             el = new PlayerSDL(data->player.data);
-            if (my_id == (int)el->uid)
+            if (my_id == el->uid)
             {
                 player = (Player *)el;
+                printf("new player uid=%ld name=%s\n", player->uid, player->get_name());
             }
             break;
+#ifdef DISABLE_NPC
+#warning DISABLE_NPC
+#endif
+
 #ifndef USE_ENET
+#warning !USE_ENET
+#endif
+
         case ObjectData::Tag::Npc:
+#if !defined(DISABLE_NPC) && !defined(USE_ENET)
             el = new NpcSDL(data->npc.data);
             el->c_id = Class_Npc;
             printf("creating NPC");
-            break;
 #endif
+        break;
+
         default:
-            printf("UNKNOWN TYPE %d\n", (int)data->tag);
+            printf("UNKNOWN Tag: %d\n", (int)data->tag);
             abort();
     }
     return el;
@@ -199,14 +209,17 @@ extern "C"
         }
     }
 
-    void got_id(uintptr_t id, int64_t seed)
+    void got_id(size_t id, int64_t seed)
     {
         my_id = id;
         // players[id] = new Player(id, SerializableCString("player"), ItemLocation::center(), 0, 0, 0);
         // player = players[id];
+
         player = (Player *)calloc(sizeof(Player), 1);
         player->location.chunk.map_x = 128;
         player->location.chunk.map_y = 128;
+        player->location.chunk.x = 8;
+        player->location.chunk.y = 8;
 
         printf("seed: %ld\n", seed);
         srand(seed);
@@ -214,7 +227,7 @@ extern "C"
         init_questions();
         init_answers();
         printf("got id %ld\n", id);
-        print_status(1, "player %d connected", id);
+        print_status(1, "player %ld connected", id);
     }
 
     void update_object(const ObjectData * data)

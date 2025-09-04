@@ -24,7 +24,7 @@ bool handle_packet(ENetPacket * packet)
             got_id(id->get_id(), 0);
             ret = true;
             break;
-        }
+        }            
         case PACKET_CHUNK_UPDATE:
         {
             PacketChunkUpdate * up = dynamic_cast<PacketChunkUpdate *>(p);
@@ -40,6 +40,14 @@ bool handle_packet(ENetPacket * packet)
             ret = true;
             break;
         }
+        case PACKET_LOCATION_UPDATE:
+        {
+            PacketLocationUpdate * loc = dynamic_cast<PacketLocationUpdate *>(p);
+            update_item_location(loc->location);
+
+            ret = true;
+            break;
+        }
     }
     delete p;
     return ret;
@@ -52,31 +60,31 @@ NetClient * init(const char * server_ip, const char * port)
     if (enet_initialize() != 0)
     {
         fprintf(stderr, "Enet initialization failed\n");
-        exit(EXIT_FAILURE);
+        return nullptr;
     }
     atexit(enet_deinitialize);
 
-    client = enet_host_create(NULL, 1, 2, 0, 0);
-    if (!client)
+    ENetHost * host = enet_host_create(NULL, 1, 2, 0, 0);
+    if (!host)
     {
         fprintf(stderr, "Can't create client\n");
-        exit(EXIT_FAILURE);
+        return nullptr;
     }
 
     ENetAddress address;
     enet_address_set_host(&address, server_ip);
     address.port = atoi(port);
 
-    ENetPeer * peer = enet_host_connect(client, &address, 2, 0);
+    ENetPeer * peer = enet_host_connect(host, &address, 2, 0);
     if (!peer)
     {
         fprintf(stderr, "Can't connect to server\n");
-        exit(EXIT_FAILURE);
+        return nullptr;
     }
 
     ENetEvent event;
 
-    if (enet_host_service(client, &event, 5000) > 0 // 5000 ms
+    if (enet_host_service(host, &event, 5000) > 0 // 5000 ms
         && event.type == ENET_EVENT_TYPE_CONNECT)
     {
 
@@ -88,18 +96,18 @@ NetClient * init(const char * server_ip, const char * port)
     {
         enet_peer_reset(peer);
         printf("Can't connect to server\n");
-        exit(EXIT_FAILURE);
+        return nullptr;
     }
 
     Packet * p = new PacketJoinRequest();
     p->send(peer);
-    enet_host_flush(client);
+    enet_host_flush(host);
 
-    if (enet_host_service(client, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_RECEIVE)
+    if (enet_host_service(host, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_RECEIVE)
     {
         handle_packet(event.packet);
         enet_packet_destroy(event.packet);
-        return (NetClient *)client;
+        return new NetClient(host, peer);
     }
     else
     {
@@ -107,7 +115,7 @@ NetClient * init(const char * server_ip, const char * port)
 
         enet_peer_disconnect(peer, 0);
 
-        while (enet_host_service(client, &event, 3000) > 0)
+        while (enet_host_service(host, &event, 3000) > 0)
         {
             if (event.type == ENET_EVENT_TYPE_DISCONNECT)
             {
@@ -115,7 +123,7 @@ NetClient * init(const char * server_ip, const char * port)
                 break;
             }
         }
-        exit(0);
+        return nullptr;
     }
 }
 
@@ -123,7 +131,7 @@ unsigned int network_tick(NetClient * client)
 {
     ENetEvent event;
     unsigned int recv = 0;
-    while (enet_host_service(client, &event, 10) > 0)
+    while (enet_host_service(client->host, &event, 10) > 0)
     {
         switch (event.type)
         {
@@ -148,6 +156,7 @@ InventoryElement * get_object_by_id(uintptr_t uid)
 
 void register_object(InventoryElement * o)
 {
+    printf("register_object: uid=%ld\n", o->uid);
 }
 
 void deregister_object(InventoryElement * o)
@@ -176,6 +185,10 @@ Base * get_base(uint32_t c_id, int32_t id)
 
 void send_packet_move(NetClient * client, int32_t x, int32_t y)
 {
+    Packet * p = new PacketPlayerMove(x, y);
+    p->send(client->peer);
+    enet_host_flush(client->host);
+
 }
 
 void send_packet_pickup(NetClient * client, uintptr_t id)

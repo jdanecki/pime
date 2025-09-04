@@ -2,7 +2,9 @@ all: configure serv serv-enet client tui-core tui-net tui-enet
 
 clean: client-clean serv-clean serv-enet-clean tui-clean tui-net-clean tui-enet-clean
 
-enet: serv-enet client tui-enet
+enet: serv-enet client-enet tui-enet
+
+client: client-enet client-rust
 
 serv:
 	cd server; 	cargo build
@@ -16,8 +18,11 @@ serv-enet:
 serv-enet-clean:	
 	rm -rf server/enet/build
 
-client:
-	make -C SDL/build -j $(nproc)
+client-enet:
+	make -C SDL/build -j $(nproc) pime_SDL_enet
+
+client-rust:
+	make -C SDL/build -j $(nproc) pime_SDL
 
 client-clean:	
 	rm -rf SDL/build

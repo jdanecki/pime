@@ -15,10 +15,10 @@ class PlayerServer : public Player
     bool plant_with_seed(InventoryElement * el, int map_x, int map_y, int x, int y);
     bool pickup(InventoryElement * item);
 
-    PlayerServer(int id);
+    PlayerServer(size_t id);
 };
 
-PlayerServer * create_player(int id);
+PlayerServer * create_player(size_t id);
 
 Npc * create_npc();
 

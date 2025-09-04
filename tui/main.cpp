@@ -50,7 +50,7 @@ void print_status(int l, const char * format, ...)
         vprintf(format, args);
     va_end(args);
     puts("");
-};
+}
 
 int kbhit()
 {
@@ -178,9 +178,10 @@ bool do_key_question_mark(char k)
 void move_player(int dx, int dy)
 {
     send_packet_move(client, dx, dy);
-    InventoryElement * el = get_item_at_ppos(player);
+    /*InventoryElement * el = get_item_at_ppos(player);
     if (el)
         printf("\nthere is something here: %s\n", el->get_class_name());
+*/
 }
 bool do_key_main(char k)
 {
@@ -304,21 +305,23 @@ void loop()
 {
     print_status(0, "Welcome in PIME - TUI version for debug!");
     unsigned int total_recv = 0;
-    static const char * name = nullptr;
-    if (!name)
+
+#ifdef USE_ENET
+    while(!player->name.str[0])
     {
-        if (!player->name.str[0])
-        {
-            name = (const char *)malloc(16);
-            strcpy((char *)name, "unknown");
-        }
-        else
-            name = player->get_name();
+        printf("waiting for data\n");
+        network_tick(client);
+        sleep(1);
     }
+#else
+        network_tick(client);
+        sleep(1);
+        network_tick(client);
+#endif
 
     for (;;)
     {
-        printf("\r%s@[%d,%d][%d,%d] %c: ", name, // player->get_name(),
+        printf("\r%s@[%d,%d][%d,%d] %c: ", player->get_name(),
             player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y, submenu ? submenu : '#');
 
         char c = check_key();

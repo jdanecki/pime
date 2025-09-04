@@ -242,6 +242,7 @@ bool handle_SDL_events()
 {
     int ww = 0, wh = 0;
     SDL_Event event;
+
     // keyboard handling for not move
     while (SDL_PollEvent(&event))
     {
@@ -279,5 +280,5 @@ bool handle_SDL_events()
     {
         last_time = tmp;
     }
-    return 0;
+    return false;
 }

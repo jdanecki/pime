@@ -103,11 +103,8 @@ class InventoryElement
     ItemLocation location;
 
     InventoryElement(Class_id c_id, size_t uid, ItemLocation location);
-    InventoryElement(Class_id c_id)
-    {
-        this->c_id = c_id;
-        uid = (size_t)this;
-    }
+    InventoryElement(Class_id c_id) : c_id(c_id), uid((size_t)this)
+    {}
 
     virtual bool action(Product_action action, Player * pl)
     {

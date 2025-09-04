@@ -201,13 +201,13 @@ bool PlayerServer::pickup(InventoryElement * item)
     return true;
 }
 
-PlayerServer::PlayerServer(int id) : Player(id, SerializableCString("player"), ItemLocation::center(), 1, 2, 3)
+PlayerServer::PlayerServer(size_t id) : Player(id, SerializableCString("player"), ItemLocation::center(), 1, 2, 3)
 {
     objects_to_create.add(this);
-    printf("player contrs %d\n", this->c_id);
+    printf("PlayerServer contrs %ld\n", id);
 }
 
-PlayerServer * create_player(int id)
+PlayerServer * create_player(size_t id)
 {
     return new PlayerServer(id);
 }

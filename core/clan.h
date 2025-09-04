@@ -48,5 +48,5 @@ public:
 };
 
 Clan * get_random_clan();
-
+Clan * get_clan_by_id(ClanId id);
 #endif // CLAN_H

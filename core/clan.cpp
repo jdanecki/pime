@@ -22,7 +22,7 @@ Human_clan::Human_clan() : Clan(Clan_Human)
 
 Dwarf_clan::Dwarf_clan() : Clan(Clan_Dwarf)
 {
-     skills->add(SK_RZEMIOSLO);
+    skills->add(SK_RZEMIOSLO);
     skills->add(SK_WALKA);
     skills->add(SK_KAMIENIARSTWO);
 }
@@ -45,10 +45,9 @@ Niziolek_clan::Niziolek_clan() : Clan(Clan_Niziolek)
     skills->add(SK_ZDUNSTWO);
 }
 
-Clan *get_random_clan()
+Clan * get_clan_by_id(ClanId id)
 {
-    int c = rand() % 4;
-    switch (c)
+    switch ((int) id)
     {
         case 0: return new Human_clan();
         case 1: return new Dwarf_clan();
@@ -56,5 +55,10 @@ Clan *get_random_clan()
         case 3: return new Niziolek_clan();
     }
     return nullptr;
+}
+Clan *get_random_clan()
+{
+    int c = rand() % 4;
+    return get_clan_by_id((ClanId) c);
 }
 

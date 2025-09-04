@@ -31,7 +31,7 @@ struct ItemLocation
     {
         ItemLocation l;
         l.tag = ItemLocation::Tag::Chunk;
-        l.chunk = {128, 128, 0, 0};
+        l.chunk = {128, 128, 8, 8};
         return l;
     }
 };

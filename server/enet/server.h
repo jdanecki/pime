@@ -50,7 +50,7 @@ class Packet
     }
     virtual bool update(unsigned char * data, size_t s)
     {
-        return false;
+        return check_size(s);
     }
 };
 
@@ -59,21 +59,21 @@ class PacketJoinRequest : public Packet
   public:
     PacketJoinRequest() : Packet(PACKET_JOIN_REQUEST)
     {
-    }
+    }    
 };
 
 struct Player_ID
 {
     PacketType t;
-    unsigned int id;
+    unsigned long id;
 } __attribute__((packed));
 
 class PacketPlayerId : public Packet
 {
-    unsigned int id;
+    unsigned long id;
 
   public:
-    PacketPlayerId(unsigned int id) : Packet(PACKET_PLAYER_ID), id(id)
+    PacketPlayerId(unsigned long id) : Packet(PACKET_PLAYER_ID), id(id)
     {
     }
     PacketPlayerId() : Packet(PACKET_PLAYER_ID), id(0)
@@ -99,7 +99,7 @@ class PacketPlayerId : public Packet
     {
         return s == sizeof(struct Player_ID);
     }
-    unsigned int get_id()
+    unsigned long get_id()
     {
         return id;
     }
@@ -118,6 +118,19 @@ ObjectData * convert_to_data(InventoryElement * el)
             obj->element.data = *element;
             BaseElement * b = (BaseElement *)&obj->data;
             *b = *base;
+            return obj;
+        }
+        case Class_Player:
+        {
+            Player * player = dynamic_cast<Player *>(el);
+            obj = new (0) ObjectData(ObjectData::Tag::Player, sizeof(ObjectData));
+            obj->player.data = *player;
+            obj->player.data.clan = nullptr;
+            obj->player.data.player_skills = nullptr;
+            obj->player.data.inventory = nullptr;
+            obj->player.data.known_elements = nullptr;
+            obj->player.data.talking_to = nullptr;
+            obj->player.data.relations = nullptr;
             return obj;
         }
         default:
@@ -160,6 +173,7 @@ class PacketObjectCreate : public Packet
     }
     int send(ENetPeer * peer)
     {
+        int ret=0;
         struct Packet_object_create * d = new (obj->size) Packet_object_create(sizeof(Packet_object_create) + obj->size);
         d->t = t;
         memcpy(d->data, (void *)obj, obj->size);
@@ -168,7 +182,9 @@ class PacketObjectCreate : public Packet
             printf("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
 */
         ENetPacket * p = enet_packet_create(d, d->size, ENET_PACKET_FLAG_RELIABLE);
-        return enet_peer_send(peer, 0, p);
+        ret = enet_peer_send(peer, 0, p);
+        delete(d);
+        return ret;
     }
     bool update(unsigned char * data, size_t s)
     {
@@ -176,12 +192,23 @@ class PacketObjectCreate : public Packet
         if (s != d->size)
             return false;
         obj = (ObjectData *)(&d->data);
-
-        BaseElement * b = (BaseElement *)&obj->data;
-        /*    for (int i=0; i<100; i++)
-                printf("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
+/*      for (int i=0; i<100; i++)
+            printf("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
 */
-        obj->element.data.set_base(new BaseElement(*b));
+        printf("PacketObjectCreate for objectData::Tag=%d\n", (int)obj->tag);
+        switch (obj->tag)
+        {
+            case ObjectData::Tag::Element:
+            {
+                BaseElement * b = (BaseElement *)&obj->data;
+                obj->element.data.set_base(new BaseElement(*b));
+                break;
+            }
+            case ObjectData::Tag::Player:
+                break;
+            default:                
+                break;
+        }
 
         return true;
     }
@@ -252,54 +279,115 @@ class PacketChunkUpdate : public Packet
     }
 };
 
-Packet * check_packet(char who, unsigned char * data, size_t s)
+struct Packet_player_move
 {
-    bool check = false;
+    PacketType t;
+    int x, y;
+} __attribute__((packed));
+
+class PacketPlayerMove : public Packet
+{
+    int x, y;
+  public:
+    PacketPlayerMove(int x, int y) : Packet(PACKET_PLAYER_MOVE), x(x), y(y)
+    {
+    }
+    PacketPlayerMove() : Packet(PACKET_PLAYER_MOVE), x(0), y(0)
+    {
+    }
+    bool update(unsigned char * data, size_t s)
+    {
+        if (check_size(s))
+        {
+            struct Packet_player_move * d = (struct Packet_player_move *)data;
+            x = d->x;
+            y = d->y;
+            return true;
+        }
+        return false;
+    }
+    int send(ENetPeer * peer)
+    {
+        struct Packet_player_move d = {t, x, y};
+        ENetPacket * p = enet_packet_create(&d, sizeof(struct Packet_player_move), ENET_PACKET_FLAG_RELIABLE);
+        return enet_peer_send(peer, 0, p);
+    }
+    bool check_size(int s)
+    {
+        return s == sizeof(struct Packet_player_move);
+    }
+    unsigned int get_x()
+    {
+        return x;
+    }
+    unsigned int get_y()
+    {
+        return y;
+    }
+};
+
+struct Packet_location_update
+{
+    PacketType t;
+    LocationUpdateData location;
+} __attribute__((packed));
+
+class PacketLocationUpdate : public Packet
+{
+  public:
+    LocationUpdateData location;
+    PacketLocationUpdate(size_t i, ItemLocation old_loc, ItemLocation new_loc):Packet(PACKET_LOCATION_UPDATE)
+    {
+        location.id = i;
+        location.old = old_loc;
+        location.new_ = new_loc;
+    }
+    PacketLocationUpdate() : Packet(PACKET_LOCATION_UPDATE)
+    {}
+    bool update(unsigned char * data, size_t s)
+    {
+        if (check_size(s))
+        {
+            struct Packet_location_update * d = (struct Packet_location_update *)data;
+            location = d->location;
+            return true;
+        }
+        return false;
+    }
+    int send(ENetPeer * peer)
+    {
+        struct Packet_location_update d = {t, location};
+        ENetPacket * p = enet_packet_create(&d, sizeof(struct Packet_location_update), ENET_PACKET_FLAG_RELIABLE);
+        return enet_peer_send(peer, 0, p);
+    }
+    bool check_size(int s)
+    {
+        return s == sizeof(struct Packet_location_update);
+    }
+
+};
+
+Packet * check_packet(char who, unsigned char * data, size_t s)
+{    
     Packet * p = nullptr;
     switch (data[0])
     {
-        case PACKET_JOIN_REQUEST:
-        {
-            p = new PacketJoinRequest();
-            if (p->check_size(s))
-                check = true;
-            else
-                delete p;
-            break;
-        }
-        case PACKET_PLAYER_ID:
-        {
-            p = new PacketPlayerId();
-            if (p->update(data, s))
-                check = true;
-            else
-                delete p;
-            break;
-        }
-        case PACKET_CHUNK_UPDATE:
-        {
-            p = new PacketChunkUpdate();
-            if (p->update(data, s))
-                check = true;
-            else
-                delete p;
-            break;
-        }
-        case PACKET_OBJECT_CREATE:
-        {
-            p = new PacketObjectCreate();
-            if (p->update(data, s))
-                check = true;
-            else
-                delete p;
-            break;
-        }
+        case PACKET_JOIN_REQUEST:    p = new PacketJoinRequest();    break;
+        case PACKET_PLAYER_ID:       p = new PacketPlayerId();       break;
+        case PACKET_PLAYER_MOVE:     p = new PacketPlayerMove();     break;
+        case PACKET_CHUNK_UPDATE:    p = new PacketChunkUpdate();    break;
+        case PACKET_OBJECT_CREATE:   p = new PacketObjectCreate();   break;
+        case PACKET_LOCATION_UPDATE: p = new PacketLocationUpdate(); break;
     }
-    if (check)
+    if (p->update(data, s))
     {
         show_packet_type_name(who, p->get_type());
         return p;
     }
-    printf("UNKNOWN PACKET: %d with size: %ld\n", data[0], s);
-    return nullptr;
+    else
+    {
+        delete p;
+        printf("UNKNOWN PACKET: %d with size: %ld\n", data[0], s);
+        return nullptr;
+    }
 }

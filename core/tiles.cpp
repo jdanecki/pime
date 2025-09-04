@@ -11,13 +11,11 @@ void chunk::add_object(InventoryElement * object, int x, int y)
         beings.add(object);
     }
 
-    ItemLocation location;
-    location.tag = ItemLocation::Tag::Chunk;
-    location.chunk.map_y = map_y;
-    location.chunk.map_x = map_x;
-    location.chunk.x = x;
-    location.chunk.y = y;
-    object->location = location;
+    object->location.tag = ItemLocation::Tag::Chunk;
+    object->location.chunk.map_y = map_y;
+    object->location.chunk.map_x = map_x;
+    object->location.chunk.x = x;
+    object->location.chunk.y = y;
 }
 
 void chunk::add_object(InventoryElement * object)

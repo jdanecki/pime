@@ -95,6 +95,7 @@ pub extern "C" fn init(
                 if core::trace_network > 0 {
                     println!("RECEIVED {:?}", &buf[9..amt]);
                 }
+                println!("{:?}", buf);
                 WORLD.set(
                     bincode::deserialize::<World>(&buf[9..amt]).expect("failed to create world"),
                 );

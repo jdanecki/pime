@@ -74,6 +74,10 @@ struct ObjectData
     ~ObjectData()
     {
     }
+    static void* operator new(size_t size)
+    {
+        return ::operator new(size);
+    }
     static void * operator new(size_t size_base, size_t extra)
     {
         printf("ObjectData: allocating %ld + %ld\n", size_base, extra);
@@ -133,8 +137,8 @@ extern "C"
     extern void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y, int32_t thirst, int32_t hunger);
 
     extern void update_chunk(int32_t x, int32_t y, const chunk_table * data);
-
-    extern void got_id(uintptr_t id, int64_t seed);
+    
+    extern void got_id(size_t id, int64_t seed);
 
     extern void update_object(const ObjectData * data);
 

@@ -20,6 +20,7 @@ bool Meat::action(Product_action action, Player * pl)
             crafted = craft_prod((int)PROD_ROASTED_MEAT, this, nullptr /*fire*/);
             // delete fire;
             // break;
+            if (crafted) return true;
         }
         default:
             return false;

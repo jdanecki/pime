@@ -63,9 +63,10 @@ int Player::get_id()
 // known_elements = new ElementsList("known elements");
 // }
 
-Player::Player(int id, SerializableCString && name, ItemLocation location, int thirst, int hunger, int nutrition)
+Player::Player(size_t id, SerializableCString&& name, ItemLocation location, int thirst, int hunger, int nutrition)
     : InventoryElement(Class_Player, id, location), name(name), thirst(thirst), hunger(hunger), nutrition(nutrition)
 {
+    printf("new player: uid = %ld name=%s\n", uid, get_name());
     hunger = 500;
     thirst = 250;
     inventory = new InvList("inventory");
@@ -86,6 +87,7 @@ Player::Player(int id, SerializableCString && name, ItemLocation location, int t
     clan = get_random_clan();
     player_skills = new Skills();
     clan->skills->copy_elements(player_skills);
+    show(true);
 }
 
 int Player::conversation(Player * who, Sentence * s, InventoryElement * el)
@@ -124,8 +126,8 @@ void Player::stop_conversation()
 
 void Player::show(bool details)
 {
-    printf("%s %s clan=%s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan_names[clan->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
-    player_skills->show(true);
+    printf("%s %s clan=%s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan ? clan_names[clan->id] : " ", get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
+    if (player_skills) player_skills->show(true);
     if (talking_to)
     {
         printf("%s is talking to %s\n", get_name(), talking_to->get_name());

@@ -252,7 +252,7 @@ impl<'de> serde::Deserialize<'de> for Player {
                     .ok_or_else(|| serde::de::Error::invalid_length(5, &self))?;
                 Ok(unsafe {
                     Player::new(
-                        id as i32,
+                        id as usize,
                         Box::<SerializableCString>::into_raw(Box::new(name)),
                         location,
                         thirst,
