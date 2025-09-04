@@ -1,0 +1,14 @@
+serv:
+	cd server; 	cargo build
+
+client-rust:
+	make -C SDL/build -j $(nproc) pime_SDL
+
+tui-net:
+	make -C tui/build -j $(nproc)
+
+clean-rust: serv-clean
+
+serv-clean:
+	cd server; cargo clean
+

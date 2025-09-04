@@ -7,7 +7,7 @@ fi
 
 if [ ! -L implementations ]
 then
-    ln -s ../SDL/implementations implementations
+    ln -sf ../SDL/implementations implementations
 fi
 
 cd build
