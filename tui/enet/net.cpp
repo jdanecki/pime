@@ -41,7 +41,7 @@ bool handle_packet(ENetPacket * packet)
         case PACKET_CHUNK_UPDATE:
         {
             PacketChunkUpdate * up = dynamic_cast<PacketChunkUpdate *>(p);
-            update_chunk(up->x, up->y, up->table);
+            update_chunk(up->get_x(), up->get_y(), up->get_table());
             ret = true;
             break;
         }
@@ -56,7 +56,7 @@ bool handle_packet(ENetPacket * packet)
         case PACKET_LOCATION_UPDATE:
         {
             PacketLocationUpdate * loc = dynamic_cast<PacketLocationUpdate *>(p);
-            update_item_location(loc->location);
+            update_item_location(loc->get_location());
 
             ret = true;
             break;
