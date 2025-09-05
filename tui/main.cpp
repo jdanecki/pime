@@ -16,6 +16,10 @@ unsigned long max_time;
 bool finish;
 
 NetClient * client;
+#ifdef USE_ENET
+#warning USE_ENET
+extern ElementsList objects;
+#endif
 
 struct termios old_stdin, stdin_tty;
 void set_terminal()
@@ -98,11 +102,11 @@ void help()
     printf("? - show\n");
     printf("1 .. 0 - select n-element in hotbar\n");
     printf("h - help\n");
-    printf("n - use/don't use network\n");
     printf("i/I - pickup/drop item at player location\n");
+    printf("n - use/don't use network\n");
     printf("q - quit\n");
-    printf("t/T - trace network in client/server\n");
     printf("r - show counter received packets per tick\n");
+    printf("t/T - trace network in client/server\n");
     printf("wasd - move player\n");
 }
 
@@ -113,6 +117,9 @@ void help_question_mark()
     printf("e/E - show item at player location in client/server\n");
     printf("h - help\n");
     printf("i - show inventory\n");
+#ifdef USE_ENET
+    printf("o - show objects\n");
+#endif
     printf("p/P - show player/players\n");
     printf("r - return to main menu\n");
 }
@@ -171,6 +178,11 @@ bool do_key_question_mark(char k)
             }
             break;
         }
+#ifdef USE_ENET
+        case 'o':
+            objects.show(false);
+            break;
+#endif
     }
     return false;
 }

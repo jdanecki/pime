@@ -1,14 +1,24 @@
-serv:
+rust: serv-rust client-rust tui-rust
+
+serv-rust:
 	cd server; 	cargo build
 
 client-rust:
 	make -C SDL/build -j $(nproc) pime_SDL
 
-tui-net:
+tui-rust:
 	make -C tui/build -j $(nproc)
 
-clean-rust: serv-clean
+clean-rust: serv-rust-clean tui-rust-clean
+	make -C SDL/build clean
+	cd the_game_net; cargo clean
 
-serv-clean:
+serv-rust-clean:
 	cd server; cargo clean
+
+tui-rust-clean:
+	make -C tui/build clean
+
+configure-rust: configure-common
+	cd SDL; ./configure
 

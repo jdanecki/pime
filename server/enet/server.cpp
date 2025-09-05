@@ -129,6 +129,9 @@ extern "C"
     void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc)
     {
         printf("update location id=%ld old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
+        old_loc.show();
+        new_loc.show();
+
         packet_to_send = new PacketLocationUpdate(id, old_loc, new_loc);
     }
     void notify_destroy(size_t id, ItemLocation location)

@@ -1,5 +1,3 @@
-#include "../../server/cpp-src/tools/knife.h"
-#include "../../server/cpp-src/tools/knife_blade.h"
-#include "../../server/cpp-src/tools/knife_handle.h"
+#include "../../server/cpp-src/tools/tools.h"
 
-Knife * test_knife();
+ProductServer *test_knife();

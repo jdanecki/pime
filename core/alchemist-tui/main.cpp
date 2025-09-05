@@ -7,16 +7,7 @@
 
 #include "test_axe.h"
 #include "test_knife.h"
-#include "../../server/cpp-src/tools/pickaxe.h"
-#include "../../server/cpp-src/tools/pickaxe_blade.h"
-#include "../../server/cpp-src/tools/pickaxe_handle.h"
 
-#include "../../server/cpp-src/tools/knife.h"
-#include "../../server/cpp-src/tools/knife_blade.h"
-#include "../../server/cpp-src/tools/knife_handle.h"
-
-#include "../../server/cpp-src/tools/wall.h"
-#include "../../server/cpp-src/tools/hut.h"
 #include "../../server/cpp-src/elements_server.h"
 
 #include <cstdio>
@@ -62,7 +53,8 @@ void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc)
 }
 
 void notify_knowledge(size_t pl_id, Class_id cid, int id) {}
-void notify_checked(size_t pl_id, size_t el) {} 
+void notify_checked(size_t pl_id, size_t el) {}
+void notify_update(const InventoryElement * el){}
 
 void help()
 {
@@ -167,7 +159,8 @@ void add_new_plant()
 
 void add_new_npc()
 {
-    Npc * el = new Npc;
+    ItemLocation location;
+    Npc * el = new Npc(location);
     npcs->add(el);
     printf("new NPC %s found\n", el->get_name());
 }
@@ -260,25 +253,20 @@ InventoryElement * craft2_ing(char c)
     switch (c)
     {
         case 'a':
-            target = new Axe(el2[0], el2[1]);
+            target = Axe::createAxe(el2[0], el2[1]);
             break;
         case '1':
-            target = new PickAxe(el2[0], el2[1]);
+            target = Pickaxe::createPickaxe(el2[0], el2[1]);
             break;
         case '4':
-            target = new Knife(el2[0], el2[1]);
+            target = Knife::createKnife(el2[0], el2[1]);
             break;
         case '7':
-            target = new Hut(el2[0], el2[1]);
+            target = Hut::createHut(el2[0], el2[1]);
             break;
     }
     if (!target)
         return nullptr;
-    if (!target->craft())
-    {
-        delete target;
-        return nullptr;
-    }
 
     player->inventory->remove(el2[0]);
     player->inventory->remove(el2[1]);
@@ -295,35 +283,30 @@ InventoryElement * craft_ing(char c)
     switch (c)
     {
         case 'b':
-            target = new AxeBlade(el);
+            target = AxeBlade::createAxeBlade(el);
             break;
         case 'h':
-            target = new AxeHandle(el);
+            target = AxeHandle::createAxeHandle(el);
             break;
         case '2':
-            target = new PickAxeBlade(el);
+            target = PickaxeBlade::createPickaxeBlade(el);
             break;
         case '3':
-            target = new PickAxeHandle(el);
+            target = PickaxeHandle::createPickaxeHandle(el);
             break;
         case '5':
-            target = new KnifeBlade(el);
+            target = KnifeBlade::createKnifeBlade(el);
             break;
         case '6':
-            target = new KnifeHandle(el);
+            target = KnifeHandle::createKnifeHandle(el);
             break;
 
         case 'w':
-            target = new Wall(el);
+            target = Wall::createWall(el);
             break;
     }
     if (!target)
         return nullptr;
-    if (!target->craft())
-    {
-        delete target;
-        return nullptr;
-    }
     player->inventory->remove(el);
     return target;
 }
@@ -614,7 +597,8 @@ int main()
     {
         add_new_npc();
     }
-    player = new Player(0);
+    ItemLocation location;
+    player = new Player(0, SerializableCString("player"), location, 100, 100, 100);
 
     init_sentences();
     init_questions();

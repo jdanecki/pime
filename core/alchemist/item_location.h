@@ -34,4 +34,12 @@ struct ItemLocation
         l.chunk = {128, 128, 8, 8};
         return l;
     }
+    void show()
+    {
+        if (tag == Tag::Chunk)
+        {
+            printf("map_x:%d map_y:%d x:%d y:%d\n", chunk.map_x, chunk.map_y, chunk.x, chunk.y);
+        } else
+            printf("player: %lu\n", player.id);
+    }
 };

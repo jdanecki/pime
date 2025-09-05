@@ -17,5 +17,5 @@ all:
         main.cpp $(TEST) show_list.cpp game_time.cpp plants.cpp 
 
 clean:
-	rm alchemist
+	rm -f alchemist
 

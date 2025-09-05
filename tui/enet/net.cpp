@@ -6,6 +6,19 @@
 #include <cstring>
 #include "../../server/enet/server.h"
 
+class ObjectElement : public ListElement
+{
+  public:
+    ObjectElement(InventoryElement *el): ListElement(el) {}
+    bool check(void *what)
+    {
+        uintptr_t * uid=(uintptr_t*)what;
+        return *uid == el->uid;
+    }
+};
+
+ElementsList objects("objects");
+
 bool handle_packet(ENetPacket * packet)
 {
     bool ret = false;
@@ -151,16 +164,21 @@ unsigned int network_tick(NetClient * client)
 }
 InventoryElement * get_object_by_id(uintptr_t uid)
 {
-    return nullptr;
+    ListElement *el = objects.find(&uid);
+    return el ? el->el : nullptr;
 }
 
 void register_object(InventoryElement * o)
 {
-    printf("register_object: uid=%ld\n", o->uid);
+    ObjectElement *obj = new ObjectElement(o);
+    printf("register_object: uid=%ld\n", o->uid);    
+    objects.add(obj);
 }
 
 void deregister_object(InventoryElement * o)
 {
+    ListElement * obj= objects.find(&o->uid);
+    objects.remove(obj);
 }
 
 BaseElement * get_base_element(int32_t id)
