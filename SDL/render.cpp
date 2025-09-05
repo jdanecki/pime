@@ -35,9 +35,13 @@ void draw_texts()
 
     sprintf(text, "Hunger=%d Thirst=%d", player->hunger, player->thirst);
     write_text(tx, ty, text, (player->hunger < 100 || player->thirst < 100) ? Red : White, 15, 30);
-
+#ifdef USE_ENET
+    sprintf(text, "%s@[%d,%d][%d,%d]", player->get_name(), player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
+        player->location.chunk.y);
+#else
     sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), clan_names[player->clan->id], player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
         player->location.chunk.y);
+#endif
     write_text(tx, window_height - 150, text, White, 15, 30);
 
     InventoryElement * item = get_item_at_ppos(player);
@@ -334,12 +338,13 @@ void draw_dialogs()
     hotbar.draw(renderer);
 }
 
-void draw()
+bool draw()
 {
     hotbar.update();
     d_craft.update();
 
-    if (draw_terrain())
+    bool ret = draw_terrain();
+    if (ret)
     {
         draw_players();
         draw_npc();
@@ -357,4 +362,5 @@ void draw()
     if (current_menu)
         current_menu->show();
     draw_dialogs();
+    return ret;
 }

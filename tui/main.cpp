@@ -359,7 +359,13 @@ void loop()
         if (recv && show_received)
             printf("recv: %u/%u max=%u time=%lu us/%lu ms\n", recv, total_recv, max_recv, stop - start, max_time / 1000);
 
-        check_chunk(player->location.chunk.map_x, player->location.chunk.map_y);
+        for (int y=-1; y < 2; y++)
+        {
+            for (int x=-1; x < 2; x++)
+            {
+                check_chunk(player->location.chunk.map_x + x, player->location.chunk.map_y + y);
+            }
+        }
         long w = 20000 - (stop - start);
         if (w > 0 && !c)
             usleep(w);

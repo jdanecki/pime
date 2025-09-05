@@ -25,7 +25,7 @@ bool handle_packet(ENetPacket * packet)
     unsigned char * data = packet->data;
     printf("Received length=%lu: %d\n", packet->dataLength, *data);
 
-    Packet * p = check_packet('C', data, packet->dataLength);
+    Packet * p = check_packet('R', data, packet->dataLength);
     if (!p)
         return ret;
 
@@ -113,8 +113,7 @@ NetClient * init(const char * server_ip, const char * port)
     }
 
     Packet * p = new PacketJoinRequest();
-    p->send(peer);
-    enet_host_flush(host);
+    p->send(peer);    
 
     if (enet_host_service(host, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_RECEIVE)
     {
@@ -205,8 +204,6 @@ void send_packet_move(NetClient * client, int32_t x, int32_t y)
 {
     Packet * p = new PacketPlayerMove(x, y);
     p->send(client->peer);
-    enet_host_flush(client->host);
-
 }
 
 void send_packet_pickup(NetClient * client, uintptr_t id)
@@ -239,4 +236,6 @@ void send_packet_craft(NetClient * client, uintptr_t prod_id, uintptr_t ingredie
 
 void send_packet_request_chunk(NetClient * client, int32_t cx, int32_t cy)
 {
+    Packet * p = new PacketRequestChunk(cx, cy);
+    p->send(client->peer);
 }

@@ -28,6 +28,15 @@ class Packet
   protected:
     PacketType t;
 
+  protected:
+  int send_data(ENetPeer * peer, void * data, size_t size)
+  {
+      show_packet_type_name('S', *(unsigned char*)data);
+      ENetPacket * p = enet_packet_create(data, size, ENET_PACKET_FLAG_RELIABLE);
+      int ret = enet_peer_send(peer, 0, p);
+      enet_host_flush(peer->host);
+      return ret;
+  }
   public:
     Packet(PacketType t) : t(t)
     {
@@ -37,8 +46,7 @@ class Packet
     }
     virtual int send(ENetPeer * peer)
     {
-        ENetPacket * p = enet_packet_create(&t, sizeof(PacketType), ENET_PACKET_FLAG_RELIABLE);
-        return enet_peer_send(peer, 0, p);
+        return send_data(peer, &t, sizeof(PacketType));
     }
     PacketType get_type()
     {
@@ -90,9 +98,8 @@ class PacketPlayerId : public Packet
         return false;
     }
     int send(ENetPeer * peer)
-    {        
-        ENetPacket * p = enet_packet_create(&data, sizeof(struct serial_data), ENET_PACKET_FLAG_RELIABLE);
-        return enet_peer_send(peer, 0, p);
+    {
+        return send_data(peer, &data, sizeof(struct serial_data));
     }
     bool check_size(int s)
     {
@@ -176,12 +183,11 @@ class PacketObjectCreate : public Packet
         struct serial_data * d = new (obj->size) serial_data(sizeof(serial_data) + obj->size);
         d->t = t;
         memcpy(d->data, (void *)obj, obj->size);
-        show_packet_type_name('S', t);
+
         /*for (int i=0; i< 100; i++)
             printf("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
 */
-        ENetPacket * p = enet_packet_create(d, d->size, ENET_PACKET_FLAG_RELIABLE);
-        ret = enet_peer_send(peer, 0, p);
+        ret = send_data(peer, d, d->size);
         delete(d);
         return ret;
     }
@@ -239,11 +245,8 @@ class PacketChunkUpdate : public Packet
     }
     int send(ENetPeer * peer)
     {
-        int ret;
-        show_packet_type_name('T', t);
-
-        ENetPacket * p1 = enet_packet_create(&data, sizeof(struct serial_data), ENET_PACKET_FLAG_RELIABLE);
-        ret = enet_peer_send(peer, 0, p1);
+        int ret;       
+        ret = send_data(peer, &data, sizeof(struct serial_data));
 
         chunk * ch = world_table[data.y][data.x];
         ch->objects.show(false);
@@ -302,9 +305,8 @@ class PacketPlayerMove : public Packet
         return false;
     }
     int send(ENetPeer * peer)
-    {        
-        ENetPacket * p = enet_packet_create(&data, sizeof(struct serial_data), ENET_PACKET_FLAG_RELIABLE);
-        return enet_peer_send(peer, 0, p);
+    {
+        return send_data(peer, &data, sizeof(struct serial_data));
     }
     bool check_size(int s)
     {
@@ -319,7 +321,6 @@ class PacketPlayerMove : public Packet
         return pdata->y;
     }
 };
-
 
 class PacketLocationUpdate : public Packet
 {
@@ -351,9 +352,8 @@ class PacketLocationUpdate : public Packet
         return false;
     }
     int send(ENetPeer * peer)
-    {        
-        ENetPacket * p = enet_packet_create(&data, sizeof(struct serial_data), ENET_PACKET_FLAG_RELIABLE);
-        return enet_peer_send(peer, 0, p);
+    {
+        return send_data(peer, &data, sizeof(struct serial_data));
     }
     bool check_size(int s)
     {
@@ -361,7 +361,46 @@ class PacketLocationUpdate : public Packet
     }
 };
 
-Packet * check_packet(char who, unsigned char * data, size_t s)
+class PacketRequestChunk : public Packet
+{
+    struct serial_data
+    {
+        PacketType t;
+        int cx, cy;
+    } data, *pdata __attribute__((packed));
+
+  public:
+    int get_cx() { return pdata->cx; }
+    int get_cy() { return pdata->cy; }
+
+    PacketRequestChunk(int cx, int cy) : Packet(PACKET_REQUEST_CHUNK)
+    {
+        data.t = t;
+        data.cx = cx;
+        data.cy = cy;
+    }
+    PacketRequestChunk() : Packet(PACKET_REQUEST_CHUNK)
+    {}
+    bool update(unsigned char * net_data, size_t s)
+    {
+        if (check_size(s))
+        {
+            pdata = (struct serial_data *)net_data;
+            return true;
+        }
+        return false;
+    }
+    int send(ENetPeer * peer)
+    {
+        return send_data(peer, &data, sizeof(struct serial_data));
+    }
+    bool check_size(int s)
+    {
+        return s == sizeof(struct serial_data);
+    }
+};
+
+Packet * check_packet(char dir, unsigned char * data, size_t s)
 {    
     Packet * p = nullptr;
     switch (data[0])
@@ -372,10 +411,11 @@ Packet * check_packet(char who, unsigned char * data, size_t s)
         case PACKET_CHUNK_UPDATE:    p = new PacketChunkUpdate();    break;
         case PACKET_OBJECT_CREATE:   p = new PacketObjectCreate();   break;
         case PACKET_LOCATION_UPDATE: p = new PacketLocationUpdate(); break;
+        case PACKET_REQUEST_CHUNK:   p = new PacketRequestChunk(); break;
     }
     if (p->update(data, s))
     {
-        show_packet_type_name(who, p->get_type());
+        show_packet_type_name(dir, p->get_type());
         return p;
     }
     else

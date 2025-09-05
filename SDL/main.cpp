@@ -18,7 +18,7 @@ bool finish;
 
 NetClient * client;
 
-extern void draw();
+extern bool draw();
 
 void (*callback_daily)();
 void daily_call()
@@ -159,11 +159,12 @@ void loop()
         /*if (auto_explore) {
             do_auto_explore();
         } */
-        draw();
-
-        SDL_RenderPresent(renderer);
-        if (!auto_explore)
-            SDL_Delay(20);
+        if (draw())
+        {
+            SDL_RenderPresent(renderer);
+            if (!auto_explore)
+                SDL_Delay(20);
+        }
     }
 }
 

@@ -65,7 +65,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
     unsigned char * data = packet->data;
     printf("Received length=%lu: %d\n", packet->dataLength, *data);
 
-    Packet * p = check_packet('S', data, packet->dataLength);
+    Packet * p = check_packet('R', data, packet->dataLength);
     if (!p)
         return false;
 
@@ -75,15 +75,13 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         {
             delete p;
             p = new PacketPlayerId(players->nr_elements);
-            p->send(peer);
-            enet_host_flush(server);
+            p->send(peer);            
             PlayerClient *pl = new PlayerClient(new PlayerServer(players->nr_elements), peer);
             players->add(pl);
             add_object_to_world(pl->player, pl->player->location);
             delete p;
             p = new PacketChunkUpdate(128, 128);
-            p->send(peer);
-            enet_host_flush(server);
+            p->send(peer);            
             delete p;
             break;
         }
@@ -99,8 +97,20 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             if (packet_to_send)
             {
                 packet_to_send->send(peer);
-                enet_host_flush(server);
+                packet_to_send = nullptr;
             }
+            break;
+        }
+        case PACKET_REQUEST_CHUNK:
+        {
+            PacketRequestChunk * req = dynamic_cast<PacketRequestChunk *>(p);
+            int cx = req->get_cx();
+            int cy = req->get_cy();
+            delete p;
+            p = new PacketChunkUpdate(cx, cy);
+            p->send(peer);
+            delete p;
+            break;
         }
     }
     return false;
@@ -115,8 +125,9 @@ extern "C"
 
         for (int y = 0; y < CHUNK_SIZE; y++)
             for (int x = 0; x < CHUNK_SIZE; x++)
-                ch->table[y][x].tile = 1;
-        ElementServer * el = create_element(new BaseElement(Form_solid, 1));
+                ch->table[y][x].tile = cx + cy;
+
+        ElementServer * el = create_element(new BaseElement(Form_solid, cx + cy));
       //  el->show(true);
         ch->add_object(el);
         world_table[cy][cx] = ch;
@@ -170,7 +181,9 @@ int main()
     printf("Server Pime started on port %u\n", address.port);
 
     players = new InvList("Players");
-    load_chunk(128, 128);
+    for (int cy=127; cy < 130; cy++)
+        for (int cx=127; cx < 130; cx++)
+            load_chunk(cy, cx);
 
     ENetEvent event;
     char hostname[512] = {
