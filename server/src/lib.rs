@@ -605,7 +605,7 @@ fn handle_packet(
                     } else {
                         println!("SERV: invalid id {}", id);
                     }
-                    if product_id >= 4 {
+                    if product_id >= core::Ingredient_id_ING_COUNT as usize {
                         let id2 = usize::from_le_bytes(ingredients_ids[8..16].try_into().unwrap());
                         let el2 = player._base.get_item_by_uid(id2);
                         if !el2.is_null() {

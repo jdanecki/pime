@@ -284,7 +284,7 @@ void create_menus()
     //  menu_help->add("v - clear statusline", MENU_CANCEL);
     //   menu_help->add("g - terrain break", MENU_CANCEL);
     //  menu_help->add("r - remove from hotbar", MENU_CANCEL);
-    //  menu_help->add("F5 - autoexplore", MENU_CANCEL);
+
     //  menu_help->add("F4 - item info at player", MENU_CANCEL);
 
     menu_help->add("Debug options", MENU_DEBUG);
@@ -298,6 +298,7 @@ void create_menus()
 
     menu_debug->add("F5 - trace network", MENU_CANCEL);
     menu_debug->add("F6 - trace network on server", MENU_CANCEL);
+    menu_debug->add("F7 - autoexplore", MENU_CANCEL);
     menu_debug->add("F11 - resize", MENU_CANCEL);
 
     /*  menu_music = new Menu("Music", 3);

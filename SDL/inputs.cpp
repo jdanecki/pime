@@ -149,6 +149,8 @@ void key_pressed(int key)
         case SDLK_F6:
             server_action_tile(SERVER_TRACE_NETWORK, player->location);
             break;
+        case SDLK_F7:
+            auto_explore ^= 1;
 
         case SDLK_RETURN:
             use_tile(player->location);

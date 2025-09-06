@@ -89,11 +89,12 @@ class KnownElement : public ListElement
 
 class ElementsList
 {
-    void remove_all();
+
    protected:    
     void virtual copy(ListElement *el) {}
 
   public:
+    void remove_all();
     const char * name;
     int nr_elements;
     ListElement * head;
@@ -113,6 +114,7 @@ class ElementsList
     void enable_all();
     void disable_all();
     ListElement * add(ListElement * el);
+    ListElement * add_front(ListElement * el);
     void remove(ListElement * el);
     void tick();
     void copy_elements(ElementsList * dst);
@@ -137,6 +139,7 @@ class InvList : public ElementsList
     InventoryElement ** find_class(enum Class_id cl, int * count);
     InventoryElement ** find_id(int id, int * count);
     InventoryElement * add(InventoryElement * el);
+    InventoryElement * add_front(InventoryElement * el);
     void remove(InventoryElement * el);
 };
 

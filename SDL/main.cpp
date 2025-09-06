@@ -119,30 +119,37 @@ int setup(const char * ip, const char * port)
     return 0;
 }
 
+int dst_map_x;
+int dst_map_y;
+
 void do_auto_explore()
 {
-    /*if ((dst_map_x == player.map_x) && (dst_map_y == player.map_y)) {
+    if ((dst_map_x == player->location.chunk.map_x) && (dst_map_y == player->location.chunk.map_y)) {
         int dx = 5 - (rand() % 11);
         int dy = 5 - (rand() % 11);
 
-       if (player.map_y+dy >= 0 && player.map_y+dy < WORLD_SIZE && player.map_x +dx >= 0 && player.map_x+dx < WORLD_SIZE)
+       if (player->location.chunk.map_y+dy >= 0 &&
+           player->location.chunk.map_y+dy < WORLD_SIZE &&
+           player->location.chunk.map_x +dx >= 0 &&
+           player->location.chunk.map_x+dx < WORLD_SIZE)
        {
-            if (!world_table[player.map_y+dy][player.map_x+dx]) {
-                dst_map_x=player.map_x + dx;
-                dst_map_y=player.map_y + dy;
+            if (!world_table[player->location.chunk.map_y+dy][player->location.chunk.map_x+dx])
+           {
+                dst_map_x=player->location.chunk.map_x + dx;
+                dst_map_y=player->location.chunk.map_y + dy;
             }
        }
     }
-    if (dst_map_x > player.map_x) player.move(1, 0);
-    if (dst_map_x < player.map_x) player.move(-1, 0);
-    if (dst_map_y > player.map_y) player.move(0, 1);
-    if (dst_map_y < player.map_y) player.move(0, -1);*/
+    if (dst_map_x > player->location.chunk.map_x) send_packet_move(client, 1, 0);
+    if (dst_map_x < player->location.chunk.map_x) send_packet_move(client, -1, 0);
+    if (dst_map_y > player->location.chunk.map_y) send_packet_move(client, 0, 1);
+    if (dst_map_y < player->location.chunk.map_y) send_packet_move(client, 0, -1);
 }
 
 void loop()
 {
-    // int dst_map_x=player.map_x;
-    // int dst_map_y=player.map_y;
+    dst_map_x=player->location.chunk.map_x;
+    dst_map_y=player->location.chunk.map_y;
 
     print_status(0, "Welcome in game!");
 
@@ -156,9 +163,9 @@ void loop()
         // TODO disconnect
         network_tick(client);
 
-        /*if (auto_explore) {
+        if (auto_explore) {
             do_auto_explore();
-        } */
+        }
         if (draw())
         {
             SDL_RenderPresent(renderer);

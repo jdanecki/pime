@@ -300,7 +300,7 @@ extern "C"
         ItemLocation & old_loc = data.old;
         ItemLocation & new_loc = data.new_;
 
-        printf("update item location id=%ld old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
+        printf("update item location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
         old_loc.show();
         new_loc.show();
 

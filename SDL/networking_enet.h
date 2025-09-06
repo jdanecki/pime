@@ -71,6 +71,11 @@ struct ObjectData
     ObjectData(Tag tag, size_t s) : tag(tag), size(s)
     {
     }
+    ObjectData(Tag tag) : tag(tag)
+    {
+        size = sizeof(struct ObjectData);
+    }
+
     ~ObjectData()
     {
     }

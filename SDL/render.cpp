@@ -76,8 +76,8 @@ void draw_texts()
     }
 }
 
-#if 0
-int wait_for_chunk;
+#ifdef USE_ENET
+//int wait_for_chunk;
 
 void draw_maps()
 {
@@ -85,10 +85,10 @@ void draw_maps()
     int pitch, x, y;
 
     SDL_LockTexture(map, NULL, (void **)&pixels, &pitch);
-    bool sent_request = false;
+//    bool sent_request = false;
 
-    int start_x = player->map_x - 5;
-    int start_y = player->map_y - 5;
+    int start_x = player->location.chunk.map_x - 5;
+    int start_y = player->location.chunk.map_y - 5;
 
     for (y = start_y; y < start_y + 10; y++)
     {
@@ -106,15 +106,16 @@ void draw_maps()
             chunk * chunk = world_table[y][x];
             if (chunk)
             {
-                int tile = get_tile_at(x, y, 0, 0);
-                BaseElement * b = get_base_element(tile);
-                unsigned long c = 0xff000000 | (b->color.r) | (b->color.g << 8) | (b->color.b << 16);
+                int tile = chunk->table[y][x].tile;
+                //BaseElement * b = get_base_element(tile);
+                unsigned long c = 0xff000000 + tile;
+                //unsigned long c = 0xff000000 | (b->color.r) | (b->color.g << 8) | (b->color.b << 16);
                 pixels[y * WORLD_SIZE + x] = c;
             }
             else
             {
                 pixels[y * WORLD_SIZE + x] = 0xff303030;
-                if (!wait_for_chunk)
+                /*if (!wait_for_chunk)
                 {
                     if (!sent_request)
                     {
@@ -126,6 +127,7 @@ void draw_maps()
                 }
                 else
                     wait_for_chunk--;
+                */
             }
         }
     }
@@ -134,8 +136,9 @@ void draw_maps()
     for (y = 0; y < 3; y++)
         for (x = 0; x < 3; x++)
         {
-            int py = player->map_y + y - 1;
-            int px = player->map_x + x - 1;
+            int px = player->location.chunk.map_x + x - 1;
+            int py = player->location.chunk.map_y + y - 1;
+
             if (py >= 0 && py < WORLD_SIZE && px >= 0 && px < WORLD_SIZE)
                 pixels[py * WORLD_SIZE + px] = 0xffffffff;
         }
@@ -349,7 +352,7 @@ bool draw()
         draw_players();
         draw_npc();
         draw_texts();
-        //  draw_maps();
+        draw_maps();
     }
     if (status_line[0] != ' ')
     {

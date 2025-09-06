@@ -129,6 +129,26 @@ ListElement * ElementsList::add(ListElement * entry)
     return entry;
 }
 
+ListElement * ElementsList::add_front(ListElement * entry)
+{
+    assert(entry);
+
+    if (head)
+    {
+        entry->next=head;
+        head->prev = entry;
+        head = entry;
+    }
+    else
+    {
+        head = entry;
+        tail = entry;
+    }
+
+    nr_elements++;
+    return entry;
+}
+
 void ElementsList::remove(ListElement * el)
 {
     assert(head);
@@ -261,6 +281,13 @@ InventoryElement * InvList::add(InventoryElement * el)
     return el;
 }
 
+InventoryElement * InvList::add_front(InventoryElement * el)
+{
+    ListElement * entry = new ListElement(el);
+    ElementsList::add_front(entry);
+    //  printf("%s elements=%d %s\n", name, nr_elements, el->get_class_name());
+    return el;
+}
 void InvList::remove(InventoryElement * el)
 {
     if (!head)

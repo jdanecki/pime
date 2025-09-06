@@ -31,6 +31,12 @@ bool handle_packet(ENetPacket * packet)
 
     switch (p->get_type())
     {
+        case PACKET_ACTION_FAILED:
+        {
+            printf("action failed\n");
+            ret = true;
+            break;
+        }
         case PACKET_PLAYER_ID:
         {
             PacketPlayerId * id = dynamic_cast<PacketPlayerId *>(p);
@@ -53,11 +59,40 @@ bool handle_packet(ENetPacket * packet)
             ret = true;
             break;
         }
+        case PACKET_OBJECT_UPDATE:
+        {
+            PacketObjectUpdate * obj = dynamic_cast<PacketObjectUpdate *>(p);
+
+            update_object(obj->obj);
+            ret = true;
+            break;
+        }
+        case PACKET_OBJECT_DESTROY:
+        {
+            PacketObjectDestroy * obj = dynamic_cast<PacketObjectDestroy *>(p);
+
+            destroy_object(obj->get_id(), obj->get_location());
+            ret = true;
+            break;
+        }
         case PACKET_LOCATION_UPDATE:
         {
             PacketLocationUpdate * loc = dynamic_cast<PacketLocationUpdate *>(p);
             update_item_location(loc->get_location());
-
+            ret = true;
+            break;
+        }
+        case PACKET_KNOWLEDGE_UPDATE:
+        {
+            PacketKnowledgeUpdate * upd = dynamic_cast<PacketKnowledgeUpdate *>(p);
+            knowledge_update(upd->get_pl_id(), upd->get_cid(), upd->get_id());
+            ret = true;
+            break;
+        }
+        case PACKET_CHECKED_UPDATE:
+        {
+            PacketCheckedUpdate * upd = dynamic_cast<PacketCheckedUpdate *>(p);
+            checked_update(upd->get_pl_id(), upd->get_id());
             ret = true;
             break;
         }
@@ -208,30 +243,47 @@ void send_packet_move(NetClient * client, int32_t x, int32_t y)
 
 void send_packet_pickup(NetClient * client, uintptr_t id)
 {
+    Packet * p = new PacketPlayerActionPickup(id);
+    p->send(client->peer);
 }
 
 void send_packet_drop(NetClient * client, uintptr_t id)
 {
+    Packet * p = new PacketPlayerActionDrop(id);
+    p->send(client->peer);
 }
 
 void send_packet_item_used_on_object(NetClient * client, uintptr_t iid, uintptr_t oid)
 {
+    Packet * p = new PacketPlayerActionUseItemOnObject(iid, oid);
+    p->send(client->peer);
 }
 
 void send_packet_action_on_object(NetClient * client, int32_t a, uintptr_t oid)
 {
+    Packet * p = new PacketPlayerActionOnObject((Player_action)a, oid);
+    p->send(client->peer);
 }
 
 void send_packet_server_action_on_object(NetClient * client, int32_t a, uintptr_t oid)
 {
+    Packet * p = new PacketServerActionOnObject((Server_action)a, oid);
+    p->send(client->peer);
 }
 
 void send_packet_item_used_on_tile(NetClient * client, uintptr_t iid, ItemLocation location)
 {
+    if (location.tag == ItemLocation::Tag::Chunk)
+    {
+        Packet * p = new PacketPlayerActionUseItemOnTile(iid, location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
+        p->send(client->peer);
+    }
 }
 
 void send_packet_craft(NetClient * client, uintptr_t prod_id, uintptr_t ingredients_num, const uintptr_t * iid)
 {
+    Packet * p = new PacketPlayerActionCraft(prod_id, ingredients_num, iid);
+    p->send(client->peer);
 }
 
 void send_packet_request_chunk(NetClient * client, int32_t cx, int32_t cy)

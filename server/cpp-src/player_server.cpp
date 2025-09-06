@@ -53,15 +53,17 @@ void PlayerServer::move(int dx, int dy)
         }
     }
 move_player:
+    location.chunk.x = new_x;
+    location.chunk.y = new_y;
+
     if (old.chunk.map_x != new_map_x || old.chunk.map_y != new_map_y)
     {
         remove_from_chunks(this);
+        location.chunk.map_x = new_map_x;
+        location.chunk.map_y = new_map_y;
+        add_object_to_world(this, this->location);
     }
-    location.chunk.map_x = new_map_x;
-    location.chunk.map_y = new_map_y;
-    location.chunk.x = new_x;
-    location.chunk.y = new_y;
-    add_object_to_world(this, this->location);
+
     hunger--;
     thirst--;
     update_location(get_uid(), old, location);

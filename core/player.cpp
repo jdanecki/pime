@@ -127,10 +127,13 @@ void Player::stop_conversation()
 void Player::show(bool details)
 {
     printf("%s %s clan=%s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan ? clan_names[clan->id] : " ", get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
-    if (player_skills) player_skills->show(true);
-    if (talking_to)
+    if (details)
     {
-        printf("%s is talking to %s\n", get_name(), talking_to->get_name());
+        if (player_skills) player_skills->show(true);
+        if (talking_to)
+        {
+            printf("%s is talking to %s\n", get_name(), talking_to->get_name());
+        }
     }
 }
 
