@@ -41,6 +41,7 @@ class ListElement
     virtual ~ListElement()
     {
     }
+    virtual size_t get_size() { return sizeof(ListElement); }
 };
 
 struct ElId
@@ -89,7 +90,6 @@ class KnownElement : public ListElement
 
 class ElementsList
 {
-
    protected:    
     void virtual copy(ListElement *el) {}
 
@@ -118,6 +118,7 @@ class ElementsList
     void remove(ListElement * el);
     void tick();
     void copy_elements(ElementsList * dst);
+    ListElement * get_random();
     
 };
 

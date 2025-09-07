@@ -7,22 +7,22 @@
 #include "../../SDL/networking.h"
 #include <assert.h>
 
-struct TerrainType
+class BaseListElement : public ListElement
 {
-    unsigned int id;
-    BaseElement base;
-};
-struct PlantType
-{
-    unsigned int id;
-    BasePlant base;
+    Base * base;
+  public:
+    BaseListElement(Base * base) : base(base) {}
+    bool check(void * what)
+    {
+        int *pid = (int *)what;
+        return (*pid == base->id);
+    }
+    size_t get_size() { return base->get_size() ; }
 };
 
-struct AnimalType
-{
-    unsigned int id;
-    BaseAnimal base;
-};
+extern ElementsList base_elements;
+extern ElementsList base_plants;
+extern ElementsList base_animals;
 
 class Packet
 {
@@ -378,6 +378,102 @@ class PacketObjectUpdate : public Packet
                     printf("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
         */
         printf("PacketObjectUpdate for objectData::Tag=%d\n", (int)obj->tag);
+        switch (obj->tag)
+        {
+            case ObjectData::Tag::Element:
+            {
+                BaseElement * b = (BaseElement *)&obj->data;
+                obj->element.data.set_base(new BaseElement(*b));
+                break;
+            }
+            case ObjectData::Tag::Player:
+                obj->player.data.inventory = new InvList("inventory");
+                obj->player.data.known_elements = new ElementsList("known elements");
+                obj->player.data.player_skills = new Skills();
+                break;
+            default:
+                break;
+        }
+
+        return true;
+    }
+};
+
+class PacketElementsList : public Packet
+{
+    struct serial_data
+    {
+        PacketType t;
+        size_t size;
+        int nr_elements;
+        char name[60];
+        Class_id c_id;
+        unsigned char data[0];
+        static void * operator new(size_t size_base, size_t extra)
+        {
+            printf("serial_data: allocating %ld + %ld\n", size_base, extra);
+            return ::operator new(size_base + extra);
+        }
+        serial_data(size_t s) : size(s)
+        {
+        }
+        static void operator delete(void * ptr)
+        {
+            ::operator delete(ptr);
+        }
+    } *pdata __attribute__((packed));
+
+  public:
+    PacketElementsList(ElementsList * list) : Packet(PACKET_ELEMENTS_LIST)
+    {
+        int size = list->nr_elements * list->head->get_size();
+        pdata = new (size) serial_data(sizeof(serial_data) + size);
+        pdata->t = t;
+        pdata->nr_elements = list->nr_elements;
+        strncpy(pdata->name, list->name, strlen(list->name)+1);
+        pdata->c_id = ((BaseListElement*)list->head)->base->c_id;
+        Base * base = (Base*) (&pdata->data);
+
+        ListElement * el = list->head;
+        while()
+        for (; i < list->nr_elements; i++)
+        {
+            switch (pdata->c_id) {
+                case Class_BaseElement:
+                    BaseElement * ptr = ((BaseElement*) base)[i];
+                    break;
+                case Class_BasePlant:
+                    BasePlant * base = pdata->data;
+                    break;
+                case Class_BaseAnimal:
+
+                    break;
+            }
+        }
+    }
+    PacketElementsList() : Packet(PACKET_OBJECT_UPDATE)
+    {
+    }
+    int send(ENetPeer * peer)
+    {
+        int ret=0;
+        /*for (int i=0; i< 100; i++)
+            printf("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
+*/
+        ret = send_data(peer, pdata, pdata->size);
+        delete(d);
+        return ret;
+    }
+    bool update(unsigned char * data, size_t s)
+    {
+        struct serial_data * d = (struct serial_data *)data;
+        if (s != d->size)
+            return false;
+        obj = (ObjectData *)(&d->data);
+        /*      for (int i=0; i<100; i++)
+                    printf("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
+        */
+        printf("PacketElementsList for objectData::Tag=%d\n", (int)obj->tag);
         switch (obj->tag)
         {
             case ObjectData::Tag::Element:
@@ -1006,6 +1102,7 @@ Packet * check_packet(char dir, unsigned char * data, size_t s)
         case PACKET_PLAYER_ACTION_CRAFT: p = new PacketPlayerActionCraft(); break;
         case PACKET_KNOWLEDGE_UPDATE: p = new PacketKnowledgeUpdate(); break;
         case PACKET_CHECKED_UPDATE: p = new PacketCheckedUpdate(); break;
+        case PACKET_ELEMENTS_LIST: p = new PacketElementsList(); break;
     }
     if (p->update(data, s))
     {

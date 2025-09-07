@@ -68,8 +68,10 @@ class Base
 
     SerializableCString name;
     Base(int index, Class_id c, const char * name);
+    virtual ~Base {};
     virtual void show(bool details = true);
     const char * get_name();
+    virtual size_t get_size() { return sizeof(Base); }
 };
 
 struct Color
@@ -89,6 +91,7 @@ class BaseElement : public Base
 
     BaseElement(Form f, int index);
     void show(bool details = true);
+    virtual size_t get_size() { return sizeof(BaseElement); }
 };
 
 class chunk;
@@ -494,6 +497,7 @@ class BaseAnimal : public Base
         if (details)
             Base::show(details);
     }
+    virtual size_t get_size() { return sizeof(BaseAnimal); }
 };
 
 class Animal : public InventoryElement
@@ -574,6 +578,7 @@ class BasePlant : public Base
         if (details)
             Base::show(details);
     }
+    virtual size_t get_size() { return sizeof(BasePlant); }
 };
 
 class Plant : public InventoryElement

@@ -340,4 +340,19 @@ void ElementsList::copy_elements(ElementsList * dst)
     }
 }
 
+ListElement *ElementsList::get_random()
+{
+    if (!nr_elements) return nullptr;
+    int i = rand() % nr_elements;
+    int cnt=0;
+    ListElement * el = head;
+    while(el)
+    {
+        if (i == cnt) return el;
+        el=el->next;
+        cnt++;
+    }
+    return nullptr;
+}
+
 

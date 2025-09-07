@@ -9,6 +9,10 @@
 #include "../cpp-src/networking.h"
 #include <math.h>
 
+ElementsList base_elements("base elements");
+ElementsList base_plants("base plants");
+ElementsList base_animals("base animals");
+
 struct Peer_id
 {
     enum class Tag
@@ -340,11 +344,12 @@ extern "C"
             for (int x = 0; x < CHUNK_SIZE; x++)
                 ch->table[y][x].tile = cx;
 
-        ;
-        ch->add_object( create_element(new BaseElement(Form_solid, rand() % 20)));
-        ch->add_object(create_animal(new BaseAnimal(rand() % 10)));
-        ch->add_object(create_plant(new BasePlant(rand() % 10)));
-        ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
+
+        ch->add_object( create_element(base_elements.get_random());
+
+      //  ch->add_object(create_animal(new BaseAnimal(rand() % 10)));
+      //  ch->add_object(create_plant(new BasePlant(rand() % 10)));
+       // ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
 
         world_table[cy][cx] = ch;
     }
@@ -375,13 +380,23 @@ extern "C"
         packets_to_send->add(new PacketToSend(new PacketCheckedUpdate(pl_id, el)));
     }
 }
+
+void generate()
+{
+    players = new InvList("Players");
+    for (int i=0; i < 5; i++)
+    {
+        base_elements.add(new BaseElement(Form_solid, i));
+    }
+}
+
 int main()
 {
     trace_network = 1;
 
     if (enet_initialize() != 0)
     {
-        fprintf(stderr, "Błąd inicjalizacji ENet\n");
+        fprintf(stderr, "Can't initialize ENet\n");
         return 1;
     }
     atexit(enet_deinitialize);
@@ -395,12 +410,13 @@ int main()
     // 0-255 channels
     if (!server)
     {
-        fprintf(stderr, "Nie udało się utworzyć hosta serwera\n");
+        fprintf(stderr, "Can't create host\n");
         return 1;
     }
     printf("Server Pime started on port %u\n", address.port);
 
-    players = new InvList("Players");
+    generate();
+
     for (int cy=127; cy < 130; cy++)
         for (int cx=127; cx < 130; cx++)
             load_chunk(cy, cx);

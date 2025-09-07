@@ -6,6 +6,12 @@
 #include <cstring>
 #include "../../server/enet/server.h"
 
+ElementsList base_elements("base elements");
+ElementsList base_plants("base plants");
+ElementsList base_animals("base animals");
+
+ElementsList objects("objects");
+
 class ObjectElement : public ListElement
 {
   public:
@@ -16,8 +22,6 @@ class ObjectElement : public ListElement
         return *uid == el->uid;
     }
 };
-
-ElementsList objects("objects");
 
 bool handle_packet(ENetPacket * packet)
 {
@@ -217,22 +221,23 @@ void deregister_object(InventoryElement * o)
 
 BaseElement * get_base_element(int32_t id)
 {
-    return nullptr;
+    return base_elements.find(&id);
 }
 
 BasePlant * get_base_plant(int32_t id)
 {
-    return nullptr;
+    return base_plants.find(&id);
 }
 
 BaseAnimal * get_base_animal(int32_t id)
 {
-    return nullptr;
+    return base_animals.find(&id);
 }
 
 Base * get_base(uint32_t c_id, int32_t id)
 {
     return nullptr;
+   // return base.find(&id);
 }
 
 void send_packet_move(NetClient * client, int32_t x, int32_t y)
