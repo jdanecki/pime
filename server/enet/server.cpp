@@ -340,9 +340,12 @@ extern "C"
             for (int x = 0; x < CHUNK_SIZE; x++)
                 ch->table[y][x].tile = cx;
 
-        ElementServer * el = create_element(new BaseElement(Form_solid, rand() % 20));
-      //  el->show(true);
-        ch->add_object(el);
+        ;
+        ch->add_object( create_element(new BaseElement(Form_solid, rand() % 20)));
+        ch->add_object(create_animal(new BaseAnimal(rand() % 10)));
+        ch->add_object(create_plant(new BasePlant(rand() % 10)));
+        ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
+
         world_table[cy][cx] = ch;
     }
 
