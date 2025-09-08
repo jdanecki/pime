@@ -7,6 +7,13 @@
 #include "el_list.h"
 #include "names.h"
 
+extern "C"
+{
+    BaseElement * get_base_element(int32_t id);
+    BasePlant * get_base_plant(int32_t id);
+    BaseAnimal * get_base_animal(int32_t id);
+}
+
 ElementsList * base_list;
 
 const char * ingredient_name[] = {
@@ -119,6 +126,11 @@ Element::Element(BaseElement * b)
 {
 
 }
+
+Element::Element(int id): base(get_base_element(id))
+{
+}
+
 // called by the_game_net/core.rs
 InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : c_id(c_id), uid(uid), location(location)
 {

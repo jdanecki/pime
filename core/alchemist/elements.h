@@ -108,7 +108,7 @@ class InventoryElement
     InventoryElement(Class_id c_id, size_t uid, ItemLocation location);
     InventoryElement(Class_id c_id) : c_id(c_id), uid((size_t)this)
     {}
-
+    InventoryElement() {}
     virtual bool action(Product_action action, Player * pl)
     {
         printf("INV: %s %s\n", product_action_name[action], get_name());
@@ -121,7 +121,7 @@ class InventoryElement
     }
     virtual void show(bool details = true)
     {
-        printf("%s: uid=%lx\n", get_class_name(), uid);
+        printf("%s: uid=%lx @[%d,%d][%d,%d]\n", get_class_name(), uid, location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
     }
     virtual bool tick()
     {
@@ -279,14 +279,10 @@ class Element : public InventoryElement
     {
         return base.get();
     }
-#ifdef USE_ENET
-    void set_base(BaseElement * b)
-    {
-        base.set(b);
-    }
-#endif
     void show(bool details = true) override;
     Element(BaseElement * b);
+    Element(int id);
+
     Form get_form() override
     {
         return get_base()->form;

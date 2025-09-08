@@ -13,6 +13,13 @@ ElementsList base_elements("base elements");
 ElementsList base_plants("base plants");
 ElementsList base_animals("base animals");
 
+BaseElement * get_base_element(int32_t id)
+{
+    BaseListElement *el=(BaseListElement*)base_elements.find(&id);
+    if (!el) return nullptr;
+    return (BaseElement*)((el)->base);
+}
+
 struct Peer_id
 {
     enum class Tag
@@ -354,8 +361,8 @@ extern "C"
             for (int x = 0; x < CHUNK_SIZE; x++)
                 ch->table[y][x].tile = cx;
 
-
-        ch->add_object( create_element((BaseElement*)base_elements.get_random()));
+        BaseListElement * base_el = (BaseListElement*) base_elements.get_random();
+        ch->add_object( create_element((BaseElement*)(base_el->base)));
 
       //  ch->add_object(create_animal(new BaseAnimal(rand() % 10)));
       //  ch->add_object(create_plant(new BasePlant(rand() % 10)));

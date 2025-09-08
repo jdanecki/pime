@@ -15,7 +15,7 @@ Edible::~Edible()
 void Edible::show()
 {
     printf("      *** Edible ***\n");
-    printf("eating by: %d -> ", eating_by);
+    printf("eating by: %x -> ", eating_by);
     for (int i = 0; i < 5; i++)
     {
         if (eating_by & (1 << i))

@@ -6,6 +6,7 @@
 #include "../../core/world.h"
 #include "../../SDL/networking.h"
 #include <assert.h>
+#include <new>
 
 extern ElementsList base_elements;
 extern ElementsList base_plants;
@@ -164,11 +165,13 @@ ObjectData * convert_to_data(InventoryElement * el)
         case Class_Element:
         {
             Element * element = dynamic_cast<Element *>(el);
-            BaseElement * base = element->get_base();
-            obj = new (sizeof(*base)) ObjectData(ObjectData::Tag::Element, sizeof(ObjectData) + sizeof(*base));
+            //BaseElement * base = element->get_base();
+            //obj = new (sizeof(*base)) ObjectData(ObjectData::Tag::Element, sizeof(ObjectData) + sizeof(*base));
+            obj = new ObjectData(ObjectData::Tag::Element);
             obj->element.data = *element;
-            BaseElement * b = (BaseElement *)&obj->data;
-            *b = *base;
+            obj->id = element->get_id();
+            //BaseElement * b = (BaseElement *)&obj->data;
+            //*b = *base;
             break;
         }
         case Class_Player:
@@ -240,7 +243,7 @@ class PacketObjectCreate : public Packet
     struct serial_data
     {
         PacketType t;
-        size_t size;
+        size_t size;        
         unsigned char data[0];
         static void * operator new(size_t size_base, size_t extra)
         {
@@ -294,8 +297,7 @@ class PacketObjectCreate : public Packet
         {
             case ObjectData::Tag::Element:
             {
-                BaseElement * b = (BaseElement *)&obj->data;
-                obj->element.data.set_base(new BaseElement(*b));
+                new (&obj->element.data) Element(obj->id);
                 break;
             }
             case ObjectData::Tag::Player:
@@ -369,8 +371,7 @@ class PacketObjectUpdate : public Packet
         {
             case ObjectData::Tag::Element:
             {
-                BaseElement * b = (BaseElement *)&obj->data;
-                obj->element.data.set_base(new BaseElement(*b));
+                new (&obj->element.data) Element(obj->id);
                 break;
             }
             case ObjectData::Tag::Player:

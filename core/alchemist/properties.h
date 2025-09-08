@@ -14,6 +14,7 @@ class Property
     {
         value = v;
     }
+    Property() {}
     void show()
     {
         printf("%s = %u\n", name.str, value);

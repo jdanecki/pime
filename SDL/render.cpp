@@ -242,7 +242,7 @@ bool draw_terrain()
                         SDL_Rect img_rect = {screen_x * tile_dungeon_size, screen_y * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
 
                         SDL_Texture * texture = tiles_textures[tile % tiles_textures_count];
-                        BaseElement * base = get_base_element(tile);
+                        BaseElement * base = get_base_element(tile % tiles_textures_count);
                         if (base)
                             SDL_SetTextureColorMod(texture, base->color.r, base->color.g, base->color.b);
                         SDL_RenderCopy(renderer, texture, NULL, &img_rect);

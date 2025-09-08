@@ -239,7 +239,9 @@ void deregister_object(InventoryElement * o)
 
 BaseElement * get_base_element(int32_t id)
 {
-    return (BaseElement*)base_elements.find(&id);
+    BaseListElement *el=(BaseListElement*)base_elements.find(&id);
+    if (!el) return nullptr;
+    return (BaseElement*)((el)->base);
 }
 
 BasePlant * get_base_plant(int32_t id)

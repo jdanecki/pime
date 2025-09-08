@@ -108,6 +108,7 @@ struct ObjectData
         Player_Body player;
         Npc_Body npc;
     };
+    int id;
     unsigned char data[0];
 };
 
