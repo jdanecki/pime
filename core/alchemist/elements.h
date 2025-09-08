@@ -68,7 +68,7 @@ class Base
 
     SerializableCString name;
     Base(int index, Class_id c, const char * name);
-    virtual ~Base {};
+    virtual ~Base() {}
     virtual void show(bool details = true);
     const char * get_name();
     virtual size_t get_size() { return sizeof(Base); }

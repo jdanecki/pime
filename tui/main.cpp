@@ -19,6 +19,9 @@ NetClient * client;
 #ifdef USE_ENET
 #warning USE_ENET
 extern ElementsList objects;
+extern ElementsList base_elements;
+extern ElementsList base_plants;
+extern ElementsList base_animals;
 #endif
 
 struct termios old_stdin, stdin_tty;
@@ -119,6 +122,7 @@ void help_question_mark()
     printf("i - show inventory\n");
 #ifdef USE_ENET
     printf("o - show objects\n");
+    printf("B - show base elements\n");
 #endif
     printf("p/P - show player/players\n");
     printf("r - return to main menu\n");
@@ -138,6 +142,9 @@ bool do_key_question_mark(char k)
                     player->hotbar[i]->show();
                 }
             };
+            break;
+        case 'B':
+            base_elements.show(true);
             break;
         case 'c':
             show_chunk(player->location);

@@ -356,3 +356,7 @@ ListElement *ElementsList::get_random()
 }
 
 
+void BaseListElement::show(bool details)
+{
+    base->show(details);
+}

@@ -110,6 +110,16 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             PlayerClient *pl = new PlayerClient(new PlayerServer(players->nr_elements), peer);
             players->add(pl);            
             delete p;
+            p = new PacketElementsList(&base_elements);
+            p->send(peer);
+            delete p;
+         /*   p = new PacketElementsList(&base_plants);
+            p->send(peer);
+            delete p;
+            p = new PacketElementsList(&base_animals);
+            p->send(peer);
+            delete p;
+*/
             p = new PacketChunkUpdate(128, 128);
             p->send(peer);            
             delete p;
@@ -345,7 +355,7 @@ extern "C"
                 ch->table[y][x].tile = cx;
 
 
-        ch->add_object( create_element(base_elements.get_random());
+        ch->add_object( create_element((BaseElement*)base_elements.get_random()));
 
       //  ch->add_object(create_animal(new BaseAnimal(rand() % 10)));
       //  ch->add_object(create_plant(new BasePlant(rand() % 10)));
@@ -386,7 +396,8 @@ void generate()
     players = new InvList("Players");
     for (int i=0; i < 5; i++)
     {
-        base_elements.add(new BaseElement(Form_solid, i));
+        ListElement * entry = new BaseListElement(new BaseElement(Form_solid, i));
+        base_elements.add(entry);
     }
 }
 
@@ -464,3 +475,4 @@ int main()
     enet_host_destroy(server);
     return 0;
 }
+

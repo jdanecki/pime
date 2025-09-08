@@ -88,6 +88,20 @@ class KnownElement : public ListElement
     }
 };
 
+class BaseListElement : public ListElement
+{
+  public:
+    Base * base;
+    BaseListElement(Base * base) : base(base) {}
+    bool check(void * what)
+    {
+        int *pid = (int *)what;
+        return (*pid == base->id);
+    }
+    size_t get_size() { return base->get_size() ; }
+    void show(bool details = true);
+};
+
 class ElementsList
 {
    protected:    

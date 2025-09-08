@@ -100,6 +100,24 @@ bool handle_packet(ENetPacket * packet)
             ret = true;
             break;
         }
+        case PACKET_ELEMENTS_LIST:
+        {
+            PacketElementsList * list = dynamic_cast<PacketElementsList *>(p);
+            for (int i=0; i < list->get_nr_elements(); i++)
+            {
+                switch (list->get_c_id()) {
+                    case Class_BaseElement:
+                    {
+                        BaseElement * base_el = &((BaseElement*) list->get_data())[i];
+                        base_elements.add(new BaseListElement(new BaseElement(*base_el)));
+                        break;
+                    }
+                }
+            }
+            ret = true;
+            break;
+        }
+
     }
     delete p;
     return ret;
@@ -221,17 +239,17 @@ void deregister_object(InventoryElement * o)
 
 BaseElement * get_base_element(int32_t id)
 {
-    return base_elements.find(&id);
+    return (BaseElement*)base_elements.find(&id);
 }
 
 BasePlant * get_base_plant(int32_t id)
 {
-    return base_plants.find(&id);
+    return (BasePlant*)base_plants.find(&id);
 }
 
 BaseAnimal * get_base_animal(int32_t id)
 {
-    return base_animals.find(&id);
+    return (BaseAnimal*)base_animals.find(&id);
 }
 
 Base * get_base(uint32_t c_id, int32_t id)

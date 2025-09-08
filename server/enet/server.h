@@ -7,19 +7,6 @@
 #include "../../SDL/networking.h"
 #include <assert.h>
 
-class BaseListElement : public ListElement
-{
-    Base * base;
-  public:
-    BaseListElement(Base * base) : base(base) {}
-    bool check(void * what)
-    {
-        int *pid = (int *)what;
-        return (*pid == base->id);
-    }
-    size_t get_size() { return base->get_size() ; }
-};
-
 extern ElementsList base_elements;
 extern ElementsList base_plants;
 extern ElementsList base_animals;
@@ -424,6 +411,10 @@ class PacketElementsList : public Packet
     } *pdata __attribute__((packed));
 
   public:
+    int get_nr_elements() { return pdata->nr_elements;}
+    Class_id get_c_id() {  return pdata->c_id;}
+    unsigned char * get_data() {  return pdata->data;}
+
     PacketElementsList(ElementsList * list) : Packet(PACKET_ELEMENTS_LIST)
     {
         int size = list->nr_elements * list->head->get_size();
@@ -432,26 +423,38 @@ class PacketElementsList : public Packet
         pdata->nr_elements = list->nr_elements;
         strncpy(pdata->name, list->name, strlen(list->name)+1);
         pdata->c_id = ((BaseListElement*)list->head)->base->c_id;
-        Base * base = (Base*) (&pdata->data);
 
+        int i=0;
         ListElement * el = list->head;
-        while()
-        for (; i < list->nr_elements; i++)
+        while(el)
         {
+            BaseListElement * base_el = (BaseListElement*) el;
+
             switch (pdata->c_id) {
                 case Class_BaseElement:
-                    BaseElement * ptr = ((BaseElement*) base)[i];
+                {
+                    BaseElement * dst = &((BaseElement*) &pdata->data)[i];
+                    *dst = *((BaseElement*)base_el->base);
                     break;
+                }
                 case Class_BasePlant:
-                    BasePlant * base = pdata->data;
+                {
+                    BasePlant * dst = &((BasePlant*) &pdata->data)[i];
+                    *dst = *((BasePlant*)base_el->base);
                     break;
+                }
                 case Class_BaseAnimal:
-
+                {
+                    BaseAnimal * dst = &((BaseAnimal*) &pdata->data)[i];
+                    *dst = *((BaseAnimal*)base_el->base);
                     break;
+                }
             }
+            el = el->next;
+            i++;
         }
     }
-    PacketElementsList() : Packet(PACKET_OBJECT_UPDATE)
+    PacketElementsList() : Packet(PACKET_ELEMENTS_LIST)
     {
     }
     int send(ENetPeer * peer)
@@ -460,37 +463,18 @@ class PacketElementsList : public Packet
         /*for (int i=0; i< 100; i++)
             printf("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
 */
-        ret = send_data(peer, pdata, pdata->size);
-        delete(d);
+        ret = send_data(peer, pdata, pdata->size);        
         return ret;
     }
     bool update(unsigned char * data, size_t s)
     {
-        struct serial_data * d = (struct serial_data *)data;
-        if (s != d->size)
-            return false;
-        obj = (ObjectData *)(&d->data);
+        pdata = (struct serial_data *)data;
+        if (s != pdata->size)
+            return false;        
         /*      for (int i=0; i<100; i++)
                     printf("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
         */
-        printf("PacketElementsList for objectData::Tag=%d\n", (int)obj->tag);
-        switch (obj->tag)
-        {
-            case ObjectData::Tag::Element:
-            {
-                BaseElement * b = (BaseElement *)&obj->data;
-                obj->element.data.set_base(new BaseElement(*b));
-                break;
-            }
-            case ObjectData::Tag::Player:
-                obj->player.data.inventory = new InvList("inventory");
-                obj->player.data.known_elements = new ElementsList("known elements");
-                obj->player.data.player_skills = new Skills();
-                break;
-            default:
-                break;
-        }
-
+        printf("PacketElementList %s for %d %s\n", pdata->name, pdata->nr_elements, class_name[pdata->c_id]);
         return true;
     }
 };
