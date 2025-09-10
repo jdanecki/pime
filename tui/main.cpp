@@ -143,9 +143,11 @@ bool do_key_question_mark(char k)
                 }
             };
             break;
+#ifdef USE_ENET
         case 'B':
             base_elements.show(true);
             break;
+#endif            
         case 'c':
             show_chunk(player->location);
             break;
@@ -340,7 +342,7 @@ void loop()
 
     for (;;)
     {
-        printf("\r%s@[%d,%d][%d,%d] %c: ", player->get_name(),
+        printf("\r%s%d@[%d,%d][%d,%d] %c: ", player->get_name(), player->get_id(),
             player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y, submenu ? submenu : '#');
 
         char c = check_key();

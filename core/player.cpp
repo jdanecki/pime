@@ -34,7 +34,7 @@ InventoryElement * Player::get_item_by_uid(size_t id)
 
 int Player::get_id()
 {
-    return uid;
+    return (int) uid;
 }
 
 // Player::Player(int id) : InventoryElement(Class_Player), id(id), name(new char[16])
@@ -63,8 +63,8 @@ int Player::get_id()
 // known_elements = new ElementsList("known elements");
 // }
 
-Player::Player(size_t id, SerializableCString&& name, ItemLocation location, int thirst, int hunger, int nutrition)
-    : InventoryElement(Class_Player, id, location), name(name), thirst(thirst), hunger(hunger), nutrition(nutrition)
+Player::Player(size_t uid, SerializableCString&& name, ItemLocation location, int thirst, int hunger, int nutrition)
+    : InventoryElement(Class_Player, uid, location), name(name), thirst(thirst), hunger(hunger), nutrition(nutrition)
 {
     printf("new player: uid = %ld name=%s\n", uid, get_name());
     hunger = 500;

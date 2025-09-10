@@ -112,6 +112,18 @@ bool handle_packet(ENetPacket * packet)
                         base_elements.add(new BaseListElement(new BaseElement(*base_el)));
                         break;
                     }
+                    case Class_BasePlant:
+                    {
+                        BasePlant * base_el = &((BasePlant*) list->get_data())[i];
+                        base_plants.add(new BaseListElement(new BasePlant(*base_el)));
+                        break;
+                    }
+                    case Class_BaseAnimal:
+                    {
+                        BaseAnimal * base_el = &((BaseAnimal*) list->get_data())[i];
+                        base_animals.add(new BaseListElement(new BaseAnimal(*base_el)));
+                        break;
+                    }
                 }
             }
             ret = true;
@@ -227,7 +239,7 @@ InventoryElement * get_object_by_id(uintptr_t uid)
 void register_object(InventoryElement * o)
 {
     ObjectElement *obj = new ObjectElement(o);
-    printf("register_object: uid=%ld\n", o->uid);    
+    printf("register_object: uid=%lx\n", o->uid);
     objects.add(obj);
 }
 
@@ -246,12 +258,16 @@ BaseElement * get_base_element(int32_t id)
 
 BasePlant * get_base_plant(int32_t id)
 {
-    return (BasePlant*)base_plants.find(&id);
+    BaseListElement *el=(BaseListElement*)base_plants.find(&id);
+    if (!el) return nullptr;
+    return (BasePlant*)((el)->base);
 }
 
 BaseAnimal * get_base_animal(int32_t id)
 {
-    return (BaseAnimal*)base_animals.find(&id);
+    BaseListElement *el=(BaseListElement*)base_animals.find(&id);
+    if (!el) return nullptr;
+    return (BaseAnimal*)((el)->base);
 }
 
 Base * get_base(uint32_t c_id, int32_t id)

@@ -4,7 +4,7 @@
 #include "server.h"
 #include "../../core/alchemist/el_list.h"
 #include "../cpp-src/player_server.h"
-#include "../cpp-src/elements_server.h"
+#include "../cpp-src/world_server.h"
 #include "../cpp-src/craft.h"
 #include "../cpp-src/networking.h"
 #include <math.h>
@@ -20,6 +20,25 @@ BaseElement * get_base_element(int32_t id)
     return (BaseElement*)((el)->base);
 }
 
+BasePlant * get_base_plant(int32_t id)
+{
+    BaseListElement *el=(BaseListElement*)base_plants.find(&id);
+    if (!el) return nullptr;
+    return (BasePlant*)((el)->base);
+}
+
+BaseAnimal * get_base_animal(int32_t id)
+{
+    BaseListElement *el=(BaseListElement*)base_animals.find(&id);
+    if (!el) return nullptr;
+    return (BaseAnimal*)((el)->base);
+}
+
+ElementsList * players, * packets_to_send;
+int players_id;
+
+ENetHost * server;
+
 struct Peer_id
 {
     enum class Tag
@@ -34,18 +53,6 @@ struct Peer_id
     };
 };
 
-class PacketToSend : public ListElement
-{
-    Packet *p;
-    public:
-    PacketToSend(Packet *p): p(p) {}
-    void send(ENetPeer * peer) {
-        p->send(peer);
-    }
-};
-
-ElementsList * players, * packets_to_send;
-ENetHost * server;
 
 class PlayerClient : public ListElement
 {
@@ -71,6 +78,31 @@ class PlayerClient : public ListElement
 
 };
 
+void send_to_all(Packet *p)
+{
+    ListElement * pl_el = players->head;
+    while (pl_el)
+    {
+        PlayerClient * pl = (PlayerClient*) pl_el;
+        printf("sending to player: %d\n", pl->player->get_id());
+        p->send(pl->peer);
+        pl_el = pl_el->next;
+    }
+}
+class PacketToSend : public ListElement
+{
+    Packet *p;
+  public:
+    PacketToSend(Packet *p): p(p) {}
+    void send(ENetPeer * peer) {
+        p->send(peer);
+    }
+    void to_all()
+    {
+        send_to_all(p);
+    }
+};
+
 void print_status(int l, const char * format, ...)
 {
     va_list args;
@@ -83,20 +115,6 @@ void print_status(int l, const char * format, ...)
     puts("");
 }
 
-void send_list(ElementsList * list, ENetPeer *peer)
-{
-    if (!list->nr_elements) return;
-    ListElement * el = list->head;
-    printf("sending from list: %s\n", list->name);
-    while (el)
-    {
-        PacketToSend * p = (PacketToSend*) el;
-        p->send(peer);
-        el = el->next;
-    }
-    list->remove_all();
-}
-
 
 bool handle_packet(ENetPacket * packet, ENetPeer * peer)
 {
@@ -107,39 +125,42 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
     if (!p)
         return false;
 
+    Peer_id peer_id;
+    peer_id.tag = Peer_id::Tag::Peer;
+    peer_id.peer = peer;
+    PlayerClient *pl=nullptr;
+    if (players->nr_elements)
+        pl = (PlayerClient*) players->find(&peer_id);
+
     switch (p->get_type())
     {
         case PACKET_JOIN_REQUEST:
         {
             delete p;
-            p = new PacketPlayerId(players->nr_elements);
-            p->send(peer);            
-            PlayerClient *pl = new PlayerClient(new PlayerServer(players->nr_elements), peer);
-            players->add(pl);            
+            p = new PacketPlayerId(players_id++);
+            p->send(peer);
+            PlayerClient *new_pl = new PlayerClient(new PlayerServer(((PacketPlayerId*)p)->get_id()), peer);
+            players->add(new_pl);
             delete p;
             p = new PacketElementsList(&base_elements);
             p->send(peer);
             delete p;
-         /*   p = new PacketElementsList(&base_plants);
+            p = new PacketElementsList(&base_plants);
             p->send(peer);
             delete p;
             p = new PacketElementsList(&base_animals);
             p->send(peer);
             delete p;
-*/
+
             p = new PacketChunkUpdate(128, 128);
             p->send(peer);            
             delete p;
-            add_object_to_world(pl->player, pl->player->location);
+            add_object_to_world(new_pl->player, new_pl->player->location);
             break;
         }
         case PACKET_PLAYER_MOVE:
         {
             PacketPlayerMove * move = dynamic_cast<PacketPlayerMove *>(p);
-            Peer_id peer_id;
-            peer_id.tag = Peer_id::Tag::Peer;
-            peer_id.peer = peer;
-            PlayerClient *pl=(PlayerClient*) players->find(&peer_id);
             pl->player->move(move->get_x(), move->get_y());
             delete p;            
             break;
@@ -158,12 +179,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         case PACKET_PLAYER_ACTION_PICKUP:
         {
             PacketPlayerActionPickup * req = dynamic_cast<PacketPlayerActionPickup *>(p);
-            uintptr_t id = req->get_id();
-            Peer_id peer_id;
-            peer_id.tag = Peer_id::Tag::Peer;
-            peer_id.peer = peer;
-            PlayerClient *pl=(PlayerClient*) players->find(&peer_id);
-
+            uintptr_t id = req->get_id();            
             InventoryElement *el = find_in_world(&pl->player->location, id);
             delete p;
             if (el)
@@ -180,12 +196,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         case PACKET_PLAYER_ACTION_DROP:
         {
             PacketPlayerActionDrop * req = dynamic_cast<PacketPlayerActionDrop *>(p);
-            uintptr_t id = req->get_id();
-            Peer_id peer_id;
-            peer_id.tag = Peer_id::Tag::Peer;
-            peer_id.peer = peer;
-            PlayerClient *pl=(PlayerClient*) players->find(&peer_id);
-
+            uintptr_t id = req->get_id();            
             InventoryElement *el = pl->player->get_item_by_uid(id);
             delete p;
             if (el)
@@ -201,12 +212,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         {
             PacketPlayerActionUseItemOnObject * req = dynamic_cast<PacketPlayerActionUseItemOnObject*>(p);
             uintptr_t iid = req->get_iid();
-            uintptr_t oid = req->get_oid();
-            Peer_id peer_id;
-            peer_id.tag = Peer_id::Tag::Peer;
-            peer_id.peer = peer;
-            PlayerClient *pl=(PlayerClient*) players->find(&peer_id);
-
+            uintptr_t oid = req->get_oid();            
             InventoryElement *el = pl->player->get_item_by_uid(iid);
             delete p;
             if (el)
@@ -226,10 +232,6 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             PacketPlayerActionOnObject * req = dynamic_cast<PacketPlayerActionOnObject*>(p);
             Player_action a = req->get_a();
             uintptr_t oid = req->get_oid();
-            Peer_id peer_id;
-            peer_id.tag = Peer_id::Tag::Peer;
-            peer_id.peer = peer;
-            PlayerClient *pl=(PlayerClient*) players->find(&peer_id);
             delete p;
             InventoryElement *obj = find_in_world(&pl->player->location, oid);
             if (obj)
@@ -248,10 +250,6 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             PacketServerActionOnObject * req = dynamic_cast<PacketServerActionOnObject*>(p);
             Server_action a = req->get_a();
             uintptr_t oid = req->get_oid();
-            Peer_id peer_id;
-            peer_id.tag = Peer_id::Tag::Peer;
-            peer_id.peer = peer;
-            PlayerClient *pl=(PlayerClient*) players->find(&peer_id);
             delete p;
             InventoryElement *obj = find_in_world(&pl->player->location, oid);
             if (obj)
@@ -273,10 +271,6 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             int x = req->get_x();
             int y = req->get_y();
             uintptr_t iid = req->get_iid();
-            Peer_id peer_id;
-            peer_id.tag = Peer_id::Tag::Peer;
-            peer_id.peer = peer;
-            PlayerClient *pl=(PlayerClient*) players->find(&peer_id);
             delete p;
             InventoryElement *item = pl->player->get_item_by_uid(iid);
             if (item)
@@ -296,10 +290,6 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             uintptr_t prod_id = req->get_prod_id();
             uintptr_t ing_num = req->get_ing_num();
             uintptr_t *iid_table = req->get_iid_table();
-            Peer_id peer_id;
-            peer_id.tag = Peer_id::Tag::Peer;
-            peer_id.peer = peer;
-            PlayerClient *pl=(PlayerClient*) players->find(&peer_id);
             delete p;
             if (craft_entry(prod_id, ing_num, iid_table,pl->player))
             {
@@ -333,69 +323,94 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             break;
         }
     }
-    send_list(packets_to_send, peer);
+    return true;
+}
+
+void send_updates()
+{
+    if (!players->nr_elements) return;
+
+    if (packets_to_send->nr_elements)
+    {
+        ListElement * el = packets_to_send->head;
+        printf("sending updates\n");
+        while (el)
+        {
+            PacketToSend * p = (PacketToSend*) el;
+            p->to_all();
+            el = el->next;
+        }
+    }
 
     if (objects_to_create.nr_elements)
     {
         ListElement * el = objects_to_create.head;
         while (el)
         {
-            printf("objects_to_create: %s id=%lx\n", el->el->get_name(), el->el->uid);
+            printf("sending objects to create: %s id=%lx\n", el->el->get_name(), el->el->uid);
             Packet * p = new PacketObjectCreate(el->el);
-            p->send(peer);
+            send_to_all(p);
             el = el->next;
         }
-        objects_to_create.remove_all();
+
     }
-    return true;
+    packets_to_send->remove_all();
+    objects_to_create.remove_all();
 }
-extern "C"
+
+void load_chunk(int cx, int cy)
 {
+    printf("load_chunk(%d, %d)\n", cx, cy);
+    chunk * ch = new chunk(cx, cy);
 
-    void load_chunk(int cx, int cy)
-    {
-        printf("load_chunk(%d, %d)\n", cx, cy);
-        chunk * ch = new chunk(cx, cy);
+    for (int y = 0; y < CHUNK_SIZE; y++)
+        for (int x = 0; x < CHUNK_SIZE; x++)
+            ch->table[y][x].tile = cx+cy;
 
-        for (int y = 0; y < CHUNK_SIZE; y++)
-            for (int x = 0; x < CHUNK_SIZE; x++)
-                ch->table[y][x].tile = cx;
+    BaseListElement * base_el = (BaseListElement*) base_elements.get_random();
+    ch->add_object( create_element((BaseElement*)(base_el->base)));
 
-        BaseListElement * base_el = (BaseListElement*) base_elements.get_random();
-        ch->add_object( create_element((BaseElement*)(base_el->base)));
+    base_el = (BaseListElement*) base_plants.get_random();
+    ch->add_object( create_plant((BasePlant*)(base_el->base)));
 
-      //  ch->add_object(create_animal(new BaseAnimal(rand() % 10)));
-      //  ch->add_object(create_plant(new BasePlant(rand() % 10)));
-       // ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
+    base_el = (BaseListElement*) base_animals.get_random();
+    ch->add_object( create_animal((BaseAnimal*)(base_el->base)));
 
-        world_table[cy][cx] = ch;
-    }
+   // ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
 
-    void notify_update(const InventoryElement * el)
-    {
-        packets_to_send->add(new PacketToSend(new PacketObjectUpdate((InventoryElement*) el)));
-    }
+    world_table[cy][cx] = ch;
+}
 
-    void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc)
-    {
-        printf("update location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
-        old_loc.show();
-        new_loc.show();
+void add_packet_to_send(Packet *p)
+{
+    if (players->nr_elements)
+        packets_to_send->add(new PacketToSend(p));
+}
 
-        packets_to_send->add(new PacketToSend(new PacketLocationUpdate(id, old_loc, new_loc)));
-    }
-    void notify_destroy(size_t id, ItemLocation location)
-    {
-        packets_to_send->add(new PacketToSend(new PacketObjectDestroy(id, location)));
-    }
-    void notify_knowledge(size_t pl_id, Class_id cid, int id)
-    {
-        packets_to_send->add(new PacketToSend(new PacketKnowledgeUpdate(pl_id, cid, id)));
-    }
-    void notify_checked(size_t pl_id, size_t el)
-    {
-        packets_to_send->add(new PacketToSend(new PacketCheckedUpdate(pl_id, el)));
-    }
+void notify_update(const InventoryElement * el)
+{
+    add_packet_to_send(new PacketObjectUpdate((InventoryElement*) el));
+}
+
+void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc)
+{
+   /* printf("update location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
+    old_loc.show();
+    new_loc.show();
+*/
+    add_packet_to_send(new PacketLocationUpdate(id, old_loc, new_loc));
+}
+void notify_destroy(size_t id, ItemLocation location)
+{
+    add_packet_to_send(new PacketObjectDestroy(id, location));
+}
+void notify_knowledge(size_t pl_id, Class_id cid, int id)
+{
+    add_packet_to_send(new PacketKnowledgeUpdate(pl_id, cid, id));
+}
+void notify_checked(size_t pl_id, size_t el)
+{
+    add_packet_to_send(new PacketCheckedUpdate(pl_id, el));
 }
 
 void generate()
@@ -405,6 +420,10 @@ void generate()
     {
         ListElement * entry = new BaseListElement(new BaseElement(Form_solid, i));
         base_elements.add(entry);
+        entry = new BaseListElement(new BasePlant(i));
+        base_plants.add(entry);
+        entry = new BaseListElement(new BaseAnimal(i));
+        base_animals.add(entry);
     }
 }
 
@@ -446,7 +465,7 @@ int main()
         0,
     };
 
-    while (enet_host_service(server, &event, 1000) >= 0)
+    while (enet_host_service(server, &event, 20) >= 0)
     {
         switch (event.type)
         {
@@ -456,25 +475,35 @@ int main()
                 printf("Client connected %s:%d\n", hostname, event.peer->address.port);
                 unsigned short * port = new unsigned short;
                 *port = event.peer->address.port;
-                event.peer->data = (void *)port;
+                event.peer->data = (void *)port;            
+                break;
             }
-            break;
-
             case ENET_EVENT_TYPE_RECEIVE:
             {
                 handle_packet(event.packet, event.peer);
                 enet_packet_destroy(event.packet);
+                send_updates();
+                break;
             }
-            break;
-
             case ENET_EVENT_TYPE_DISCONNECT:
-                printf("Client [%d] disconnected ", *(unsigned short *)(event.peer->data));
+            {
+                Peer_id peer_id;
+                peer_id.tag = Peer_id::Tag::Peer;
+                peer_id.peer = event.peer;
+                PlayerClient *pl = (PlayerClient*) players->find(&peer_id);
                 enet_address_get_host_ip(&event.peer->address, hostname, 512);
-                printf("%s:%d\n", hostname, event.peer->address.port);
+
+                printf("player: %s from %s:%d disconnected\n", pl->player->get_name(), hostname, event.peer->address.port);
+                destroy(pl->player);
+                players->remove(pl);
+                send_updates();
                 event.peer->data = NULL;
                 break;
-
+            }
             default:
+                //printf("time=%ld\n", get_time_ms());
+                update();
+                send_updates();
                 break;
         }
     }

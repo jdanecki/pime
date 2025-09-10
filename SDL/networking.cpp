@@ -49,9 +49,9 @@ void update_hotbar()
     }
 }
 
-InventoryElement * remove_from_location(ItemLocation location, size_t id)
+InventoryElement * remove_from_location(ItemLocation location, size_t uid)
 {
-    InventoryElement * el = get_object_by_id(id);
+    InventoryElement * el = get_object_by_id(uid);
     if (!el)
         return nullptr;
     switch (location.tag)
@@ -136,8 +136,10 @@ InventoryElement * el_from_data(const ObjectData * data)
     return el;
 }
 
+#ifndef USE_ENET
 extern "C"
 {
+#endif
     void knowledge_update(int pl_id, Class_id cid, int id)
     {
         if (pl_id != player->get_id())
@@ -415,4 +417,6 @@ extern "C"
     {
         print_status(1, "action failed");
     }
+#ifndef USE_ENET
 }
+#endif

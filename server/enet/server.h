@@ -80,6 +80,7 @@ class PacketPlayerId : public Packet
     {      
         data.t = t;
         data.id=id;
+        pdata = &data;
     }
     PacketPlayerId() : Packet(PACKET_PLAYER_ID)
     {
@@ -165,13 +166,9 @@ ObjectData * convert_to_data(InventoryElement * el)
         case Class_Element:
         {
             Element * element = dynamic_cast<Element *>(el);
-            //BaseElement * base = element->get_base();
-            //obj = new (sizeof(*base)) ObjectData(ObjectData::Tag::Element, sizeof(ObjectData) + sizeof(*base));
             obj = new ObjectData(ObjectData::Tag::Element);
             obj->element.data = *element;
             obj->id = element->get_id();
-            //BaseElement * b = (BaseElement *)&obj->data;
-            //*b = *base;
             break;
         }
         case Class_Player:
@@ -207,6 +204,7 @@ ObjectData * convert_to_data(InventoryElement * el)
             Plant * plant = dynamic_cast<Plant *>(el);
             obj = new ObjectData(ObjectData::Tag::Plant);
             obj->plant.data = *plant;
+            obj->id = plant->get_id();
             break;
         }
         case Class_Animal:
@@ -214,6 +212,7 @@ ObjectData * convert_to_data(InventoryElement * el)
             Animal * animal = dynamic_cast<Animal *>(el);
             obj = new ObjectData(ObjectData::Tag::Animal);
             obj->animal.data = *animal;
+            obj->id = animal->get_id();
             break;
         }
         case Class_Scroll:
@@ -300,6 +299,16 @@ class PacketObjectCreate : public Packet
                 new (&obj->element.data) Element(obj->id);
                 break;
             }
+            case ObjectData::Tag::Plant:
+            {
+                new (&obj->plant.data) Plant(obj->id);
+                break;
+            }
+            case ObjectData::Tag::Animal:
+            {
+                new (&obj->animal.data) Animal(obj->id);
+                break;
+            }
             case ObjectData::Tag::Player:
                 obj->player.data.inventory = new InvList("inventory");
                 obj->player.data.known_elements = new ElementsList("known elements");
@@ -372,6 +381,16 @@ class PacketObjectUpdate : public Packet
             case ObjectData::Tag::Element:
             {
                 new (&obj->element.data) Element(obj->id);
+                break;
+            }
+            case ObjectData::Tag::Plant:
+            {
+                new (&obj->plant.data) Plant(obj->id);
+                break;
+            }
+            case ObjectData::Tag::Animal:
+            {
+                new (&obj->animal.data) Animal(obj->id);
                 break;
             }
             case ObjectData::Tag::Player:
@@ -510,8 +529,8 @@ class PacketChunkUpdate : public Packet
         ret = send_data(peer, &data, sizeof(struct serial_data));
 
         chunk * ch = world_table[data.y][data.x];
-        ch->objects.show(false);
-        ch->beings.show(false);
+       // ch->objects.show(false);
+       // ch->beings.show(false);
         ListElement * el = ch->objects.head;
         while (el)
         {

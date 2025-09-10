@@ -2,21 +2,17 @@
 #include "elements_server.h"
 #include <stdarg.h>
 
-void generator()
+unsigned long get_time_usec()
 {
-    load_chunk(WORLD_CENTER, WORLD_CENTER);
-    printf("generated: %d items\n", world_table[128][128]->objects.nr_elements);
+    struct timespec t;
+
+    clock_gettime(CLOCK_MONOTONIC_RAW, &t);
+    return (t.tv_sec * 1000000 + t.tv_nsec / 1000);
 }
 
 unsigned long get_time_ms()
 {
-    struct timespec t;
-    int err;
-
-    err = clock_gettime(CLOCK_MONOTONIC_RAW, &t);
-    if (!err)
-        return (t.tv_sec * 1000 + t.tv_nsec / 1000000);
-    return 0;
+    return get_time_usec() / 1000;
 }
 
 void update()

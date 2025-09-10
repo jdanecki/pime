@@ -281,8 +281,9 @@ class Element : public InventoryElement
     }
     void show(bool details = true) override;
     Element(BaseElement * b);
+#ifdef USE_ENET
     Element(int id);
-
+#endif
     Form get_form() override
     {
         return get_base()->form;
@@ -505,7 +506,9 @@ class Animal : public InventoryElement
   public:
     float size;
     Animal(BaseAnimal * b);
-
+#ifdef USE_ENET
+    Animal(int id);
+#endif
     void show(bool details = true) override
     {
         InventoryElement::show(details);
@@ -599,7 +602,9 @@ class Plant : public InventoryElement
     bool grown;
 
     Plant(BasePlant * b);
-
+#ifdef USE_ENET
+    Plant(int id);
+#endif
     void show(bool details = true) override
     {
         InventoryElement::show(details);

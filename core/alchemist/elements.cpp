@@ -7,12 +7,11 @@
 #include "el_list.h"
 #include "names.h"
 
-extern "C"
-{
+#ifdef USE_ENET
     BaseElement * get_base_element(int32_t id);
     BasePlant * get_base_plant(int32_t id);
     BaseAnimal * get_base_animal(int32_t id);
-}
+#endif
 
 ElementsList * base_list;
 
@@ -126,10 +125,11 @@ Element::Element(BaseElement * b)
 {
 
 }
-
+#ifdef USE_ENET
 Element::Element(int id): base(get_base_element(id))
 {
 }
+#endif
 
 // called by the_game_net/core.rs
 InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : c_id(c_id), uid(uid), location(location)
@@ -140,9 +140,10 @@ InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation locat
 void Element::show(bool details)
 {
     InventoryElement::show(details);
-    printf("form=%s\n", get_form_name());
+
     if (!details)
         return;
+    printf("form=%s\n", get_form_name());
     length.show();
     width.show();
     height.show();
@@ -218,6 +219,13 @@ Animal::Animal(BaseAnimal * b) : InventoryElement(Class_Animal), base(b)
     init(b);
 }
 
+#ifdef USE_ENET
+Animal::Animal(int id) : base(get_base_animal(id))
+{
+
+}
+#endif
+
 BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(5))
 {
     flowers = rand() % 2;
@@ -242,6 +250,12 @@ Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)
 {
     init(b);
 }
+
+#ifdef USE_ENET
+Plant::Plant(int id): base(get_base_plant(id))
+{
+}
+#endif
 
 Scroll::Scroll(Base * b) : InventoryElement(Class_Scroll), base(b)
 {

@@ -14,7 +14,9 @@ class Property
     {
         value = v;
     }
+#ifdef USE_ENET
     Property() {}
+#endif
     void show()
     {
         printf("%s = %u\n", name.str, value);

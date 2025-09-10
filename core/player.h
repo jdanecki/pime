@@ -79,8 +79,8 @@ class Player : public InventoryElement
     void drop(InventoryElement * item);
     InventoryElement * get_item_by_uid(size_t id);
     int get_id();
-    // Player(int id);
-    Player(size_t id, SerializableCString&& name, ItemLocation location, int thirst, int hunger, int nutrition);
+    // Player(int uid);
+    Player(size_t uid, SerializableCString&& name, ItemLocation location, int thirst, int hunger, int nutrition);
     int conversation(Player * who, Sentence * s, InventoryElement * el);
     void stop_conversation();
 

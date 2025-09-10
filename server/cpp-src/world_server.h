@@ -13,4 +13,5 @@ extern "C"
 {
     void load_chunk(int x, int y);
 }
+unsigned long get_time_ms();
 #endif
