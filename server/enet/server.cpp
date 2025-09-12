@@ -418,7 +418,11 @@ void generate()
     players = new InvList("Players");
     for (int i=0; i < 5; i++)
     {
-        ListElement * entry = new BaseListElement(new BaseElement(Form_solid, i));
+        enum Form form;
+        int f = rand() % 10;
+        if (f < 8) form = Form_solid;
+        else form = Form_liquid;
+        ListElement * entry = new BaseListElement(new BaseElement(form, i));
         base_elements.add(entry);
         entry = new BaseListElement(new BasePlant(i));
         base_plants.add(entry);
