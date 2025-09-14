@@ -9,6 +9,11 @@
 #include "../cpp-src/networking.h"
 #include <math.h>
 
+#define REGIONS_NUM 1000
+#include "generator/generator.cpp"
+
+Region **regions;
+
 ElementsList base_elements("base elements");
 ElementsList base_plants("base plants");
 ElementsList base_animals("base animals");
@@ -145,13 +150,13 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             p = new PacketElementsList(&base_elements);
             p->send(peer);
             delete p;
-            p = new PacketElementsList(&base_plants);
+            /*p = new PacketElementsList(&base_plants);
             p->send(peer);
             delete p;
             p = new PacketElementsList(&base_animals);
             p->send(peer);
             delete p;
-
+*/
             p = new PacketChunkUpdate(128, 128);
             p->send(peer);            
             delete p;
@@ -358,24 +363,49 @@ void send_updates()
     objects_to_create.remove_all();
 }
 
+int random_bool(double probability) {
+    return ((double)rand() / RAND_MAX) < probability;
+}
+
+typedef void (*callback_fn)(chunk * ch, int id);
+
+void do_times(float prob, callback_fn f, chunk * ch, int id)
+{
+        int count = (int)(prob * 2.0f);
+        for (int i = 0; i < count; ++i) {
+            if (random_bool(0.5)) {
+                f(ch, id);
+            }
+        }
+}
+
+void add_element(chunk *ch, int id)
+{
+    BaseListElement * base_el = (BaseListElement*) base_elements.find(&id);
+    ch->add_object( create_element((BaseElement*)(base_el->base)));
+}
+
 void load_chunk(int cx, int cy)
 {
     printf("load_chunk(%d, %d)\n", cx, cy);
     chunk * ch = new chunk(cx, cy);
+    Region * r = find_region(cx, cy);
 
     for (int y = 0; y < CHUNK_SIZE; y++)
         for (int x = 0; x < CHUNK_SIZE; x++)
-            ch->table[y][x].tile = cx+cy;
+            ch->table[y][x].tile = r->terrain_type->id;
 
-    BaseListElement * base_el = (BaseListElement*) base_elements.get_random();
-    ch->add_object( create_element((BaseElement*)(base_el->base)));
+    for (int i=0; i < r->rocks_count; i++)
+    {
+        do_times(r->rocks_types[i]->value, add_element, ch, r->rocks_types[i]->terrain->id);
+    }
 
-    base_el = (BaseListElement*) base_plants.get_random();
+  /*  base_el = (BaseListElement*) base_plants.get_random();
     ch->add_object( create_plant((BasePlant*)(base_el->base)));
 
     base_el = (BaseListElement*) base_animals.get_random();
     ch->add_object( create_animal((BaseAnimal*)(base_el->base)));
-
+*/
    // ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
 
     world_table[cy][cx] = ch;
@@ -416,18 +446,16 @@ void notify_checked(size_t pl_id, size_t el)
 void generate()
 {
     players = new InvList("Players");
-    for (int i=0; i < 5; i++)
+    create_regions();
+
+    for (int i=0; i < terrains_count; i++)
     {
-        enum Form form;
-        int f = rand() % 10;
-        if (f < 8) form = Form_solid;
-        else form = Form_liquid;
-        ListElement * entry = new BaseListElement(new BaseElement(form, i));
+        ListElement * entry = new BaseListElement(new BaseElement((Form) terrains[i]->form, terrains[i]->id));
         base_elements.add(entry);
-        entry = new BaseListElement(new BasePlant(i));
+    /*    entry = new BaseListElement(new BasePlant(i));
         base_plants.add(entry);
         entry = new BaseListElement(new BaseAnimal(i));
-        base_animals.add(entry);
+        base_animals.add(entry);*/
     }
 }
 

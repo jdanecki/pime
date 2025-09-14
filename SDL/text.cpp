@@ -74,4 +74,4 @@ void print_status(int l, const char * format, ...)
     else
         vsprintf(status_line2, format, args);
     va_end(args);
-};
+}
