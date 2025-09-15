@@ -79,7 +79,7 @@ int init_window()
     }
     SDL_SetWindowTitle(main_window, "pime");
     SDL_SetWindowPosition(main_window, 150, 10);
-    SDL_SetWindowSize(main_window, 512, 256 + 64);
+    SDL_SetWindowSize(main_window, 1024, 600 + 64);
     SDL_GetWindowSize(main_window, &window_width, &window_height);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_ShowWindow(main_window);
@@ -170,12 +170,19 @@ int main() {
         {
             Region * r = find_region(mx, my);
             char buf[256];
+            write_text(260, 0, "rocks", Yellow, 15, 30);
             for (int i=0; i < r->rocks_count; i++)
             {
                 sprintf(buf, "%d %f", r->rocks_types[i]->terrain->id, r->rocks_types[i]->value);
-                write_text(260, i*32, buf, White, 15, 30);
+                write_text(260, 32+i*32, buf, White, 15, 30);
             }
-            print_status(1, "rocks %ld", r->rocks_count);
+            write_text(460, 0, "plants", Yellow, 15, 30);
+            for (int i=0; i < r->plants_count; i++)
+            {
+                sprintf(buf, "%d %f", r->plants_types[i]->plant->id, r->plants_types[i]->value);
+                write_text(460, 32+i*32, buf, White, 15, 30);
+            }
+            print_status(1, "rocks: %ld plants: %ld", r->rocks_count, r->plants_count);
         }
 
                //  unsigned long stop=get_time_usec();

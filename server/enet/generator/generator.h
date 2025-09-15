@@ -39,8 +39,31 @@ class TerrainType {
         printf(" TerrainType: id=%d form=%d\n", id, form);
     }
 };
+
+class PlantType {
+  public:
+    int id; // id of BasePlant
+    TerrainType** possible_ground;
+    int grounds_count;
+    PlantType(int id);
+    void show() {
+        printf(" PlanType: id=%d grounds=%d\n", id, grounds_count);
+    }
+    bool check_ground(int g)
+    {
+        for (int i=0; i< grounds_count; i++)
+        {
+            if (possible_ground[i]->id == g) return true;
+        }
+        return false;
+    }
+
+};
+
 extern int terrains_count;
 extern TerrainType ** terrains;
+extern int all_plants_count;
+extern PlantType ** all_plants;
 
 class RockEntry
 {
@@ -55,15 +78,30 @@ class RockEntry
     }
 };
 
+class PlantEntry
+{
+  public:
+    PlantType* plant;
+    float value;
+    PlantEntry(PlantType *p, float v): plant(p), value(v) {}
+    void show()
+    {
+        plant->show();
+        printf("      PlantEntry: value=%f\n", value);
+    }
+};
+
 class Region
 {
   public:
     TerrainType* terrain_type;
     RockEntry** rocks_types; //elements in this region
     int rocks_count;
+    PlantEntry ** plants_types;
+    int plants_count;
     unsigned int size;
     Coords coords;
-    Region(TerrainType* terrain_type, TerrainType** rocks, int rocks_len, int x, int y, unsigned int size);
+    Region(TerrainType* terrain_type,  int x, int y, unsigned int size);
     ~Region()
     {
         delete rocks_types;
@@ -80,13 +118,17 @@ class Region
             printf("%d: ", i);
             rocks_types[i]->show();
         }
+        printf("%d plants:\n", plants_count);
+        for (int i = 0; i < plants_count; i++)
+        {
+            printf("%d: ", i);
+            plants_types[i]->show();
+        }
     }
 };
 
 extern Region **regions;
 
-void create_regions(
-                     //PlantType** plants, size_t plant_count,
-                     //AnimalType** animals, size_t animal_count
-    );
+void create_regions();
+
 Region * find_region(int x, int y);

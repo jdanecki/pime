@@ -150,10 +150,10 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             p = new PacketElementsList(&base_elements);
             p->send(peer);
             delete p;
-            /*p = new PacketElementsList(&base_plants);
+            p = new PacketElementsList(&base_plants);
             p->send(peer);
             delete p;
-            p = new PacketElementsList(&base_animals);
+            /*p = new PacketElementsList(&base_animals);
             p->send(peer);
             delete p;
 */
@@ -385,6 +385,12 @@ void add_element(chunk *ch, int id)
     ch->add_object( create_element((BaseElement*)(base_el->base)));
 }
 
+void add_plant(chunk * ch, int id)
+{
+    BaseListElement * base_el = (BaseListElement*) base_plants.find(&id);
+    ch->add_object( create_plant((BasePlant*)(base_el->base)));
+}
+
 void load_chunk(int cx, int cy)
 {
     printf("load_chunk(%d, %d)\n", cx, cy);
@@ -399,9 +405,13 @@ void load_chunk(int cx, int cy)
     {
         do_times(r->rocks_types[i]->value, add_element, ch, r->rocks_types[i]->terrain->id);
     }
+    for (int i=0; i < r->plants_count; i++)
+    {
+        do_times(r->plants_types[i]->value, add_plant, ch, r->plants_types[i]->plant->id);
+    }
 
-  /*  base_el = (BaseListElement*) base_plants.get_random();
-    ch->add_object( create_plant((BasePlant*)(base_el->base)));
+
+  /*
 
     base_el = (BaseListElement*) base_animals.get_random();
     ch->add_object( create_animal((BaseAnimal*)(base_el->base)));
@@ -452,17 +462,23 @@ void generate()
     {
         ListElement * entry = new BaseListElement(new BaseElement((Form) terrains[i]->form, terrains[i]->id));
         base_elements.add(entry);
-    /*    entry = new BaseListElement(new BasePlant(i));
+    }
+    for (int i=0; i < all_plants_count; i++)
+    {
+        ListElement * entry = new BaseListElement(new BasePlant(all_plants[i]->id));
         base_plants.add(entry);
+    }
+
+        /*
         entry = new BaseListElement(new BaseAnimal(i));
         base_animals.add(entry);*/
-    }
+
 }
 
 int main()
 {
     trace_network = 1;
-
+    srand(0);
     if (enet_initialize() != 0)
     {
         fprintf(stderr, "Can't initialize ENet\n");
