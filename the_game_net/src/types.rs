@@ -64,15 +64,3 @@ pub enum BaseObjectData {
     Animal { data: BaseAnimalData },
     Scroll { data: BaseElementData },
 }
-
-#[no_mangle]
-extern "C" fn foo() -> ObjectData {
-    ObjectData::InvElement {
-        data: core::InventoryElement {
-            uid: 123,
-            location: core::ItemLocation::Player { id: 1 },
-            vtable_: todo!(),
-            c_id: todo!(),            
-        },
-    }
-}

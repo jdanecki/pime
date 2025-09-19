@@ -12,6 +12,11 @@ template <typename T> class SerializablePointer
         return ptr;
     }
 };
+
+template <typename T> SerializablePointer<T>::SerializablePointer(T * p) : ptr(p)
+{
+}
+
 /// <div rustbindgen nodebug></div>
 class SerializableCString
 {

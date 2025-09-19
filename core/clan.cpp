@@ -1,9 +1,10 @@
 #include "clan.h"
+#include "alchemist/object.h"
 #include <stdlib.h>
 
 const char * clan_names[] = {"Animal", "Human", "Dwarf", "Elf", "Niziolek"};
 
-Clan::Clan(ClanId id): id(id)
+Clan::Clan(ClanId id): id(id), NetworkObject(Class_Clan)
 {    
     skills = new Skills();
 }

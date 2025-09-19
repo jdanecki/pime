@@ -26,6 +26,7 @@ add_library(${PIME_TARGET_NAME} SHARED
     alchemist/properties.cpp
     alchemist/skills.cpp
     alchemist/serialization.cpp
+    alchemist/object.cpp
 	)
 
 if(USE_ENET)

@@ -1,13 +1,13 @@
+use nix::libc::{c_int, FIONREAD};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::CStr;
+use std::mem::MaybeUninit;
 use std::net::UdpSocket;
+use std::os::unix::io::AsRawFd;
 use std::rc::Rc;
 use std::sync::{Arc, Mutex, RwLock};
-use nix::libc::{FIONREAD, c_int};
-use std::os::unix::io::AsRawFd;
-use std::mem::MaybeUninit;
 use types::ObjectData;
 
 mod core;
@@ -146,9 +146,7 @@ fn get_pending_bytes(socket: &UdpSocket) -> std::io::Result<usize> {
     let fd = socket.as_raw_fd();
     let mut bytes: c_int = 0;
 
-    let res = unsafe {
-        nix::libc::ioctl(fd, FIONREAD, &mut bytes)
-    };
+    let res = unsafe { nix::libc::ioctl(fd, FIONREAD, &mut bytes) };
 
     if res < 0 {
         Err(std::io::Error::last_os_error())
@@ -157,30 +155,29 @@ fn get_pending_bytes(socket: &UdpSocket) -> std::io::Result<usize> {
     }
 }
 
-static mut max_pending: usize =0;
-static mut total_resv : usize = 0;
-static mut prev_resv : usize = 0;
-static mut prev_send :usize = 0;
+static mut max_pending: usize = 0;
+static mut total_resv: usize = 0;
+static mut prev_resv: usize = 0;
+static mut prev_send: usize = 0;
 
 #[no_mangle]
 pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
     let mut buf = [0; 8096];
-    let mut cnt=0;
+    let mut cnt = 0;
     loop {
         if let Ok(pending) = get_pending_bytes(&client.socket) {
             unsafe {
-                if pending > max_pending
-                {
-                        println!("Bufor kernela zawiera {} max={}", pending, max_pending);
-                        max_pending=pending;
+                if pending > max_pending {
+                    println!("Bufor kernela zawiera {} max={}", pending, max_pending);
+                    max_pending = pending;
                 }
             }
         }
-                   
+
         if let Ok((amt, src)) = client.socket.recv_from(&mut buf) {
-            cnt +=1;
+            cnt += 1;
             unsafe {
-                total_resv +=1;
+                total_resv += 1;
             }
             let seq = u32::from_le_bytes(buf[0..4].try_into().unwrap());
             let ack = u32::from_le_bytes(buf[4..8].try_into().unwrap());
@@ -361,7 +358,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
             break;
         }
     }
-/*
+    /*
     unsafe {
         if prev_send != total_sent || prev_resv != total_resv
         {
@@ -404,7 +401,7 @@ pub extern "C" fn get_object_by_id(uid: usize) -> *mut core::InventoryElement {
 
 #[no_mangle]
 pub extern "C" fn register_object(o: *mut core::InventoryElement) {
-    let uid = unsafe { (*o).uid };
+    let uid = unsafe { (*o)._base.uid };
     OBJECTS
         .write()
         .unwrap()
@@ -415,7 +412,7 @@ pub extern "C" fn register_object(o: *mut core::InventoryElement) {
 
 #[no_mangle]
 pub extern "C" fn deregister_object(o: *mut core::InventoryElement) {
-    let uid = unsafe { (*o).uid };
+    let uid = unsafe { (*o)._base.uid };
     OBJECTS.write().unwrap().as_mut().unwrap().remove(&uid);
 }
 

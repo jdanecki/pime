@@ -1,9 +1,10 @@
 #include "player_actions.h"
 
 #include "../core/world.h"
+#include "implementations/playerSDL.h"
 #include "networking.h"
 
-extern Player * player;
+extern PlayerSDL * player;
 extern int active_hotbar;
 
 void put_element()

@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "alchemist/el_list.h"
 #include "alchemist/elements.h"
 #include "alchemist/npc_talk.h"
 
@@ -43,7 +44,7 @@ struct PlayerRelation
 
 class Player : public InventoryElement
 {
-    int * padding; // FIXME
+    size_t padding; // FIXME
 #ifdef USE_ENET
   public:
 #else
@@ -61,19 +62,22 @@ class Player : public InventoryElement
     int thirst;
     int hunger; // hungry, very hungry, full
     int nutrition;
-    InvList * inventory;
-    InventoryElement * hotbar[10];
-    ElementsList * known_elements;
+    InvList inventory;
+    ElementsList known_elements;
+    ElementsList* get_known_elements() {return &known_elements;}
     size_t checked_element;
 
-    Clan * clan;
-    Skills * player_skills;
+    SerializablePointer<Clan> clan;
+    Clan* get_clan() {return clan.get();}
+    Skills player_skills;
 
-    int craftbar[10];
     bool in_conversation;
     bool welcomed;
-    Player * talking_to;
-    PlayerRelation * relations;
+    // Player * talking_to;
+    SerializablePointer<Player> talking_to;
+    Player* get_talking_to() {return talking_to.get();}
+    // FIXME change that to list
+    // PlayerRelation * relations;
 
     void pickup(InventoryElement * item);
     void drop(InventoryElement * item);

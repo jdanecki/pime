@@ -13,7 +13,6 @@ void print_status(int l, const char * format, ...);
 
 #define PLAYER_NUM 16
 extern Player * players[PLAYER_NUM];
-extern Player * player;
 
 size_t my_id;
 
@@ -21,12 +20,10 @@ InventoryElement * find_by_uid(size_t uid, int chunk_x, int chunk_y)
 {
     if (!world_table[chunk_y][chunk_x])
         return nullptr;
-    ListElement * el = world_table[chunk_y][chunk_x]->objects.head;
-    while (el)
+    for(InventoryElement* el: world_table[chunk_y][chunk_x]->objects)
     {
-        if (el->el->uid == uid)
-            return el->el;
-        el = el->next;
+        if (el->uid == uid)
+            return el;
     }
     return nullptr;
 }
@@ -36,14 +33,14 @@ void update_hotbar()
     // FIXME - remove/add only one element
     for (int i = 0; i < 10; i++)
         player->hotbar[i] = nullptr;
-    ListElement * le = player->inventory->head;
+    ListElement * le = player->inventory.head;
     int i = 0;
     while (le)
     {
         if (i >= 10)
             break;
-        if (le->el)
-            player->hotbar[i] = le->el;
+        if (le->el.get())
+            player->hotbar[i] = le->el.get();
         le = le->next;
         i++;
     }
@@ -109,7 +106,7 @@ InventoryElement * el_from_data(const ObjectData * data)
             el = new PlayerSDL(data->player.data);
             if (my_id == el->uid)
             {
-                player = (Player *)el;
+                player = (PlayerSDL*)el;
                 printf("new player uid=%ld name=%s\n", player->uid, player->get_name());
             }
             break;
@@ -217,7 +214,7 @@ extern "C"
         // players[id] = new Player(id, SerializableCString("player"), ItemLocation::center(), 0, 0, 0);
         // player = players[id];
 
-        player = (Player *)calloc(sizeof(Player), 1);
+        player = (PlayerSDL *)calloc(sizeof(PlayerSDL), 1);
         player->location.chunk.map_x = 128;
         player->location.chunk.map_y = 128;
         player->location.chunk.x = 8;

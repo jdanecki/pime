@@ -2,6 +2,7 @@
 #define CLAN_H
 
 
+#include "alchemist/object.h"
 #include "alchemist/skills.h"
 
 enum ClanId
@@ -15,7 +16,7 @@ enum ClanId
 
 extern const char * clan_names[];
 
-class Clan
+class Clan : NetworkObject
 {
 public:
     ClanId id;

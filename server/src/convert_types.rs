@@ -2,7 +2,7 @@ use crate::core;
 use crate::types::*;
 
 pub fn convert_to_data(el: *const core::InventoryElement) -> ObjectData {
-    match unsafe { (*el).c_id } {
+    match unsafe { (*el).get_cid() } {
         core::Class_id_Class_Element => {
             let element = unsafe { &*(el as *const core::Element) };
             ObjectData::Element { data: *element }
@@ -35,11 +35,11 @@ pub fn convert_to_data(el: *const core::InventoryElement) -> ObjectData {
         }
         core::Class_id_Class_Npc => {
             let npc = unsafe { &*(el as *const core::Npc) };
-            println!(" NPC {:?}", npc._base._base.c_id);
+            println!(" NPC {:?}", unsafe { npc._base._base.get_cid() });
             ObjectData::Npc { data: *npc }
         }
         _ => {
-            println!("WRONG CLASS ID {}", unsafe { (*el).c_id });
+            println!("WRONG CLASS ID {}", unsafe { (*el).get_cid() });
             println!("{:?}", el);
             panic!();
         }

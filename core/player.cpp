@@ -1,3 +1,4 @@
+#include "clan.h"
 #include "tiles.h"
 #include "player.h"
 
@@ -7,7 +8,7 @@ const char * relations_names[] = {"unknown", "known"};
 
 void Player::pickup(InventoryElement * item)
 {
-    inventory->add(item);
+    inventory.add(item);
 
     ItemLocation location;
     location.tag = ItemLocation::Tag::Player;
@@ -17,17 +18,15 @@ void Player::pickup(InventoryElement * item)
 
 void Player::drop(InventoryElement * item)
 {
-    inventory->remove(item);
+    inventory.remove(item);
 }
 
 InventoryElement * Player::get_item_by_uid(size_t id)
 {
-    ListElement * cur = inventory->head;
-    while (cur)
+    for (InventoryElement* el: inventory)
     {
-        if (cur->el->uid == id)
-            return cur->el;
-        cur = cur->next;
+        if (el->uid == id)
+            return el;
     }
     return NULL;
 }
@@ -64,29 +63,22 @@ int Player::get_id()
 // }
 
 Player::Player(size_t uid, SerializableCString&& name, ItemLocation location, int thirst, int hunger, int nutrition)
-    : InventoryElement(Class_Player, uid, location), name(name), thirst(thirst), hunger(hunger), nutrition(nutrition)
+    : InventoryElement(Class_Player, uid, location), name(name), thirst(thirst), hunger(hunger), nutrition(nutrition),
+    inventory("inventory"), clan(get_random_clan()), talking_to(nullptr), known_elements("known elements")
 {
     printf("new player: uid = %ld name=%s\n", uid, get_name());
     hunger = 500;
     thirst = 250;
-    inventory = new InvList("inventory");
-    relations = nullptr;
+    // FIXME
+    // relations = nullptr;
 
-    for (int i = 0; i < 10; i++)
-    {
-        hotbar[i] = NULL;
-        craftbar[i] = 0;
-    }
     in_conversation = false;
     talking_to = nullptr;
     welcomed = false;
 
-    known_elements = new ElementsList("known elements");
     checked_element = 0;
-
-    clan = get_random_clan();
-    player_skills = new Skills();
-    clan->skills->copy_elements(player_skills);
+    
+    clan.get()->skills->copy_elements(&player_skills);
     show(true);
 }
 
@@ -115,10 +107,10 @@ void Player::stop_conversation()
 {
     in_conversation = false;
     welcomed = false;
-    if (talking_to)
+    if (talking_to.get())
     {
-        printf("%s stopped talking to %s\n", talking_to->get_name(), get_name());
-        Player * p = talking_to;
+        printf("%s stopped talking to %s\n", talking_to.get()->get_name(), get_name());
+        Player * p = talking_to.get();
         talking_to = nullptr;
         p->stop_conversation();
     }
@@ -126,13 +118,13 @@ void Player::stop_conversation()
 
 void Player::show(bool details)
 {
-    printf("%s %s clan=%s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan ? clan_names[clan->id] : " ", get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
+    printf("%s %s clan=%s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan_names[clan.get()->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
     if (details)
     {
-        if (player_skills) player_skills->show(true);
-        if (talking_to)
+        player_skills.show(true);
+        if (get_talking_to())
         {
-            printf("%s is talking to %s\n", get_name(), talking_to->get_name());
+            printf("%s is talking to %s\n", get_name(), get_talking_to()->get_name());
         }
     }
 }
@@ -150,10 +142,10 @@ bool Player::say(Sentence * s)
             return true;
 
         case NPC_Say_Hello:
-            talking_to->welcomed = true;
+            get_talking_to()->welcomed = true;
         // pass through
         default:
-            talking_to->get_answer(s);
+            get_talking_to()->get_answer(s);
             break;
     }
     return false;
@@ -165,7 +157,7 @@ Sentence * Player::get_answer(Sentence * s)
     Sentence * a = dynamic_cast<Sentence *>(sentences->find(&sid));
 
     const char * n;
-    if (talking_to->find_relation(this) == REL_known)
+    if (get_talking_to()->find_relation(this) == REL_known)
         n = get_name();
     else
         n = get_class_name();
@@ -181,8 +173,8 @@ Sentence * Player::get_answer(Sentence * s)
 
 void Player::ask(Sentence * s, InventoryElement * el)
 {
-    if (talking_to)
-        talking_to->ask(s->id, el);
+    if (get_talking_to())
+        get_talking_to()->ask(s->id, el);
 }
 
 void Player::ask(enum Npc_say s, InventoryElement * el)
@@ -190,7 +182,7 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
     Npc_say sid = NPC_Say_Nothing;
     Sentence * a;
     const char * n;
-    Relations player_rel = talking_to->find_relation(this);
+    Relations player_rel = get_talking_to()->find_relation(this);
     if (player_rel == REL_known)
         n = get_name();
     else
@@ -208,7 +200,7 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
         if (des)
         {
             print_status(1, "%s says: %s. It's %s", n, a->text, des);
-            talking_to->set_known(el->get_base_cid(), el->get_id());
+            get_talking_to()->set_known(el->get_base_cid(), el->get_id());
         }
         else
         {
@@ -233,7 +225,7 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
                 break;
             case NPC_Ask_who_are_you:
                 print_status(1, "%s says: I'm %s", n, get_name());
-                talking_to->set_relation(this, REL_known);
+                get_talking_to()->set_relation(this, REL_known);
                 break;
         }
         a = dynamic_cast<Sentence *>(answers->find(&sid));
@@ -257,7 +249,7 @@ bool Player::check_known(InventoryElement * el)
     i.c_id = el->get_base_cid();
     i.id = el->get_id();
 
-    KnownElement * k = dynamic_cast<KnownElement *>(known_elements->find(&i));
+    KnownElement * k = dynamic_cast<KnownElement *>(known_elements.find(&i));
     if (!k)
         return false;
     return k->is_known();
@@ -269,11 +261,11 @@ bool Player::set_known(Class_id cid, int el_id)
     i.c_id = cid;
     i.id = el_id;
 
-    KnownElement * k = dynamic_cast<KnownElement *>(known_elements->find(&i));
+    KnownElement * k = dynamic_cast<KnownElement *>(known_elements.find(&i));
     if (!k)
     {
         KnownElement * n = new KnownElement(i.c_id, i.id);
-        known_elements->add(n);
+        known_elements.add(n);
         n->set_known();
         return true;
     }
@@ -294,41 +286,43 @@ bool Player::set_checked(size_t el)
 
 Relations Player::find_relation(Player * who)
 {
-    if (relations)
-    {
-        PlayerRelation * p = relations;
-        while (p)
-        {
-            if (p->who == who)
-                return p->rel;
-            p = p->next;
-        }
-    }
+    // FIXME
+    // if (relations)
+    // {
+    //     PlayerRelation * p = relations;
+    //     while (p)
+    //     {
+    //         if (p->who == who)
+    //             return p->rel;
+    //         p = p->next;
+    //     }
+    // }
     return REL_unknown;
 }
 
 void Player::set_relation(Player * who, enum Relations rel)
 {
-    if (relations)
-    {
-        PlayerRelation * p = relations;
-        while (p)
-        {
-            if (p->who == who)
-            {
-                p->rel = rel;
-                return;
-            }
-            p = p->next;
-        }
-        PlayerRelation * new_rel = new PlayerRelation(who, rel);
-        new_rel->next = relations;
-        relations = new_rel;
-    }
-    else
-    {
-        relations = new PlayerRelation(who, rel);
-    }
+    // FIXME
+    // if (relations)
+    // {
+    //     PlayerRelation * p = relations;
+    //     while (p)
+    //     {
+    //         if (p->who == who)
+    //         {
+    //             p->rel = rel;
+    //             return;
+    //         }
+    //         p = p->next;
+    //     }
+    //     PlayerRelation * new_rel = new PlayerRelation(who, rel);
+    //     new_rel->next = relations;
+    //     relations = new_rel;
+    // }
+    // else
+    // {
+    //     relations = new PlayerRelation(who, rel);
+    // }
 }
 
 PlayerRelation::PlayerRelation(Player * p, Relations r)

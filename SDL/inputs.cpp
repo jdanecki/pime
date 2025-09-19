@@ -8,7 +8,7 @@
 #include <SDL2/SDL_timer.h>
 #include <cstdio>
 
-#include "../core/player.h"
+#include "implementations/playerSDL.h"
 #include "../core/tiles.h"
 #include "../core/packet_types.h"
 #include "dialog/d_craft.h"
@@ -18,7 +18,6 @@
 #include "player_actions.h"
 #include "window.h"
 
-extern Player * player;
 extern int active_hotbar;
 extern int auto_explore;
 extern DHotbar hotbar;

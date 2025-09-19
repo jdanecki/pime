@@ -1,6 +1,7 @@
 #ifndef __ELEMENTS__H
 #define __ELEMENTS__H
 
+#include "object.h"
 #include "names.h"
 #include <cstddef>
 #include <cstdlib>
@@ -8,24 +9,6 @@
 #include "properties.h"
 #include "item_location.h"
 #include "serialization.h"
-
-enum Class_id
-{
-    Class_Unknown = 0,
-    Class_BaseElement,
-    Class_BaseAnimal,
-    Class_BasePlant,
-
-    Class_Element, // base: BaseElement
-    Class_Ingredient,
-    Class_Product,
-    Class_Scroll,
-
-    Class_Plant,  // base: BasePlant -> Base
-    Class_Animal, // base: BaseAnimal->Base
-    Class_Player,
-    Class_Npc,
-};
 
 extern const char * class_name[];
 
@@ -97,18 +80,16 @@ class BaseElement : public Base
 class chunk;
 class Player;
 
-class InventoryElement
+class InventoryElement : public NetworkObject
 {
     // int x, y, z;
   public:
-    Class_id c_id;
-    size_t uid;
     ItemLocation location;
 
     InventoryElement(Class_id c_id, size_t uid, ItemLocation location);
-    InventoryElement(Class_id c_id) : c_id(c_id), uid((size_t)this)
+    InventoryElement(Class_id c_id) : NetworkObject(c_id)
     {}
-    InventoryElement() {}
+    // InventoryElement() {}
     virtual bool action(Product_action action, Player * pl)
     {
         printf("INV: %s %s\n", product_action_name[action], get_name());
@@ -143,11 +124,7 @@ class InventoryElement
     {
         return c_id;
     }
-    virtual Class_id get_cid()
-    {
-        return c_id;
-    }
-
+    Class_id get_cid() const;
     int get_x()
     {
         return location.chunk.x;
@@ -156,10 +133,7 @@ class InventoryElement
     {
         return location.chunk.y;
     }
-    size_t get_uid()
-    {
-        return uid;
-    }
+    size_t get_uid() const;
     virtual char * get_description()
     {
         char * buf = new char[128];

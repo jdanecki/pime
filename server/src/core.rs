@@ -75,16 +75,17 @@ impl serde::Serialize for SerializablePointer<Base> {
     }
 }
 
-
 impl serde::Serialize for InventoryElement {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
         let mut state = serializer.serialize_tuple(3)?;
-        state.serialize_element(&self.c_id)?;
-        state.serialize_element(&self.uid)?;
-        state.serialize_element(&self.location)?;        
+        unsafe {
+            state.serialize_element(&self.get_cid())?;
+            state.serialize_element(&self.get_uid())?;
+        }
+        state.serialize_element(&self.location)?;
         state.end()
     }
 }
@@ -95,13 +96,43 @@ impl serde::Serialize for Player {
         S: serde::Serializer,
     {
         let mut state = serializer.serialize_tuple(6)?;
-        state.serialize_element(&self._base.uid)?;
+        unsafe {
+            state.serialize_element(&self._base.get_uid())?;
+        }
         state.serialize_element(&self.name)?;
         state.serialize_element(&self._base.location)?;
         state.serialize_element(&self.thirst)?;
         state.serialize_element(&self.hunger)?;
         state.serialize_element(&self.nutrition)?;
         state.end()
+    }
+}
+
+impl serde::Serialize for SerializablePointer<Player> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        usize::serialize(unsafe { &(*self.ptr)._base.get_uid() }, serializer)
+    }
+}
+
+impl serde::Serialize for SerializablePointer<Clan> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        usize::serialize(unsafe { &(*self.ptr)._base.uid }, serializer)
+    }
+}
+
+impl serde::Serialize for ElementsList {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        // usize::serialize(unsafe { &(*self.ptr)._base.uid }, serializer)
+        todo!()
     }
 }
 

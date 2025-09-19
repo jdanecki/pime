@@ -43,6 +43,9 @@ impl ParseCallbacks for MacroCallback {
             "Solid",
             "Base",
             "Edible",
+            "InvList",
+            "ElementsList",
+            "Skills",
         ];
         if ser.contains(&info.name) {
             der.append(&mut vec![String::from("serde::Deserialize")]);

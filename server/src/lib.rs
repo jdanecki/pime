@@ -259,10 +259,10 @@ pub fn main_loop(server: &mut Server) {
         // let update = start.elapsed();
         // let start = std::time::Instant::now();
         send_game_updates(server);
-/*    unsafe {
-            println!("packets sent {} recv {}", total_sent, total_recv);
-        }
-*/
+        /*    unsafe {
+                    println!("packets sent {} recv {}", total_sent, total_recv);
+                }
+        */
         // let send = start.elapsed();
         // println!(
         //     "net {:5?} update {:5?} send {:5?}",
@@ -379,7 +379,8 @@ fn handle_network(server: &mut Server, players: &mut Vec<*mut core::PlayerServer
             }
 
             match server.clients.get_mut(&src) {
-                Some(data) => { //client known already
+                Some(data) => {
+                    //client known already
                     let id = data.id;
                     unsafe {
                         core::show_packet_type_name('S' as std::os::raw::c_char, buf[12] as u8);
@@ -412,7 +413,8 @@ fn handle_network(server: &mut Server, players: &mut Vec<*mut core::PlayerServer
                         }
                     }
                 }
-                None => { //new connection from player
+                None => {
+                    //new connection from player
                     if buf[12] == core::PACKET_JOIN_REQUEST {
                         println!("connected");
                         add_player(server, src, players);
@@ -529,7 +531,7 @@ fn handle_packet(
                     let loc = (*item).location;
                     add_object_to_world(item, player._base._base.location);
                     player._base.drop(item);
-                    core::update_location((*item).uid, loc, (*item).location);
+                    core::update_location((*item).get_uid(), loc, (*item).location);
                     //let mut buf = vec![core::PACKET_PLAYER_ACTION_DROP];
                     //buf.extend_from_slice(&id.to_le_bytes());
                     //buf.extend_from_slice(&player_id.to_le_bytes());
@@ -599,7 +601,7 @@ fn handle_packet(
                     let el = player._base.get_item_by_uid(id);
                     println!("SERV: id after CRAFT{:?}", el);
                     if !el.is_null() {
-                        destroy_object(server, (*el).uid, (*el).location);
+                        destroy_object(server, (*el).get_uid(), (*el).location);
                         player._base.drop(el);
                         println!("SERV: deleted {}", id);
                     } else {
@@ -609,7 +611,7 @@ fn handle_packet(
                         let id2 = usize::from_le_bytes(ingredients_ids[8..16].try_into().unwrap());
                         let el2 = player._base.get_item_by_uid(id2);
                         if !el2.is_null() {
-                            destroy_object(server, (*el2).uid, (*el2).location);
+                            destroy_object(server, (*el2).get_uid(), (*el2).location);
                             player._base.drop(el2);
                         } else {
                             println!("SERV: invalid id2 {}", id2);

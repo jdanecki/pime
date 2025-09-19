@@ -12,7 +12,7 @@ SDL_Texture * map;
 int auto_explore;
 
 Player * players[PLAYER_NUM];
-Player * player;
+PlayerSDL * player;
 
 bool finish;
 

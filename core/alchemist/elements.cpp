@@ -114,9 +114,6 @@ void BaseElement::show(bool details)
     }
 }
 
-template <typename T> SerializablePointer<T>::SerializablePointer(T * p) : ptr(p)
-{
-}
 // called by networking.cpp:create_object
 Element::Element(BaseElement * b)
     //  : InventoryElement(Class_Element), base(b), length("length", 8 + rand() % 120), width("width", 8 + rand() % 120), height("height", 8 + rand() % 120),
@@ -132,10 +129,20 @@ Element::Element(int id): base(get_base_element(id))
 #endif
 
 // called by the_game_net/core.rs
-InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : c_id(c_id), uid(uid), location(location)
+InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : NetworkObject(c_id, uid), location(location)
 {
 
 }
+Class_id InventoryElement::get_cid() const 
+{
+    return c_id;
+}
+
+size_t InventoryElement::get_uid() const
+{
+    return uid;
+}
+
 
 void Element::show(bool details)
 {

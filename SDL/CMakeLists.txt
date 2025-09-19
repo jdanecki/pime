@@ -21,8 +21,8 @@ set(CORE_ENET_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/core-enet)
 set(USE_ENET OFF)
 add_subdirectory(${CORE_SOURCE_DIR} ${CORE_BINARY_DIR})
 
-set(USE_ENET ON)
-add_subdirectory(${CORE_SOURCE_DIR} ${CORE_ENET_BINARY_DIR})
+# set(USE_ENET ON)
+# add_subdirectory(${CORE_SOURCE_DIR} ${CORE_ENET_BINARY_DIR})
 
 set(MULTI_USER 1)
 
@@ -74,9 +74,9 @@ target_link_libraries(pime_SDL
     pime ${SHARED_LIBRARIES} ${NETWORKING_LIB}
 )
 
-add_executable(pime_SDL_enet ${SHARED_SOURCES} ../tui/enet/net.cpp)
-target_compile_definitions(pime_SDL_enet PRIVATE USE_ENET)
-target_link_libraries(pime_SDL_enet
-    pime_enet ${SHARED_LIBRARIES} enet
-)
+# add_executable(pime_SDL_enet ${SHARED_SOURCES} ../tui/enet/net.cpp)
+#target_compile_definitions(pime_SDL_enet PRIVATE USE_ENET)
+#target_link_libraries(pime_SDL_enet
+#    pime_enet ${SHARED_LIBRARIES} enet
+#)
 

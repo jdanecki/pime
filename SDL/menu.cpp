@@ -1,6 +1,6 @@
 #include "menu.h"
 #include "../core/alchemist/elements.h"
-#include "../core/player.h"
+#include "implementations/playerSDL.h"
 #include "../core/tiles.h"
 #include "../core/world.h"
 #include "music.h"
@@ -16,7 +16,6 @@
 #include "player_actions.h"
 #include <cassert>
 
-extern class Player * player;
 extern int active_hotbar;
 extern NetClient * client;
 
@@ -343,7 +342,7 @@ void create_menus()
 Menu * create_inv_form(enum Form f)
 {
     int count = 0;
-    InventoryElement ** elements_with_form = player->inventory->find_form(f, &count);
+    InventoryElement ** elements_with_form = player->inventory.find_form(f, &count);
     if (!count)
         return nullptr;
 
@@ -370,7 +369,7 @@ Menu * create_inv_form(enum Form f)
 Menu * create_inv_category_classes(enum Class_id c)
 {
     int count = 0;
-    InventoryElement ** elements_with_class = player->inventory->find_class(c, &count);
+    InventoryElement ** elements_with_class = player->inventory.find_class(c, &count);
     if (!count)
         return nullptr;
 
@@ -391,10 +390,10 @@ Menu * create_inv_category_classes(enum Class_id c)
 
 Menu * create_knowledge_classes(enum Class_id c)
 {
-    if (!player->known_elements->nr_elements)
+    if (!player->get_known_elements()->nr_elements)
         return nullptr;
 
-    ListElement * cur = player->known_elements->head;
+    ListElement * cur = player->get_known_elements()->head;
     if (menu_known_items)
     {
         delete menu_known_items;
@@ -425,7 +424,7 @@ void create_inv_menu(int id)
 {
     printf("szukam %d\n", id);
     int c = 0;
-    InventoryElement ** i_el = player->inventory->find_id(id, &c);
+    InventoryElement ** i_el = player->inventory.find_id(id, &c);
     if (i_el)
     {
         printf("found %d elements\n", c);
@@ -496,7 +495,7 @@ int menu_interact(int key)
         }
         case SDLK_i:
         {
-            player->inventory->show();
+            player->inventory.show();
             if (!current_menu)
                 current_menu = menu_inventory_categories;
             else if (current_menu == menu_inventory_categories)

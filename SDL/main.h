@@ -3,6 +3,7 @@
 
 #include "../core/world.h"
 #include "implementations/alchemistSDL.h"
+#include "implementations/playerSDL.h"
 #include "npc.h"
 #include "text.h"
 #include "window.h"
@@ -25,7 +26,6 @@
 #include <termios.h>
 #include <unistd.h>
 
-extern Player * player;
 #define PLAYER_NUM 16
 extern Player * players[PLAYER_NUM];
 extern SDL_Texture * map;

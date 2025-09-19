@@ -37,12 +37,10 @@ void chunk::remove_object(InventoryElement * object)
 
 InventoryElement * chunk::find_by_id(size_t id)
 {
-    ListElement * el = objects.head;
-    while (el)
+    for (InventoryElement* el: objects)
     {
-        if (el->el->uid == id)
-            return el->el;
-        el = el->next;
+        if (el->uid == id)
+            return el;
     }
     return nullptr;
 }

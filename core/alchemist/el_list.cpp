@@ -7,9 +7,8 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-ListElement::ListElement(InventoryElement * entry)
+ListElement::ListElement(InventoryElement * entry) : el(entry)
 {
-    el = entry;
     next = nullptr;
     prev = nullptr;
     enabled = true;
@@ -23,7 +22,7 @@ void ListElement::add(ListElement * entry)
 
 void ListElement::show(bool details)
 {
-    el->show(details);
+    el.get()->show(details);
 }
 
 void ElementsList::remove_all()
@@ -199,9 +198,9 @@ InventoryElement ** InvList::find_by_fun(FindFunc fun, void *arg, int *count)
     int c = 0;
     while (cur)
     {
-        if (fun(cur->el, arg))
+        if (fun(cur->el.get(), arg))
         {
-            a[c] = cur->el;
+            a[c] = cur->el.get();
             c++;
         }
         cur = cur->next;
@@ -294,14 +293,14 @@ void InvList::remove(InventoryElement * el)
         return;
     ListElement * cur = head;
     ListElement * tmp;
-    if (head->el == el)
+    if (head->el.get() == el)
     {
         tmp = head->next;
         if (!tail)
         {
             exit(0);
         }
-        if (tail->el == el) // only 1 element on the list
+        if (tail->el.get() == el) // only 1 element on the list
         {
             if (head == tail)
                 tail = NULL;
@@ -315,11 +314,11 @@ void InvList::remove(InventoryElement * el)
     {
         if (!cur->next)
             break;
-        if (cur->next->el == el)
+        if (cur->next->el.get() == el)
         {
             tmp = cur->next;
             cur->next = cur->next->next;
-            if (tail->el == el)
+            if (tail->el.get() == el)
             {
                 tail = cur;
             }

@@ -159,14 +159,12 @@ InventoryElement * get_item_at(ItemLocation loc)
     chunk * ch = world_table[loc.chunk.map_y][loc.chunk.map_x];
     if (!ch)
         return nullptr;
-    ListElement * le = ch->objects.head;
-    while (le)
+    for (InventoryElement* el: ch->objects)
     {
-        if (le->el->get_x() == loc.chunk.x && le->el->get_y() == loc.chunk.y)
+        if (el->get_x() == loc.chunk.x && el->get_y() == loc.chunk.y)
         {
-            return le->el;
+            return el;
         }
-        le = le->next;
     }
     return nullptr;
 }

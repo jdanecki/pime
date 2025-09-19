@@ -2,13 +2,14 @@
 #define EL_LIST_H
 
 #include "elements.h"
+#include "serialization-rust.h"
 
 class ListElement
 {
     bool enabled;
 
   public:
-    InventoryElement * el;
+    SerializablePointer<InventoryElement> el;
     ListElement *next, *prev;
 
     void add(ListElement * entry);
@@ -27,7 +28,7 @@ class ListElement
     virtual void show(bool details = true);
     virtual bool tick()
     {
-        return el->tick();
+        return el.get()->tick();
     }
     ListElement(InventoryElement * entry);
     ListElement() : el(nullptr), next(nullptr), prev(nullptr)
@@ -102,6 +103,27 @@ class BaseListElement : public ListElement
     void show(bool details = true);
 };
 
+class ElementsListIterator
+{
+    ListElement* le;
+  public:
+    ElementsListIterator(ListElement *le): le(le) {};
+    bool operator!=(ElementsListIterator& other)
+    {
+        return le != other.le;
+    }
+    ElementsListIterator operator++()
+    {
+        le = le->next;
+        printf("goo\n");
+        return *this;
+    }
+    InventoryElement* operator*()
+    {
+        return le->el.get();
+    }
+};
+
 class ElementsList
 {
    protected:    
@@ -134,6 +156,8 @@ class ElementsList
     void copy_elements(ElementsList * dst);
     ListElement * get_random();
     
+    ElementsListIterator begin() {return head;}
+    ElementsListIterator end() {return nullptr;}
 };
 
 typedef bool (*FindFunc)(InventoryElement * el, void * arg);

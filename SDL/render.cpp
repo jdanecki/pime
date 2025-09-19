@@ -1,4 +1,3 @@
-#include "main.h"
 #include "networking.h"
 #include "npc.h"
 #include "text.h"
@@ -9,6 +8,10 @@
 #include <cstdio>
 #include "dialog/d_craft.h"
 #include <cassert>
+#include "dialog/d_hotbar.h"
+#include "implementations/playerSDL.h"
+
+extern SDL_Texture* map;
 
 // TODO move it
 int active_hotbar = 0;
@@ -39,7 +42,7 @@ void draw_texts()
     sprintf(text, "%s@[%d,%d][%d,%d]", player->get_name(), player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
         player->location.chunk.y);
 #else
-    sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), clan_names[player->clan->id], player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
+    sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), clan_names[player->get_clan()->id], player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
         player->location.chunk.y);
 #endif
     write_text(tx, window_height - 150, text, White, 15, 30);
@@ -264,10 +267,8 @@ bool draw_terrain()
             if (!ch)
                 continue;
 
-            ListElement * el = ch->objects.head;
-            while (el)
+            for(InventoryElement* o: ch->objects)
             {
-                InventoryElement * o = (el->el);
                 Renderable * r = dynamic_cast<Renderable *>(o);
                 if (o && r)
                 {
@@ -287,7 +288,6 @@ bool draw_terrain()
                 {
                     printf("unrenderable %d\n", o->get_cid());
                 }
-                el = el->next;
             }
         }
     }
@@ -352,7 +352,6 @@ bool draw()
         draw_players();
         draw_npc();
         draw_texts();
-        draw_maps();
     }
     if (status_line[0] != ' ')
     {
