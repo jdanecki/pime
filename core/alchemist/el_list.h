@@ -107,21 +107,14 @@ class ElementsListIterator
 {
     ListElement* le;
   public:
-    ElementsListIterator(ListElement *le): le(le) {};
-    bool operator!=(ElementsListIterator& other)
-    {
-        return le != other.le;
-    }
-    ElementsListIterator operator++()
-    {
-        le = le->next;
-        printf("goo\n");
-        return *this;
-    }
-    InventoryElement* operator*()
-    {
-        return le->el.get();
-    }
+    ElementsListIterator(ListElement *le);
+    bool operator!=(ElementsListIterator& other);
+    ElementsListIterator operator++();
+    InventoryElement* operator*();
+
+    ElementsListIterator next();
+    bool equal(ElementsListIterator& other);
+    InventoryElement* get();
 };
 
 class ElementsList
@@ -156,8 +149,9 @@ class ElementsList
     void copy_elements(ElementsList * dst);
     ListElement * get_random();
     
-    ElementsListIterator begin() {return head;}
-    ElementsListIterator end() {return nullptr;}
+    ElementsListIterator begin();
+
+    ElementsListIterator end();
 };
 
 typedef bool (*FindFunc)(InventoryElement * el, void * arg);

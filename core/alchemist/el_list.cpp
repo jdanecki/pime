@@ -33,6 +33,42 @@ void ElementsList::remove_all()
     }
 }
 
+ElementsListIterator::ElementsListIterator(ListElement* le): le(le) {};
+
+bool ElementsListIterator::operator!=(ElementsListIterator& other)
+{
+    return le != other.le;
+}
+
+ElementsListIterator ElementsListIterator::operator++()
+{
+    le = le->next;
+    return *this;
+}
+
+InventoryElement* ElementsListIterator::operator*()
+{
+    return le->el.get();
+}
+
+bool ElementsListIterator::equal(ElementsListIterator& other)
+{
+    return (*this != other);
+}
+
+ElementsListIterator ElementsListIterator::next()
+{
+    return ++*this;
+}
+
+InventoryElement* ElementsListIterator::get()
+{
+    return **this;
+}
+
+ElementsListIterator ElementsList::begin() {return head;}
+ElementsListIterator ElementsList::end() {return nullptr;}
+
 ElementsList::ElementsList(const char * n)
 {
     name = n;

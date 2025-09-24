@@ -1,5 +1,6 @@
 use core::add_object_to_world;
 use core::find_in_world;
+use core::ElementsListIterator;
 use std::collections::HashMap;
 use std::error::Error;
 use std::net::SocketAddr;
@@ -16,10 +17,17 @@ mod types;
 pub static mut SEED: i64 = 0;
 pub static mut LOCATION_UPDATES: Vec<types::LocationUpdateData> = vec![];
 pub static mut OBJECT_UPDATES: Vec<types::ObjectData> = vec![];
+pub static mut CREATE_ITEMS: Vec<types::ObjectData> = vec![];
 
 pub static mut DESTROY_ITEMS: Vec<(usize, core::ItemLocation)> = vec![];
 pub static mut KNOWN_UPDATES: Vec<(i32, core::Class_id, i32)> = vec![];
 pub static mut CHECKED_UPDATES: Vec<(i32, usize)> = vec![];
+
+#[no_mangle]
+extern "C" fn notify_create(el: *const core::InventoryElement) {
+    let data = convert_to_data(el);
+    unsafe { CREATE_ITEMS.push(data) }
+}
 
 #[no_mangle]
 extern "C" fn notify_update(el: *const core::InventoryElement) {
@@ -348,16 +356,16 @@ fn create_objects_in_chunk_for_player(server: &mut Server, peer: &SocketAddr, co
             .as_mut()
             .unwrap();
 
-        let mut le = chunk.objects._base.head;
-        while le != std::ptr::null_mut() {
+        let mut iter = chunk.objects._base.begin();
+        while iter.equal(&mut chunk.objects._base.end() as *mut ElementsListIterator) {
             let mut data = vec![core::PACKET_OBJECT_CREATE];
             //  println!("create_objects_in_chunk_for_player PACKET_OBJECT_CREATE");
-            let obj = convert_types::convert_to_data(&*(*le).el);
+            let obj = vec![convert_types::convert_to_data(iter.get())];
             let obj_data = &bincode::serialize(&obj).unwrap()[..];
             data.extend_from_slice(obj_data);
 
-            le = (*le).next;
             server.send_to_reliable(&data, peer);
+            iter.next();
         }
     }
 }
@@ -654,22 +662,13 @@ fn handle_packet(
 
 fn send_game_updates(server: &mut Server) {
     unsafe {
-        let list = std::ptr::addr_of_mut!(core::objects_to_create);
-        let mut le = (*list)._base.head;
-        while le != std::ptr::null_mut() {
+        if CREATE_ITEMS.len() > 0 {
             let mut data = vec![core::PACKET_OBJECT_CREATE];
-            //         println!("send_game_updates PACKET_OBJECT_CREATE");
-            let obj = convert_types::convert_to_data(&*(*le).el);
-            let obj_data = &bincode::serialize(&obj).unwrap()[..];
-            //            println!("data {:?}", obj_data);
+            let obj_data = &bincode::serialize(&CREATE_ITEMS[..]).unwrap()[..];
             data.extend_from_slice(obj_data);
 
-            le = (*le).next;
             server.broadcast(&data);
-        }
-
-        while (*list)._base.head != std::ptr::null_mut() {
-            (*list).remove((*(*list)._base.head).el);
+            CREATE_ITEMS.clear();
         }
 
         if OBJECT_UPDATES.len() > 0 {

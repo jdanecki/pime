@@ -26,14 +26,11 @@ void update()
             chunk * c = world_table[y][x];
             if (!c)
                 continue;
-            ListElement * el = world_table[y][x]->beings.head;
-            while (el)
+            for (InventoryElement* el : world_table[y][x]->beings)
             {
-                BeingServer * b = dynamic_cast<BeingServer *>(el->el);
+                BeingServer * b = dynamic_cast<BeingServer *>(el);
                 b->tick();
-                // unsigned long ms=get_time_ms();
-                // printf("tick: %llu:%llu ms\n", ms/1000, ms % 1000);
-                el = el->next;
+                
             }
         }
     }

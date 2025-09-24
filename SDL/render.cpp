@@ -42,7 +42,8 @@ void draw_texts()
     sprintf(text, "%s@[%d,%d][%d,%d]", player->get_name(), player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
         player->location.chunk.y);
 #else
-    sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), clan_names[player->get_clan()->id], player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
+    if (player->c_id != 0) 
+        sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), player->get_clan() ? clan_names[player->get_clan()->id] : "", player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
         player->location.chunk.y);
 #endif
     write_text(tx, window_height - 150, text, White, 15, 30);

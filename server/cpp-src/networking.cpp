@@ -1,12 +1,7 @@
 #include "networking.h"
-
-InvList objects_to_update;
-InvList objects_to_update_reliable;
-
-InvList objects_to_create;
-InvList objects_to_destroy;
+#include "elements_server.h"
 
 Networked::Networked()
 {
-    objects_to_create.add((InventoryElement *)this);
+    notify_create((InventoryElement *)this);
 }

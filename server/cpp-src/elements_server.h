@@ -10,6 +10,7 @@ unsigned int get_packet_size_binding(InventoryElement * el);
 extern "C"
 {
     void notify_update(const InventoryElement * el);
+    void notify_create(const InventoryElement * el);
     void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc);
     void notify_destroy(size_t id, ItemLocation location);
     void notify_knowledge(size_t pl_id, Class_id cid, int id);
