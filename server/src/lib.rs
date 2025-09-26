@@ -17,7 +17,8 @@ mod types;
 pub static mut SEED: i64 = 0;
 pub static mut LOCATION_UPDATES: Vec<types::LocationUpdateData> = vec![];
 pub static mut OBJECT_UPDATES: Vec<types::ObjectData> = vec![];
-pub static mut CREATE_ITEMS: Vec<types::ObjectData> = vec![];
+// pub static mut CREATE_ITEMS: Vec<types::ObjectData> = vec![];
+pub static mut CREATE_ITEMS: Vec<*const core::InventoryElement> = vec![];
 
 pub static mut DESTROY_ITEMS: Vec<(usize, core::ItemLocation)> = vec![];
 pub static mut KNOWN_UPDATES: Vec<(i32, core::Class_id, i32)> = vec![];
@@ -25,8 +26,9 @@ pub static mut CHECKED_UPDATES: Vec<(i32, usize)> = vec![];
 
 #[no_mangle]
 extern "C" fn notify_create(el: *const core::InventoryElement) {
-    let data = convert_to_data(el);
-    unsafe { CREATE_ITEMS.push(data) }
+    // let data = convert_to_data(el);
+    // unsafe { CREATE_ITEMS.push(data) }
+    unsafe { CREATE_ITEMS.push(el) }
 }
 
 #[no_mangle]
@@ -361,6 +363,7 @@ fn create_objects_in_chunk_for_player(server: &mut Server, peer: &SocketAddr, co
             let mut data = vec![core::PACKET_OBJECT_CREATE];
             //  println!("create_objects_in_chunk_for_player PACKET_OBJECT_CREATE");
             let obj = vec![convert_types::convert_to_data(iter.get())];
+            println!("{:?}", obj);
             let obj_data = &bincode::serialize(&obj).unwrap()[..];
             data.extend_from_slice(obj_data);
 
@@ -664,7 +667,11 @@ fn send_game_updates(server: &mut Server) {
     unsafe {
         if CREATE_ITEMS.len() > 0 {
             let mut data = vec![core::PACKET_OBJECT_CREATE];
-            let obj_data = &bincode::serialize(&CREATE_ITEMS[..]).unwrap()[..];
+            let mut objects = vec![];
+            for el in CREATE_ITEMS.iter() {
+                objects.push(convert_to_data(*el));
+            }
+            let obj_data = &bincode::serialize(&objects[..]).unwrap()[..];
             data.extend_from_slice(obj_data);
 
             server.broadcast(&data);

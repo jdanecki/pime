@@ -318,7 +318,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
                             amt,
                             &value[1..amt]
                         ));
-                    // println!("{:?}", obj);
+                    println!("{:?}", obj);
                     for o in obj {
                         events::create_object(&o);
                     }

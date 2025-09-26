@@ -10,7 +10,7 @@ pub struct LocationUpdateData {
 }
 
 #[repr(C)]
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 #[allow(dead_code)]
 pub enum ObjectData {
     InvElement { data: core::InventoryElement },

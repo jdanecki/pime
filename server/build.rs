@@ -47,13 +47,24 @@ impl ParseCallbacks for MacroCallback {
             "ElementsList",
             "Skills",
         ];
+        let debug = vec![
+            "Element",
+            "Plant",
+            "Animal",
+            "Ingredient",
+            "Product",
+            "InventoryElement",
+            "Scroll",
+            "Player",
+            "Npc",
+        ];
         if ser.contains(&info.name) {
             der.append(&mut vec![String::from("serde::Serialize")]);
         }
         if co_cl.contains(&info.name) {
             der.append(&mut vec![String::from("Copy, Clone")]);
         }
-        if info.name == "InventoryElement" {
+        if debug.contains(&info.name) {
             der.append(&mut vec![String::from("Debug")]);
         }
         // if info.name == "Test" {

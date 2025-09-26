@@ -4,6 +4,7 @@ project(pime)
 set(CMAKE_BUILD_TYPE Debug)
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(../../core core)
 

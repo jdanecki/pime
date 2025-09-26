@@ -268,6 +268,7 @@ bool PlantServer::grow()
 
 IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id i, Form f) : Ingredient(i)
 {
+    printf("Ingredient const %p\n", this);
     c_id = Class_Ingredient;
     el = from;
     id = i;

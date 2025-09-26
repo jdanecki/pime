@@ -13,6 +13,7 @@ pub fn convert_to_data(el: *const core::InventoryElement) -> ObjectData {
         }
         core::Class_id_Class_Ingredient => {
             let ingredient = unsafe { &*(el as *const core::Ingredient) };
+            println!("{:?}", ingredient._base.location);
             ObjectData::Ingredient { data: *ingredient }
         }
         core::Class_id_Class_Product => {
