@@ -3,7 +3,6 @@
 
 #include <cstddef>
 // FIXME @jacek add enet
-#include "serialization-rust.h"
 
 enum Class_id
 {

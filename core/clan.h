@@ -16,12 +16,13 @@ enum ClanId
 
 extern const char * clan_names[];
 
-class Clan : NetworkObject
+class Clan : public NetworkObject
 {
 public:
     ClanId id;
     Clan(ClanId id);
-    Skills *skills;
+    // TODO use those as default for a player
+    Skill skills[SK_NUM];
 };
 
 class Human_clan: public Clan

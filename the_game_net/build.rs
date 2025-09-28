@@ -24,6 +24,10 @@ impl ParseCallbacks for MacroCallback {
             "Solid",
             "Property",
             "BaseElement",
+            "Player",
+            "Skill",
+            "InvList",
+            "NetworkObject",
         ];
         let debug = vec![
             "Element",

@@ -311,7 +311,7 @@ pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
                     );
                 },
                 core::PACKET_OBJECT_CREATE => unsafe {
-                    // println!("value {:?}", &value[1..amt]);
+                    println!("len {}, value {:?}", amt, &value[1..amt]);
                     let obj: Vec<ObjectData> =
                         bincode::deserialize(&value[1..amt]).expect(&format!(
                             "Failed to create item from data amt {} {:?}",

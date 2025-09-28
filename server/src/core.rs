@@ -4,7 +4,10 @@ include!("core_bindings.rs");
 include!("../../core/alchemist/item_location.rs");
 
 use serde::{ser::SerializeTuple, Serialize};
-use std::ffi::{CStr, CString};
+use std::{
+    ffi::{CStr, CString},
+    ptr::addr_of_mut,
+};
 
 impl std::fmt::Debug for SerializableCString {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -27,9 +30,33 @@ impl serde::Serialize for Base {
         S: serde::Serializer,
     {
         let mut state = serializer.serialize_tuple(3)?;
-        state.serialize_element(&self.c_id)?;
-        state.serialize_element(&self.id)?;
+        state.serialize_element(&self._base.c_id)?;
+        state.serialize_element(&self._base.uid)?;
         state.serialize_element(&self.name)?;
+        state.end()
+    }
+}
+
+impl serde::Serialize for SerializablePointer<NetworkObject> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_tuple(2)?;
+        state.serialize_element(unsafe { &(*self.ptr).c_id })?;
+        state.serialize_element(unsafe { &(*self.ptr).uid })?;
+        state.end()
+    }
+}
+
+impl serde::Serialize for SerializablePointer<InventoryElement> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_tuple(2)?;
+        state.serialize_element(unsafe { &(*self.ptr)._base.c_id })?;
+        state.serialize_element(unsafe { &(*self.ptr)._base.uid })?;
         state.end()
     }
 }
@@ -39,7 +66,7 @@ impl serde::Serialize for SerializablePointer<BaseElement> {
     where
         S: serde::Serializer,
     {
-        i32::serialize(unsafe { &(*self.ptr)._base.id }, serializer)
+        usize::serialize(unsafe { &(*self.ptr)._base._base.uid }, serializer)
     }
 }
 
@@ -48,7 +75,7 @@ impl serde::Serialize for SerializablePointer<BasePlant> {
     where
         S: serde::Serializer,
     {
-        i32::serialize(unsafe { &(*self.ptr)._base.id }, serializer)
+        usize::serialize(unsafe { &(*self.ptr)._base._base.uid }, serializer)
     }
 }
 
@@ -57,7 +84,7 @@ impl serde::Serialize for SerializablePointer<BaseAnimal> {
     where
         S: serde::Serializer,
     {
-        i32::serialize(unsafe { &(*self.ptr)._base.id }, serializer)
+        usize::serialize(unsafe { &(*self.ptr)._base._base.uid }, serializer)
     }
 }
 
@@ -68,8 +95,8 @@ impl serde::Serialize for SerializablePointer<Base> {
     {
         let mut state = serializer.serialize_tuple(2)?;
         unsafe {
-            state.serialize_element(&(*self.ptr).c_id)?;
-            state.serialize_element(&(*self.ptr).id)?;
+            state.serialize_element(&(*self.ptr)._base.c_id)?;
+            state.serialize_element(&(*self.ptr)._base.uid)?;
         }
         state.end()
     }
@@ -90,30 +117,34 @@ impl serde::Serialize for InventoryElement {
     }
 }
 
-impl serde::Serialize for Player {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut state = serializer.serialize_tuple(6)?;
-        unsafe {
-            state.serialize_element(&self._base.get_uid())?;
-        }
-        state.serialize_element(&self.name)?;
-        state.serialize_element(&self._base.location)?;
-        state.serialize_element(&self.thirst)?;
-        state.serialize_element(&self.hunger)?;
-        state.serialize_element(&self.nutrition)?;
-        state.end()
-    }
-}
+// impl serde::Serialize for Player {
+//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+//     where
+//         S: serde::Serializer,
+//     {
+//         let mut state = serializer.serialize_tuple(6)?;
+//         unsafe {
+//             state.serialize_element(&self._base.get_uid())?;
+//         }
+//         state.serialize_element(&self.name)?;
+//         state.serialize_element(&self._base.location)?;
+//         state.serialize_element(&self.thirst)?;
+//         state.serialize_element(&self.hunger)?;
+//         state.serialize_element(&self.nutrition)?;
+//         state.end()
+//     }
+// }
 
 impl serde::Serialize for SerializablePointer<Player> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
-        usize::serialize(unsafe { &(*self.ptr)._base.get_uid() }, serializer)
+        if self.ptr != std::ptr::null_mut() {
+            usize::serialize(unsafe { &(*self.ptr)._base.get_uid() }, serializer)
+        } else {
+            usize::serialize(&0, serializer)
+        }
     }
 }
 
@@ -131,8 +162,41 @@ impl serde::Serialize for ElementsList {
     where
         S: serde::Serializer,
     {
-        // usize::serialize(unsafe { &(*self.ptr)._base.uid }, serializer)
-        todo!()
+        let mut data = vec![];
+        let len = self.nr_elements as usize;
+        unsafe {
+            let mut iter = self.begin();
+            while iter.equal(&self.end() as *const ElementsListIterator) {
+                let ptr = iter.get();
+                let id = if ptr == std::ptr::null_mut() {
+                    NetworkObject { c_id: 0, uid: 0 }
+                } else {
+                    unsafe {
+                        NetworkObject {
+                            c_id: (*ptr)._base.c_id,
+                            uid: (*ptr)._base.uid,
+                        }
+                    }
+                };
+                data.push(SerializablePointer {
+                    _phantom_0: std::marker::PhantomData,
+                    ptr: iter.get(),
+                    id,
+                });
+                iter.next();
+            }
+        }
+        assert!(data.len() == len);
+        println!("LIST HAS {len} ELEMENTS");
+        if len > 0 {
+            let mut state = serializer.serialize_tuple(data.len())?;
+            for d in data {
+                state.serialize_element(&d)?;
+            }
+            state.end()
+        } else {
+            usize::serialize(&0, serializer)
+        }
     }
 }
 

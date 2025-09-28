@@ -2,6 +2,7 @@
 #define EL_LIST_H
 
 #include "elements.h"
+#include "object.h"
 #include "serialization-rust.h"
 
 class ListElement
@@ -9,7 +10,7 @@ class ListElement
     bool enabled;
 
   public:
-    SerializablePointer<InventoryElement> el;
+    SerializablePointer<NetworkObject> el;
     ListElement *next, *prev;
 
     void add(ListElement * entry);
@@ -28,9 +29,10 @@ class ListElement
     virtual void show(bool details = true);
     virtual bool tick()
     {
-        return el.get()->tick();
+        return ((InventoryElement*)(el.get()))->tick();
     }
     ListElement(InventoryElement * entry);
+    ListElement(NetworkObject* entry);
     ListElement() : el(nullptr), next(nullptr), prev(nullptr)
     {
         enable();
@@ -97,7 +99,7 @@ class BaseListElement : public ListElement
     bool check(void * what)
     {
         int *pid = (int *)what;
-        return (*pid == base->id);
+        return (*pid == base->uid);
     }
     size_t get_size() { return base->get_size() ; }
     void show(bool details = true);
@@ -108,12 +110,12 @@ class ElementsListIterator
     ListElement* le;
   public:
     ElementsListIterator(ListElement *le);
-    bool operator!=(ElementsListIterator& other);
+    bool operator!=(const ElementsListIterator& other);
     ElementsListIterator operator++();
     InventoryElement* operator*();
 
     ElementsListIterator next();
-    bool equal(ElementsListIterator& other);
+    bool equal(const ElementsListIterator& other);
     InventoryElement* get();
 };
 
@@ -149,9 +151,9 @@ class ElementsList
     void copy_elements(ElementsList * dst);
     ListElement * get_random();
     
-    ElementsListIterator begin();
+    ElementsListIterator begin() const;
 
-    ElementsListIterator end();
+    ElementsListIterator end() const;
 };
 
 typedef bool (*FindFunc)(InventoryElement * el, void * arg);

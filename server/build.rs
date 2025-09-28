@@ -24,8 +24,9 @@ impl ParseCallbacks for MacroCallback {
             "Npc",
             "Solid",
             "Property",
-            // "Player",
-            "Skills",
+            "Player",
+            "Skill",
+            "InvList",
         ];
         let co_cl = vec![
             "Element",

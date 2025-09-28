@@ -14,6 +14,14 @@ ListElement::ListElement(InventoryElement * entry) : el(entry)
     enabled = true;
 }
 
+ListElement::ListElement(NetworkObject * entry) : el(entry)
+{
+    next = nullptr;
+    prev = nullptr;
+    enabled = true;
+}
+
+
 void ListElement::add(ListElement * entry)
 {
     next = entry;
@@ -22,7 +30,8 @@ void ListElement::add(ListElement * entry)
 
 void ListElement::show(bool details)
 {
-    el.get()->show(details);
+    // FIXME
+    // el.get()->show(details);
 }
 
 void ElementsList::remove_all()
@@ -35,7 +44,7 @@ void ElementsList::remove_all()
 
 ElementsListIterator::ElementsListIterator(ListElement* le): le(le) {};
 
-bool ElementsListIterator::operator!=(ElementsListIterator& other)
+bool ElementsListIterator::operator!=(const ElementsListIterator& other)
 {
     return le != other.le;
 }
@@ -48,10 +57,10 @@ ElementsListIterator ElementsListIterator::operator++()
 
 InventoryElement* ElementsListIterator::operator*()
 {
-    return le->el.get();
+    return (InventoryElement*)le->el.get();
 }
 
-bool ElementsListIterator::equal(ElementsListIterator& other)
+bool ElementsListIterator::equal(const ElementsListIterator& other)
 {
     return (*this != other);
 }
@@ -66,8 +75,8 @@ InventoryElement* ElementsListIterator::get()
     return **this;
 }
 
-ElementsListIterator ElementsList::begin() {return head;}
-ElementsListIterator ElementsList::end() {return nullptr;}
+ElementsListIterator ElementsList::begin() const {return head;}
+ElementsListIterator ElementsList::end() const {return nullptr;}
 
 ElementsList::ElementsList(const char * n)
 {
@@ -229,28 +238,30 @@ void ElementsList::remove(ListElement * el)
 
 InventoryElement ** InvList::find_by_fun(FindFunc fun, void *arg, int *count)
 {
-    ListElement * cur = head;
-    InventoryElement ** a = (InventoryElement **)calloc(nr_elements, sizeof(InventoryElement *));
-    int c = 0;
-    while (cur)
-    {
-        if (fun(cur->el.get(), arg))
-        {
-            a[c] = cur->el.get();
-            c++;
-        }
-        cur = cur->next;
-    }
-    if (!c)
-    {
-        free(a);
-        return NULL;
-    }
-    else
-    {
-        *count = c;
-        return a;
-    }
+    // ListElement * cur = head;
+    // InventoryElement ** a = (InventoryElement **)calloc(nr_elements, sizeof(InventoryElement *));
+    // int c = 0;
+    // while (cur)
+    // {
+    //     if (fun(cur->el.get(), arg))
+    //     {
+    //         a[c] = cur->el.get();
+    //         c++;
+    //     }
+    //     cur = cur->next;
+    // }
+    // if (!c)
+    // {
+    //     free(a);
+    //     return NULL;
+    // }
+    // else
+    // {
+    //     *count = c;
+    //     return a;
+    // }
+    *count = 0;
+    return nullptr;
 }
 
 bool match_form(InventoryElement * el, void * arg)
@@ -272,7 +283,9 @@ bool match_class(InventoryElement * el, void * arg)
 
 InventoryElement **InvList::find_class(Class_id cl, int *count)
 {
-    return find_by_fun(match_class, &cl, count);
+    *count = 0;
+    return nullptr;
+    // return find_by_fun(match_class, &cl, count);
 }
 
 InventoryElement ** InvList::find_id(int id, int * count)

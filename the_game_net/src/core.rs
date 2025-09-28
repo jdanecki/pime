@@ -12,13 +12,21 @@ use serde::{Deserialize, Deserializer};
 use crate::get_base_animal;
 use crate::get_base_element;
 use crate::get_base_plant;
-use crate::get_base;
+use crate::{get_base, get_object_by_id};
 
 impl<T> SerializablePointer<T> {
     pub fn new(p: *mut T) -> Self {
         Self {
             _phantom_0: std::marker::PhantomData,
             ptr: p,
+            id: NetworkObject { c_id: 0, uid: 0 },
+        }
+    }
+    pub fn from_id(id: NetworkObject) -> Self {
+        Self {
+            _phantom_0: std::marker::PhantomData,
+            ptr: std::ptr::null_mut(),
+            id,
         }
     }
 }
@@ -50,7 +58,7 @@ impl<'de> serde::Deserialize<'de> for Base {
                 let c_id = seq
                     .next_element()?
                     .ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
-                let id = seq
+                let id: usize = seq
                     .next_element()?
                     .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
                 let name: &[u8] = seq
@@ -58,7 +66,7 @@ impl<'de> serde::Deserialize<'de> for Base {
                     .ok_or_else(|| serde::de::Error::invalid_length(2, &self))?;
                 let name =
                     CString::from_vec_with_nul(name.to_vec()).expect("BAD property name received");
-                Ok(unsafe { Base::new(id, c_id, name.into_raw()) })
+                Ok(unsafe { Base::new(id as i32, c_id, name.into_raw()) })
             }
         }
 
@@ -117,7 +125,7 @@ impl<'de> serde::Deserialize<'de> for SerializablePointer<BaseElement> {
     where
         D: Deserializer<'de>,
     {
-        let id = i32::deserialize(deserializer)?;
+        let id = usize::deserialize(deserializer)? as i32;
 
         Ok(SerializablePointer::new(get_base_element(id)))
     }
@@ -128,7 +136,7 @@ impl<'de> serde::Deserialize<'de> for SerializablePointer<BasePlant> {
     where
         D: Deserializer<'de>,
     {
-        let id = i32::deserialize(deserializer)?;
+        let id = usize::deserialize(deserializer)? as i32;
 
         Ok(SerializablePointer::new(get_base_plant(id)))
     }
@@ -139,12 +147,11 @@ impl<'de> serde::Deserialize<'de> for SerializablePointer<BaseAnimal> {
     where
         D: Deserializer<'de>,
     {
-        let id = i32::deserialize(deserializer)?;
+        let id = usize::deserialize(deserializer)? as i32;
 
         Ok(SerializablePointer::new(get_base_animal(id)))
     }
 }
-
 
 impl<'de> serde::Deserialize<'de> for SerializablePointer<Base> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -167,17 +174,16 @@ impl<'de> serde::Deserialize<'de> for SerializablePointer<Base> {
                 let c_id = seq
                     .next_element()?
                     .ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
-                let id = seq
+                let id: usize = seq
                     .next_element()?
                     .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
-                Ok(unsafe { SerializablePointer::new(get_base(c_id, id)) })
+                Ok(unsafe { SerializablePointer::new(get_base(c_id, id as i32)) })
             }
         }
 
         deserializer.deserialize_tuple(2, BaseVisitor)
-     }
+    }
 }
-
 
 impl<'de> serde::Deserialize<'de> for InventoryElement {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -214,58 +220,141 @@ impl<'de> serde::Deserialize<'de> for InventoryElement {
     }
 }
 
-impl<'de> serde::Deserialize<'de> for Player {
+impl<'de> serde::Deserialize<'de> for SerializablePointer<Player> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
-        struct PlayerVisitor;
+        let id = usize::deserialize(deserializer)?;
 
-        impl<'de> Visitor<'de> for PlayerVisitor {
-            type Value = Player;
+        if id != 0 {
+            Ok(SerializablePointer::new(unsafe {
+                get_object_by_id(id) as *mut Player
+            }))
+        } else {
+            Ok(SerializablePointer::from_id(NetworkObject {
+                c_id: Class_id_Class_Player,
+                uid: id,
+            }))
+        }
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for SerializablePointer<Clan> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let id = usize::deserialize(deserializer)?;
+
+        if id != 0 {
+            Ok(SerializablePointer::new(unsafe {
+                get_object_by_id(id) as *mut Clan
+            }))
+        } else {
+            Ok(SerializablePointer::from_id(NetworkObject {
+                c_id: Class_id_Class_Clan,
+                uid: id,
+            }))
+        }
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ElementsList {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        struct ElementsListVisitor;
+
+        impl<'de> Visitor<'de> for ElementsListVisitor {
+            type Value = ElementsList;
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("struct Player")
+                formatter.write_str("struct ElementsList")
             }
 
-            fn visit_seq<V>(self, mut seq: V) -> Result<Player, V::Error>
+            fn visit_seq<V>(self, mut seq: V) -> Result<ElementsList, V::Error>
             where
                 V: SeqAccess<'de>,
             {
-                let id: usize = seq
-                    .next_element()?
-                    .ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
-                let name: SerializableCString = seq
-                    .next_element()?
-                    .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
-                let location = seq
-                    .next_element()?
-                    .ok_or_else(|| serde::de::Error::invalid_length(2, &self))?;
-                let thirst = seq
-                    .next_element()?
-                    .ok_or_else(|| serde::de::Error::invalid_length(3, &self))?;
-                let hunger = seq
-                    .next_element()?
-                    .ok_or_else(|| serde::de::Error::invalid_length(4, &self))?;
-                let nutrition = seq
-                    .next_element()?
-                    .ok_or_else(|| serde::de::Error::invalid_length(5, &self))?;
-                Ok(unsafe {
-                    Player::new(
-                        id as usize,
-                        Box::<SerializableCString>::into_raw(Box::new(name)),
-                        location,
-                        thirst,
-                        hunger,
-                        nutrition,
-                    )
-                })
+                unsafe {
+                    let mut a = ElementsList::new1();
+                    if let Some(num) = seq.next_element()? {
+                        let num: usize = num;
+                        println!("list has {num} elements");
+                        for _ in 0..num {
+                            if let Some(o) = seq.next_element()? {
+                                let mut o: NetworkObject = o;
+                                let mut le = ListElement::new1(&mut o as *mut NetworkObject);
+                                a.add(&mut le as *mut ListElement);
+                            } else {
+                                panic!("WTF");
+                            }
+                        }
+                        return Ok(a);
+                    }
+                    panic!("failed to deserialize");
+                }
             }
         }
 
-        deserializer.deserialize_tuple(6, PlayerVisitor)
+        deserializer.deserialize_tuple(6, ElementsListVisitor)
     }
 }
+
+// impl<'de> serde::Deserialize<'de> for Player {
+//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+//     where
+//         D: Deserializer<'de>,
+//     {
+//         struct PlayerVisitor;
+
+//         impl<'de> Visitor<'de> for PlayerVisitor {
+//             type Value = Player;
+
+//             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+//                 formatter.write_str("struct Player")
+//             }
+
+//             fn visit_seq<V>(self, mut seq: V) -> Result<Player, V::Error>
+//             where
+//                 V: SeqAccess<'de>,
+//             {
+//                 let id: usize = seq
+//                     .next_element()?
+//                     .ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
+//                 let name: SerializableCString = seq
+//                     .next_element()?
+//                     .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
+//                 let location = seq
+//                     .next_element()?
+//                     .ok_or_else(|| serde::de::Error::invalid_length(2, &self))?;
+//                 let thirst = seq
+//                     .next_element()?
+//                     .ok_or_else(|| serde::de::Error::invalid_length(3, &self))?;
+//                 let hunger = seq
+//                     .next_element()?
+//                     .ok_or_else(|| serde::de::Error::invalid_length(4, &self))?;
+//                 let nutrition = seq
+//                     .next_element()?
+//                     .ok_or_else(|| serde::de::Error::invalid_length(5, &self))?;
+//                 Ok(unsafe {
+//                     Player::new(
+//                         id as usize,
+//                         Box::<SerializableCString>::into_raw(Box::new(name)),
+//                         location,
+//                         thirst,
+//                         hunger,
+//                         nutrition,
+//                     )
+//                 })
+//             }
+//         }
+
+//         deserializer.deserialize_tuple(6, PlayerVisitor)
+//     }
+// }
 // impl<'de> serde::Deserialize<'de> for Property {
 //     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
 //     where

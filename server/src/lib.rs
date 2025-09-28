@@ -37,6 +37,13 @@ extern "C" fn notify_update(el: *const core::InventoryElement) {
     unsafe { OBJECT_UPDATES.push(data) }
 }
 
+// TODO remove this when no longer needed
+#[no_mangle]
+extern "C" fn get_object_by_id(_id: usize) -> *mut core::InventoryElement {
+    println!("get_object_by_id should not be called in server");
+    return std::ptr::null_mut();
+}
+
 #[no_mangle]
 extern "C" fn update_location(
     id: usize,
@@ -363,8 +370,8 @@ fn create_objects_in_chunk_for_player(server: &mut Server, peer: &SocketAddr, co
             let mut data = vec![core::PACKET_OBJECT_CREATE];
             //  println!("create_objects_in_chunk_for_player PACKET_OBJECT_CREATE");
             let obj = vec![convert_types::convert_to_data(iter.get())];
-            println!("{:?}", obj);
             let obj_data = &bincode::serialize(&obj).unwrap()[..];
+            println!("LEN {} {:?}", obj_data.len(), obj);
             data.extend_from_slice(obj_data);
 
             server.send_to_reliable(&data, peer);
