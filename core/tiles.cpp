@@ -47,6 +47,8 @@ InventoryElement * chunk::find_by_id(size_t id)
 
 chunk::chunk(int map_x, int map_y) : map_x(map_x), map_y(map_y)
 {
+    objects.name="objects";
+    beings.name="beings";
 }
 
 void chunk::show()

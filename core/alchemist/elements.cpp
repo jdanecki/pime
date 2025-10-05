@@ -57,7 +57,7 @@ const char * server_action_name[] = {"server show item", "server show chunk", "s
 
 const char * object_names[] = {"wall"};
 const char * plant_phase_name[] = {"Seed", "Seedling", "Growing", "Flowers", "Fruits"};
-const char * class_name[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Scroll", "Plant", "Animal", "Player", "Npc"};
+const char * class_name[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Scroll", "Plant", "Animal", "Player", "Npc", "Clan", "ListElement", "KnownElement", "BaseListElement"};
 
 Base::Base(int index, Class_id c, const char * name) : name(name)
 {
