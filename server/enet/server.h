@@ -159,7 +159,7 @@ class PacketObjectDestroy : public Packet
 };
 
 #ifdef SERVER_CODE
-extern void add_packet_to_send(Packet *p);
+extern void add_packet_to_send1(Packet *p);
 #endif
 class PacketElementsList : public Packet
 {
@@ -224,7 +224,7 @@ class PacketElementsList : public Packet
         size_t uid=inv->get_uid();
         size_t *dst=&((size_t*)(&pdata->data))[i];
         *dst=uid;
-        printf("copy_list_element: [%d]=%lx\n", i, uid);
+        printf("copy_list_element: [%d/%d]=%lx\n", i, pdata->nr_elements, uid);
     }
     void init(ElementsList *list)
     {
@@ -308,7 +308,7 @@ ObjectData * convert_to_data(InventoryElement * el)
             obj = new ObjectData(ObjectData::Tag::Player);
             obj->player.data = *player;
             if (player->inventory.nr_elements)
-                add_packet_to_send(new PacketElementsList(player));
+                add_packet_to_send1(new PacketElementsList(player));
             //obj->player.data.clan = nullptr;
             //obj->player.data.player_skills = nullptr;
             //obj->player.data.inventory = nullptr;
@@ -535,7 +535,9 @@ class PacketObjectUpdate : public Packet
                 break;
             }
             case ObjectData::Tag::Player:
+                printf("ObjectUpdate for player inv_elems=%d\n", obj->player.data.inventory.nr_elements);
                 new (&obj->player.data.inventory) InvList("inventory");
+                printf("ObjectUpdate for player initialized: inv_elems=%d\n", obj->player.data.inventory.nr_elements);
                 new (&obj->player.data.known_elements) ElementsList("known elements");
                 new (&obj->player.data.player_skills) Skills();
                 new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));

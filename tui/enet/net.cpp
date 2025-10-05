@@ -55,7 +55,7 @@ void add_elements(PacketElementsList * list, int i)
     if (p)
         p->pickup(get_object_by_id(uid));
 
-    printf("[%d]=%lx elems=%d\n", i, uid,p->inventory.nr_elements);
+    printf("player=%p [%d]=%lx elems=%d\n", p, i, uid,p->inventory.nr_elements);
     update_hotbar();
 }
 

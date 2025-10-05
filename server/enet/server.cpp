@@ -39,7 +39,7 @@ BaseAnimal * get_base_animal(int32_t id)
     return (BaseAnimal*)((el)->base);
 }
 
-ElementsList * players, * packets_to_send;
+ElementsList * players, * packets_to_send, * packets_to_send1;
 int players_id;
 
 ENetHost * server;
@@ -86,12 +86,14 @@ class PlayerClient : public ListElement
 void send_to_all(Packet *p)
 {
     ListElement * pl_el = players->head;
+    int i=0;
     while (pl_el)
     {
         PlayerClient * pl = (PlayerClient*) pl_el;
-        printf("sending to player: %d\n", pl->player->get_id());
+        printf("[%d/%d] sending to player: %d\n", i, players->nr_elements, pl->player->get_id());
         p->send(pl->peer);
         pl_el = pl_el->next;
+        i++;
     }
 }
 class PacketToSend : public ListElement
@@ -338,13 +340,27 @@ void send_updates()
     if (packets_to_send->nr_elements)
     {
         ListElement * el = packets_to_send->head;
-        printf("sending updates\n");
+        printf("sending updates elems=%d\n", packets_to_send->nr_elements);
         while (el)
         {
             PacketToSend * p = (PacketToSend*) el;
             p->to_all();
             el = el->next;
         }
+        printf("sent updates\n");
+    }
+
+    if (packets_to_send1->nr_elements)
+    {
+        ListElement * el = packets_to_send1->head;
+        printf("sending updates1 elems=%d\n", packets_to_send1->nr_elements);
+        while (el)
+        {
+            PacketToSend * p = (PacketToSend*) el;
+            p->to_all();
+            el = el->next;
+        }
+        printf("sent updates1\n");
     }
 
     if (objects_to_create.nr_elements)
@@ -359,6 +375,7 @@ void send_updates()
         }
     }
     packets_to_send->remove_all();
+    packets_to_send1->remove_all();
     objects_to_create.remove_all();
 }
 
@@ -424,6 +441,12 @@ void add_packet_to_send(Packet *p)
 {
     if (players->nr_elements)
         packets_to_send->add(new PacketToSend(p));
+}
+
+void add_packet_to_send1(Packet *p)
+{
+    if (players->nr_elements)
+        packets_to_send1->add(new PacketToSend(p));
 }
 
 void notify_update(const InventoryElement * el)
@@ -506,6 +529,7 @@ int main()
             load_chunk(cy, cx);
 
     packets_to_send = new ElementsList("packets to send");
+    packets_to_send1 = new ElementsList("packets1 to send");
 
     ENetEvent event;
     char hostname[512] = {

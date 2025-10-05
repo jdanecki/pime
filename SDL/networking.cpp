@@ -238,7 +238,11 @@ extern "C"
         Class_id c_id = data->inv_element.data.c_id;
 
         InventoryElement * el = find_by_uid(data->inv_element.data.uid, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
-
+        printf("update_object: el=%p chunk[%d,%d]\n", el, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
+        if (el)
+        {
+            printf("update_object: el->cid=%x c_id=%x\n", el->c_id, c_id);
+        }
         if (el && el->c_id == c_id)
         {
             //  printf("SDL update_object: %s %s\n", class_name[c_id],  el->get_name());
@@ -279,7 +283,9 @@ extern "C"
                 case Class_Player:
                 {
                     Player * player = dynamic_cast<Player *>(el);
+                    printf("udpate_object: player=%p inv_elems=%d\n", player, player->inventory.nr_elements);
                     *player = data->player.data;
+                    printf("udpate_object: -> update: inv_elems=%d\n", player->inventory.nr_elements);
                     break;
                 }
                 default:
