@@ -4,8 +4,8 @@
 #include "../core/player.h"
 #include "../SDL/player_actions.h"
 
-Player * players[PLAYER_NUM];
-Player * player;
+PlayerSDL * players[PLAYER_NUM];
+PlayerSDL * player;
 extern int trace_network;
 bool use_network = true;
 bool show_received;
@@ -170,7 +170,7 @@ bool do_key_question_mark(char k)
             help_question_mark();
             break;
         case 'i':
-            player->inventory->show();
+            player->inventory.show();
             break;
         case 'r':
             submenu = 0;

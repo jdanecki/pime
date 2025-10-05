@@ -352,6 +352,9 @@ bool draw()
         draw_players();
         draw_npc();
         draw_texts();
+#ifdef USE_ENET
+        draw_maps();
+#endif
     }
     if (status_line[0] != ' ')
     {

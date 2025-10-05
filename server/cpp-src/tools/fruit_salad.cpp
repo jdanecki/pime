@@ -25,6 +25,7 @@ bool FruitSalad::player_action(Player_action action, Player * pl)
     {
         case PLAYER_EAT:
             pl->hunger += this->quality.value * 3 - 100;
+            printf("ate %s\n", get_name());
             destroy(this);
             break;
     }

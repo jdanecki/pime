@@ -2,12 +2,17 @@
 #define EL_LIST_H
 
 #include "elements.h"
+#ifdef USE_ENET
+#include "serialization-enet.h"
+#else
 #include "serialization-rust.h"
+#endif
 
 class ListElement
 {
     bool enabled;
-
+  protected:
+    Class_id c_id;
   public:
     SerializablePointer<InventoryElement> el;
     ListElement *next, *prev;
@@ -31,7 +36,7 @@ class ListElement
         return el.get()->tick();
     }
     ListElement(InventoryElement * entry);
-    ListElement() : el(nullptr), next(nullptr), prev(nullptr)
+    ListElement() : c_id(Class_ListElement), el(nullptr), next(nullptr), prev(nullptr)
     {
         enable();
     }
@@ -42,7 +47,8 @@ class ListElement
     virtual ~ListElement()
     {
     }
-    virtual size_t get_size() { return sizeof(ListElement); }
+    virtual size_t get_size() { return sizeof(size_t); } //only uid size
+    Class_id get_cid() {  return c_id; }
 };
 
 struct ElId
@@ -62,6 +68,7 @@ class KnownElement : public ListElement
         elid.c_id = t;
         elid.id = i;
         known = false;
+        c_id=Class_KnownElement;
     }
 
     bool is_known()
@@ -87,13 +94,16 @@ class KnownElement : public ListElement
     {
         return elid.id;
     }
+    size_t get_size() { return sizeof(KnownElement); }
 };
 
 class BaseListElement : public ListElement
 {
   public:
     Base * base;
-    BaseListElement(Base * base) : base(base) {}
+    BaseListElement(Base * base) : base(base) {
+        c_id=Class_BaseListElement;
+    }
     bool check(void * what)
     {
         int *pid = (int *)what;
@@ -107,7 +117,7 @@ class ElementsListIterator
 {
     ListElement* le;
   public:
-    ElementsListIterator(ListElement *le): le(le) {};
+    ElementsListIterator(ListElement *le): le(le) {}
     bool operator!=(ElementsListIterator& other)
     {
         return le != other.le;
@@ -115,7 +125,6 @@ class ElementsListIterator
     ElementsListIterator operator++()
     {
         le = le->next;
-        printf("goo\n");
         return *this;
     }
     InventoryElement* operator*()

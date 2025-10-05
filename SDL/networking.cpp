@@ -40,7 +40,10 @@ void update_hotbar()
         if (i >= 10)
             break;
         if (le->el.get())
+        {
             player->hotbar[i] = le->el.get();
+            printf("player=%p hotbar[%d] inv=%lx\n", player, i, (le->el.get())->get_uid());
+        }
         le = le->next;
         i++;
     }

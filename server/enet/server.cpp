@@ -352,12 +352,11 @@ void send_updates()
         ListElement * el = objects_to_create.head;
         while (el)
         {
-            printf("sending objects to create: %s id=%lx\n", el->el->get_name(), el->el->uid);
-            Packet * p = new PacketObjectCreate(el->el);
+            printf("sending objects to create: %s id=%lx\n", el->el.get()->get_name(), el->el.get()->uid);
+            Packet * p = new PacketObjectCreate(el->el.get());
             send_to_all(p);
             el = el->next;
         }
-
     }
     packets_to_send->remove_all();
     objects_to_create.remove_all();
@@ -550,7 +549,7 @@ int main()
             }
             default:
                 //printf("time=%ld\n", get_time_ms());
-                update();
+               // update();
                 send_updates();
                 break;
         }

@@ -5,7 +5,7 @@
 
 int npcs_count;
 
-Npc::Npc(ItemLocation location) : Player((size_t)this, SerializableCString(create_name(rand() % 3 + 3)), location, 0, 0, 0)
+Npc::Npc(ItemLocation location) : Player((size_t)this, SerializableCString(create_name(rand() % 3 + 3)), location, 100, 100, 100)
 {
     c_id = Class_Npc;
 }

@@ -47,6 +47,13 @@ class Edible
     {
         eating_by = rand() % 16;
     }
+    void set_no_edible() {
+        eating_by = 0;
+    }
+    bool can_be_eaten_by(int who)
+    {
+        return eating_by & (1 << who);
+    }
     void show();
 };
 

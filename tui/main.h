@@ -2,7 +2,7 @@
 #define MAIN_H
 
 #include "../core/world.h"
-#include "implementations/alchemistSDL.h"
+#include "implementations/playerSDL.h"
 #include <cstdlib>
 #include <time.h>
 #include <stdio.h>
@@ -14,7 +14,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-extern Player * player;
+extern PlayerSDL * player;
 #define PLAYER_NUM 16
-extern Player * players[PLAYER_NUM];
+extern PlayerSDL * players[PLAYER_NUM];
 #endif // MAIN_H

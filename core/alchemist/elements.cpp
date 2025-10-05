@@ -92,6 +92,7 @@ BaseElement::BaseElement(Form f, int index) : Base(index, Class_BaseElement, cre
             break;
         case Form_gas:
             density = Property("density", 1);
+            edible.set_no_edible();
             break;
     }
 }

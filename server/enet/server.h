@@ -158,6 +158,137 @@ class PacketObjectDestroy : public Packet
 
 };
 
+#ifdef SERVER_CODE
+extern void add_packet_to_send(Packet *p);
+#endif
+class PacketElementsList : public Packet
+{
+    struct serial_data
+    {
+        PacketType t;
+        size_t size;
+        int nr_elements;
+        char name[60];
+        Class_id c_id;
+        Class_id list_c_id;
+        int pl_id;
+        unsigned char data[0];
+        static void * operator new(size_t size_base, size_t extra)
+        {
+            printf("PacketElementsList: serial_data: allocating %ld + %ld\n", size_base, extra);
+            return ::operator new(size_base + extra);
+        }
+        serial_data(size_t s) : size(s)
+        {
+        }
+        static void operator delete(void * ptr)
+        {
+            ::operator delete(ptr);
+        }
+    } *pdata __attribute__((packed));
+
+  public:
+    int get_nr_elements() { return pdata->nr_elements;}
+    Class_id get_c_id() {  return pdata->c_id;}
+    Class_id get_list_c_id() {  return pdata->list_c_id;}
+    int get_pl_id() {  return pdata->pl_id;}
+    unsigned char * get_data() {  return pdata->data;}
+
+    void copy_base_list_element(ListElement * el, serial_data *pdata, int i)
+    {
+        BaseListElement * base_el = (BaseListElement*) el;
+        switch (pdata->c_id) {
+            case Class_BaseElement:
+            {
+                BaseElement * dst = &((BaseElement*) &pdata->data)[i];
+                *dst = *((BaseElement*)base_el->base);
+                break;
+            }
+            case Class_BasePlant:
+            {
+                BasePlant * dst = &((BasePlant*) &pdata->data)[i];
+                *dst = *((BasePlant*)base_el->base);
+                break;
+            }
+            case Class_BaseAnimal:
+            {
+                BaseAnimal * dst = &((BaseAnimal*) &pdata->data)[i];
+                *dst = *((BaseAnimal*)base_el->base);
+                break;
+            }
+        }
+    }
+    void copy_list_element(ListElement * el, serial_data *pdata, int i)
+    {
+        InventoryElement *inv = el->el.get();
+        size_t uid=inv->get_uid();
+        size_t *dst=&((size_t*)(&pdata->data))[i];
+        *dst=uid;
+        printf("copy_list_element: [%d]=%lx\n", i, uid);
+    }
+    void init(ElementsList *list)
+    {
+        int size = list->nr_elements * list->head->get_size();
+        pdata = new (size) serial_data(sizeof(serial_data) + size);
+        pdata->t = t;
+        pdata->nr_elements = list->nr_elements;
+        strncpy(pdata->name, list->name, strlen(list->name)+1);
+        pdata->list_c_id = list->head->get_cid();
+
+        int i=0;
+        ListElement * el = list->head;
+        while(el)
+        {
+            switch(pdata->list_c_id)
+            {
+                case Class_BaseListElement:
+                    pdata->c_id = ((BaseListElement*)list->head)->base->c_id;
+                    copy_base_list_element(el, pdata, i);
+                    break;
+                case Class_ListElement:
+                    copy_list_element(el, pdata, i);
+                    break;
+            }
+
+            el = el->next;
+            i++;
+        }
+    }
+    PacketElementsList(Player * pl) : Packet(PACKET_ELEMENTS_LIST)
+    {
+        init(&pl->inventory);
+        pdata->pl_id=pl->get_id();
+    }
+    PacketElementsList(ElementsList * list) : Packet(PACKET_ELEMENTS_LIST)
+    {
+        init(list);
+    }
+    PacketElementsList() : Packet(PACKET_ELEMENTS_LIST)
+    {
+    }
+    int send(ENetPeer * peer)
+    {
+        int ret=0;
+        /*for (int i=0; i< 100; i++)
+            printf("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
+*/
+        ret = send_data(peer, pdata, pdata->size);
+        return ret;
+    }
+    bool update(unsigned char * data, size_t s)
+    {
+        pdata = (struct serial_data *)data;
+        if (s != pdata->size)
+            return false;
+        /*      for (int i=0; i<100; i++)
+                    printf("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
+        */
+        printf("PacketElementList: list=%s elems=%d %s\n", pdata->name, pdata->nr_elements, class_name[get_list_c_id()]);
+        return true;
+    }
+};
+
+#ifdef SERVER_CODE
 ObjectData * convert_to_data(InventoryElement * el)
 {
     ObjectData * obj = nullptr;
@@ -176,12 +307,14 @@ ObjectData * convert_to_data(InventoryElement * el)
             Player * player = dynamic_cast<Player *>(el);
             obj = new ObjectData(ObjectData::Tag::Player);
             obj->player.data = *player;
-            obj->player.data.clan = nullptr;
-            obj->player.data.player_skills = nullptr;
-            obj->player.data.inventory = nullptr;
-            obj->player.data.known_elements = nullptr;
-            obj->player.data.talking_to = nullptr;
-            obj->player.data.relations = nullptr;
+            if (player->inventory.nr_elements)
+                add_packet_to_send(new PacketElementsList(player));
+            //obj->player.data.clan = nullptr;
+            //obj->player.data.player_skills = nullptr;
+            //obj->player.data.inventory = nullptr;
+            //obj->player.data.known_elements = nullptr;
+           // obj->player.data.talking_to = nullptr;
+           // obj->player.data.relations = nullptr;
             break;
 
         }
@@ -236,6 +369,7 @@ ObjectData * convert_to_data(InventoryElement * el)
     }
     return obj;
 }
+#endif
 
 class PacketObjectCreate : public Packet
 {
@@ -246,7 +380,7 @@ class PacketObjectCreate : public Packet
         unsigned char data[0];
         static void * operator new(size_t size_base, size_t extra)
         {
-            printf("serial_data: allocating %ld + %ld\n", size_base, extra);
+            printf("PacketObjectCreate: serial_data: allocating %ld + %ld\n", size_base, extra);
             return ::operator new(size_base + extra);
         }
         serial_data(size_t s) : size(s)
@@ -261,8 +395,10 @@ class PacketObjectCreate : public Packet
   public:
     ObjectData * obj;
     PacketObjectCreate(InventoryElement * el) : Packet(PACKET_OBJECT_CREATE)
-    { // called by server
+    {
+#ifdef SERVER_CODE
         obj = convert_to_data(el);
+#endif
     }
     PacketObjectCreate() : Packet(PACKET_OBJECT_CREATE)
     { // called by client
@@ -310,9 +446,12 @@ class PacketObjectCreate : public Packet
                 break;
             }
             case ObjectData::Tag::Player:
-                obj->player.data.inventory = new InvList("inventory");
-                obj->player.data.known_elements = new ElementsList("known elements");
-                obj->player.data.player_skills = new Skills();
+                new (&obj->player.data.inventory) InvList("inventory");
+                new (&obj->player.data.known_elements) ElementsList("known elements");
+                new (&obj->player.data.player_skills) Skills();
+                new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
+                //talking_to
+                //relations
                 break;
             default:
                 break;
@@ -330,7 +469,7 @@ class PacketObjectUpdate : public Packet
         unsigned char data[0];
         static void * operator new(size_t size_base, size_t extra)
         {
-            printf("serial_data: allocating %ld + %ld\n", size_base, extra);
+            printf("PacketObjectUpdate: serial_data: allocating %ld + %ld\n", size_base, extra);
             return ::operator new(size_base + extra);
         }
         serial_data(size_t s) : size(s)
@@ -345,8 +484,10 @@ class PacketObjectUpdate : public Packet
   public:
     ObjectData * obj;
     PacketObjectUpdate(InventoryElement * el) : Packet(PACKET_OBJECT_UPDATE)
-    { // called by server
+    {
+#ifdef SERVER_CODE
         obj = convert_to_data(el);
+#endif
     }
     PacketObjectUpdate() : Packet(PACKET_OBJECT_UPDATE)
     { // called by client
@@ -394,9 +535,12 @@ class PacketObjectUpdate : public Packet
                 break;
             }
             case ObjectData::Tag::Player:
-                obj->player.data.inventory = new InvList("inventory");
-                obj->player.data.known_elements = new ElementsList("known elements");
-                obj->player.data.player_skills = new Skills();
+                new (&obj->player.data.inventory) InvList("inventory");
+                new (&obj->player.data.known_elements) ElementsList("known elements");
+                new (&obj->player.data.player_skills) Skills();
+                new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
+                //talking_to
+                //relations
                 break;
             default:
                 break;
@@ -406,98 +550,6 @@ class PacketObjectUpdate : public Packet
     }
 };
 
-class PacketElementsList : public Packet
-{
-    struct serial_data
-    {
-        PacketType t;
-        size_t size;
-        int nr_elements;
-        char name[60];
-        Class_id c_id;
-        unsigned char data[0];
-        static void * operator new(size_t size_base, size_t extra)
-        {
-            printf("serial_data: allocating %ld + %ld\n", size_base, extra);
-            return ::operator new(size_base + extra);
-        }
-        serial_data(size_t s) : size(s)
-        {
-        }
-        static void operator delete(void * ptr)
-        {
-            ::operator delete(ptr);
-        }
-    } *pdata __attribute__((packed));
-
-  public:
-    int get_nr_elements() { return pdata->nr_elements;}
-    Class_id get_c_id() {  return pdata->c_id;}
-    unsigned char * get_data() {  return pdata->data;}
-
-    PacketElementsList(ElementsList * list) : Packet(PACKET_ELEMENTS_LIST)
-    {
-        int size = list->nr_elements * list->head->get_size();
-        pdata = new (size) serial_data(sizeof(serial_data) + size);
-        pdata->t = t;
-        pdata->nr_elements = list->nr_elements;
-        strncpy(pdata->name, list->name, strlen(list->name)+1);
-        pdata->c_id = ((BaseListElement*)list->head)->base->c_id;
-
-        int i=0;
-        ListElement * el = list->head;
-        while(el)
-        {
-            BaseListElement * base_el = (BaseListElement*) el;
-
-            switch (pdata->c_id) {
-                case Class_BaseElement:
-                {
-                    BaseElement * dst = &((BaseElement*) &pdata->data)[i];
-                    *dst = *((BaseElement*)base_el->base);
-                    break;
-                }
-                case Class_BasePlant:
-                {
-                    BasePlant * dst = &((BasePlant*) &pdata->data)[i];
-                    *dst = *((BasePlant*)base_el->base);
-                    break;
-                }
-                case Class_BaseAnimal:
-                {
-                    BaseAnimal * dst = &((BaseAnimal*) &pdata->data)[i];
-                    *dst = *((BaseAnimal*)base_el->base);
-                    break;
-                }
-            }
-            el = el->next;
-            i++;
-        }
-    }
-    PacketElementsList() : Packet(PACKET_ELEMENTS_LIST)
-    {
-    }
-    int send(ENetPeer * peer)
-    {
-        int ret=0;
-        /*for (int i=0; i< 100; i++)
-            printf("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
-*/
-        ret = send_data(peer, pdata, pdata->size);        
-        return ret;
-    }
-    bool update(unsigned char * data, size_t s)
-    {
-        pdata = (struct serial_data *)data;
-        if (s != pdata->size)
-            return false;        
-        /*      for (int i=0; i<100; i++)
-                    printf("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
-        */
-        printf("PacketElementList %s for %d %s\n", pdata->name, pdata->nr_elements, class_name[pdata->c_id]);
-        return true;
-    }
-};
 
 class PacketChunkUpdate : public Packet
 {
@@ -534,7 +586,7 @@ class PacketChunkUpdate : public Packet
         ListElement * el = ch->objects.head;
         while (el)
         {
-            Packet * p = new PacketObjectCreate(el->el);
+            Packet * p = new PacketObjectCreate(el->el.get());
             ret = p->send(peer);
             el = el->next;
         }

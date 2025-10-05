@@ -29,7 +29,7 @@ void update()
             ListElement * el = world_table[y][x]->beings.head;
             while (el)
             {
-                BeingServer * b = dynamic_cast<BeingServer *>(el->el);
+                BeingServer * b = dynamic_cast<BeingServer *>(el->el.get());
                 b->tick();
                 // unsigned long ms=get_time_ms();
                 // printf("tick: %llu:%llu ms\n", ms/1000, ms % 1000);

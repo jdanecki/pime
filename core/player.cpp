@@ -9,7 +9,7 @@ const char * relations_names[] = {"unknown", "known"};
 void Player::pickup(InventoryElement * item)
 {
     inventory.add(item);
-
+    printf("player %p pickup inv=%lx\n", this, item->get_uid());
     ItemLocation location;
     location.tag = ItemLocation::Tag::Player;
     location.player.id = uid;
@@ -63,17 +63,16 @@ int Player::get_id()
 // }
 
 Player::Player(size_t uid, SerializableCString&& name, ItemLocation location, int thirst, int hunger, int nutrition)
-    : InventoryElement(Class_Player, uid, location), name(name), thirst(thirst), hunger(hunger), nutrition(nutrition),
-    inventory("inventory"), clan(get_random_clan()), talking_to(nullptr), known_elements("known elements")
+    : InventoryElement(Class_Player, uid, location), name(name),
+      thirst(thirst), hunger(hunger), nutrition(nutrition),
+      inventory("inventory"), known_elements("known elements"),
+      clan(get_clan_by_id(Clan_Human)), talking_to(nullptr)
 {
     printf("new player: uid = %ld name=%s\n", uid, get_name());
-    hunger = 500;
-    thirst = 250;
     // FIXME
     // relations = nullptr;
 
     in_conversation = false;
-    talking_to = nullptr;
     welcomed = false;
 
     checked_element = 0;

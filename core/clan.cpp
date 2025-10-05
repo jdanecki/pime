@@ -4,7 +4,7 @@
 
 const char * clan_names[] = {"Animal", "Human", "Dwarf", "Elf", "Niziolek"};
 
-Clan::Clan(ClanId id): id(id), NetworkObject(Class_Clan)
+Clan::Clan(ClanId id):  NetworkObject(Class_Clan), id(id)
 {    
     skills = new Skills();
 }

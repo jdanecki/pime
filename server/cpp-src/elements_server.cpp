@@ -203,8 +203,21 @@ void PlantServer::show(bool details)
 
 bool PlantServer::player_action(Player_action action, Player * pl)
 {
+    bool res = false;
     printf("PLANT_SERVER: %s %s\n", player_action_name[action], get_name());
-    return false;
+    switch (action)
+    {
+        case PLAYER_EAT:
+            printf("ate %s\n", get_name());
+            res = true;
+            if (res) {
+                pl->hunger += 10;
+                destroy(this);
+            }
+            break;
+    }
+
+    return res;
 }
 
 bool PlantServer::grow()
@@ -406,13 +419,16 @@ bool ElementServer::player_action(Player_action action, Player * pl)
     {
         case PLAYER_DRINK:
             res = action_drink();
-            if (res)
-                pl->thirst += 10;
+            if (res) {
+                pl->thirst += 10;                
+            }
             break;
         case PLAYER_EAT:
             res = action_eat();
-            if (res)
+            if (res) {
                 pl->hunger += 10;
+
+            }
             break;
     }
 

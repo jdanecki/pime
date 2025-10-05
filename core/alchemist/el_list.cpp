@@ -7,7 +7,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-ListElement::ListElement(InventoryElement * entry) : el(entry)
+ListElement::ListElement(InventoryElement * entry) : el(entry), c_id(Class_ListElement)
 {
     next = nullptr;
     prev = nullptr;
@@ -276,7 +276,7 @@ InventoryElement * InvList::add(InventoryElement * el)
 {
     ListElement * entry = new ListElement(el);
     ElementsList::add(entry);
-  //  printf("%s elements=%d %s\n", name, nr_elements, el->get_class_name());
+    printf("InvList: added to list(%s) elements=%d el_class_name:%s\n", name, nr_elements, el->get_class_name());
     return el;
 }
 

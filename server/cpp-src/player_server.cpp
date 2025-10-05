@@ -68,6 +68,7 @@ move_player:
     thirst--;
     update_location(get_uid(), old, location);
     printf("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
+    notify_update(this);
 }
 
 bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement * object)
@@ -98,6 +99,13 @@ bool PlayerServer::action_on_object(Player_action a, InventoryElement * object)
             else
             {
                 printf("%s: already checked this item\n", object->get_name());
+            }
+            break;
+        case PLAYER_EAT:
+        case PLAYER_DRINK:
+            if (object->player_action(a, this))
+            {
+                notify_update(this);
             }
             break;
         default:
@@ -203,7 +211,7 @@ bool PlayerServer::pickup(InventoryElement * item)
     return true;
 }
 
-PlayerServer::PlayerServer(size_t uid) : Player(uid, SerializableCString("player"), ItemLocation::center(), 1, 2, 3)
+PlayerServer::PlayerServer(size_t uid) : Player(uid, SerializableCString("player"), ItemLocation::center(), 50+rand()%100, 50+rand()%100, 50+rand()%100)
 {
     printf("PlayerServer: uid=%ld\n", uid);
     objects_to_create.add(this);

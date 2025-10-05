@@ -89,7 +89,7 @@ class InventoryElement : public NetworkObject
     InventoryElement(Class_id c_id, size_t uid, ItemLocation location);
     InventoryElement(Class_id c_id) : NetworkObject(c_id)
     {}
-    // InventoryElement() {}
+     InventoryElement() {}
     virtual bool action(Product_action action, Player * pl)
     {
         printf("INV: %s %s\n", product_action_name[action], get_name());

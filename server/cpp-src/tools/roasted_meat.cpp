@@ -13,7 +13,8 @@ bool RoastedMeat::player_action(Player_action action, Player * pl)
     {
         case PLAYER_EAT:
             pl->hunger += this->quality.value * 2 - 40;
-            destroy(this);
+            printf("ate %s\n", get_name());
+            destroy(this);            
             break;
     }
 
