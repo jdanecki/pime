@@ -31,7 +31,8 @@ add_library(${PIME_TARGET_NAME} SHARED
 	)
 
 if(USE_ENET)
-    target_compile_definitions(${PIME_TARGET_NAME} PRIVATE USE_ENET)
+    target_compile_definitions(${PIME_TARGET_NAME} PRIVATE USE_ENET )
+    add_definitions(${enet_CFLAGS} )
 endif()
 
 

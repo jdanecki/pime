@@ -1,13 +1,13 @@
 enet: serv-enet client-enet tui-enet
 
 serv-enet:
-	make -C server/enet/build -j $(nproc)
+	make -C server/enet/build -j $(shell nproc)
 
 client-enet:
-	make -C SDL/build -j $(nproc) pime_SDL_enet
+	make -C SDL/build -j $(shell nproc) pime_SDL_enet
 
 tui-enet:
-	make -C tui/enet/build -j $(nproc)
+	make -C tui/enet/build -j $(shell nproc)
 
 clean-enet: serv-enet-clean tui-enet-clean
 	make -C SDL/build clean

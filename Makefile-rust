@@ -4,10 +4,10 @@ serv-rust:
 	cd server; 	cargo build
 
 client-rust:
-	make -C SDL/build -j $(nproc) pime_SDL
+	make -C SDL/build -j $(shell nproc) pime_SDL
 
 tui-rust:
-	make -C tui/build -j $(nproc)
+	make -C tui/build -j $(shell nproc)
 
 clean-rust: serv-rust-clean tui-rust-clean
 	make -C SDL/build clean

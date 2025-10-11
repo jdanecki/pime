@@ -6,13 +6,14 @@ pkg_check_modules(SDL sdl2)
 pkg_check_modules(SDL2_IMAGE SDL2_image)
 pkg_check_modules(SDL2_TTF SDL2_ttf)
 pkg_check_modules(SDL2_MIXER SDL2_mixer)
+pkg_check_modules(enet libenet)
 
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch -Wno-reorder")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 
-add_definitions(-DCORE_FOR_CLIENT)
+add_definitions(-DCORE_FOR_CLIENT ${enet_CFLAGS} )
 
 set(CORE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../core)
 set(CORE_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/core)
@@ -46,7 +47,7 @@ set(SHARED_SOURCES
 set(SHARED_LIBRARIES
      SDL2 SDL2_image SDL2_ttf SDL2_mixer
     ${SDL_LDFLAGS} ${SDL2_MIXER_LDFLAGS}
-    m 
+    m
 )
 
 add_executable(pime_SDL ${SHARED_SOURCES})

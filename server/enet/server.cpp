@@ -114,10 +114,7 @@ void print_status(int l, const char * format, ...)
 {
     va_list args;
     va_start(args, format);
-    if (!l)
-        vprintf(format, args);
-    else
-        vprintf(format, args);
+    vprintf(format, args);
     va_end(args);
     puts("");
 }
