@@ -2,7 +2,6 @@
 #include "networking.h"
 #include "world_server.h"
 #include "craft_ing.h"
-#include "ncurses-costam.h"
 
 // #define TRACE_PLANTS 1
 
@@ -32,7 +31,7 @@ AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
 bool AnimalServer::action(Product_action action, Player * pl)
 {
     // Animal::action(action, pl);
-    printf("ANIMAL_SERVER: %s %s\n", product_action_name[action], get_name());
+    CONSOLE_LOG("ANIMAL_SERVER: %s %s\n", product_action_name[action], get_name());
 
     InventoryElement * crafted = nullptr;
     switch (action)
@@ -49,13 +48,13 @@ bool AnimalServer::action(Product_action action, Player * pl)
     {
         add_object_to_world(crafted, pl->location);
         objects_to_create.add(crafted);
-        printf("crafted meat\n");
+        CONSOLE_LOG("crafted meat\n");
         destroy(this);
         return true;
     }
     else
     {
-        printf("failed to craft\n");
+        CONSOLE_LOG("failed to craft\n");
     }
     return false;
 }
@@ -70,7 +69,7 @@ bool AnimalServer::grow()
 {
     delay_for_grow--;
     // unsigned long ms=get_time_ms();
-    // printf("AnimalServer.grow: %llu:%llu ms delay=%d\n", ms/1000, ms % 1000, delay_for_grow);
+    // CONSOLE_LOG("AnimalServer.grow: %llu:%llu ms delay=%d\n", ms/1000, ms % 1000, delay_for_grow);
 
     if (delay_for_grow)
         return false;
@@ -79,7 +78,7 @@ bool AnimalServer::grow()
     bool ret = BeingServer::grow();
     if (!alive)
     {
-        printf("%s is dead age=%d/%d\n", get_name(), age->value, max_age->value);
+        CONSOLE_LOG("%s is dead age=%d/%d\n", get_name(), age->value, max_age->value);
         destroy(this);
         // FIXME leave meat after death
     }
@@ -87,7 +86,7 @@ bool AnimalServer::grow()
     {
         size = 1.0 * age->value / max_age->value;
         notify_update(this);
-        //   printf("%s:%s growing size=%f %d/%d \n", get_class_name(), get_name(), size, age->value, max_age->value);
+        //  CONSOLE_LOG("%s:%s growing size=%f %d/%d \n", get_class_name(), get_name(), size, age->value, max_age->value);
     }
     return ret;
 }
@@ -125,7 +124,7 @@ void AnimalServer::move()
                 _y--;
         }
     }
-    //  printf("%d, %d -> dst[%d, %d]\n", _x, _y, dst_loc_x, dst_loc_y);
+    // CONSOLE_LOG("%d, %d -> dst[%d, %d]\n", _x, _y, dst_loc_x, dst_loc_y);
 
     if (_x >= CHUNK_SIZE)
         _x = CHUNK_SIZE - 1;
@@ -191,7 +190,7 @@ void PlantServer::change_phase(Plant_phase p)
     notify_update(this);
     if (phase != p)
     {
-        //   printf("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
+        //  CONSOLE_LOG("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
     }
     phase = p;
 }
@@ -205,11 +204,11 @@ void PlantServer::show(bool details)
 bool PlantServer::player_action(Player_action action, Player * pl)
 {
     bool res = false;
-    printf("PLANT_SERVER: %s %s\n", player_action_name[action], get_name());
+    CONSOLE_LOG("PLANT_SERVER: %s %s\n", player_action_name[action], get_name());
     switch (action)
     {
         case PLAYER_EAT:
-            printf("ate %s\n", get_name());
+            CONSOLE_LOG("ate %s\n", get_name());
             res = true;
             if (res)
             {
@@ -225,7 +224,7 @@ bool PlantServer::player_action(Player_action action, Player * pl)
 bool PlantServer::grow()
 {
     // unsigned long ms=get_time_ms();
-    // printf("PlantServer.grow: %llu:%llu ms delay=%d\n", ms/1000, ms % 1000, delay_for_grow);
+    // CONSOLE_LOG("PlantServer.grow: %llu:%llu ms delay=%d\n", ms/1000, ms % 1000, delay_for_grow);
     if (grown)
         return false;
 
@@ -241,7 +240,7 @@ bool PlantServer::grow()
     age->value++;
     size = 1.0 * age->value / max_age->value;
 #ifdef TRACE_PLANTS
-    printf("PlantServer:%s growing %d/%d phase=%s grown=%d planted=%d times=%d/%d/%d/ size=%f\n", get_name(), age->value, max_age->value, plant_phase_name[phase], grown, planted, seedling_time,
+    CONSOLE_LOG("PlantServer:%s growing %d/%d phase=%s grown=%d planted=%d times=%d/%d/%d/ size=%f\n", get_name(), age->value, max_age->value, plant_phase_name[phase], grown, planted, seedling_time,
         growing_time, flowers_time, size);
 #endif
     if (age->value >= max_age->value)
@@ -291,7 +290,7 @@ IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id i, For
 
 bool IngredientServer::action(Product_action action, Player * pl)
 {
-    printf("ING_SERVER: %s %s\n", product_action_name[action], get_name());
+    CONSOLE_LOG("ING_SERVER: %s %s\n", product_action_name[action], get_name());
     return false;
 }
 
@@ -335,13 +334,13 @@ PlantServer * create_plant(BasePlant * base)
 
 ElementServer * create_element(BaseElement * base)
 {
-    //   printf("create_element %s\n", base->get_name());
+    //  CONSOLE_LOG("create_element %s\n", base->get_name());
     return new ElementServer(base);
 }
 
 ScrollServer * create_scroll(Base * base)
 {
-    //  printf("create_scroll: base=%s id=%d\n", base->get_name(), base->id);
+    // CONSOLE_LOG("create_scroll: base=%s id=%d\n", base->get_name(), base->id);
     ScrollServer * s = new ScrollServer(base);
     return s;
 }
@@ -357,7 +356,7 @@ ElementServer::ElementServer(BaseElement * b) : Element(b)
 
 bool ElementServer::action(Product_action action, Player * pl)
 {
-    printf("ELEMENT_SERVER: %s %s\n", product_action_name[action], get_name());
+    CONSOLE_LOG("ELEMENT_SERVER: %s %s\n", product_action_name[action], get_name());
 
     bool res = false;
     switch (action)
@@ -416,7 +415,7 @@ bool ElementServer::player_action(Player_action action, Player * pl)
 {
     bool res = false;
 
-    printf("ELEMENT_SERVER: %s %s\n", player_action_name[action], get_name());
+    CONSOLE_LOG("ELEMENT_SERVER: %s %s\n", player_action_name[action], get_name());
     switch (action)
     {
         case PLAYER_DRINK:
@@ -455,12 +454,12 @@ bool ElementServer::action_drink()
         {
             volume.value = length.decrease(2) * width.decrease(2) * height.decrease(2);
             mass.value = b->density.value * volume.value / 1000;
-            printf("drunk %s\n", get_name());
+            CONSOLE_LOG("drunk %s\n", get_name());
         }
         return true;
     }
     else
-        printf("can't drink %s\n", get_name());
+        CONSOLE_LOG("can't drink %s\n", get_name());
     return false;
 }
 
@@ -473,12 +472,12 @@ bool ElementServer::action_eat()
         {
             volume.value = length.decrease(4) * width.decrease(4) * height.decrease(4);
             mass.value = b->density.value * volume.value / 1000;
-            printf("ate %s\n", get_name());
+            CONSOLE_LOG("ate %s\n", get_name());
         }
         return true;
     }
     else
-        printf("can't eat %s\n", get_name());
+        CONSOLE_LOG("can't eat %s\n", get_name());
     return false;
 }
 
@@ -519,7 +518,7 @@ ScrollServer::ScrollServer(Base * b) : Scroll(b)
 
 bool ScrollServer::player_action(Player_action action, Player * pl)
 {
-    printf("ScrollServer: %s %s\n", player_action_name[action], get_name());
+    CONSOLE_LOG("ScrollServer: %s %s\n", player_action_name[action], get_name());
 
     switch (action)
     {
@@ -530,7 +529,7 @@ bool ScrollServer::player_action(Player_action action, Player * pl)
             }
             else
             {
-                printf("ScrollServer: already known this item\n");
+                CONSOLE_LOG("ScrollServer: already known this item\n");
             }
             destroy(this);
             break;

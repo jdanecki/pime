@@ -8,7 +8,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 
-add_definitions(-DCORE_FOR_CLIENT -DDISABLE_NPC)
+add_definitions(-DDISABLE_NPC)
 
 add_subdirectory(../core core)
 

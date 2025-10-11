@@ -36,47 +36,31 @@ void shift_output()
     }
 }
 
-void add_to_output(const char * fmt, ...)
+int add_to_output(const char * fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
     shift_output();
     vsnprintf(out_buf[history_size - 1], MAX_OUTPUT_SIZE, fmt, args);
     va_end(args);
+    return 0;
 }
 
 void print_help()
 {
-    add_to_output("exit/quit\n");
+    add_to_output("exit\n");
     add_to_output("help\n");
     add_to_output("clear\n");
+    add_to_output("players\n");
 }
 
-char handle_command()
+void clear_history()
 {
-    // comparing the first letters ISN'T A BUG
-
-    if (strlen(in_buf) == 0)
-        return 0;
-    else if (strncmp(in_buf, "q", 1) == 0 || strncmp(in_buf, "e", 1) == 0) // quit || exit
-        return 1;
-    else if (strncmp(in_buf, "h", 1) == 0) // help
-        print_help();
-    else if (strncmp(in_buf, "c", 1) == 0) // clear
+    for (int i = 0; i < history_size; i++)
     {
-        for (int i = 0; i < history_size; i++)
-        {
-            memset(out_buf[i], 0, MAX_OUTPUT_SIZE);
-        }
-        add_to_output("%scleared%s\n", RED, RESET);
+        memset(out_buf[i], 0, MAX_OUTPUT_SIZE);
     }
-    else
-    {
-        add_to_output("%sinvalid command: %s%s\n", RED, RESET, in_buf);
-        add_to_output("use \"help\" to show help\n");
-    }
-
-    return 0;
+    add_to_output("%scleared%s\n", RED, RESET);
 }
 
 void handle_resize()
@@ -88,6 +72,7 @@ void handle_resize()
     mvwin(in_w, h - 3, 0);
 }
 
+char handle_command();
 char handle_pressed(int pressed)
 {
     if (pressed == 0)
@@ -270,9 +255,7 @@ class PlayerClient : public ListElement
     ENetPeer * peer;
     PlayerClient(PlayerServer * player, ENetPeer * peer) : player(player), peer(peer)
     {
-        char hostname[64];
-        enet_address_get_host_ip(&peer->address, hostname, 64);
-        add_to_output("new player uid=%ld host=%s port=%u\n", player->uid, hostname, peer->address.port);
+        show();
     }
     bool check(void * what)
     {
@@ -285,6 +268,12 @@ class PlayerClient : public ListElement
                 return p->id == player->uid;
         }
         return false;
+    }
+    void show()
+    {
+        char hostname[64];
+        enet_address_get_host_ip(&peer->address, hostname, 64);
+        add_to_output("player uid=%ld host=%s port=%u\n", player->uid, hostname, peer->address.port);
     }
 };
 
@@ -301,6 +290,7 @@ void send_to_all(Packet * p)
         i++;
     }
 }
+
 class PacketToSend : public ListElement
 {
     Packet * p;
@@ -664,7 +654,7 @@ void notify_update(const InventoryElement * el)
 
 void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc)
 {
-    /* printf("update location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
+    /*CONSOLE_LOG("update location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
      old_loc.show();
      new_loc.show();
  */
@@ -704,13 +694,51 @@ void generate()
     base_animals.add(entry);*/
 }
 
+void show_players()
+{
+    ListElement * pl_el = players->head;
+    while (pl_el)
+    {
+        PlayerClient * pl = (PlayerClient *)pl_el;
+        pl->show();
+        pl_el = pl_el->next;
+    }
+}
+
+char handle_command()
+{
+    // comparing the first letters ISN'T A BUG
+
+    if (strlen(in_buf) == 0)
+        return 0;
+    switch (in_buf[0])
+    {
+        case 'e':
+            return 1;
+        case 'h':
+            print_help();
+            break;
+        case 'c':
+            clear_history();
+            break;
+        case 'p':
+            show_players();
+            break;
+        default:
+            add_to_output("%sinvalid command: %s%s\n", RED, RESET, in_buf);
+            add_to_output("use \"help\" to show help\n");
+            break;
+    }
+
+    return 0;
+}
+
 int main()
 {
     ncurses_init();
     add_to_output("%spime_enet  \nCopyright (C) 2025 Piotr Danecki <i3riced@mailfence.com>\nCopyright (C) 2025 Jacek Danecki\n    ", GREEN);
     add_to_output("  This program comes with ABSOLUTELY NO WARRANTY.\n");
-    add_to_output("  This is free software, and you are welcome to redistribute it under certain conditions.\n");
-    add_to_output("  To show the license, type \"license\" and press enter. \n%s", RESET);
+    add_to_output("  This is free software, and you are welcome to redistribute it under certain conditions. See LICENSE file\n");
     trace_network = 1;
     srand(0);
     if (enet_initialize() != 0)
@@ -788,8 +816,8 @@ int main()
                 break;
             }
             default:
-                // printf("time=%ld\n", get_time_ms());
-                // update();
+                // CONSOLE_LOG("time=%ld\n", get_time_ms());
+                update();
                 send_updates();
                 break;
         }

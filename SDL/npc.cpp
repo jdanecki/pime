@@ -5,7 +5,7 @@
 #include "window.h"
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
-#include <cstdio>
+#include <stdio.h>
 #include "implementations/playerSDL.h"
 
 NpcSDL * current_npc;

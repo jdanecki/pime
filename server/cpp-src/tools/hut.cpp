@@ -12,6 +12,6 @@ ProductServer * Hut::Hut::createHut(InventoryElement * el1, InventoryElement * e
 
     if (id1 == ING_WALL && id2 == ING_WALL)
         return new Hut(el1, el2);
-    printf(" wrong ingredients\n");
+    CONSOLE_LOG(" wrong ingredients\n");
     return nullptr;
 }

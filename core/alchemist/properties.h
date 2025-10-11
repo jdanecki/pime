@@ -1,9 +1,10 @@
 #ifndef PROPERTIES_H
 #define PROPERTIES_H
 
-#include <cstdio>
+#include <stdio.h>
 #include <stdlib.h>
 #include "serialization.h"
+#include "ncurses-output.h"
 
 class Property
 {
@@ -15,11 +16,13 @@ class Property
         value = v;
     }
 #ifdef USE_ENET
-    Property() {}
+    Property()
+    {
+    }
 #endif
     void show()
     {
-        printf("%s = %u\n", name.str, value);
+        CONSOLE_LOG("%s = %u\n", name.str, value);
     }
     unsigned int decrease(unsigned int by)
     {
@@ -47,7 +50,8 @@ class Edible
     {
         eating_by = rand() % 16;
     }
-    void set_no_edible() {
+    void set_no_edible()
+    {
         eating_by = 0;
     }
     bool can_be_eaten_by(int who)

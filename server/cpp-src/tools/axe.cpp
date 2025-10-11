@@ -14,6 +14,6 @@ ProductServer * Axe::Axe::createAxe(InventoryElement * el1, InventoryElement * e
 
     if ((id1 == ING_AXE_BLADE && id2 == ING_AXE_HANDLE) || (id1 == ING_AXE_HANDLE && id2 == ING_AXE_BLADE))
         return new Axe(el1, el2);
-    printf(" wrong ingredients\n");
+    CONSOLE_LOG(" wrong ingredients\n");
     return nullptr;
 }

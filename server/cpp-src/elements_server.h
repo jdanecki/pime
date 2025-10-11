@@ -124,7 +124,7 @@ class PlantServer : public Plant, public BeingServer
     bool action(Product_action action, Player * pl) override
     {
         Plant::action(action, pl);
-        printf("PLANT_SERVER: %s %s\n", product_action_name[action], get_name());
+        CONSOLE_LOG("PLANT_SERVER: %s %s\n", product_action_name[action], get_name());
         return false;
     }
     void show(bool details = true) override;
@@ -163,7 +163,7 @@ class ProductServer : public Product
         // if (!actions) return false;
         if (actions == ACT_NOTHING)
             return false;
-        printf("%s: %s %s\n", get_name(), product_action_name[actions], object->get_name());
+        CONSOLE_LOG("%s: %s %s\n", get_name(), product_action_name[actions], object->get_name());
         return object->action(actions, pl);
         // FIXME change properties of product after action
     }

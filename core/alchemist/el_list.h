@@ -2,17 +2,14 @@
 #define EL_LIST_H
 
 #include "elements.h"
-#ifdef USE_ENET
-#include "serialization-enet.h"
-#else
-#include "serialization-rust.h"
-#endif
 
 class ListElement
 {
     bool enabled;
+
   protected:
     Class_id c_id;
+
   public:
     SerializablePointer<InventoryElement> el;
     ListElement *next, *prev;
@@ -47,8 +44,14 @@ class ListElement
     virtual ~ListElement()
     {
     }
-    virtual size_t get_size() { return sizeof(size_t); } //only uid size
-    Class_id get_cid() {  return c_id; }
+    virtual size_t get_size()
+    {
+        return sizeof(size_t);
+    } // only uid size
+    Class_id get_cid()
+    {
+        return c_id;
+    }
 };
 
 struct ElId
@@ -68,7 +71,7 @@ class KnownElement : public ListElement
         elid.c_id = t;
         elid.id = i;
         known = false;
-        c_id=Class_KnownElement;
+        c_id = Class_KnownElement;
     }
 
     bool is_known()
@@ -78,7 +81,7 @@ class KnownElement : public ListElement
     void set_known()
     {
         known = true;
-        printf("learning %s %d\n", class_name[elid.c_id], elid.id);
+        CONSOLE_LOG("learning %s %d\n", class_name[elid.c_id], elid.id);
     }
 
     bool check(void * what)
@@ -94,31 +97,41 @@ class KnownElement : public ListElement
     {
         return elid.id;
     }
-    size_t get_size() { return sizeof(KnownElement); }
+    size_t get_size()
+    {
+        return sizeof(KnownElement);
+    }
 };
 
 class BaseListElement : public ListElement
 {
   public:
     Base * base;
-    BaseListElement(Base * base) : base(base) {
-        c_id=Class_BaseListElement;
+    BaseListElement(Base * base) : base(base)
+    {
+        c_id = Class_BaseListElement;
     }
     bool check(void * what)
     {
-        int *pid = (int *)what;
+        int * pid = (int *)what;
         return (*pid == base->id);
     }
-    size_t get_size() { return base->get_size() ; }
+    size_t get_size()
+    {
+        return base->get_size();
+    }
     void show(bool details = true);
 };
 
 class ElementsListIterator
 {
-    ListElement* le;
+    ListElement * le;
+
   public:
-    ElementsListIterator(ListElement *le): le(le) {}
-    bool operator!=(ElementsListIterator& other)
+    ElementsListIterator(ListElement * le) : le(le)
+    {
+    }
+    bool operator!=(ElementsListIterator & other)
     {
         return le != other.le;
     }
@@ -127,7 +140,7 @@ class ElementsListIterator
         le = le->next;
         return *this;
     }
-    InventoryElement* operator*()
+    InventoryElement * operator*()
     {
         return le->el.get();
     }
@@ -135,8 +148,10 @@ class ElementsListIterator
 
 class ElementsList
 {
-   protected:    
-    void virtual copy(ListElement *el) {}
+  protected:
+    void virtual copy(ListElement * el)
+    {
+    }
 
   public:
     void remove_all();
@@ -164,9 +179,15 @@ class ElementsList
     void tick();
     void copy_elements(ElementsList * dst);
     ListElement * get_random();
-    
-    ElementsListIterator begin() {return head;}
-    ElementsListIterator end() {return nullptr;}
+
+    ElementsListIterator begin()
+    {
+        return head;
+    }
+    ElementsListIterator end()
+    {
+        return nullptr;
+    }
 };
 
 typedef bool (*FindFunc)(InventoryElement * el, void * arg);

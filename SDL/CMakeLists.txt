@@ -13,7 +13,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch -Wno-reorder")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 
-add_definitions(-DCORE_FOR_CLIENT ${enet_CFLAGS} )
+add_definitions(${enet_CFLAGS} )
 
 set(CORE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../core)
 set(CORE_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/core)

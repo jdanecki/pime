@@ -1,6 +1,5 @@
 #include "craft_prod.h"
 #include "tools/tools.h"
-#include "ncurses-costam.h"
 
 typedef ProductServer * (*ProductFunction)(InventoryElement *, InventoryElement *);
 

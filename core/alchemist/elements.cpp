@@ -3,14 +3,14 @@
 #include <cstring>
 #include "elements.h"
 
-//#include "../tiles.h"
+// #include "../tiles.h"
 #include "el_list.h"
 #include "names.h"
 
 #ifdef USE_ENET
-    BaseElement * get_base_element(int32_t id);
-    BasePlant * get_base_plant(int32_t id);
-    BaseAnimal * get_base_animal(int32_t id);
+BaseElement * get_base_element(int32_t id);
+BasePlant * get_base_plant(int32_t id);
+BaseAnimal * get_base_animal(int32_t id);
 #endif
 
 ElementsList * base_list;
@@ -57,7 +57,8 @@ const char * server_action_name[] = {"server show item", "server show chunk", "s
 
 const char * object_names[] = {"wall"};
 const char * plant_phase_name[] = {"Seed", "Seedling", "Growing", "Flowers", "Fruits"};
-const char * class_name[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Scroll", "Plant", "Animal", "Player", "Npc", "Clan", "ListElement", "KnownElement", "BaseListElement"};
+const char * class_name[] = {
+    "unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Scroll", "Plant", "Animal", "Player", "Npc", "Clan", "ListElement", "KnownElement", "BaseListElement"};
 
 Base::Base(int index, Class_id c, const char * name) : name(name)
 {
@@ -68,7 +69,7 @@ Base::Base(int index, Class_id c, const char * name) : name(name)
 
 void Base::show(bool details)
 {
-    printf("Base name=%s class:%s id=%d \n", get_name(), class_name[c_id], id);
+    CONSOLE_LOG("Base name=%s class:%s id=%d \n", get_name(), class_name[c_id], id);
     if (details)
         edible.show();
 }
@@ -80,7 +81,7 @@ const char * Base::get_name()
 
 BaseElement::BaseElement(Form f, int index) : Base(index, Class_BaseElement, create_name(5 - f)), form(f), color({rand() % 256, rand() % 256, rand() % 256}), density("", 0)
 {
-    //  printf("BaseElement index=%d name=%s\n", index, get_name());
+    // CONSOLE_LOG("BaseElement index=%d name=%s\n", index, get_name());
 
     switch (form)
     {
@@ -100,11 +101,11 @@ BaseElement::BaseElement(Form f, int index) : Base(index, Class_BaseElement, cre
 void BaseElement::show(bool details)
 {
     Base::show(details);
-    printf("BaseElement form=%s\n", Form_name[form]);
+    CONSOLE_LOG("BaseElement form=%s\n", Form_name[form]);
     if (!details)
         return;
     density.show(); // gęstość
-    printf("   form = %s\n", Form_name[form]);
+    CONSOLE_LOG("   form = %s\n", Form_name[form]);
     switch (form)
     {
         case Form_solid:
@@ -121,10 +122,9 @@ Element::Element(BaseElement * b)
     : InventoryElement(Class_Element), base(b), length("length", 3 + rand() % 30), width("width", 3 + rand() % 30), height("height", 3 + rand() % 30),
       volume("volume", length.value * width.value * height.value), sharpness("sharpness", 0), smoothness("smoothness", 0), mass("mass", b->density.value * volume.value / 1000)
 {
-
 }
 #ifdef USE_ENET
-Element::Element(int id): base(get_base_element(id))
+Element::Element(int id) : base(get_base_element(id))
 {
 }
 #endif
@@ -132,9 +132,8 @@ Element::Element(int id): base(get_base_element(id))
 // called by the_game_net/core.rs
 InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : NetworkObject(c_id, uid), location(location)
 {
-
 }
-Class_id InventoryElement::get_cid() const 
+Class_id InventoryElement::get_cid() const
 {
     return c_id;
 }
@@ -144,14 +143,13 @@ size_t InventoryElement::get_uid() const
     return uid;
 }
 
-
 void Element::show(bool details)
 {
     InventoryElement::show(details);
 
     if (!details)
         return;
-    printf("form=%s\n", get_form_name());
+    CONSOLE_LOG("form=%s\n", get_form_name());
     length.show();
     width.show();
     height.show();
@@ -174,13 +172,13 @@ Ingredient::Ingredient(Ingredient_id i) : InventoryElement(Class_Ingredient), qu
 void Ingredient::show(bool details)
 {
     InventoryElement::show(details);
-    printf("name=%s id=%d\n", get_name(), id);
+    CONSOLE_LOG("name=%s id=%d\n", get_name(), id);
     if (!details)
         return;
     quality.show();
     resilience.show();
     usage.show();
-    printf("form = %s", Form_name[req_form]);
+    CONSOLE_LOG("form = %s", Form_name[req_form]);
 }
 
 Product::Product(Product_id i) : InventoryElement(Class_Product), quality("quality", 0), resilience("resilience", 0), usage("usage", 0)
@@ -195,21 +193,20 @@ Product::Product(Product_id i) : InventoryElement(Class_Product), quality("quali
 void Product::show(bool details)
 {
     InventoryElement::show(details);
-    printf("name=%s id=%d\n", get_name(), id);
+    CONSOLE_LOG("name=%s id=%d\n", get_name(), id);
     if (!details)
         return;
     quality.show();
     resilience.show();
     usage.show();
 
-    printf("action: %d -> %s\n", actions, product_action_name[actions]);
+    CONSOLE_LOG("action: %d -> %s\n", actions, product_action_name[actions]);
 }
 
 void Animal::init(BaseAnimal * b)
 {
     c_id = Class_Animal;
     size = 0;
-
 }
 
 BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(7))
@@ -218,7 +215,7 @@ BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(7)
     carnivorous = rand() % 2;
     swimming = rand() % 2;
     flying = rand() % 2;
-    //   printf("BaseAnimal index=%d name=%s\n", index, get_name());
+    //  CONSOLE_LOG("BaseAnimal index=%d name=%s\n", index, get_name());
     edible.set_random();
 }
 
@@ -230,7 +227,6 @@ Animal::Animal(BaseAnimal * b) : InventoryElement(Class_Animal), base(b)
 #ifdef USE_ENET
 Animal::Animal(int id) : base(get_base_animal(id))
 {
-
 }
 #endif
 
@@ -238,7 +234,7 @@ BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(5))
 {
     flowers = rand() % 2;
     leaves = rand() % 2;
-    //  printf("BasePlant index=%d name=%s\n", index, get_name());
+    // CONSOLE_LOG("BasePlant index=%d name=%s\n", index, get_name());
     edible.set_random();
 }
 
@@ -260,12 +256,12 @@ Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)
 }
 
 #ifdef USE_ENET
-Plant::Plant(int id): base(get_base_plant(id))
+Plant::Plant(int id) : base(get_base_plant(id))
 {
 }
 #endif
 
 Scroll::Scroll(Base * b) : InventoryElement(Class_Scroll), base(b)
 {
-    //  printf("Scroll class=%s id=%d name=%s\n", class_name[b->c_id], b->id, b->get_name());
+    // CONSOLE_LOG("Scroll class=%s id=%d name=%s\n", class_name[b->c_id], b->id, b->get_name());
 }

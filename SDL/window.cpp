@@ -1,6 +1,7 @@
 #include "window.h"
 #include <SDL2/SDL.h>
 #include <time.h>
+#include "../core/alchemist/ncurses-output.h"
 
 SDL_Renderer * renderer;
 SDL_Window * main_window;
@@ -61,7 +62,7 @@ int init_window()
     }
 
     unsigned long t2 = get_time_usec();
-    printf("Time it took to initialize SDL2: %ldms\n", (t2 - t1) / 1000);
+    CONSOLE_LOG("Time it took to initialize SDL2: %ldms\n", (t2 - t1) / 1000);
 
     if (SDL_CreateWindowAndRenderer(0, 0, flags, &main_window, &renderer) < 0)
     {
@@ -78,14 +79,14 @@ int init_window()
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags))
     {
-        printf("\nUnable to initialize sdl_image:  %s\n", IMG_GetError());
+        CONSOLE_LOG("\nUnable to initialize sdl_image:  %s\n", IMG_GetError());
         return 1;
     }
 
     SDL_Surface * icon = IMG_Load("textures/pime.png");
     if (icon == NULL)
     {
-        printf("\nUnable to load image %s! SDL_image Error: %s\n", "textures/pime.png", IMG_GetError());
+        CONSOLE_LOG("\nUnable to load image %s! SDL_image Error: %s\n", "textures/pime.png", IMG_GetError());
         return 1;
     }
     SDL_SetWindowIcon(main_window, icon);
@@ -94,7 +95,7 @@ int init_window()
     TTF_Init();
 
     unsigned long t3 = get_time_usec();
-    printf("Time it took to initialize SDL2 modules (img, window, renderer): %ldms\n ", (t3 - t1) / 1000);
+    CONSOLE_LOG("Time it took to initialize SDL2 modules (img, window, renderer): %ldms\n ", (t3 - t1) / 1000);
 
     return 0;
 }

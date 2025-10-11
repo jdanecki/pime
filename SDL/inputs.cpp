@@ -6,7 +6,7 @@
 #include <SDL2/SDL_mouse.h>
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_timer.h>
-#include <cstdio>
+#include <stdio.h>
 
 #include "implementations/playerSDL.h"
 #include "../core/tiles.h"
@@ -128,7 +128,7 @@ void key_pressed(int key)
             if (item)
                 item->show();
             else
-                printf("nothing to show\n");
+                CONSOLE_LOG("nothing to show\n");
             break;
         }
         case SDLK_F2:
@@ -171,7 +171,7 @@ void mouse_pressed(SDL_MouseButtonEvent * event)
         d_craft.press(event->x, event->y, event->button);
         return;
     }
-    printf("mouse %d,%d %d \n", event->x, event->y, event->button);
+    CONSOLE_LOG("mouse %d,%d %d \n", event->x, event->y, event->button);
 }
 
 Uint64 handle_keyboard_state(const Uint8 * keys)
@@ -263,7 +263,7 @@ bool handle_SDL_events()
             // i3 window manager sends these events if window is not floated
             if (ww != event.window.data1 && wh != event.window.data2)
             {
-                printf("window event: resizing to %d, %d\n", event.window.data1, event.window.data2);
+                CONSOLE_LOG("window event: resizing to %d, %d\n", event.window.data1, event.window.data2);
                 update_window_size();
                 ww = event.window.data1;
                 wh = event.window.data2;

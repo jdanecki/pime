@@ -36,11 +36,11 @@ class Renderable
             texture = get_texture();
             if (SDL_QueryTexture(texture, NULL, NULL, &w, &h) != 0)
             {
-                printf("SDL_QueryTexture failed: %s", SDL_GetError());
+                CONSOLE_LOG("SDL_QueryTexture failed: %s", SDL_GetError());
             }
             else
             {
-                // printf("%s: width: %d, heigh: %d\n", get_name(), width, height);
+                // CONSOLE_LOG("%s: width: %d, heigh: %d\n", get_name(), width, height);
             }
         }
         float scale = get_scale();

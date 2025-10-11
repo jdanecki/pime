@@ -79,13 +79,13 @@ struct ObjectData
     ~ObjectData()
     {
     }
-    static void* operator new(size_t size)
+    static void * operator new(size_t size)
     {
         return ::operator new(size);
     }
     static void * operator new(size_t size_base, size_t extra)
     {
-        printf("ObjectData: allocating %ld + %ld\n", size_base, extra);
+        CONSOLE_LOG("ObjectData: allocating %ld + %ld\n", size_base, extra);
         return ::operator new(size_base + extra);
     }
 
@@ -178,4 +178,3 @@ void send_packet_craft(NetClient * client, uintptr_t prod_id, uintptr_t ingredie
 void send_packet_request_chunk(NetClient * client, int32_t x, int32_t y);
 
 ObjectData foo();
-

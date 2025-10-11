@@ -102,7 +102,7 @@ ElementSDL::ElementSDL(Element data) : Element(data)
 void ElementSDL::show(bool details)
 {
     Element::show(details);
-    //  printf("scale=%0.2f %d %d\n", get_scale(), width.value, start_width);
+    // CONSOLE_LOG("scale=%0.2f %d %d\n", get_scale(), width.value, start_width);
 }
 
 IngredientSDL::IngredientSDL(Ingredient data) : Ingredient(data)

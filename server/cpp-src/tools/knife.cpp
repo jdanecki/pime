@@ -15,6 +15,6 @@ ProductServer * Knife::createKnife(InventoryElement * el1, InventoryElement * el
 
     if ((id1 == ING_KNIFE_BLADE && id2 == ING_KNIFE_HANDLE) || (id1 == ING_KNIFE_HANDLE && id2 == ING_KNIFE_BLADE))
         return new Knife(el1, el2);
-    printf(" wrong ingredients id1=%d id=%d\n", id1, id2);
+    CONSOLE_LOG(" wrong ingredients id1=%d id=%d\n", id1, id2);
     return nullptr;
 }

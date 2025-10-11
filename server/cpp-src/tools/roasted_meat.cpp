@@ -7,14 +7,14 @@ RoastedMeat::RoastedMeat(InventoryElement * el1, InventoryElement * el2) : Produ
 
 bool RoastedMeat::player_action(Player_action action, Player * pl)
 {
-    printf("ROASTED_MEAT: %s %s\n", player_action_name[action], get_name());
+    CONSOLE_LOG("ROASTED_MEAT: %s %s\n", player_action_name[action], get_name());
 
     switch (action)
     {
         case PLAYER_EAT:
             pl->hunger += this->quality.value * 2 - 40;
-            printf("ate %s\n", get_name());
-            destroy(this);            
+            CONSOLE_LOG("ate %s\n", get_name());
+            destroy(this);
             break;
     }
 
@@ -28,6 +28,6 @@ ProductServer * RoastedMeat::createRoastedMeat(InventoryElement * el1, Inventory
 
     if ((id1 == ING_MEAT && id2 == PROD_FIRE) || (id2 == ING_MEAT && id1 == PROD_FIRE))
         return new RoastedMeat(el1, el2);
-    printf(" wrong ingredients\n");
+    CONSOLE_LOG(" wrong ingredients\n");
     return nullptr;
 }

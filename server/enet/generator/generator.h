@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <climits>
+#include "../../../core/alchemist/ncurses-output.h"
 
 int random_range(int min, int max);
 
@@ -10,20 +11,24 @@ class Coords
   public:
     int x;
     int y;
-    Coords(int x, int y): x(x), y(y) {}
-    Coords()  {
+    Coords(int x, int y) : x(x), y(y)
+    {
+    }
+    Coords()
+    {
         x = rand() % WORLD_SIZE;
         y = rand() % WORLD_SIZE;
     }
-    int distance_squared(Coords *other)
+    int distance_squared(Coords * other)
     {
         int dx = x - other->x;
         int dy = y - other->y;
-        return   dx * dx + dy * dy;
+        return dx * dx + dy * dy;
     }
 };
 
-class TerrainType {
+class TerrainType
+{
   public:
     int form;
     int id;
@@ -35,29 +40,32 @@ class TerrainType {
     {
         return id == other->id;
     }
-    void show() {
-        printf(" TerrainType: id=%d form=%d\n", id, form);
+    void show()
+    {
+        CONSOLE_LOG(" TerrainType: id=%d form=%d\n", id, form);
     }
 };
 
-class PlantType {
+class PlantType
+{
   public:
     int id; // id of BasePlant
-    TerrainType** possible_ground;
+    TerrainType ** possible_ground;
     int grounds_count;
     PlantType(int id);
-    void show() {
-        printf(" PlanType: id=%d grounds=%d\n", id, grounds_count);
+    void show()
+    {
+        CONSOLE_LOG(" PlanType: id=%d grounds=%d\n", id, grounds_count);
     }
     bool check_ground(int g)
     {
-        for (int i=0; i< grounds_count; i++)
+        for (int i = 0; i < grounds_count; i++)
         {
-            if (possible_ground[i]->id == g) return true;
+            if (possible_ground[i]->id == g)
+                return true;
         }
         return false;
     }
-
 };
 
 extern int terrains_count;
@@ -68,66 +76,71 @@ extern PlantType ** all_plants;
 class RockEntry
 {
   public:
-    TerrainType* terrain;
+    TerrainType * terrain;
     float value;
-    RockEntry(TerrainType *t, float v): terrain(t), value(v) {}
+    RockEntry(TerrainType * t, float v) : terrain(t), value(v)
+    {
+    }
     void show()
     {
         terrain->show();
-        printf("      RockEntry: value=%f\n", value);
+        CONSOLE_LOG("      RockEntry: value=%f\n", value);
     }
 };
 
 class PlantEntry
 {
   public:
-    PlantType* plant;
+    PlantType * plant;
     float value;
-    PlantEntry(PlantType *p, float v): plant(p), value(v) {}
+    PlantEntry(PlantType * p, float v) : plant(p), value(v)
+    {
+    }
     void show()
     {
         plant->show();
-        printf("      PlantEntry: value=%f\n", value);
+        CONSOLE_LOG("      PlantEntry: value=%f\n", value);
     }
 };
 
 class Region
 {
   public:
-    TerrainType* terrain_type;
-    RockEntry** rocks_types; //elements in this region
+    TerrainType * terrain_type;
+    RockEntry ** rocks_types; // elements in this region
     int rocks_count;
     PlantEntry ** plants_types;
     int plants_count;
     unsigned int size;
     Coords coords;
-    Region(TerrainType* terrain_type,  int x, int y, unsigned int size);
+    Region(TerrainType * terrain_type, int x, int y, unsigned int size);
     ~Region()
     {
         delete rocks_types;
     }
-    unsigned int total_size() {
+    unsigned int total_size()
+    {
         return size * CHUNK_SIZE * CHUNK_SIZE;
     }
     void show()
     {
-        printf("Region size: %u\n", total_size());
-        printf("%d rocks types in region:\n", rocks_count);
+        CONSOLE_LOG("Region size: %u\n", total_size());
+        CONSOLE_LOG("%d rocks types in region:\n", rocks_count);
         for (int i = 0; i < rocks_count; i++)
         {
-            printf("%d: ", i);
+            CONSOLE_LOG("%d: ", i);
             rocks_types[i]->show();
         }
-        printf("%d plants:\n", plants_count);
+        CONSOLE_LOG("%d plants:\n", plants_count);
         for (int i = 0; i < plants_count; i++)
         {
-            printf("%d: ", i);
+            CONSOLE_LOG("%d: ", i);
             plants_types[i]->show();
         }
     }
 };
 
-extern Region **regions;
+extern Region ** regions;
 
 void create_regions();
 

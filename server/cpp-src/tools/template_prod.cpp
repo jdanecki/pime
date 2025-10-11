@@ -12,7 +12,7 @@ bool CLASS_NAME::check_ing()
 
     if (id1 == ING_1 && id2 == ING_2)
         return new CLASS_NAME(el1, el2);
-    printf(" wrong ingredients\n");
+    CONSOLE_LOG(" wrong ingredients\n");
     return nullptr;
 }
 

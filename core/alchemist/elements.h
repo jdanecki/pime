@@ -51,10 +51,15 @@ class Base
 
     SerializableCString name;
     Base(int index, Class_id c, const char * name);
-    virtual ~Base() {}
+    virtual ~Base()
+    {
+    }
     virtual void show(bool details = true);
     const char * get_name();
-    virtual size_t get_size() { return sizeof(Base); }
+    virtual size_t get_size()
+    {
+        return sizeof(Base);
+    }
 };
 
 struct Color
@@ -74,7 +79,10 @@ class BaseElement : public Base
 
     BaseElement(Form f, int index);
     void show(bool details = true);
-    virtual size_t get_size() { return sizeof(BaseElement); }
+    virtual size_t get_size()
+    {
+        return sizeof(BaseElement);
+    }
 };
 
 class chunk;
@@ -88,21 +96,24 @@ class InventoryElement : public NetworkObject
 
     InventoryElement(Class_id c_id, size_t uid, ItemLocation location);
     InventoryElement(Class_id c_id) : NetworkObject(c_id)
-    {}
-     InventoryElement() {}
+    {
+    }
+    InventoryElement()
+    {
+    }
     virtual bool action(Product_action action, Player * pl)
     {
-        printf("INV: %s %s\n", product_action_name[action], get_name());
+        CONSOLE_LOG("INV: %s %s\n", product_action_name[action], get_name());
         return false;
     }
     virtual bool player_action(Player_action action, Player * pl)
     {
-        printf("INV: %s %s\n", player_action_name[action], get_name());
+        CONSOLE_LOG("INV: %s %s\n", player_action_name[action], get_name());
         return false;
     }
     virtual void show(bool details = true)
     {
-        printf("%s: uid=%lx @[%d,%d][%d,%d]\n", get_class_name(), uid, location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
+        CONSOLE_LOG("%s: uid=%lx @[%d,%d][%d,%d]\n", get_class_name(), uid, location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
     }
     virtual bool tick()
     {
@@ -194,7 +205,7 @@ class Object : public InventoryElement
     }
     void show(bool details = true) override
     {
-        printf("Object type: %s", get_name());
+        CONSOLE_LOG("Object type: %s", get_name());
         base->show(details);
     }
 };
@@ -396,7 +407,7 @@ class Ingredient : public InventoryElement
     }
     bool action(Product_action action, Player * pl)
     {
-        printf("ING: %s %s\n", product_action_name[action], get_name());
+        CONSOLE_LOG("ING: %s %s\n", product_action_name[action], get_name());
         return false;
     }
 };
@@ -461,14 +472,17 @@ class BaseAnimal : public Base
     BaseAnimal(int index);
     void show(bool details = true)
     {
-        printf("BaseAnimal:\n");
-        printf("carnivorous=%d\n", carnivorous);
-        printf("swimming=%d\n", swimming);
-        printf("flying=%d\n", flying);
+        CONSOLE_LOG("BaseAnimal:\n");
+        CONSOLE_LOG("carnivorous=%d\n", carnivorous);
+        CONSOLE_LOG("swimming=%d\n", swimming);
+        CONSOLE_LOG("flying=%d\n", flying);
         if (details)
             Base::show(details);
     }
-    virtual size_t get_size() { return sizeof(BaseAnimal); }
+    virtual size_t get_size()
+    {
+        return sizeof(BaseAnimal);
+    }
 };
 
 class Animal : public InventoryElement
@@ -511,7 +525,7 @@ class Animal : public InventoryElement
 
     bool action(Product_action action, Player * pl) override
     {
-        printf("ANIMAL: %s %s\n", product_action_name[action], get_name());
+        CONSOLE_LOG("ANIMAL: %s %s\n", product_action_name[action], get_name());
         return false;
     }
     const char * get_name() override
@@ -545,13 +559,16 @@ class BasePlant : public Base
     BasePlant(int index);
     void show(bool details = true)
     {
-        printf("BasePlant:\n");
-        printf("flowers=%d\n", flowers);
-        printf("leaves=%d\n", leaves);
+        CONSOLE_LOG("BasePlant:\n");
+        CONSOLE_LOG("flowers=%d\n", flowers);
+        CONSOLE_LOG("leaves=%d\n", leaves);
         if (details)
             Base::show(details);
     }
-    virtual size_t get_size() { return sizeof(BasePlant); }
+    virtual size_t get_size()
+    {
+        return sizeof(BasePlant);
+    }
 };
 
 class Plant : public InventoryElement
@@ -582,11 +599,11 @@ class Plant : public InventoryElement
     void show(bool details = true) override
     {
         InventoryElement::show(details);
-        printf("%s\n", get_base()->get_name());
+        CONSOLE_LOG("%s\n", get_base()->get_name());
         if (details)
         {
             get_base()->show(details);
-            printf("phase=%s grown=%d planted=%d times=%d/%d/%d/ water=%d \n", plant_phase_name[phase], grown, planted, seedling_time, growing_time, flowers_time, water);
+            CONSOLE_LOG("phase=%s grown=%d planted=%d times=%d/%d/%d/ water=%d \n", plant_phase_name[phase], grown, planted, seedling_time, growing_time, flowers_time, water);
         }
     }
     BasePlant * get_base()
@@ -607,7 +624,7 @@ class Plant : public InventoryElement
     }
     bool action(Product_action action, Player * pl)
     {
-        printf("PLANT: %s %s\n", product_action_name[action], get_name());
+        CONSOLE_LOG("PLANT: %s %s\n", product_action_name[action], get_name());
         return false;
     }
 

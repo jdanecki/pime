@@ -26,7 +26,7 @@ SDL_Texture * load_texture(const char * texture_name)
     SDL_Surface * loadedSurface = IMG_Load(texture_name);
     if (loadedSurface == NULL)
     {
-        printf("Unable to load texture: %s error: %s\n", texture_name, SDL_GetError());
+        CONSOLE_LOG("Unable to load texture: %s error: %s\n", texture_name, SDL_GetError());
         exit(0);
     }
     else
@@ -35,7 +35,7 @@ SDL_Texture * load_texture(const char * texture_name)
 
         if (texture == NULL)
         {
-            printf("Unable to create texture: %s error: %s\n", texture_name, SDL_GetError());
+            CONSOLE_LOG("Unable to create texture: %s error: %s\n", texture_name, SDL_GetError());
             exit(0);
         }
         SDL_FreeSurface(loadedSurface);
@@ -50,13 +50,13 @@ void add_items_texture(int id, const char * file)
 
 void add_ing_texture(int id, const char * file)
 {
-    printf("adding ing texture: %s\n", file);
+    CONSOLE_LOG("adding ing texture: %s\n", file);
     ing_textures[id] = load_texture(file);
 }
 
 void add_prod_texture(int id, const char * file)
 {
-    printf("adding product texture: %s\n", file);
+    CONSOLE_LOG("adding product texture: %s\n", file);
     prod_textures[id] = load_texture(file);
 }
 
@@ -85,7 +85,7 @@ int add_textures_from_dir(SDL_Texture ** to, int i, const char * dir_path)
                 continue;
             }
             sprintf(path, "%s/%s", dir_path, namelist[n]->d_name);
-            printf("adding texture: %s\n", path);
+            CONSOLE_LOG("adding texture: %s\n", path);
             to[i++] = load_texture(path);
             free(namelist[n]);
         }
@@ -99,7 +99,7 @@ void load_textures()
 {
     Player_textures.npc = IMG_Load("textures/player.png");
     // SDL_PIXELFORMAT_ABGR8888 for surface
-    // printf("surface format=%x %s rgba=%x argb=%x\n", surface->format->format, SDL_GetPixelFormatName(surface->format->format), SDL_PIXELFORMAT_RGBA8888, SDL_PIXELFORMAT_ARGB8888);
+    // CONSOLE_LOG("surface format=%x %s rgba=%x argb=%x\n", surface->format->format, SDL_GetPixelFormatName(surface->format->format), SDL_PIXELFORMAT_RGBA8888, SDL_PIXELFORMAT_ARGB8888);
     /*
     bajt 0: R
     bajt 1: G

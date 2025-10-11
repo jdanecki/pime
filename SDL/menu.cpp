@@ -9,12 +9,12 @@
 #include "text.h"
 #include "texture.h"
 #include "window.h"
-#include <cstddef>
-#include <cstdio>
-#include <cstdlib>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "dialog/d_craft.h"
 #include "player_actions.h"
-#include <cassert>
+#include <assert.h>
 
 extern int active_hotbar;
 extern NetClient * client;
@@ -125,7 +125,7 @@ void Menu::show()
     int menu_opt_size = game_size / (menu_entries + 3);
     int mody;
     int mody2;
-    // printf("menu_entries = %d\n", menu_entries);
+    // CONSOLE_LOG("menu_entries = %d\n", menu_entries);
 
     if (menu_entries % 2)
     {
@@ -422,12 +422,12 @@ Menu * create_knowledge_classes(enum Class_id c)
 // create menu for elements with the same base id
 void create_inv_menu(int id)
 {
-    printf("szukam %d\n", id);
+    CONSOLE_LOG("szukam %d\n", id);
     int c = 0;
     InventoryElement ** i_el = player->inventory.find_id(id, &c);
     if (i_el)
     {
-        printf("found %d elements\n", c);
+        CONSOLE_LOG("found %d elements\n", c);
 
         if (menu_inventory)
             delete menu_inventory;
@@ -436,7 +436,7 @@ void create_inv_menu(int id)
         Element ** el = (Element **)i_el;
         for (int i = 0; i < c; i++)
         {
-            printf("%s\n", el[i]->get_name());
+            CONSOLE_LOG("%s\n", el[i]->get_name());
             menu_inventory->add("->", (menu_actions)(MENU_ITEM + i), el[i]);
         }
         free(el);
@@ -568,7 +568,7 @@ void action(menu_actions a)
     if (!el) return;
     Product * product=dynamic_cast<Product *>(el);
     if (!product) return;
-    printf("action: %d -> %s\n", product->actions, Product_action_names[product->actions]);
+   CONSOLE_LOG("action: %d -> %s\n", product->actions, Product_action_names[product->actions]);
 
 }
 */
@@ -664,13 +664,13 @@ int Menu::interact()
         case MENU_LOUDER:
             Mix_Volume(0, Mix_Volume(0, -1) + 5);
             Mix_Volume(1, Mix_Volume(1, -1) + 5);
-            printf("%d\n%d\n", Mix_Volume(1, -1), Mix_Volume(0, -1));
+            CONSOLE_LOG("%d\n%d\n", Mix_Volume(1, -1), Mix_Volume(0, -1));
             return 0;
 
         case MENU_QUIETER:
             Mix_Volume(0, Mix_Volume(0, -1) - 5);
             Mix_Volume(1, Mix_Volume(1, -1) - 5);
-            printf("%d\n%d\n", Mix_Volume(1, -1), Mix_Volume(0, -1));
+            CONSOLE_LOG("%d\n%d\n", Mix_Volume(1, -1), Mix_Volume(0, -1));
             return 0;
 
         case MENU_NPC_SAY:

@@ -9,7 +9,7 @@ const char * relations_names[] = {"unknown", "known"};
 void Player::pickup(InventoryElement * item)
 {
     inventory.add(item);
-    printf("player %p pickup inv=%lx\n", this, item->get_uid());
+    CONSOLE_LOG("player %p pickup inv=%lx\n", this, item->get_uid());
     ItemLocation location;
     location.tag = ItemLocation::Tag::Player;
     location.player.id = uid;
@@ -23,7 +23,7 @@ void Player::drop(InventoryElement * item)
 
 InventoryElement * Player::get_item_by_uid(size_t id)
 {
-    for (InventoryElement* el: inventory)
+    for (InventoryElement * el : inventory)
     {
         if (el->uid == id)
             return el;
@@ -33,7 +33,7 @@ InventoryElement * Player::get_item_by_uid(size_t id)
 
 int Player::get_id()
 {
-    return (int) uid;
+    return (int)uid;
 }
 
 // Player::Player(int id) : InventoryElement(Class_Player), id(id), name(new char[16])
@@ -62,13 +62,11 @@ int Player::get_id()
 // known_elements = new ElementsList("known elements");
 // }
 
-Player::Player(size_t uid, SerializableCString&& name, ItemLocation location, int thirst, int hunger, int nutrition)
-    : InventoryElement(Class_Player, uid, location), name(name),
-      thirst(thirst), hunger(hunger), nutrition(nutrition),
-      inventory("inventory"), known_elements("known elements"),
+Player::Player(size_t uid, SerializableCString && name, ItemLocation location, int thirst, int hunger, int nutrition)
+    : InventoryElement(Class_Player, uid, location), name(name), thirst(thirst), hunger(hunger), nutrition(nutrition), inventory("inventory"), known_elements("known elements"),
       clan(get_clan_by_id(Clan_Human)), talking_to(nullptr)
 {
-    printf("new player: uid = %ld name=%s\n", uid, get_name());
+    CONSOLE_LOG("new player: uid = %ld name=%s\n", uid, get_name());
     // FIXME
     // relations = nullptr;
 
@@ -76,7 +74,7 @@ Player::Player(size_t uid, SerializableCString&& name, ItemLocation location, in
     welcomed = false;
 
     checked_element = 0;
-    
+
     clan.get()->skills->copy_elements(&player_skills);
     show(true);
 }
@@ -86,7 +84,7 @@ int Player::conversation(Player * who, Sentence * s, InventoryElement * el)
     if (!in_conversation)
     {
         in_conversation = true;
-        printf("%s start talking to %s\n", get_name(), who->get_name());
+        CONSOLE_LOG("%s start talking to %s\n", get_name(), who->get_name());
         talking_to = who;
         who->talking_to = this;
     }
@@ -108,7 +106,7 @@ void Player::stop_conversation()
     welcomed = false;
     if (talking_to.get())
     {
-        printf("%s stopped talking to %s\n", talking_to.get()->get_name(), get_name());
+        CONSOLE_LOG("%s stopped talking to %s\n", talking_to.get()->get_name(), get_name());
         Player * p = talking_to.get();
         talking_to = nullptr;
         p->stop_conversation();
@@ -117,13 +115,14 @@ void Player::stop_conversation()
 
 void Player::show(bool details)
 {
-    printf("%s %s clan=%s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan_names[clan.get()->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
+    CONSOLE_LOG(
+        "%s %s clan=%s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan_names[clan.get()->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
     if (details)
     {
         player_skills.show(true);
         if (get_talking_to())
         {
-            printf("%s is talking to %s\n", get_name(), get_talking_to()->get_name());
+            CONSOLE_LOG("%s is talking to %s\n", get_name(), get_talking_to()->get_name());
         }
     }
 }

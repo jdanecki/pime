@@ -4,14 +4,14 @@
 #include "texture.h"
 #include "window.h"
 #include <SDL2/SDL_render.h>
-#include <cstddef>
-#include <cstdio>
+#include <stddef.h>
+#include <stdio.h>
 #include "dialog/d_craft.h"
-#include <cassert>
+#include <assert.h>
 #include "dialog/d_hotbar.h"
 #include "implementations/playerSDL.h"
 
-extern SDL_Texture* map;
+extern SDL_Texture * map;
 
 // TODO move it
 int active_hotbar = 0;
@@ -39,8 +39,7 @@ void draw_texts()
     sprintf(text, "Hunger=%d Thirst=%d", player->hunger, player->thirst);
     write_text(tx, ty, text, (player->hunger < 100 || player->thirst < 100) ? Red : White, 15, 30);
 #ifdef USE_ENET
-    sprintf(text, "%s@[%d,%d][%d,%d]", player->get_name(), player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
-        player->location.chunk.y);
+    sprintf(text, "%s@[%d,%d][%d,%d]", player->get_name(), player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y);
 #else
     sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), clan_names[player->get_clan()->id], player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
         player->location.chunk.y);
@@ -80,7 +79,7 @@ void draw_texts()
 }
 
 #ifdef USE_ENET
-//int wait_for_chunk;
+// int wait_for_chunk;
 
 void draw_maps()
 {
@@ -88,7 +87,7 @@ void draw_maps()
     int pitch, x, y;
 
     SDL_LockTexture(map, NULL, (void **)&pixels, &pitch);
-//    bool sent_request = false;
+    //    bool sent_request = false;
 
     int start_x = player->location.chunk.map_x - 5;
     int start_y = player->location.chunk.map_y - 5;
@@ -110,9 +109,9 @@ void draw_maps()
             if (chunk)
             {
                 int tile = chunk->table[y][x].tile;
-                //BaseElement * b = get_base_element(tile);
+                // BaseElement * b = get_base_element(tile);
                 unsigned long c = 0xff000000 + tile;
-                //unsigned long c = 0xff000000 | (b->color.r) | (b->color.g << 8) | (b->color.b << 16);
+                // unsigned long c = 0xff000000 | (b->color.r) | (b->color.g << 8) | (b->color.b << 16);
                 pixels[y * WORLD_SIZE + x] = c;
             }
             else
@@ -122,7 +121,7 @@ void draw_maps()
                 {
                     if (!sent_request)
                     {
-                        printf("request_chunk: %d %d\n", x, y);
+                       CONSOLE_LOG("request_chunk: %d %d\n", x, y);
                         send_packet_request_chunk(client, x, y);
                         sent_request = true;
                     }
@@ -181,7 +180,7 @@ chunk * check_chunk(int cx, int cy)
         }
         else
         {
-            printf("waiting for chunk %d %d\n", cx, cy);
+            CONSOLE_LOG("waiting for chunk %d %d\n", cx, cy);
             return nullptr;
         }
     }
@@ -255,7 +254,7 @@ bool draw_terrain()
         }
     }
 
-    //  printf("%d,%d -> %d,%d\n", left_chunk_x, top_chunk_y, right_chunk_x, bottom_chunk_y);
+    // CONSOLE_LOG("%d,%d -> %d,%d\n", left_chunk_x, top_chunk_y, right_chunk_x, bottom_chunk_y);
     for (int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
     {
         for (int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
@@ -267,7 +266,7 @@ bool draw_terrain()
             if (!ch)
                 continue;
 
-            for(InventoryElement* o: ch->objects)
+            for (InventoryElement * o : ch->objects)
             {
                 Renderable * r = dynamic_cast<Renderable *>(o);
                 if (o && r)
@@ -286,7 +285,7 @@ bool draw_terrain()
                 }
                 else
                 {
-                    printf("unrenderable %d\n", o->get_cid());
+                    CONSOLE_LOG("unrenderable %d\n", o->get_cid());
                 }
             }
         }

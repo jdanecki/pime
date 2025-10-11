@@ -1,7 +1,6 @@
 #include "world_server.h"
 #include "elements_server.h"
 #include <stdarg.h>
-#include "ncurses-costam.h"
 
 unsigned long get_time_usec()
 {
@@ -33,7 +32,7 @@ void update()
                 BeingServer * b = dynamic_cast<BeingServer *>(el->el.get());
                 b->tick();
                 // unsigned long ms=get_time_ms();
-                // printf("tick: %llu:%llu ms\n", ms/1000, ms % 1000);
+                // CONSOLE_LOG("tick: %llu:%llu ms\n", ms/1000, ms % 1000);
                 el = el->next;
             }
         }
@@ -49,18 +48,17 @@ void update()
         BeingServer * b = dynamic_cast<BeingServer *>(el->el);
         b->tick();
         // unsigned long ms=get_time_ms();
-        // printf("tick: %llu:%llu ms\n", ms/1000, ms % 1000);
+        // CONSOLE_LOG("tick: %llu:%llu ms\n", ms/1000, ms % 1000);
         el = el->next;
     }
 #endif
 }
-
+#ifndef USE_ENET
 void print_status(int l, const char * format, ...)
 {
     va_list args;
     va_start(args, format);
     vprintf(format, args);
     va_end(args);
-    printf("\n");
-    fflush(stdout);
 }
+#endif

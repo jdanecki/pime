@@ -2,11 +2,8 @@
 #define OBJECT_H
 
 #include <cstddef>
-#ifdef USE_ENET
-#include "serialization-enet.h"
-#else
-#include "serialization-rust.h"
-#endif
+#include "serialization.h"
+#include "ncurses-output.h"
 
 enum Class_id
 {
@@ -34,14 +31,14 @@ enum Class_id
 
 class NetworkObject
 {
-public:
+  public:
     NetworkObject(Class_id id);
     NetworkObject(Class_id id, size_t uid);
-    NetworkObject() {}
+    NetworkObject()
+    {
+    }
     Class_id c_id;
     size_t uid;
 };
-
-
 
 #endif

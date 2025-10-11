@@ -3,8 +3,7 @@
 #include "networking.h"
 #include "world_server.h"
 #include "../../core/packet_types.h"
-#include <cstdio>
-#include "ncurses-costam.h"
+#include <stdio.h>
 
 bool check_and_load_chunk(int new_map_x, int new_map_y)
 {
@@ -32,7 +31,7 @@ void PlayerServer::move(int dx, int dy)
     int new_map_x = location.chunk.map_x;
     int new_map_y = location.chunk.map_y;
 
-    printf("SERV: player move dx=%d dy=%d\n", dx, dy);
+    CONSOLE_LOG("SERV: player move dx=%d dy=%d\n", dx, dy);
 
     if (!((new_x >= 0 && new_x < CHUNK_SIZE) && (new_y >= 0 && new_y < CHUNK_SIZE)))
     {
@@ -68,7 +67,7 @@ move_player:
     hunger--;
     thirst--;
     update_location(get_uid(), old, location);
-    printf("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
+    CONSOLE_LOG("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
     notify_update(this);
 }
 
@@ -77,7 +76,7 @@ bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement 
     ProductServer * i = dynamic_cast<ProductServer *>(item);
     if (i)
     {
-        printf("%s: using %s on %s\n", get_name(), i->get_name(), object->get_name());
+        CONSOLE_LOG("%s: using %s on %s\n", get_name(), i->get_name(), object->get_name());
         return i->use(object, this);
     }
     else
@@ -88,18 +87,18 @@ bool PlayerServer::action_on_object(Player_action a, InventoryElement * object)
 {
     if (!object)
         return false;
-    printf("%s action: %s on %s\n", get_name(), player_action_name[a], object->get_name());
+    CONSOLE_LOG("%s action: %s on %s\n", get_name(), player_action_name[a], object->get_name());
     switch (a)
     {
         case PLAYER_CHECK:
-            printf("checking %s:\n", object->get_name());
+            CONSOLE_LOG("checking %s:\n", object->get_name());
             if (set_checked(object->uid))
             {
                 notify_checked(get_id(), object->uid);
             }
             else
             {
-                printf("%s: already checked this item\n", object->get_name());
+                CONSOLE_LOG("%s: already checked this item\n", object->get_name());
             }
             break;
         case PLAYER_EAT:
@@ -119,9 +118,9 @@ bool PlayerServer::action_on_object(Player_action a, InventoryElement * object)
 bool PlayerServer::server_action_on_object(Server_action a, InventoryElement * object)
 {
     if (object)
-        printf("%s server action: %s on %s\n", get_name(), server_action_name[a], object->get_name());
+        CONSOLE_LOG("%s server action: %s on %s\n", get_name(), server_action_name[a], object->get_name());
     else
-        printf("%s server action: %s\n", get_name(), server_action_name[a]);
+        CONSOLE_LOG("%s server action: %s\n", get_name(), server_action_name[a]);
     switch (a)
     {
         case SERVER_SHOW_ITEM:
@@ -202,7 +201,7 @@ bool PlayerServer::pickup(InventoryElement * item)
 {
     if (!item->can_pickup())
     {
-        printf("can't pickup %s\n", item->get_name());
+        CONSOLE_LOG("can't pickup %s\n", item->get_name());
         return false;
     }
     ItemLocation old_location = item->location;
@@ -214,7 +213,7 @@ bool PlayerServer::pickup(InventoryElement * item)
 
 PlayerServer::PlayerServer(size_t uid) : Player(uid, SerializableCString("player"), ItemLocation::center(), 50 + rand() % 100, 50 + rand() % 100, 50 + rand() % 100)
 {
-    printf("PlayerServer: uid=%ld\n", uid);
+    CONSOLE_LOG("PlayerServer: uid=%ld\n", uid);
     objects_to_create.add(this);
 }
 

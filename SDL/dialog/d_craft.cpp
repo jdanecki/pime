@@ -1,7 +1,7 @@
 #include "d_craft.h"
 #include "../main.h"
 #include "dialog.h"
-#include <cstdio>
+#include <stdio.h>
 
 extern int active_hotbar;
 extern NetClient * client;
@@ -45,7 +45,7 @@ bool craft2elements(Product_id what)
 
 void button_craft_ing(DialogButton * button)
 {
-    printf("Crafting %d\n", button->id);
+    CONSOLE_LOG("Crafting %d\n", button->id);
     if (player->hotbar[active_hotbar])
     {
         send_packet_craft(client, button->id, 1, &player->hotbar[active_hotbar]->uid);

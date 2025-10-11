@@ -12,6 +12,6 @@ ProductServer * Fire::createFire(InventoryElement * el1, InventoryElement * el2)
 
     if ((id1 == ING_TINDER && id2 == ING_STICK) || (id2 == ING_TINDER && id1 == ING_STICK))
         return new Fire(el1, el2);
-    printf(" wrong ingredients\n");
+    CONSOLE_LOG(" wrong ingredients\n");
     return nullptr;
 }

@@ -18,7 +18,7 @@ void put_element()
         set_item_at_ppos(el, &player);
         player.inventory->remove(el);
         player.hotbar[active_hotbar]=NULL;
-        printf("item %s placed\n", el->get_name());*/
+       CONSOLE_LOG("item %s placed\n", el->get_name());*/
     }
 }
 
@@ -30,7 +30,7 @@ void use_tile(ItemLocation loc)
         if (InventoryElement * item = player->hotbar[active_hotbar])
         {
             send_packet_item_used_on_tile(client, item->uid, loc);
-            printf("plant seed\n");
+            CONSOLE_LOG("plant seed\n");
         }
 
         return;
@@ -38,7 +38,7 @@ void use_tile(ItemLocation loc)
 
     if (Product * item = dynamic_cast<Product *>(player->hotbar[active_hotbar]))
     {
-        printf("SDL: using %s on %s\n", item->get_name(), object->get_name());
+        CONSOLE_LOG("SDL: using %s on %s\n", item->get_name(), object->get_name());
         send_packet_item_used_on_object(client, item->uid, object->uid);
         return;
     }
@@ -107,11 +107,11 @@ void action_tile(Player_action a, ItemLocation loc)
     InventoryElement * object = get_item_at(loc);
     if (!object)
     {
-        printf("SDL: nothing on tile\n");
+        CONSOLE_LOG("SDL: nothing on tile\n");
         return;
     }
 
-    printf("SDL: action %s on %s\n", player_action_name[a], object->get_name());
+    CONSOLE_LOG("SDL: action %s on %s\n", player_action_name[a], object->get_name());
     send_packet_action_on_object(client, a, object->uid);
 }
 
@@ -120,7 +120,7 @@ void server_action_tile(Server_action a, ItemLocation loc)
     InventoryElement * object = get_item_at(loc);
     if (object)
     {
-        printf("SDL: server action %s on %s\n", server_action_name[a], object->get_name());
+        CONSOLE_LOG("SDL: server action %s on %s\n", server_action_name[a], object->get_name());
         send_packet_server_action_on_object(client, a, object->uid);
     }
     else
@@ -129,11 +129,11 @@ void server_action_tile(Server_action a, ItemLocation loc)
         {
             case SERVER_SHOW_CHUNK:
             case SERVER_TRACE_NETWORK:
-                printf("SDL: server action %s\n", server_action_name[a]);
+                CONSOLE_LOG("SDL: server action %s\n", server_action_name[a]);
                 send_packet_server_action_on_object(client, a, 0);
                 break;
             default:
-                printf("SDL: nothing to show\n");
+                CONSOLE_LOG("SDL: nothing to show\n");
                 break;
         }
     }

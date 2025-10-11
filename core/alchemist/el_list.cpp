@@ -1,8 +1,8 @@
 #include "el_list.h"
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <cassert>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -27,7 +27,7 @@ void ListElement::show(bool details)
 
 void ElementsList::remove_all()
 {
-    while(head)
+    while (head)
     {
         remove(head);
     }
@@ -64,7 +64,7 @@ ListElement * ElementsList::find(void * what)
 void ElementsList::show(bool details)
 {
     ListElement * cur = head;
-    printf("--- %s (%d) ---\n", name, nr_elements);
+    CONSOLE_LOG("--- %s (%d) ---\n", name, nr_elements);
     while (cur)
     {
         cur->show(details);
@@ -134,7 +134,7 @@ ListElement * ElementsList::add_front(ListElement * entry)
 
     if (head)
     {
-        entry->next=head;
+        entry->next = head;
         head->prev = entry;
         head = entry;
     }
@@ -157,7 +157,8 @@ void ElementsList::remove(ListElement * el)
     if (head == el)
     {
         tmp = head->next;
-        if (tmp) tmp->prev = nullptr;
+        if (tmp)
+            tmp->prev = nullptr;
         assert(tail);
 
         if (tail == el) // only 1 element on the list
@@ -177,7 +178,8 @@ void ElementsList::remove(ListElement * el)
         if (cur->next == el)
         {
             tmp = cur->next;
-            if (tmp && tmp->next) tmp->next->prev = cur;
+            if (tmp && tmp->next)
+                tmp->next->prev = cur;
             cur->next = cur->next->next;
             if (tail == el)
             {
@@ -191,7 +193,7 @@ void ElementsList::remove(ListElement * el)
     }
 }
 
-InventoryElement ** InvList::find_by_fun(FindFunc fun, void *arg, int *count)
+InventoryElement ** InvList::find_by_fun(FindFunc fun, void * arg, int * count)
 {
     ListElement * cur = head;
     InventoryElement ** a = (InventoryElement **)calloc(nr_elements, sizeof(InventoryElement *));
@@ -234,14 +236,14 @@ bool match_class(InventoryElement * el, void * arg)
     return el->get_cid() == cl;
 }
 
-InventoryElement **InvList::find_class(Class_id cl, int *count)
+InventoryElement ** InvList::find_class(Class_id cl, int * count)
 {
     return find_by_fun(match_class, &cl, count);
 }
 
 InventoryElement ** InvList::find_id(int id, int * count)
 {
-    //FIXME
+    // FIXME
 #if 0
     ListElement * cur = head;
     InventoryElement ** a = (InventoryElement **)calloc(nr_elements, sizeof(InventoryElement *));
@@ -276,7 +278,7 @@ InventoryElement * InvList::add(InventoryElement * el)
 {
     ListElement * entry = new ListElement(el);
     ElementsList::add(entry);
-    printf("InvList: added to list(%s) elements=%d el_class_name:%s\n", name, nr_elements, el->get_class_name());
+    CONSOLE_LOG("InvList: added to list(%s) elements=%d el_class_name:%s\n", name, nr_elements, el->get_class_name());
     return el;
 }
 
@@ -284,7 +286,7 @@ InventoryElement * InvList::add_front(InventoryElement * el)
 {
     ListElement * entry = new ListElement(el);
     ElementsList::add_front(entry);
-    //  printf("%s elements=%d %s\n", name, nr_elements, el->get_class_name());
+    // CONSOLE_LOG("%s elements=%d %s\n", name, nr_elements, el->get_class_name());
     return el;
 }
 void InvList::remove(InventoryElement * el)
@@ -333,27 +335,29 @@ void InvList::remove(InventoryElement * el)
 void ElementsList::copy_elements(ElementsList * dst)
 {
     ListElement * cur = head;
-    while(cur) {
+    while (cur)
+    {
         dst->copy(cur);
         cur = cur->next;
     }
 }
 
-ListElement *ElementsList::get_random()
+ListElement * ElementsList::get_random()
 {
-    if (!nr_elements) return nullptr;
+    if (!nr_elements)
+        return nullptr;
     int i = rand() % nr_elements;
-    int cnt=0;
+    int cnt = 0;
     ListElement * el = head;
-    while(el)
+    while (el)
     {
-        if (i == cnt) return el;
-        el=el->next;
+        if (i == cnt)
+            return el;
+        el = el->next;
         cnt++;
     }
     return nullptr;
 }
-
 
 void BaseListElement::show(bool details)
 {
