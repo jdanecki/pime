@@ -1,5 +1,6 @@
 #include "craft_ing.h"
 #include "tools/tools.h"
+#include "ncurses-costam.h"
 
 typedef IngredientServer * (*IngredientFunction)(InventoryElement *);
 

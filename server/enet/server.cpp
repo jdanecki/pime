@@ -8,11 +8,212 @@
 #include "../cpp-src/craft.h"
 #include "../cpp-src/networking.h"
 #include <math.h>
+#include <ncurses.h>
+#include <sys/ioctl.h>
+
+#define RED "$COLOR_PAIR_1_"
+#define GREEN "$COLOR_PAIR_2_"
+#define ORANGE "$COLOR_PAIR_3_"
+#define BLUE "$COLOR_PAIR_4_"
+#define RESET "$COLOR_PAIR_0_"
+#define INPUT_SIZE 64
+#define MAX_OUTPUT_SIZE 1024
+int history_size = 1024;
+
+WINDOW * in_w;
+WINDOW * out_w;
+
+char in_buf[INPUT_SIZE + 1]; // +1 for the '\0' character
+char ** out_buf;
+
+int history_up = 0;
+
+void shift_output()
+{
+    for (int i = 1; i < history_size; i++)
+    {
+        strncpy(out_buf[i - 1], out_buf[i], MAX_OUTPUT_SIZE);
+    }
+}
+
+void add_to_output(const char * fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    shift_output();
+    vsnprintf(out_buf[history_size - 1], MAX_OUTPUT_SIZE, fmt, args);
+    va_end(args);
+}
+
+void print_help()
+{
+    add_to_output("exit/quit\n");
+    add_to_output("help\n");
+    add_to_output("clear\n");
+}
+
+char handle_command()
+{
+    // comparing the first letters ISN'T A BUG
+
+    if (strlen(in_buf) == 0)
+        return 0;
+    else if (strncmp(in_buf, "q", 1) == 0 || strncmp(in_buf, "e", 1) == 0) // quit || exit
+        return 1;
+    else if (strncmp(in_buf, "h", 1) == 0) // help
+        print_help();
+    else if (strncmp(in_buf, "c", 1) == 0) // clear
+    {
+        for (int i = 0; i < history_size; i++)
+        {
+            memset(out_buf[i], 0, MAX_OUTPUT_SIZE);
+        }
+        add_to_output("%scleared%s\n", RED, RESET);
+    }
+    else
+    {
+        add_to_output("%sinvalid command: %s%s\n", RED, RESET, in_buf);
+        add_to_output("use \"help\" to show help\n");
+    }
+
+    return 0;
+}
+
+void handle_resize()
+{
+    int w, h;
+    getmaxyx(stdscr, h, w);
+    wresize(out_w, h - 3, w);
+    wresize(in_w, 3, w);
+    mvwin(in_w, h - 3, 0);
+}
+
+char handle_pressed(int pressed)
+{
+    if (pressed == 0)
+        return 0;
+    if (pressed < 127 && (isalpha((unsigned char)pressed) || isdigit((unsigned char)pressed)))
+    {
+        char append[2] = {(char)pressed, 0};
+        strcat(in_buf, append);
+    }
+    switch (pressed)
+    {
+        case KEY_BACKSPACE:
+            if (strlen(in_buf))
+            {
+                in_buf[strlen(in_buf) - 1] = '\0';
+            }
+            break;
+        case '\n':
+        {
+            add_to_output("> %s\n", in_buf);
+            char retval = handle_command();
+            in_buf[0] = '\0';
+            return retval;
+        }
+        case KEY_RESIZE:
+            handle_resize(); // FALLTHROUGH
+        case KEY_END:
+        case KEY_HOME:
+            history_up = 0;
+            break;
+        case KEY_UP:
+            history_up += 5;
+            break;
+        case KEY_DOWN:
+            history_up -= 5;
+            if (history_up < 0)
+                history_up = 0;
+            break;
+    }
+    return 0;
+}
+
+char ncurses_init()
+{
+    initscr();
+    start_color();
+    cbreak();
+    noecho();
+    keypad(stdscr, 1);
+    curs_set(1);
+
+    int w, h;
+    getmaxyx(stdscr, h, w);
+    out_w = newwin(h - 3, w, 0, 0);
+    in_w = newwin(3, w, h - 3, 0);
+    keypad(out_w, 1);
+    keypad(in_w, 1);
+    nodelay(out_w, 1);
+    nodelay(in_w, 1);
+
+    out_buf = (char **)calloc(history_size, sizeof(char *));
+    for (int i = 0; i < history_size; i++)
+    {
+        out_buf[i] = (char *)calloc(MAX_OUTPUT_SIZE, sizeof(char *));
+    }
+
+    memset(in_buf, 0, sizeof(char) * INPUT_SIZE);
+
+    init_pair(0, COLOR_WHITE, COLOR_BLACK);
+    init_pair(1, COLOR_RED, COLOR_BLACK);
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);
+    init_pair(3, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(4, COLOR_BLUE, COLOR_BLACK);
+
+    scrollok(out_w, 1);
+
+    return 0;
+}
+
+void print_color(WINDOW * w, const char * string)
+{
+    int current_color = 0;
+    const char * c = string;
+    while (*c)
+    {
+        if (*c == '$' && strncmp(c, "$COLOR_PAIR_", 12) == 0)
+        {
+            c += 12;
+            current_color = atoi(c);
+            while (*c != '_')
+                c++;
+            c++;
+            if (!*c)
+                break;
+        }
+        wattron(w, COLOR_PAIR(current_color));
+        waddch(w, *c);
+        wattroff(w, COLOR_PAIR(current_color));
+        c++;
+    }
+}
+
+void ncurses_tick()
+{
+    werase(in_w);
+    werase(out_w);
+    box(in_w, 0, 0);
+    wmove(in_w, 1, 2);
+    char buf[128];
+    snprintf(buf, 128, "> %s", in_buf);
+    print_color(in_w, buf);
+
+    for (int i = 0; i < history_size - history_up; i++)
+    {
+        print_color(out_w, out_buf[i]);
+    }
+
+    wrefresh(out_w);
+    wmove(in_w, 4 + strlen(in_buf), 1);
+    wrefresh(in_w);
+}
 
 #define REGIONS_NUM 1000
 #include "generator/generator.cpp"
 
-Region **regions;
+Region ** regions;
 
 ElementsList base_elements("base elements");
 ElementsList base_plants("base plants");
@@ -20,26 +221,29 @@ ElementsList base_animals("base animals");
 
 BaseElement * get_base_element(int32_t id)
 {
-    BaseListElement *el=(BaseListElement*)base_elements.find(&id);
-    if (!el) return nullptr;
-    return (BaseElement*)((el)->base);
+    BaseListElement * el = (BaseListElement *)base_elements.find(&id);
+    if (!el)
+        return nullptr;
+    return (BaseElement *)((el)->base);
 }
 
 BasePlant * get_base_plant(int32_t id)
 {
-    BaseListElement *el=(BaseListElement*)base_plants.find(&id);
-    if (!el) return nullptr;
-    return (BasePlant*)((el)->base);
+    BaseListElement * el = (BaseListElement *)base_plants.find(&id);
+    if (!el)
+        return nullptr;
+    return (BasePlant *)((el)->base);
 }
 
 BaseAnimal * get_base_animal(int32_t id)
 {
-    BaseListElement *el=(BaseListElement*)base_animals.find(&id);
-    if (!el) return nullptr;
-    return (BaseAnimal*)((el)->base);
+    BaseListElement * el = (BaseListElement *)base_animals.find(&id);
+    if (!el)
+        return nullptr;
+    return (BaseAnimal *)((el)->base);
 }
 
-ElementsList * players, * packets_to_send, * packets_to_send1;
+ElementsList *players, *packets_to_send, *packets_to_send1;
 int players_id;
 
 ENetHost * server;
@@ -52,45 +256,46 @@ struct Peer_id
         Id,
     };
     Tag tag;
-    union {
-        ENetPeer *peer;
+    union
+    {
+        ENetPeer * peer;
         unsigned long id;
     };
 };
-
 
 class PlayerClient : public ListElement
 {
   public:
     PlayerServer * player;
-    ENetPeer *peer;
-    PlayerClient(PlayerServer *player, ENetPeer * peer): player(player), peer(peer)
+    ENetPeer * peer;
+    PlayerClient(PlayerServer * player, ENetPeer * peer) : player(player), peer(peer)
     {
         char hostname[64];
         enet_address_get_host_ip(&peer->address, hostname, 64);
-        printf("new player uid=%ld host=%s port=%u\n",player->uid, hostname, peer->address.port);
+        add_to_output("new player uid=%ld host=%s port=%u\n", player->uid, hostname, peer->address.port);
     }
     bool check(void * what)
     {
-        Peer_id * p=(Peer_id*) what;
-        switch(p->tag)
+        Peer_id * p = (Peer_id *)what;
+        switch (p->tag)
         {
-            case Peer_id::Tag::Peer:  return p->peer == peer;
-            case Peer_id::Tag::Id:    return p->id == player->uid;
+            case Peer_id::Tag::Peer:
+                return p->peer == peer;
+            case Peer_id::Tag::Id:
+                return p->id == player->uid;
         }
         return false;
     }
-
 };
 
-void send_to_all(Packet *p)
+void send_to_all(Packet * p)
 {
     ListElement * pl_el = players->head;
-    int i=0;
+    int i = 0;
     while (pl_el)
     {
-        PlayerClient * pl = (PlayerClient*) pl_el;
-        printf("[%d/%d] sending to player: %d\n", i, players->nr_elements, pl->player->get_id());
+        PlayerClient * pl = (PlayerClient *)pl_el;
+        add_to_output("[%d/%d] sending to player: %d\n", i, players->nr_elements, pl->player->get_id());
         p->send(pl->peer);
         pl_el = pl_el->next;
         i++;
@@ -98,10 +303,14 @@ void send_to_all(Packet *p)
 }
 class PacketToSend : public ListElement
 {
-    Packet *p;
+    Packet * p;
+
   public:
-    PacketToSend(Packet *p): p(p) {}
-    void send(ENetPeer * peer) {
+    PacketToSend(Packet * p) : p(p)
+    {
+    }
+    void send(ENetPeer * peer)
+    {
         p->send(peer);
     }
     void to_all()
@@ -114,16 +323,15 @@ void print_status(int l, const char * format, ...)
 {
     va_list args;
     va_start(args, format);
-    vprintf(format, args);
+    shift_output();
+    vsnprintf(out_buf[history_size - 1], MAX_OUTPUT_SIZE, format, args);
     va_end(args);
-    puts("");
 }
-
 
 bool handle_packet(ENetPacket * packet, ENetPeer * peer)
 {
     unsigned char * data = packet->data;
-    printf("Received length=%lu: %d\n", packet->dataLength, *data);
+    add_to_output("Received length=%lu: %d\n", packet->dataLength, *data);
 
     Packet * p = check_packet('R', data, packet->dataLength);
     if (!p)
@@ -132,9 +340,9 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
     Peer_id peer_id;
     peer_id.tag = Peer_id::Tag::Peer;
     peer_id.peer = peer;
-    PlayerClient *pl=nullptr;
+    PlayerClient * pl = nullptr;
     if (players->nr_elements)
-        pl = (PlayerClient*) players->find(&peer_id);
+        pl = (PlayerClient *)players->find(&peer_id);
 
     switch (p->get_type())
     {
@@ -143,7 +351,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             delete p;
             p = new PacketPlayerId(players_id++);
             p->send(peer);
-            PlayerClient *new_pl = new PlayerClient(new PlayerServer(((PacketPlayerId*)p)->get_id()), peer);
+            PlayerClient * new_pl = new PlayerClient(new PlayerServer(((PacketPlayerId *)p)->get_id()), peer);
             players->add(new_pl);
             delete p;
             p = new PacketElementsList(&base_elements);
@@ -157,7 +365,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             delete p;
 */
             p = new PacketChunkUpdate(128, 128);
-            p->send(peer);            
+            p->send(peer);
             delete p;
             add_object_to_world(new_pl->player, new_pl->player->location);
             break;
@@ -166,7 +374,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         {
             PacketPlayerMove * move = dynamic_cast<PacketPlayerMove *>(p);
             pl->player->move(move->get_x(), move->get_y());
-            delete p;            
+            delete p;
             break;
         }
         case PACKET_REQUEST_CHUNK:
@@ -183,8 +391,8 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         case PACKET_PLAYER_ACTION_PICKUP:
         {
             PacketPlayerActionPickup * req = dynamic_cast<PacketPlayerActionPickup *>(p);
-            uintptr_t id = req->get_id();            
-            InventoryElement *el = find_in_world(&pl->player->location, id);
+            uintptr_t id = req->get_id();
+            InventoryElement * el = find_in_world(&pl->player->location, id);
             delete p;
             if (el)
             {
@@ -200,8 +408,8 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         case PACKET_PLAYER_ACTION_DROP:
         {
             PacketPlayerActionDrop * req = dynamic_cast<PacketPlayerActionDrop *>(p);
-            uintptr_t id = req->get_id();            
-            InventoryElement *el = pl->player->get_item_by_uid(id);
+            uintptr_t id = req->get_id();
+            InventoryElement * el = pl->player->get_item_by_uid(id);
             delete p;
             if (el)
             {
@@ -214,14 +422,14 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         }
         case PACKET_PLAYER_ACTION_USE_ITEM_ON_OBJECT:
         {
-            PacketPlayerActionUseItemOnObject * req = dynamic_cast<PacketPlayerActionUseItemOnObject*>(p);
+            PacketPlayerActionUseItemOnObject * req = dynamic_cast<PacketPlayerActionUseItemOnObject *>(p);
             uintptr_t iid = req->get_iid();
-            uintptr_t oid = req->get_oid();            
-            InventoryElement *el = pl->player->get_item_by_uid(iid);
+            uintptr_t oid = req->get_oid();
+            InventoryElement * el = pl->player->get_item_by_uid(iid);
             delete p;
             if (el)
             {
-                InventoryElement *obj = find_in_world(&pl->player->location, oid);
+                InventoryElement * obj = find_in_world(&pl->player->location, oid);
                 if (!pl->player->use_item_on_object(el, obj))
                 {
                     p = new PacketActionFailed();
@@ -233,11 +441,11 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         }
         case PACKET_PLAYER_ACTION_ON_OBJECT:
         {
-            PacketPlayerActionOnObject * req = dynamic_cast<PacketPlayerActionOnObject*>(p);
+            PacketPlayerActionOnObject * req = dynamic_cast<PacketPlayerActionOnObject *>(p);
             Player_action a = req->get_a();
             uintptr_t oid = req->get_oid();
             delete p;
-            InventoryElement *obj = find_in_world(&pl->player->location, oid);
+            InventoryElement * obj = find_in_world(&pl->player->location, oid);
             if (obj)
             {
                 if (!pl->player->action_on_object(a, obj))
@@ -251,11 +459,11 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         }
         case PACKET_SERVER_ACTION_ON_OBJECT:
         {
-            PacketServerActionOnObject * req = dynamic_cast<PacketServerActionOnObject*>(p);
+            PacketServerActionOnObject * req = dynamic_cast<PacketServerActionOnObject *>(p);
             Server_action a = req->get_a();
             uintptr_t oid = req->get_oid();
             delete p;
-            InventoryElement *obj = find_in_world(&pl->player->location, oid);
+            InventoryElement * obj = find_in_world(&pl->player->location, oid);
             if (obj)
             {
                 if (!pl->player->server_action_on_object(a, obj))
@@ -269,14 +477,14 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         }
         case PACKET_PLAYER_ACTION_USE_ITEM_ON_TILE:
         {
-            PacketPlayerActionUseItemOnTile * req = dynamic_cast<PacketPlayerActionUseItemOnTile*>(p);
+            PacketPlayerActionUseItemOnTile * req = dynamic_cast<PacketPlayerActionUseItemOnTile *>(p);
             int map_x = req->get_map_x();
             int map_y = req->get_map_y();
             int x = req->get_x();
             int y = req->get_y();
             uintptr_t iid = req->get_iid();
             delete p;
-            InventoryElement *item = pl->player->get_item_by_uid(iid);
+            InventoryElement * item = pl->player->get_item_by_uid(iid);
             if (item)
             {
                 if (!pl->player->plant_with_seed(item, map_x, map_y, x, y))
@@ -290,14 +498,14 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         }
         case PACKET_PLAYER_ACTION_CRAFT:
         {
-            PacketPlayerActionCraft * req = dynamic_cast<PacketPlayerActionCraft*>(p);
+            PacketPlayerActionCraft * req = dynamic_cast<PacketPlayerActionCraft *>(p);
             uintptr_t prod_id = req->get_prod_id();
             uintptr_t ing_num = req->get_ing_num();
-            uintptr_t *iid_table = req->get_iid_table();
+            uintptr_t * iid_table = req->get_iid_table();
             delete p;
-            if (craft_entry(prod_id, ing_num, iid_table,pl->player))
+            if (craft_entry(prod_id, ing_num, iid_table, pl->player))
             {
-                printf("crafted id=%ld\n", prod_id);
+                add_to_output("crafted id=%ld\n", prod_id);
                 InventoryElement * el1 = pl->player->get_item_by_uid(iid_table[0]);
                 if (el1)
                 {
@@ -320,9 +528,9 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             }
             else
             {
-                    p = new PacketActionFailed();
-                    p->send(peer);
-                    delete p;
+                p = new PacketActionFailed();
+                p->send(peer);
+                delete p;
             }
             break;
         }
@@ -332,32 +540,33 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
 
 void send_updates()
 {
-    if (!players->nr_elements) return;
+    if (!players->nr_elements)
+        return;
 
     if (packets_to_send->nr_elements)
     {
         ListElement * el = packets_to_send->head;
-        printf("sending updates elems=%d\n", packets_to_send->nr_elements);
+        add_to_output("sending updates elems=%d\n", packets_to_send->nr_elements);
         while (el)
         {
-            PacketToSend * p = (PacketToSend*) el;
+            PacketToSend * p = (PacketToSend *)el;
             p->to_all();
             el = el->next;
         }
-        printf("sent updates\n");
+        add_to_output("sent updates\n");
     }
 
     if (packets_to_send1->nr_elements)
     {
         ListElement * el = packets_to_send1->head;
-        printf("sending updates1 elems=%d\n", packets_to_send1->nr_elements);
+        add_to_output("sending updates1 elems=%d\n", packets_to_send1->nr_elements);
         while (el)
         {
-            PacketToSend * p = (PacketToSend*) el;
+            PacketToSend * p = (PacketToSend *)el;
             p->to_all();
             el = el->next;
         }
-        printf("sent updates1\n");
+        add_to_output("sent updates1\n");
     }
 
     if (objects_to_create.nr_elements)
@@ -365,7 +574,7 @@ void send_updates()
         ListElement * el = objects_to_create.head;
         while (el)
         {
-            printf("sending objects to create: %s id=%lx\n", el->el.get()->get_name(), el->el.get()->uid);
+            add_to_output("sending objects to create: %s id=%lx\n", el->el.get()->get_name(), el->el.get()->uid);
             Packet * p = new PacketObjectCreate(el->el.get());
             send_to_all(p);
             el = el->next;
@@ -376,7 +585,8 @@ void send_updates()
     objects_to_create.remove_all();
 }
 
-int random_bool(double probability) {
+int random_bool(double probability)
+{
     return ((double)rand() / RAND_MAX) < probability;
 }
 
@@ -384,29 +594,31 @@ typedef void (*callback_fn)(chunk * ch, int id);
 
 void do_times(float prob, callback_fn f, chunk * ch, int id)
 {
-        int count = (int)(prob * 2.0f);
-        for (int i = 0; i < count; ++i) {
-            if (random_bool(0.5)) {
-                f(ch, id);
-            }
+    int count = (int)(prob * 2.0f);
+    for (int i = 0; i < count; ++i)
+    {
+        if (random_bool(0.5))
+        {
+            f(ch, id);
         }
+    }
 }
 
-void add_element(chunk *ch, int id)
+void add_element(chunk * ch, int id)
 {
-    BaseListElement * base_el = (BaseListElement*) base_elements.find(&id);
-    ch->add_object( create_element((BaseElement*)(base_el->base)));
+    BaseListElement * base_el = (BaseListElement *)base_elements.find(&id);
+    ch->add_object(create_element((BaseElement *)(base_el->base)));
 }
 
 void add_plant(chunk * ch, int id)
 {
-    BaseListElement * base_el = (BaseListElement*) base_plants.find(&id);
-    ch->add_object( create_plant((BasePlant*)(base_el->base)));
+    BaseListElement * base_el = (BaseListElement *)base_plants.find(&id);
+    ch->add_object(create_plant((BasePlant *)(base_el->base)));
 }
 
 void load_chunk(int cx, int cy)
 {
-    printf("load_chunk(%d, %d)\n", cx, cy);
+    add_to_output("load_chunk(%d, %d)\n", cx, cy);
     chunk * ch = new chunk(cx, cy);
     Region * r = find_region(cx, cy);
 
@@ -414,33 +626,32 @@ void load_chunk(int cx, int cy)
         for (int x = 0; x < CHUNK_SIZE; x++)
             ch->table[y][x].tile = r->terrain_type->id;
 
-    for (int i=0; i < r->rocks_count; i++)
+    for (int i = 0; i < r->rocks_count; i++)
     {
         do_times(r->rocks_types[i]->value, add_element, ch, r->rocks_types[i]->terrain->id);
     }
-    for (int i=0; i < r->plants_count; i++)
+    for (int i = 0; i < r->plants_count; i++)
     {
         do_times(r->plants_types[i]->value, add_plant, ch, r->plants_types[i]->plant->id);
     }
 
+    /*
 
-  /*
-
-    base_el = (BaseListElement*) base_animals.get_random();
-    ch->add_object( create_animal((BaseAnimal*)(base_el->base)));
-*/
-   // ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
+      base_el = (BaseListElement*) base_animals.get_random();
+      ch->add_object( create_animal((BaseAnimal*)(base_el->base)));
+  */
+    // ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
 
     world_table[cy][cx] = ch;
 }
 
-void add_packet_to_send(Packet *p)
+void add_packet_to_send(Packet * p)
 {
     if (players->nr_elements)
         packets_to_send->add(new PacketToSend(p));
 }
 
-void add_packet_to_send1(Packet *p)
+void add_packet_to_send1(Packet * p)
 {
     if (players->nr_elements)
         packets_to_send1->add(new PacketToSend(p));
@@ -448,15 +659,15 @@ void add_packet_to_send1(Packet *p)
 
 void notify_update(const InventoryElement * el)
 {
-    add_packet_to_send(new PacketObjectUpdate((InventoryElement*) el));
+    add_packet_to_send(new PacketObjectUpdate((InventoryElement *)el));
 }
 
 void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc)
 {
-   /* printf("update location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
-    old_loc.show();
-    new_loc.show();
-*/
+    /* printf("update location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
+     old_loc.show();
+     new_loc.show();
+ */
     add_packet_to_send(new PacketLocationUpdate(id, old_loc, new_loc));
 }
 void notify_destroy(size_t id, ItemLocation location)
@@ -477,25 +688,29 @@ void generate()
     players = new InvList("Players");
     create_regions();
 
-    for (int i=0; i < terrains_count; i++)
+    for (int i = 0; i < terrains_count; i++)
     {
-        ListElement * entry = new BaseListElement(new BaseElement((Form) terrains[i]->form, terrains[i]->id));
+        ListElement * entry = new BaseListElement(new BaseElement((Form)terrains[i]->form, terrains[i]->id));
         base_elements.add(entry);
     }
-    for (int i=0; i < all_plants_count; i++)
+    for (int i = 0; i < all_plants_count; i++)
     {
         ListElement * entry = new BaseListElement(new BasePlant(all_plants[i]->id));
         base_plants.add(entry);
     }
 
-        /*
-        entry = new BaseListElement(new BaseAnimal(i));
-        base_animals.add(entry);*/
-
+    /*
+    entry = new BaseListElement(new BaseAnimal(i));
+    base_animals.add(entry);*/
 }
 
 int main()
 {
+    ncurses_init();
+    add_to_output("%spime_enet  \nCopyright (C) 2025 Piotr Danecki <i3riced@mailfence.com>\nCopyright (C) 2025 Jacek Danecki\n    ", GREEN);
+    add_to_output("  This program comes with ABSOLUTELY NO WARRANTY.\n");
+    add_to_output("  This is free software, and you are welcome to redistribute it under certain conditions.\n");
+    add_to_output("  To show the license, type \"license\" and press enter. \n%s", RESET);
     trace_network = 1;
     srand(0);
     if (enet_initialize() != 0)
@@ -517,12 +732,12 @@ int main()
         fprintf(stderr, "Can't create host\n");
         return 1;
     }
-    printf("Server Pime started on port %u\n", address.port);
+    add_to_output("Server Pime started on port %u\n", address.port);
 
     generate();
 
-    for (int cy=127; cy < 130; cy++)
-        for (int cx=127; cx < 130; cx++)
+    for (int cy = 127; cy < 130; cy++)
+        for (int cx = 127; cx < 130; cx++)
             load_chunk(cy, cx);
 
     packets_to_send = new ElementsList("packets to send");
@@ -535,15 +750,19 @@ int main()
 
     while (enet_host_service(server, &event, 20) >= 0)
     {
+        ncurses_tick();
+        int ch = wgetch(in_w);
+        if (ch != ERR && handle_pressed(ch))
+            break;
         switch (event.type)
         {
             case ENET_EVENT_TYPE_CONNECT:
             {
                 enet_address_get_host_ip(&event.peer->address, hostname, 512);
-                printf("Client connected %s:%d\n", hostname, event.peer->address.port);
+                add_to_output("Client connected %s:%d\n", hostname, event.peer->address.port);
                 unsigned short * port = new unsigned short;
                 *port = event.peer->address.port;
-                event.peer->data = (void *)port;            
+                event.peer->data = (void *)port;
                 break;
             }
             case ENET_EVENT_TYPE_RECEIVE:
@@ -558,10 +777,10 @@ int main()
                 Peer_id peer_id;
                 peer_id.tag = Peer_id::Tag::Peer;
                 peer_id.peer = event.peer;
-                PlayerClient *pl = (PlayerClient*) players->find(&peer_id);
+                PlayerClient * pl = (PlayerClient *)players->find(&peer_id);
                 enet_address_get_host_ip(&event.peer->address, hostname, 512);
 
-                printf("player: %s from %s:%d disconnected\n", pl->player->get_name(), hostname, event.peer->address.port);
+                add_to_output("player: %s from %s:%d disconnected\n", pl->player->get_name(), hostname, event.peer->address.port);
                 destroy(pl->player);
                 players->remove(pl);
                 send_updates();
@@ -569,14 +788,16 @@ int main()
                 break;
             }
             default:
-                //printf("time=%ld\n", get_time_ms());
-               // update();
+                // printf("time=%ld\n", get_time_ms());
+                // update();
                 send_updates();
                 break;
         }
     }
+    delwin(in_w);
+    delwin(out_w);
+    endwin();
 
     enet_host_destroy(server);
     return 0;
 }
-

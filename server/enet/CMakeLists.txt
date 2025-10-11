@@ -3,6 +3,7 @@ project(server_enet)
 
 find_package(PkgConfig)
 pkg_check_modules(enet libenet)
+pkg_check_modules(ncurses ncurses)
 
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch")
@@ -21,6 +22,6 @@ add_executable(server_enet
 )
 
 target_link_libraries(server_enet
-    server_cpp enet
+    server_cpp enet ncurses
 )
 

@@ -4,6 +4,7 @@
 #include "world_server.h"
 #include "../../core/packet_types.h"
 #include <cstdio>
+#include "ncurses-costam.h"
 
 bool check_and_load_chunk(int new_map_x, int new_map_y)
 {
@@ -211,7 +212,7 @@ bool PlayerServer::pickup(InventoryElement * item)
     return true;
 }
 
-PlayerServer::PlayerServer(size_t uid) : Player(uid, SerializableCString("player"), ItemLocation::center(), 50+rand()%100, 50+rand()%100, 50+rand()%100)
+PlayerServer::PlayerServer(size_t uid) : Player(uid, SerializableCString("player"), ItemLocation::center(), 50 + rand() % 100, 50 + rand() % 100, 50 + rand() % 100)
 {
     printf("PlayerServer: uid=%ld\n", uid);
     objects_to_create.add(this);

@@ -2,6 +2,7 @@
 #include "networking.h"
 #include "world_server.h"
 #include "craft_ing.h"
+#include "ncurses-costam.h"
 
 // #define TRACE_PLANTS 1
 
@@ -210,7 +211,8 @@ bool PlantServer::player_action(Player_action action, Player * pl)
         case PLAYER_EAT:
             printf("ate %s\n", get_name());
             res = true;
-            if (res) {
+            if (res)
+            {
                 pl->hunger += 10;
                 destroy(this);
             }
@@ -419,15 +421,16 @@ bool ElementServer::player_action(Player_action action, Player * pl)
     {
         case PLAYER_DRINK:
             res = action_drink();
-            if (res) {
-                pl->thirst += 10;                
+            if (res)
+            {
+                pl->thirst += 10;
             }
             break;
         case PLAYER_EAT:
             res = action_eat();
-            if (res) {
+            if (res)
+            {
                 pl->hunger += 10;
-
             }
             break;
     }

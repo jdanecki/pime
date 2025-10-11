@@ -1,6 +1,7 @@
 #include "world_server.h"
 #include "elements_server.h"
 #include <stdarg.h>
+#include "ncurses-costam.h"
 
 unsigned long get_time_usec()
 {

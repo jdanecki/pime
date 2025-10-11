@@ -4,6 +4,7 @@
 #include "world_server.h"
 #include "craft_ing.h"
 #include "craft_prod.h"
+#include "ncurses-costam.h"
 
 #include <cstdio>
 

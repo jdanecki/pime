@@ -1,4 +1,5 @@
 #include "networking.h"
+#include "ncurses-costam.h"
 
 InvList objects_to_update;
 InvList objects_to_update_reliable;
