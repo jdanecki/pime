@@ -71,8 +71,10 @@ int init_window()
     }
     SDL_SetWindowTitle(main_window, "pime");
     SDL_SetWindowPosition(main_window, 150, 10);
-    SDL_SetWindowSize(main_window, GAME_WINDOW + PANEL_WINDOW, GAME_WINDOW + STATUS_LINES);
+    int texture_size=32;
+    SDL_SetWindowSize(main_window, texture_size*CHUNK_SIZE + PANEL_WINDOW, texture_size*CHUNK_SIZE + STATUS_LINES);
     SDL_GetWindowSize(main_window, &window_width, &window_height);
+    CONSOLE_LOG("window_width=%d window_height=%d\n", window_width, window_height);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_ShowWindow(main_window);
 
@@ -109,4 +111,26 @@ void clear_window()
 unsigned int color(int r, int g, int b, int a)
 {
     return (a << 24) | (b << 16) | (g << 8) | r;
+}
+
+void update_window_size()
+{
+    int width;
+    SDL_GetWindowSize(main_window, &window_width, &window_height);
+
+    width = window_width - PANEL_WINDOW;
+
+    if (width < window_height)
+    {
+        tile_size = width / CHUNK_SIZE;
+    }
+    else
+    {
+        tile_size = window_height / CHUNK_SIZE;
+    }
+    if (tile_size < 32)
+        tile_size = 32;
+
+    SDL_SetWindowSize(main_window, (tile_size * CHUNK_SIZE) + PANEL_WINDOW, tile_size * CHUNK_SIZE + STATUS_LINES);
+    SDL_GetWindowSize(main_window, &window_width, &window_height);
 }

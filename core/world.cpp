@@ -1,6 +1,7 @@
 #include "world.h"
 #include "player.h"
 
+int tile_size;
 chunk * world_table[WORLD_SIZE][WORLD_SIZE];
 Chunk_state loaded_chunks[WORLD_SIZE][WORLD_SIZE];
 
@@ -161,7 +162,7 @@ InventoryElement * get_item_at(ItemLocation loc)
         return nullptr;
     for (InventoryElement* el: ch->objects)
     {
-        if (el->get_x() == loc.chunk.x && el->get_y() == loc.chunk.y)
+        if (el->check_rect(loc.chunk.x, loc.chunk.y, tile_size))
         {
             return el;
         }

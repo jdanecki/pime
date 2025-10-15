@@ -15,10 +15,6 @@ extern SDL_Texture * map;
 
 // TODO move it
 int active_hotbar = 0;
-int width;
-int tx;
-int game_size;
-int tile_dungeon_size;
 
 int left_chunk_x;
 int right_chunk_x;
@@ -35,6 +31,7 @@ extern NetClient * client;
 void draw_texts()
 {
     int ty = 10;
+    int tx = window_width - PANEL_WINDOW + 10;
 
     sprintf(text, "Hunger=%d Thirst=%d", player->hunger, player->thirst);
     write_text(tx, ty, text, (player->hunger < 100 || player->thirst < 100) ? Red : White, 15, 30);
@@ -157,7 +154,7 @@ void draw_maps()
         window_rec.w = 0;
         window_rec.h = 0;
     }*/
-    window_rec.x = width + 10;
+    window_rec.x = window_width - PANEL_WINDOW;
     window_rec.y = 200; // window_height - WORLD_SIZE - STATUS_LINES;
 
     SDL_RenderCopy(renderer, map, NULL, &window_rec);
@@ -193,19 +190,6 @@ chunk * check_chunk(int cx, int cy)
 
 bool draw_terrain()
 {
-    width = window_width - PANEL_WINDOW;
-    tx = width + 10;
-
-    if (width < window_height)
-    {
-        game_size = width;
-        tile_dungeon_size = width / (CHUNK_SIZE);
-    }
-    else
-    {
-        game_size = window_height;
-        tile_dungeon_size = window_height / (CHUNK_SIZE);
-    }
 
     int player_world_x = get_world_x(player->location);
     int player_world_y = get_world_y(player->location);
@@ -241,7 +225,7 @@ bool draw_terrain()
                     {
                         int tile = ch->table[ty][tx].tile;
 
-                        SDL_Rect img_rect = {screen_x * tile_dungeon_size, screen_y * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
+                        SDL_Rect img_rect = {screen_x * tile_size, screen_y * tile_size, tile_size, tile_size};
 
                         SDL_Texture * texture = tiles_textures[tile % tiles_textures_count];
                         BaseElement * base = get_base_element(tile % tiles_textures_count);
@@ -278,9 +262,9 @@ bool draw_terrain()
                     int screen_y = obj_world_y - left_top_world_y;
 
                     if (screen_x >= 0 && screen_x < CHUNK_SIZE && screen_y >= 0 && screen_y < CHUNK_SIZE)
-                    {
-                        SDL_Rect img_rect = {screen_x * tile_dungeon_size, screen_y * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
-                        r->render(&img_rect);
+                    {                        
+                        r->render(screen_x * tile_size, screen_y * tile_size);
+
                     }
                 }
                 else
@@ -295,16 +279,17 @@ bool draw_terrain()
 
 void draw_players()
 {
-    // render GUI
-    int icon_size = game_size / 10;
+    int w=window_width - PANEL_WINDOW;
+    int icon_size = w / 10;
+    int x = (int)(w - (icon_size * 1.1));
     if (player->running)
     {
-        SDL_Rect running_icon_rect = {(int)(game_size - (icon_size * 1.1)), 0, icon_size, icon_size};
+        SDL_Rect running_icon_rect = {x, 0, icon_size, icon_size};
         SDL_RenderCopy(renderer, Player_textures.run_icon, NULL, &running_icon_rect);
     }
     if (player->sneaking)
     {
-        SDL_Rect sneaking_icon_rect = {(int)(game_size - (icon_size * 1.1)), 0, icon_size, icon_size};
+        SDL_Rect sneaking_icon_rect = {x, 0, icon_size, icon_size};
         SDL_RenderCopy(renderer, Player_textures.sneak_icon, NULL, &sneaking_icon_rect);
     }
 }
@@ -314,7 +299,7 @@ void draw_npc()
     // FIXME
     if (!current_npc)
         return;
-    SDL_Rect img_rect = {5 * tile_dungeon_size, 5 * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
+    SDL_Rect img_rect = {5 * tile_size, 5 * tile_size, tile_size, tile_size};
     static int tick = 0;
     static int dir = 1;
     int side;

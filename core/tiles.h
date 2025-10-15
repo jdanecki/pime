@@ -3,6 +3,7 @@
 
 #include "alchemist/el_list.h"
 #include "alchemist/elements.h"
+#include "world_params.h"
 
 enum biomes
 {
@@ -11,10 +12,6 @@ enum biomes
     BIOME_PLAINS, // green
 };
 #define BIOMES 3
-
-#define CHUNK_SIZE 17
-#define WORLD_SIZE 256
-#define WORLD_CENTER WORLD_SIZE / 2
 #define WORLD_SCALE 100.0
 
 struct tile

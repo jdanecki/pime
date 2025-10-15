@@ -25,29 +25,6 @@ extern DHotbar hotbar;
 int last_frame_press = 0;
 Uint64 last_time = 0;
 
-// TODO cleanup this
-void update_window_size()
-{
-    int tile_size;
-    int width;
-    SDL_GetWindowSize(main_window, &window_width, &window_height);
-
-    width = window_width - PANEL_WINDOW;
-
-    if (width < window_height)
-    {
-        tile_size = width / (CHUNK_SIZE);
-    }
-    else
-    {
-        tile_size = window_height / (CHUNK_SIZE);
-    }
-    if (tile_size < 32)
-        tile_size = 32;
-
-    SDL_SetWindowSize(main_window, (tile_size * CHUNK_SIZE) + PANEL_WINDOW, tile_size * CHUNK_SIZE + STATUS_LINES);
-    SDL_GetWindowSize(main_window, &window_width, &window_height);
-}
 
 void key_pressed(int key)
 {

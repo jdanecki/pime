@@ -1,24 +1,24 @@
 #include "BeingSDL.h"
 #include "../networking.h"
 
-SDL_Texture * BeingSDL::get_texture()
+/*SDL_Texture * BeingSDL::get_texture()
 {
     return nullptr;
 }
-
+*/
 SDL_Texture * AnimalSDL::get_texture()
 {
-    return animal_textures[get_id() % 2];
+    return animal_textures[get_id() % BASE_ANIMALS];
 }
 
 AnimalSDL::AnimalSDL(Animal data) : Animal(data)
 {
 }
 
-void AnimalSDL::render(SDL_Rect * rect)
+void AnimalSDL::render(int x, int y)
 {
     flip = !going_right;
-    Renderable::render(rect);
+    Renderable::render(x, y);
 }
 
 void AnimalSDL::update_item_location(ItemLocation & old_loc, ItemLocation & new_loc)

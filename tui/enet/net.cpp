@@ -63,7 +63,7 @@ bool handle_packet(ENetPacket * packet)
 {
     bool ret = false;
     unsigned char * data = packet->data;
-    printf("Received length=%lu: %d\n", packet->dataLength, *data);
+  //  printf("Received length=%lu: %d\n", packet->dataLength, *data);
 
     Packet * p = check_packet('R', data, packet->dataLength);
     if (!p)
@@ -164,7 +164,7 @@ bool handle_packet(ENetPacket * packet)
 
 NetClient * init(const char * server_ip, const char * port)
 {
-    trace_network = 1;
+    //trace_network = 1;
 
     if (enet_initialize() != 0)
     {
@@ -267,7 +267,7 @@ InventoryElement * get_object_by_id(uintptr_t uid)
 void register_object(InventoryElement * o)
 {
     ObjectElement *obj = new ObjectElement(o);
-    printf("register_object: uid=%lx\n", o->uid);
+   // printf("register_object: uid=%lx\n", o->uid);
     objects.add(obj);
 }
 

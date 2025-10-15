@@ -6,6 +6,7 @@ pkg_check_modules(SDL sdl2)
 pkg_check_modules(SDL2_IMAGE SDL2_image)
 pkg_check_modules(SDL2_TTF SDL2_ttf)
 pkg_check_modules(SDL2_MIXER SDL2_mixer)
+pkg_check_modules(SDL2_GFX SDL2_gfx)
 pkg_check_modules(enet libenet)
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -45,7 +46,7 @@ set(SHARED_SOURCES
 )
 
 set(SHARED_LIBRARIES
-     SDL2 SDL2_image SDL2_ttf SDL2_mixer
+     SDL2 SDL2_image SDL2_ttf SDL2_mixer SDL2_gfx
     ${SDL_LDFLAGS} ${SDL2_MIXER_LDFLAGS}
     m
 )

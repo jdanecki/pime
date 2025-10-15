@@ -6,6 +6,7 @@
 #include <SDL2/SDL_image.h>
 #include <dirent.h>
 #include <stdio.h>
+#include <assert.h>
 
 struct player_textures Player_textures;
 
@@ -116,10 +117,10 @@ Field:     A          B          G        R
     int i = 0;
 
     // FIXME check number of tiles textures
-    tiles_textures = new SDL_Texture *[20];
+    tiles_textures = new SDL_Texture *[10];
 
     tiles_textures_count = add_textures_from_dir(tiles_textures, i, "textures/game_tiles");
-
+    assert(tiles_textures_count == 10);
     add_ing_texture(ING_AXE_BLADE, "textures/items/ingredients/axe_blade.png");
     add_ing_texture(ING_AXE_HANDLE, "textures/items/ingredients/axe_handle.png");
     add_ing_texture(ING_KNIFE_BLADE, "textures/items/ingredients/knife_blade.png");
@@ -144,19 +145,10 @@ Field:     A          B          G        R
 
     i = 0;
     i = add_textures_from_dir(plant_textures, i, "textures/plants");
-
-    animal_textures[0] = load_texture("textures/animals/pig.png");
-    animal_textures[1] = load_texture("textures/animals/boar.png");
+    i=0;
+    i = add_textures_from_dir(animal_textures, i, "textures/animals");
 
     scroll_surface = IMG_Load("textures/scroll.png");
-
-// FIXME
-#if 0
-    object_textures[TEXTURE_stone_wall] = load_texture("textures/objects/stone_wall.png");
-    object_textures[TEXTURE_log_wall] = load_texture("textures/objects/log_wall.png");
-    object_textures[TEXTURE_log1_wall] = load_texture("textures/objects/log1_wall.png");
-    object_textures[TEXTURE_log2_wall] = load_texture("textures/objects/log2_wall.png");
-#endif
 }
 
 SDL_Texture * add_texture_color(SDL_Surface * s, Color c)

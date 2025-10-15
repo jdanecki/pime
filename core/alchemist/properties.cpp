@@ -21,7 +21,7 @@ void Edible::show()
         if (eating_by & (1 << i))
             CONSOLE_LOG("%s ", clan_names[i]);
     }
-    puts("");
+    CONSOLE_LOG("\n");
     caloric.show();
     irrigation.show();
     poison.show();

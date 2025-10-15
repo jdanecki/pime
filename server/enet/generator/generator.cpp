@@ -6,6 +6,9 @@ TerrainType ** terrains;
 int all_plants_count;
 PlantType ** all_plants;
 
+int all_animals_count;
+AnimalType ** all_animals;
+
 int random_range(int min, int max)
 {
     return rand() % (max - min) + min;
@@ -56,7 +59,7 @@ Region::Region(TerrainType * terrain_type, int x, int y, unsigned int size) : te
     rocks_count = n;
     delete[] chosen_indices;
 
-    n = random_range(3, all_plants_count);
+    n = random_range(1, all_plants_count);
 
     plants_types = new PlantEntry *[n];
     chosen_indices = new int[n];
@@ -73,10 +76,29 @@ Region::Region(TerrainType * terrain_type, int x, int y, unsigned int size) : te
     }
     plants_count = p;
     delete[] chosen_indices;
+
+    n = random_range(1, all_animals_count);
+
+    animals_types = new AnimalEntry *[n];
+    chosen_indices = new int[n];
+    choose_multiple(all_animals_count, n, chosen_indices);
+    p = 0;
+    for (int i = 0; i < n; i++)
+    {
+        int idx = chosen_indices[i];
+        if (all_animals[idx]->check_ground(terrain_type->id))
+        {
+            animals_types[p] = new AnimalEntry(all_animals[idx], random_float_range(0.1f, 1.0f));
+            p++;
+        }
+    }
+    animals_count = p;
+    delete[] chosen_indices;
 }
 
 void create_regions()
 {
+    //number of base elements
     terrains_count = random_range(10, 20);
     terrains = new TerrainType *[terrains_count];
     for (int i = 0; i < terrains_count; i++)
@@ -85,13 +107,21 @@ void create_regions()
     }
     CONSOLE_LOG("terrains count=%d\n", terrains_count);
 
-    all_plants_count = random_range(10, 20);
+    all_plants_count = BASE_PLANTS; //random_range(10, BASE_PLANTS);
     all_plants = new PlantType *[all_plants_count];
     for (int i = 0; i < all_plants_count; i++)
     {
         all_plants[i] = new PlantType(i);
     }
     CONSOLE_LOG("plants count=%d\n", all_plants_count);
+
+    all_animals_count = BASE_ANIMALS;//random_range(10, 20);
+    all_animals = new AnimalType *[all_animals_count];
+    for (int i = 0; i < all_animals_count; i++)
+    {
+        all_animals[i] = new AnimalType(i);
+    }
+    CONSOLE_LOG("animals count=%d\n", all_animals_count);
 
     regions = new Region *[REGIONS_NUM];
     unsigned int sizes[REGIONS_NUM] = {0};
@@ -144,6 +174,23 @@ Region * find_region(int x, int y)
 }
 
 PlantType::PlantType(int id) : id(id)
+{
+    int n = random_range(3, terrains_count);
+
+    possible_ground = new TerrainType *[n];
+    int * chosen_indices = new int[n];
+    choose_multiple(terrains_count, n, chosen_indices);
+
+    for (int i = 0; i < n; i++)
+    {
+        int idx = chosen_indices[i];
+        possible_ground[i] = terrains[idx];
+    }
+    grounds_count = n;
+    delete[] chosen_indices;
+}
+
+AnimalType::AnimalType(int id) : id(id)
 {
     int n = random_range(3, terrains_count);
 

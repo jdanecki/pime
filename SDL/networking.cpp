@@ -77,7 +77,7 @@ InventoryElement * remove_from_location(ItemLocation location, size_t uid)
 
 InventoryElement * el_from_data(const ObjectData * data)
 {
-    CONSOLE_LOG("CREATING OBJECT for tag: %d\n", (int)data->tag);
+   // CONSOLE_LOG("CREATING OBJECT for tag: %d\n", (int)data->tag);
     InventoryElement * el = nullptr;
     switch (data->tag)
     {
@@ -238,10 +238,11 @@ extern "C"
         Class_id c_id = data->inv_element.data.c_id;
 
         InventoryElement * el = find_by_uid(data->inv_element.data.uid, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
-        CONSOLE_LOG("update_object: el=%p chunk[%d,%d]\n", el, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
+        //FIXME why we get el=NULL?
+        //  CONSOLE_LOG("update_object: el=%p chunk[%d,%d]\n", el, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
         if (el)
         {
-            CONSOLE_LOG("update_object: el->cid=%x c_id=%x\n", el->c_id, c_id);
+           // CONSOLE_LOG("update_object: el->cid=%x c_id=%x\n", el->c_id, c_id);
         }
         if (el && el->c_id == c_id)
         {
@@ -283,9 +284,9 @@ extern "C"
                 case Class_Player:
                 {
                     Player * player = dynamic_cast<Player *>(el);
-                    CONSOLE_LOG("udpate_object: player=%p inv_elems=%d\n", player, player->inventory.nr_elements);
+                    //CONSOLE_LOG("update_object: player=%p inv_elems=%d\n", player, player->inventory.nr_elements);
                     *player = data->player.data;
-                    CONSOLE_LOG("udpate_object: -> update: inv_elems=%d\n", player->inventory.nr_elements);
+                    //CONSOLE_LOG("update_object: -> update: inv_elems=%d\n", player->inventory.nr_elements);
                     break;
                 }
                 default:
@@ -308,10 +309,10 @@ extern "C"
         ItemLocation & old_loc = data.old;
         ItemLocation & new_loc = data.new_;
 
-        CONSOLE_LOG("update item location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
+        /*CONSOLE_LOG("update item location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
         old_loc.show();
         new_loc.show();
-
+*/
         InventoryElement * el = remove_from_location(old_loc, id);
         if (!el)
         { // FIXME
@@ -405,7 +406,7 @@ extern "C"
             {
                 abort();
             }
-            CONSOLE_LOG("SDL: destroy_object %ld", id);
+          //  CONSOLE_LOG("SDL: destroy_object %ld", id);
             deregister_object(el);
             delete el;
         }

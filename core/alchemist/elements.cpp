@@ -118,8 +118,8 @@ void BaseElement::show(bool details)
 
 // called by networking.cpp:create_object
 Element::Element(BaseElement * b)
-    //  : InventoryElement(Class_Element), base(b), length("length", 8 + rand() % 120), width("width", 8 + rand() % 120), height("height", 8 + rand() % 120),
-    : InventoryElement(Class_Element), base(b), length("length", 3 + rand() % 30), width("width", 3 + rand() % 30), height("height", 3 + rand() % 30),
+    : InventoryElement(Class_Element), base(b), length("length", 10 + rand() % 200), width("width", 10 + rand() % 200), height("height", 10 + rand() % 200),
+//    : InventoryElement(Class_Element), base(b), length("length", 5 + rand() % 60), width("width", 5 + rand() % 60), height("height", 5 + rand() % 60),
       volume("volume", length.value * width.value * height.value), sharpness("sharpness", 0), smoothness("smoothness", 0), mass("mass", b->density.value * volume.value / 1000)
 {
 }

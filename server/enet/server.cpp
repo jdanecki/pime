@@ -10,6 +10,7 @@
 #include <math.h>
 #include <ncurses.h>
 #include <sys/ioctl.h>
+#include "generator/generator.h"
 
 #define RED "$COLOR_PAIR_1_"
 #define GREEN "$COLOR_PAIR_2_"
@@ -22,36 +23,78 @@ int history_size = 1024;
 
 WINDOW * in_w;
 WINDOW * out_w;
+WINDOW * status;
 
-char in_buf[INPUT_SIZE + 1]; // +1 for the '\0' character
+char in_buf[INPUT_SIZE + 1];
 char ** out_buf;
 
-int history_up = 0;
+int history_up;
+int buf_pos;
+bool scrolling=true;
 
 void shift_output()
 {
     for (int i = 1; i < history_size; i++)
     {
         strncpy(out_buf[i - 1], out_buf[i], MAX_OUTPUT_SIZE);
+        out_buf[i][0]=0;
     }
+}
+
+int print_color(WINDOW * w, const char * string)
+{
+    int current_color = 0;
+    const char * c = string;
+    if (!(*c)) return 2;
+    int ret = OK;
+    while (*c)
+    {        
+        if (*c == '$' && strncmp(c, "$COLOR_PAIR_", 12) == 0)
+        {
+            c += 12;
+            current_color = atoi(c);
+            while (*c != '_')
+                c++;
+            c++;
+            if (!*c)
+                break;
+        }
+        wattron(w, COLOR_PAIR(current_color));
+        if (waddch(w, *c) == ERR) ret = 1;
+        wattroff(w, COLOR_PAIR(current_color));
+        if (ret == 1) break;
+        c++;
+    }
+    return ret;
 }
 
 int add_to_output(const char * fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    shift_output();
-    vsnprintf(out_buf[history_size - 1], MAX_OUTPUT_SIZE, fmt, args);
+
+    vsnprintf(out_buf[buf_pos], MAX_OUTPUT_SIZE, fmt, args);
+
+    if (buf_pos < history_size-1) buf_pos++;
+    else shift_output();
     va_end(args);
+
     return 0;
 }
 
 void print_help()
 {
-    add_to_output("exit\n");
-    add_to_output("help\n");
-    add_to_output("clear\n");
-    add_to_output("players\n");
+    add_to_output("e - exit\n");
+    add_to_output("h - help\n");
+    add_to_output("c - clear\n");
+    add_to_output("p - players\n");
+    add_to_output("1 - show terrains types\n");
+    add_to_output("2 - show plants types\n");
+    add_to_output("3 - show animals types\n");
+    add_to_output("4 - show chunk\n");
+    add_to_output("5 - show base elements\n");
+    add_to_output("6 - show base plants\n");
+    add_to_output("7 - show base animals\n");
 }
 
 void clear_history()
@@ -60,6 +103,8 @@ void clear_history()
     {
         memset(out_buf[i], 0, MAX_OUTPUT_SIZE);
     }
+    history_up=0;
+    buf_pos=0;
     add_to_output("%scleared%s\n", RED, RESET);
 }
 
@@ -67,9 +112,9 @@ void handle_resize()
 {
     int w, h;
     getmaxyx(stdscr, h, w);
-    wresize(out_w, h - 3, w);
+    wresize(out_w, h - 4, w);
     wresize(in_w, 3, w);
-    mvwin(in_w, h - 3, 0);
+    mvwin(in_w, h - 4, 0);
 }
 
 char handle_command();
@@ -77,6 +122,7 @@ char handle_pressed(int pressed)
 {
     if (pressed == 0)
         return 0;
+
     if (pressed < 127 && (isalpha((unsigned char)pressed) || isdigit((unsigned char)pressed)))
     {
         char append[2] = {(char)pressed, 0};
@@ -100,13 +146,18 @@ char handle_pressed(int pressed)
         case KEY_RESIZE:
             handle_resize(); // FALLTHROUGH
         case KEY_END:
+            scrolling=true;
+            break;
         case KEY_HOME:
+            scrolling=false;
             history_up = 0;
             break;
-        case KEY_UP:
+        case KEY_DOWN:
+            scrolling=false;
             history_up += 5;
             break;
-        case KEY_DOWN:
+        case KEY_UP:
+            scrolling=false;
             history_up -= 5;
             if (history_up < 0)
                 history_up = 0;
@@ -121,17 +172,20 @@ char ncurses_init()
     start_color();
     cbreak();
     noecho();
-    keypad(stdscr, 1);
+    keypad(stdscr, TRUE);
     curs_set(1);
 
     int w, h;
     getmaxyx(stdscr, h, w);
-    out_w = newwin(h - 3, w, 0, 0);
-    in_w = newwin(3, w, h - 3, 0);
-    keypad(out_w, 1);
-    keypad(in_w, 1);
-    nodelay(out_w, 1);
-    nodelay(in_w, 1);
+    out_w = newwin(h - 4, w, 0, 0);
+    in_w = newwin(3, w, h - 4, 0);
+    status = newwin(1, w, h - 1, 0);
+    wbkgd(status, COLOR_PAIR(5));
+    wbkgd(in_w, COLOR_PAIR(6));
+ //   keypad(out_w, TRUE);
+    keypad(in_w, TRUE);
+  //  nodelay(out_w, TRUE);
+    nodelay(in_w, TRUE);
 
     out_buf = (char **)calloc(history_size, sizeof(char *));
     for (int i = 0; i < history_size; i++)
@@ -146,34 +200,13 @@ char ncurses_init()
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
     init_pair(3, COLOR_YELLOW, COLOR_BLACK);
     init_pair(4, COLOR_BLUE, COLOR_BLACK);
-
-    scrollok(out_w, 1);
+    init_pair(5,COLOR_BLACK,COLOR_BLUE);
+    init_pair(6,COLOR_BLACK,COLOR_GREEN);
+    scrollok(out_w, FALSE);
 
     return 0;
 }
 
-void print_color(WINDOW * w, const char * string)
-{
-    int current_color = 0;
-    const char * c = string;
-    while (*c)
-    {
-        if (*c == '$' && strncmp(c, "$COLOR_PAIR_", 12) == 0)
-        {
-            c += 12;
-            current_color = atoi(c);
-            while (*c != '_')
-                c++;
-            c++;
-            if (!*c)
-                break;
-        }
-        wattron(w, COLOR_PAIR(current_color));
-        waddch(w, *c);
-        wattroff(w, COLOR_PAIR(current_color));
-        c++;
-    }
-}
 
 void ncurses_tick()
 {
@@ -183,20 +216,26 @@ void ncurses_tick()
     wmove(in_w, 1, 2);
     char buf[128];
     snprintf(buf, 128, "> %s", in_buf);
-    print_color(in_w, buf);
+    print_color(in_w, buf);    
 
-    for (int i = 0; i < history_size - history_up; i++)
+    for (int i = 0; i + history_up < history_size; i++)
     {
-        print_color(out_w, out_buf[i]);
+        int ret = print_color(out_w, out_buf[i+history_up]);
+        switch(ret)
+        {
+            case 1:
+                if (scrolling) {
+                    history_up++;
+                }
+            case 2:
+                goto last_line;
+        }
     }
-
+last_line:
     wrefresh(out_w);
     wmove(in_w, 4 + strlen(in_buf), 1);
-    wrefresh(in_w);
+    wrefresh(in_w);    
 }
-
-#define REGIONS_NUM 1000
-#include "generator/generator.cpp"
 
 Region ** regions;
 
@@ -274,6 +313,7 @@ class PlayerClient : public ListElement
         char hostname[64];
         enet_address_get_host_ip(&peer->address, hostname, 64);
         add_to_output("player uid=%ld host=%s port=%u\n", player->uid, hostname, peer->address.port);
+        player->location.show();
     }
 };
 
@@ -284,7 +324,7 @@ void send_to_all(Packet * p)
     while (pl_el)
     {
         PlayerClient * pl = (PlayerClient *)pl_el;
-        add_to_output("[%d/%d] sending to player: %d\n", i, players->nr_elements, pl->player->get_id());
+     //   add_to_output("[%d/%d] sending to player: %d\n", i, players->nr_elements, pl->player->get_id());
         p->send(pl->peer);
         pl_el = pl_el->next;
         i++;
@@ -312,16 +352,19 @@ class PacketToSend : public ListElement
 void print_status(int l, const char * format, ...)
 {
     va_list args;
+    char buf[128];
     va_start(args, format);
-    shift_output();
-    vsnprintf(out_buf[history_size - 1], MAX_OUTPUT_SIZE, format, args);
+    vsnprintf(buf, 127, format, args);
     va_end(args);
+
+    wprintw(status, "\r %s ", buf);
+    wrefresh(status);
 }
 
 bool handle_packet(ENetPacket * packet, ENetPeer * peer)
 {
     unsigned char * data = packet->data;
-    add_to_output("Received length=%lu: %d\n", packet->dataLength, *data);
+   // add_to_output("Received length=%lu: %d\n", packet->dataLength, *data);
 
     Packet * p = check_packet('R', data, packet->dataLength);
     if (!p)
@@ -350,10 +393,10 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             p = new PacketElementsList(&base_plants);
             p->send(peer);
             delete p;
-            /*p = new PacketElementsList(&base_animals);
+            p = new PacketElementsList(&base_animals);
             p->send(peer);
             delete p;
-*/
+
             p = new PacketChunkUpdate(128, 128);
             p->send(peer);
             delete p;
@@ -536,27 +579,27 @@ void send_updates()
     if (packets_to_send->nr_elements)
     {
         ListElement * el = packets_to_send->head;
-        add_to_output("sending updates elems=%d\n", packets_to_send->nr_elements);
+      //  add_to_output("sending updates elems=%d\n", packets_to_send->nr_elements);
         while (el)
         {
             PacketToSend * p = (PacketToSend *)el;
             p->to_all();
             el = el->next;
         }
-        add_to_output("sent updates\n");
+      //  add_to_output("sent updates\n");
     }
 
     if (packets_to_send1->nr_elements)
     {
         ListElement * el = packets_to_send1->head;
-        add_to_output("sending updates1 elems=%d\n", packets_to_send1->nr_elements);
+       // add_to_output("sending updates1 elems=%d\n", packets_to_send1->nr_elements);
         while (el)
         {
             PacketToSend * p = (PacketToSend *)el;
             p->to_all();
             el = el->next;
         }
-        add_to_output("sent updates1\n");
+      //  add_to_output("sent updates1\n");
     }
 
     if (objects_to_create.nr_elements)
@@ -564,7 +607,7 @@ void send_updates()
         ListElement * el = objects_to_create.head;
         while (el)
         {
-            add_to_output("sending objects to create: %s id=%lx\n", el->el.get()->get_name(), el->el.get()->uid);
+        //    add_to_output("sending objects to create: %s id=%lx\n", el->el.get()->get_name(), el->el.get()->uid);
             Packet * p = new PacketObjectCreate(el->el.get());
             send_to_all(p);
             el = el->next;
@@ -606,6 +649,12 @@ void add_plant(chunk * ch, int id)
     ch->add_object(create_plant((BasePlant *)(base_el->base)));
 }
 
+void add_animal(chunk * ch, int id)
+{
+    BaseListElement * base_el = (BaseListElement *)base_animals.find(&id);
+    ch->add_object(create_animal((BaseAnimal *)(base_el->base)));
+}
+
 void load_chunk(int cx, int cy)
 {
     add_to_output("load_chunk(%d, %d)\n", cx, cy);
@@ -625,11 +674,11 @@ void load_chunk(int cx, int cy)
         do_times(r->plants_types[i]->value, add_plant, ch, r->plants_types[i]->plant->id);
     }
 
-    /*
+    for (int i = 0; i < r->animals_count; i++)
+    {
+        do_times(r->animals_types[i]->value, add_animal, ch, r->animals_types[i]->animal->id);
+    }
 
-      base_el = (BaseListElement*) base_animals.get_random();
-      ch->add_object( create_animal((BaseAnimal*)(base_el->base)));
-  */
     // ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
 
     world_table[cy][cx] = ch;
@@ -688,10 +737,11 @@ void generate()
         ListElement * entry = new BaseListElement(new BasePlant(all_plants[i]->id));
         base_plants.add(entry);
     }
-
-    /*
-    entry = new BaseListElement(new BaseAnimal(i));
-    base_animals.add(entry);*/
+    for (int i = 0; i < all_animals_count; i++)
+    {
+        ListElement * entry = new BaseListElement(new BaseAnimal(all_animals[i]->id));
+        base_animals.add(entry);
+    }
 }
 
 void show_players()
@@ -705,12 +755,47 @@ void show_players()
     }
 }
 
-char handle_command()
+void show_terrains()
 {
-    // comparing the first letters ISN'T A BUG
+    for (int i=0; i < terrains_count; i++)
+    {
+        terrains[i]->show();
+    }
+}
 
-    if (strlen(in_buf) == 0)
-        return 0;
+void show_plants()
+{
+    for (int i=0; i < all_plants_count; i++)
+    {
+        all_plants[i]->show();
+    }
+}
+
+void show_animals()
+{
+    for (int i=0; i < all_animals_count; i++)
+    {
+        all_animals[i]->show();
+    }
+}
+
+void show_chunk()
+{
+    ListElement * pl_el = players->head;
+    if (!pl_el) return;
+    PlayerClient * pl = (PlayerClient *)pl_el;
+    int x = pl->player->location.chunk.map_x;
+    int y = pl->player->location.chunk.map_y;
+    CONSOLE_LOG("Player@[%d,%d]\n", x, y);
+    chunk * ch = world_table[y][x];
+    ch->show();
+    Region * reg = find_region(x, y);
+    reg->show();
+}
+
+char handle_command()
+{    
+    if (!in_buf[0]) return 0;
     switch (in_buf[0])
     {
         case 'e':
@@ -728,6 +813,27 @@ char handle_command()
             add_to_output("%sinvalid command: %s%s\n", RED, RESET, in_buf);
             add_to_output("use \"help\" to show help\n");
             break;
+        case '1':
+            show_terrains();
+            break;
+        case '2':
+            show_plants();
+            break;
+        case '3':
+            show_animals();
+            break;
+        case '4':
+            show_chunk();
+            break;
+        case '5':
+            base_elements.show();
+            break;
+        case '6':
+             base_plants.show();
+            break;
+        case '7':
+             base_animals.show();
+            break;
     }
 
     return 0;
@@ -736,10 +842,13 @@ char handle_command()
 int main()
 {
     ncurses_init();
-    add_to_output("%spime_enet  \nCopyright (C) 2025 Piotr Danecki <i3riced@mailfence.com>\nCopyright (C) 2025 Jacek Danecki\n    ", GREEN);
-    add_to_output("  This program comes with ABSOLUTELY NO WARRANTY.\n");
-    add_to_output("  This is free software, and you are welcome to redistribute it under certain conditions. See LICENSE file\n");
-    trace_network = 1;
+    print_status(0, "pime_enet\n");
+    add_to_output("Copyright (C) 2025 Piotr Danecki <i3riced@mailfence.com>\n");
+    add_to_output("Copyright (C) 2025 Jacek Danecki\n");
+    add_to_output("This program comes with ABSOLUTELY NO WARRANTY.\n");
+    add_to_output("This is free software, and you are welcome to redistribute it under certain conditions.\n");
+    add_to_output("See LICENSE file\n");
+ //   trace_network = 1;
     srand(0);
     if (enet_initialize() != 0)
     {

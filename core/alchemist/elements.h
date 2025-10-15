@@ -113,7 +113,7 @@ class InventoryElement : public NetworkObject
     }
     virtual void show(bool details = true)
     {
-        CONSOLE_LOG("%s: uid=%lx @[%d,%d][%d,%d]\n", get_class_name(), uid, location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
+        CONSOLE_LOG("%s: uid=%lx id=%d @[%d,%d][%d,%d]\n", get_class_name(), uid, get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
     }
     virtual bool tick()
     {
@@ -136,13 +136,17 @@ class InventoryElement : public NetworkObject
         return c_id;
     }
     Class_id get_cid() const;
-    int get_x()
+    unsigned int get_x()
     {
         return location.chunk.x;
     }
-    int get_y()
+    unsigned int get_y()
     {
         return location.chunk.y;
+    }
+    virtual bool check_rect(unsigned int px, unsigned int py, int )
+    {
+        return (px == get_x() && py == get_y());
     }
     size_t get_uid() const;
     virtual char * get_description()
@@ -321,6 +325,7 @@ class Element : public InventoryElement
         sprintf(buf, "%s %s: (%s)", get_form_name(), get_class_name(), get_name());
         return buf;
     }
+
 };
 
 enum Ingredient_id
@@ -643,8 +648,5 @@ class Plant : public InventoryElement
         return props;
     }
 };
-
-#define BASE_ANIMALS 40
-#define BASE_PLANTS 10
 
 #endif

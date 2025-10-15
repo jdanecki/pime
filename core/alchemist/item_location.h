@@ -11,8 +11,8 @@ struct ItemLocation
     {
         int32_t map_x;
         int32_t map_y;
-        int32_t x;
-        int32_t y;
+        unsigned int x;
+        unsigned int y;
     };
 
     struct Player_Body

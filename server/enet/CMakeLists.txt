@@ -18,7 +18,7 @@ set(SERVER_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/cpp-src)
 add_subdirectory(${SERVER_CPP_SOURCE_DIR} ${SERVER_BINARY_DIR})
 
 add_executable(server_enet
-    server.cpp
+    server.cpp generator/generator.cpp
 )
 
 target_link_libraries(server_enet

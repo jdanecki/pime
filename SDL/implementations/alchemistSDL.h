@@ -5,9 +5,10 @@
 #include "../networking.h"
 #include "../texture.h"
 #include "../window.h"
+#include <SDL2/SDL_render.h>
 
 class Renderable
-{
+{    
   protected:
     int w, h;
     bool flip;
@@ -29,7 +30,7 @@ class Renderable
     {
         return 1.0;
     }
-    virtual void render(SDL_Rect * rect)
+    virtual void render(int x, int y)
     {
         if (!texture)
         {
@@ -46,12 +47,35 @@ class Renderable
         float scale = get_scale();
         if (scale < 0.01)
             return;
-        SDL_Rect img_rect = {rect->x, rect->y, (int)(w * scale), (int)(h * scale)};
-
+        SDL_Rect img_rect = {x, y, (int)(w * scale), (int)(h * scale)};
+        int ww = window_width - PANEL_WINDOW;
+        int wh = window_height - STATUS_LINES;
+        if (img_rect.x + img_rect.w > ww)
+            img_rect.w = ww - img_rect.x;
+        if (img_rect.y + img_rect.h > wh)
+            img_rect.h = wh - img_rect.y;
+        SDL_Rect src_rect = {0, 0, img_rect.w, img_rect.h};
         if (flip)
-            SDL_RenderCopyEx(renderer, texture, NULL, &img_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+            SDL_RenderCopyEx(renderer, texture, &src_rect, &img_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
         else
-            SDL_RenderCopy(renderer, texture, NULL, &img_rect);
+            SDL_RenderCopy(renderer, texture, &src_rect, &img_rect);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDrawRect(renderer, &img_rect);
+    }
+    bool check_rect(unsigned int px, unsigned int py, unsigned int x, unsigned int y, int t_size)
+    {
+        float scale = get_scale();
+        unsigned int rx = x + ((unsigned int)(w * scale) / t_size);
+        unsigned int by = y + ((unsigned int)(h * scale) / t_size);
+        //printf("px=%d  [x=%d..%d) py=%d [y=%d..%d) scale=%f\n", px, x, rx, py, y, by, scale);
+        if (scale < 0.01) {
+            return false;
+        }
+        return (
+            (px >= x) &&
+            (px <= rx) &&
+            (py >= y) &&
+            (py <= by));
     }
 };
 
@@ -87,6 +111,10 @@ class ElementSDL : public Element, public Renderable
         return 1.0 * width.value / start_width;
     }
     void show(bool details = true) override;
+    bool check_rect(unsigned int px, unsigned int py, int t_size)
+    {
+        return Renderable::check_rect(px, py, get_x(), get_y(), t_size);
+    }
 };
 
 class ScrollSDL : public Scroll, public Renderable

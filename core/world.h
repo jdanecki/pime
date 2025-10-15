@@ -43,4 +43,5 @@ void set_item_at_ppos(InventoryElement * item, Player * player);
 
 bool check_chunks();
 
+extern int tile_size;
 #endif

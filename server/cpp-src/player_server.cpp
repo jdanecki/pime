@@ -31,7 +31,7 @@ void PlayerServer::move(int dx, int dy)
     int new_map_x = location.chunk.map_x;
     int new_map_y = location.chunk.map_y;
 
-    CONSOLE_LOG("SERV: player move dx=%d dy=%d\n", dx, dy);
+ //   CONSOLE_LOG("SERV: player move dx=%d dy=%d\n", dx, dy);
 
     if (!((new_x >= 0 && new_x < CHUNK_SIZE) && (new_y >= 0 && new_y < CHUNK_SIZE)))
     {
@@ -67,7 +67,7 @@ move_player:
     hunger--;
     thirst--;
     update_location(get_uid(), old, location);
-    CONSOLE_LOG("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
+   // CONSOLE_LOG("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
     notify_update(this);
 }
 

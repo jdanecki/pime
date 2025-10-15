@@ -3,6 +3,9 @@
 #include <time.h>
 #include <climits>
 #include "../../../core/alchemist/ncurses-output.h"
+#include "../../../core/world_params.h"
+
+#define REGIONS_NUM 1000
 
 int random_range(int min, int max);
 
@@ -55,7 +58,12 @@ class PlantType
     PlantType(int id);
     void show()
     {
-        CONSOLE_LOG(" PlanType: id=%d grounds=%d\n", id, grounds_count);
+        CONSOLE_LOG(" PlanType: id=%d grounds=%d: ", id, grounds_count);
+        for (int i=0; i< grounds_count; i++)
+        {
+            CONSOLE_LOG("%d ", possible_ground[i]->id);
+        }
+        CONSOLE_LOG("\n");
     }
     bool check_ground(int g)
     {
@@ -68,10 +76,40 @@ class PlantType
     }
 };
 
+class AnimalType
+{
+  public:
+    int id; // id of BaseAnimal
+    TerrainType ** possible_ground;
+    int grounds_count;
+    AnimalType(int id);
+    void show()
+    {
+        CONSOLE_LOG(" AnimalType: id=%d grounds=%d: ", id, grounds_count);
+        for (int i=0; i< grounds_count; i++)
+        {
+            CONSOLE_LOG("%d ", possible_ground[i]->id);
+        }
+        CONSOLE_LOG("\n");
+    }
+    bool check_ground(int g)
+    {
+        for (int i = 0; i < grounds_count; i++)
+        {
+            if (possible_ground[i]->id == g)
+                return true;
+        }
+        return false;
+    }
+};
+
+
 extern int terrains_count;
 extern TerrainType ** terrains;
 extern int all_plants_count;
 extern PlantType ** all_plants;
+extern int all_animals_count;
+extern AnimalType ** all_animals;
 
 class RockEntry
 {
@@ -103,14 +141,33 @@ class PlantEntry
     }
 };
 
+
+class AnimalEntry
+{
+  public:
+    AnimalType * animal;
+    float value;
+    AnimalEntry(AnimalType * p, float v) : animal(p), value(v)
+    {
+    }
+    void show()
+    {
+        animal->show();
+        CONSOLE_LOG("      AnimalEntry: value=%f\n", value);
+    }
+};
+
 class Region
 {
   public:
     TerrainType * terrain_type;
     RockEntry ** rocks_types; // elements in this region
-    int rocks_count;
+    int rocks_count; //number of elements in this region
     PlantEntry ** plants_types;
     int plants_count;
+    AnimalEntry ** animals_types;
+    int animals_count;
+
     unsigned int size;
     Coords coords;
     Region(TerrainType * terrain_type, int x, int y, unsigned int size);
@@ -124,7 +181,7 @@ class Region
     }
     void show()
     {
-        CONSOLE_LOG("Region size: %u\n", total_size());
+        CONSOLE_LOG("Region terrain(id=%d form=%d) size: %u\n", terrain_type->id, terrain_type->form, total_size());
         CONSOLE_LOG("%d rocks types in region:\n", rocks_count);
         for (int i = 0; i < rocks_count; i++)
         {
@@ -136,6 +193,12 @@ class Region
         {
             CONSOLE_LOG("%d: ", i);
             plants_types[i]->show();
+        }
+        CONSOLE_LOG("%d animals:\n", animals_count);
+        for (int i = 0; i < animals_count; i++)
+        {
+            CONSOLE_LOG("%d: ", i);
+            animals_types[i]->show();
         }
     }
 };

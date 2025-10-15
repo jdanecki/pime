@@ -278,7 +278,7 @@ InventoryElement * InvList::add(InventoryElement * el)
 {
     ListElement * entry = new ListElement(el);
     ElementsList::add(entry);
-    CONSOLE_LOG("InvList: added to list(%s) elements=%d el_class_name:%s\n", name, nr_elements, el->get_class_name());
+   // CONSOLE_LOG("InvList: added to list(%s) elements=%d el_class_name:%s\n", name, nr_elements, el->get_class_name());
     return el;
 }
 
