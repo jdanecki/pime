@@ -261,10 +261,9 @@ bool draw_terrain()
                     int screen_x = obj_world_x - left_top_world_x;
                     int screen_y = obj_world_y - left_top_world_y;
 
-                    if (screen_x >= 0 && screen_x < CHUNK_SIZE && screen_y >= 0 && screen_y < CHUNK_SIZE)
+                    if (screen_x < CHUNK_SIZE && screen_y < CHUNK_SIZE)
                     {                        
                         r->render(screen_x * tile_size, screen_y * tile_size);
-
                     }
                 }
                 else

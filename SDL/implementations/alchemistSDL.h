@@ -50,11 +50,36 @@ class Renderable
         SDL_Rect img_rect = {x, y, (int)(w * scale), (int)(h * scale)};
         int ww = window_width - PANEL_WINDOW;
         int wh = window_height - STATUS_LINES;
-        if (img_rect.x + img_rect.w > ww)
-            img_rect.w = ww - img_rect.x;
-        if (img_rect.y + img_rect.h > wh)
-            img_rect.h = wh - img_rect.y;
-        SDL_Rect src_rect = {0, 0, img_rect.w, img_rect.h};
+        SDL_Rect src_rect={0, 0, img_rect.w, img_rect.h};
+
+        if (x >=0 )
+        {
+            if (img_rect.x + img_rect.w > ww)
+            {
+                img_rect.w = ww - img_rect.x;
+                src_rect.w  = img_rect.w;
+            }
+        } else {
+            if (img_rect.x + img_rect.w >=0)
+            {
+                src_rect.x = -x;
+                img_rect.w += img_rect.x;
+                src_rect.w  = img_rect.w;
+            }
+        }
+        if (y >=0 )
+        {
+            if (img_rect.y + img_rect.h > wh)
+                img_rect.h = wh - img_rect.y;
+        } else {
+            if (img_rect.y + img_rect.h >=0)
+            {
+                src_rect.y = -y;
+                img_rect.h += img_rect.y;
+                src_rect.h  = img_rect.h;
+            }
+        }
+
         if (flip)
             SDL_RenderCopyEx(renderer, texture, &src_rect, &img_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
         else
