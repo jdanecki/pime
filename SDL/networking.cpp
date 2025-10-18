@@ -336,13 +336,14 @@ extern "C"
                     new_loc.chunk.map_x, new_loc.chunk.map_y,
                     new_loc.chunk.x, new_loc.chunk.y);
 */
-                ItemLocation old_l;
+                /*ItemLocation old_l;
                 ItemLocation new_l;
                 old_l.chunk.x = old_loc.chunk.x;
                 old_l.chunk.y = old_loc.chunk.y;
                 new_l.chunk.x = new_loc.chunk.x;
-                new_l.chunk.y = new_loc.chunk.y;
-                el->update_item_location(old_l, new_l);
+                new_l.chunk.y = new_loc.chunk.y;*/
+                //el->update_item_location(old_l, new_l);
+                el->update_item_location(old_loc, new_loc);
                 add_object_to_world(el, new_loc);
                 break;
             }

@@ -215,8 +215,8 @@ bool draw_terrain()
             {
                 for (int tx = 0; tx < CHUNK_SIZE; ++tx)
                 {
-                    int world_x = cx * CHUNK_SIZE + tx;
-                    int world_y = cy * CHUNK_SIZE + ty;
+                    int world_x = get_world_pos(cx, tx);
+                    int world_y = get_world_pos(cy, ty);
 
                     int screen_x = world_x - left_top_world_x;
                     int screen_y = world_y - left_top_world_y;
@@ -229,8 +229,10 @@ bool draw_terrain()
 
                         SDL_Texture * texture = tiles_textures[tile % tiles_textures_count];
                         BaseElement * base = get_base_element(tile % tiles_textures_count);
-                        if (base)
-                            SDL_SetTextureColorMod(texture, base->color.r, base->color.g, base->color.b);
+                        if (base) {
+                            //SDL_SetTextureColorMod(texture, base->color.r, base->color.g, base->color.b);
+                            SDL_SetTextureColorMod(texture, tx * 15, ty*15, (tx+ty)*7);
+                        }
                         SDL_RenderCopy(renderer, texture, NULL, &img_rect);
                     }
                 }
@@ -255,8 +257,8 @@ bool draw_terrain()
                 Renderable * r = dynamic_cast<Renderable *>(o);
                 if (o && r)
                 {
-                    int obj_world_x = cx * CHUNK_SIZE + o->get_x();
-                    int obj_world_y = cy * CHUNK_SIZE + o->get_y();
+                    int obj_world_x = get_world_pos(cx, o->get_x());
+                    int obj_world_y = get_world_pos(cy, o->get_y());
 
                     int screen_x = obj_world_x - left_top_world_x;
                     int screen_y = obj_world_y - left_top_world_y;

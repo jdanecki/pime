@@ -62,21 +62,26 @@ class Renderable
         } else {
             if (img_rect.x + img_rect.w >=0)
             {
-                src_rect.x = -x;
-                img_rect.w += img_rect.x;
+                src_rect.x = -x;                
+                img_rect.w += img_rect.x;                
                 src_rect.w  = img_rect.w;
+                img_rect.x = 0;
             }
         }
-        if (y >=0 )
+        if (y >= 0 )
         {
             if (img_rect.y + img_rect.h > wh)
+            {
                 img_rect.h = wh - img_rect.y;
+                src_rect.h  = img_rect.h;
+            }
         } else {
             if (img_rect.y + img_rect.h >=0)
             {
-                src_rect.y = -y;
-                img_rect.h += img_rect.y;
+                src_rect.y = -y;                
+                img_rect.h += img_rect.y;                
                 src_rect.h  = img_rect.h;
+                img_rect.y = 0;
             }
         }
 
@@ -92,15 +97,17 @@ class Renderable
         float scale = get_scale();
         unsigned int rx = x + ((unsigned int)(w * scale) / t_size);
         unsigned int by = y + ((unsigned int)(h * scale) / t_size);
-        //printf("px=%d  [x=%d..%d) py=%d [y=%d..%d) scale=%f\n", px, x, rx, py, y, by, scale);
+
         if (scale < 0.01) {
             return false;
         }
-        return (
+        bool ret= (
             (px >= x) &&
             (px <= rx) &&
             (py >= y) &&
             (py <= by));
+        printf("px=%d  [x=%d..%d) py=%d [y=%d..%d) scale=%f ret=%d\n", px, x, rx, py, y, by, scale, ret);
+        return ret;
     }
 };
 
