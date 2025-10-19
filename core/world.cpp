@@ -49,19 +49,6 @@ InventoryElement * find_in_world(ItemLocation * loc, size_t uid)
     return nullptr;
 }
 
-int get_world_x(ItemLocation loc)
-{
-    return get_world_pos(loc.chunk.map_x, loc.chunk.x);
-}
-int get_world_y(ItemLocation loc)
-{
-    return get_world_pos(loc.chunk.map_y, loc.chunk.y);
-}
-
-int get_world_pos(int chunk, int pos)
-{
-    return chunk * CHUNK_SIZE + pos;
-}
 
 int get_tile_at(ItemLocation loc)
 {
@@ -73,14 +60,23 @@ InventoryElement * get_item_at(ItemLocation loc)
     if (loc.tag == ItemLocation::Tag::Player)
         abort();
 
-    chunk * ch = world_table[loc.chunk.map_y][loc.chunk.map_x];
-    if (!ch)
-        return nullptr;
-    for (InventoryElement* el: ch->objects)
+    unsigned int left_chunk_x, right_chunk_x, top_chunk_y, bottom_chunk_y, left_top_world_x, left_top_world_y;
+    get_chunks_around(loc, &left_chunk_x, &right_chunk_x, &top_chunk_y, &bottom_chunk_y, &left_top_world_x, &left_top_world_y);
+
+    for (unsigned int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
     {
-        if (el->check_rect(loc.chunk.x, loc.chunk.y, tile_size))
+        for (unsigned int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
         {
-            return el;
+            chunk * ch =world_table[cy][cx];
+            if (!ch)
+                return nullptr;
+            for (InventoryElement* el: ch->objects)
+            {
+                if (el->check_rect(loc.get_world_x(), loc.get_world_y(), tile_size))
+                {
+                    return el;
+                }
+            }
         }
     }
     return nullptr;
@@ -89,5 +85,28 @@ InventoryElement * get_item_at(ItemLocation loc)
 InventoryElement * get_item_at_ppos(Player * player)
 {
     return get_item_at(player->location);
+}
+
+unsigned int get_world_pos(unsigned int chunk, unsigned int pos)
+{
+    return chunk * CHUNK_SIZE + pos;
+}
+
+void get_chunks_around(ItemLocation loc, unsigned int *left_chunk_x, unsigned int *right_chunk_x,
+    unsigned int *top_chunk_y, unsigned int *bottom_chunk_y,
+    unsigned int *left_top_world_x, unsigned int *left_top_world_y)
+{
+    unsigned int player_world_x = loc.get_world_x();
+    unsigned int player_world_y = loc.get_world_y();
+
+    *left_top_world_x = player_world_x - CHUNK_SIZE / 2;
+    *left_top_world_y = player_world_y - CHUNK_SIZE / 2;
+
+    *left_chunk_x = *left_top_world_x / CHUNK_SIZE;
+    *right_chunk_x = (*left_top_world_x + CHUNK_SIZE - 1) / CHUNK_SIZE;
+
+    *top_chunk_y = *left_top_world_y / CHUNK_SIZE;
+    *bottom_chunk_y = (*left_top_world_y + CHUNK_SIZE - 1) / CHUNK_SIZE;
+
 }
 

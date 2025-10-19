@@ -19,9 +19,6 @@ void remove_from_chunks(InventoryElement * object);
 void add_object_to_world(InventoryElement * object, ItemLocation location);
 void show_chunk(ItemLocation loc);
 InventoryElement * find_in_world(ItemLocation * loc, size_t uid);
-int get_world_x(ItemLocation loc);
-int get_world_y(ItemLocation loc);
-int get_world_pos(int chunk, int pos);
 InventoryElement * get_item_at(ItemLocation loc);
 int get_tile_at(ItemLocation loc);
 
@@ -43,6 +40,7 @@ void set_item_at(InventoryElement * item, int chunk_x, int chunk_y, int x, int y
 void set_item_at_ppos(InventoryElement * item, Player * player);
 
 bool check_chunks();
+void get_chunks_around(ItemLocation loc, unsigned int *left_chunk_x, unsigned int *right_chunk_x, unsigned int *top_chunk_y, unsigned int *bottom_chunk_y, unsigned int *ltwx, unsigned int *ltwy);
 
 extern int tile_size;
 #endif

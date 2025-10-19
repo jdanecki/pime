@@ -16,10 +16,10 @@ extern SDL_Texture * map;
 // TODO move it
 int active_hotbar = 0;
 
-int left_chunk_x;
-int right_chunk_x;
-int top_chunk_y;
-int bottom_chunk_y;
+unsigned int left_chunk_x;
+unsigned int right_chunk_x;
+unsigned int top_chunk_y;
+unsigned int bottom_chunk_y;
 
 DHotbar hotbar;
 
@@ -190,30 +190,21 @@ chunk * check_chunk(int cx, int cy)
 
 bool draw_terrain()
 {
+    unsigned int left_top_world_x, left_top_world_y;
 
-    int player_world_x = get_world_x(player->location);
-    int player_world_y = get_world_y(player->location);
+    get_chunks_around(player->location, &left_chunk_x, &right_chunk_x, &top_chunk_y, &bottom_chunk_y, &left_top_world_x, &left_top_world_y);
 
-    int left_top_world_x = player_world_x - CHUNK_SIZE / 2;
-    int left_top_world_y = player_world_y - CHUNK_SIZE / 2;
-
-    left_chunk_x = left_top_world_x / CHUNK_SIZE;
-    right_chunk_x = (left_top_world_x + CHUNK_SIZE - 1) / CHUNK_SIZE;
-
-    top_chunk_y = left_top_world_y / CHUNK_SIZE;
-    bottom_chunk_y = (left_top_world_y + CHUNK_SIZE - 1) / CHUNK_SIZE;
-
-    for (int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
+    for (unsigned int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
     {
-        for (int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
+        for (unsigned int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
         {
             chunk * ch = check_chunk(cx, cy);
             if (!ch)
                 return false;
 
-            for (int ty = 0; ty < CHUNK_SIZE; ++ty)
+            for (unsigned int ty = 0; ty < CHUNK_SIZE; ++ty)
             {
-                for (int tx = 0; tx < CHUNK_SIZE; ++tx)
+                for (unsigned int tx = 0; tx < CHUNK_SIZE; ++tx)
                 {
                     int world_x = get_world_pos(cx, tx);
                     int world_y = get_world_pos(cy, ty);
@@ -257,8 +248,8 @@ bool draw_terrain()
                 Renderable * r = dynamic_cast<Renderable *>(o);
                 if (o && r)
                 {
-                    int obj_world_x = get_world_pos(cx, o->get_x());
-                    int obj_world_y = get_world_pos(cy, o->get_y());
+                    int obj_world_x = o->location.get_world_x();
+                    int obj_world_y = o->location.get_world_y();
 
                     int screen_x = obj_world_x - left_top_world_x;
                     int screen_y = obj_world_y - left_top_world_y;

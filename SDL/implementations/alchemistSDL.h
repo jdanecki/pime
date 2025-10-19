@@ -106,7 +106,7 @@ class Renderable
             (px <= rx) &&
             (py >= y) &&
             (py <= by));
-        printf("px=%d  [x=%d..%d) py=%d [y=%d..%d) scale=%f ret=%d\n", px, x, rx, py, y, by, scale, ret);
+     //   printf("px=%d  [x=%d..%d) py=%d [y=%d..%d) scale=%f ret=%d\n", px, x, rx, py, y, by, scale, ret);
         return ret;
     }
 };
@@ -145,7 +145,7 @@ class ElementSDL : public Element, public Renderable
     void show(bool details = true) override;
     bool check_rect(unsigned int px, unsigned int py, int t_size)
     {
-        return Renderable::check_rect(px, py, get_x(), get_y(), t_size);
+        return Renderable::check_rect(px, py, location.get_world_x(), location.get_world_y(), t_size);
     }
 };
 

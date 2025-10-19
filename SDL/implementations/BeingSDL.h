@@ -24,7 +24,7 @@ class PlantSDL : public Plant, public Renderable
     }
     bool check_rect(unsigned int px, unsigned int py, int t_size)
     {
-        return Renderable::check_rect(px, py, get_x(), get_y(), t_size);
+        return Renderable::check_rect(px, py, location.get_world_x(), location.get_world_y(), t_size);
     }
 
 };
@@ -43,7 +43,7 @@ class AnimalSDL : public Animal, public Renderable
     }
     bool check_rect(unsigned int px, unsigned int py, int t_size)
     {
-        return Renderable::check_rect(px, py, get_x(), get_y(), t_size);
+        return Renderable::check_rect(px, py, location.get_world_x(), location.get_world_y(), t_size);
     }
 };
 

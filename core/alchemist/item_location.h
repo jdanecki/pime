@@ -1,4 +1,9 @@
 /// <div rustbindgen hide></div>
+#ifndef ITEM_LOCATION_H
+#define ITEM_LOCATION_H
+
+extern unsigned int get_world_pos(unsigned int chunk, unsigned int pos);
+
 struct ItemLocation
 {
     enum class Tag
@@ -43,4 +48,21 @@ struct ItemLocation
         else
             CONSOLE_LOG("player: %lu\n", player.id);
     }
+    unsigned int get_world_x()
+    {
+        return get_world_pos(chunk.map_x, chunk.x);
+    }
+    unsigned int get_world_y()
+    {
+        return get_world_pos(chunk.map_y, chunk.y);
+    }
+    unsigned int get_x()
+    {
+        return chunk.x;
+    }
+    unsigned int get_y()
+    {
+        return chunk.y;
+    }
 };
+#endif

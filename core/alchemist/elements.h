@@ -136,17 +136,10 @@ class InventoryElement : public NetworkObject
         return c_id;
     }
     Class_id get_cid() const;
-    unsigned int get_x()
-    {
-        return location.chunk.x;
-    }
-    unsigned int get_y()
-    {
-        return location.chunk.y;
-    }
+
     virtual bool check_rect(unsigned int px, unsigned int py, int )
     {
-        return (px == get_x() && py == get_y());
+        return (px == location.get_x() && py == location.get_y());
     }
     size_t get_uid() const;
     virtual char * get_description()

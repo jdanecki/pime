@@ -17,7 +17,6 @@ bool finish;
 
 NetClient * client;
 #ifdef USE_ENET
-#warning USE_ENET
 extern ElementsList objects;
 extern ElementsList base_elements;
 extern ElementsList base_plants;

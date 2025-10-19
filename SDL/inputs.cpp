@@ -129,7 +129,7 @@ void key_pressed(int key)
             auto_explore ^= 1;
 
         case SDLK_RETURN:
-            use_tile(player->location);
+            use_tile();
             break;
         case SDLK_c:
             d_craft.show ^= 1;

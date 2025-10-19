@@ -22,14 +22,14 @@ void put_element()
     }
 }
 
-void use_tile(ItemLocation loc)
+void use_tile()
 {
-    InventoryElement * object = get_item_at(loc);
+    InventoryElement * object = get_item_at(player->location);
     if (!object)
     {
         if (InventoryElement * item = player->hotbar[active_hotbar])
         {
-            send_packet_item_used_on_tile(client, item->uid, loc);
+            send_packet_item_used_on_tile(client, item->uid, player->location);
             CONSOLE_LOG("plant seed\n");
         }
 
