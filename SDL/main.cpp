@@ -82,8 +82,11 @@ void intro()
 
 int init_SDL()
 {
-    if (init_window())
+    int texture_size=32;
+    if (init_window("pime", texture_size*CHUNK_SIZE + PANEL_WINDOW, texture_size*CHUNK_SIZE + STATUS_LINES))
+    {
         return 1;
+    }
     if (load_font())
         return 1;
 

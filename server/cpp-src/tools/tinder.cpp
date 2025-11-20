@@ -6,7 +6,7 @@ Tinder::Tinder(InventoryElement * from) : IngredientServer(from, ING_TINDER, For
 
 IngredientServer * Tinder::createTinder(InventoryElement * from)
 {
-    if ((from->get_base_cid() == Class_BaseElement) || (from->get_base_cid() == Class_BasePlant))
+    if ((from->get_cid() == Class_Element) || (from->get_cid() == Class_Plant))
         return new Tinder(from);
     else
         return nullptr;

@@ -5,7 +5,7 @@
 #include "../../../core/alchemist/ncurses-output.h"
 #include "../../../core/world_params.h"
 
-#define REGIONS_NUM 1000
+#define REGIONS_NUM 16
 
 int random_range(int min, int max);
 
@@ -110,6 +110,7 @@ extern int all_plants_count;
 extern PlantType ** all_plants;
 extern int all_animals_count;
 extern AnimalType ** all_animals;
+extern int all_base_elements_count;
 
 class RockEntry
 {

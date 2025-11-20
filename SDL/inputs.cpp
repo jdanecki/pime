@@ -145,8 +145,7 @@ void mouse_pressed(SDL_MouseButtonEvent * event)
     hotbar.press(event->x, event->y, event->button);
     if (d_craft.show)
     {
-        d_craft.press(event->x, event->y, event->button);
-        return;
+        d_craft.press(event->x, event->y, event->button);        
     }
     CONSOLE_LOG("mouse %d,%d %d \n", event->x, event->y, event->button);
 }

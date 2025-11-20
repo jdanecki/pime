@@ -42,10 +42,22 @@ void DHotbar::update()
         // SELECTION
         DialogBox * b = dynamic_cast<DialogBox *>(get_element_from_id(i, DialogElementType::Box));
         if (i == active_hotbar)
-            b->color = {255, 255, 255, 255};
-        else if (player->craftbar[i] == 1)
-            b->color = {000, 200, 255, 255};
-        else
+        {
+            b->color = {150, 150, 80, 255};
+            b->fill = true;
+        }
+        else {
+            b->fill = false;
             b->color = {125, 125, 125, 255};
+        }
+        if (player->craftbar[i] == 1) {
+            if (b->fill)
+                b->color = {000, 240, 40, 255};
+            else
+            {
+                b->fill=true;
+                b->color = {000, 150, 40, 255};
+            }
+        }
     }
 }

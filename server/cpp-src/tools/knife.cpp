@@ -1,11 +1,8 @@
 #include "tools.h"
 
-Knife::Knife(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_KNIFE, Form_solid)
-{
-    /* actions = new Product_action[1];
-     actions[0]=ACT_CUT;
- */
-    actions = ACT_CUT;
+Knife::Knife(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_KNIFE, Form_solid, 1)
+{    
+    actions[0]=ACT_CUT;
 }
 
 ProductServer * Knife::createKnife(InventoryElement * el1, InventoryElement * el2)

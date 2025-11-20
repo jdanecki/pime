@@ -50,7 +50,7 @@ unsigned long get_time_usec()
     return (t.tv_sec * 1000000 + t.tv_nsec / 1000);
 }
 
-int init_window()
+int init_window(const char *title, int wx, int wy)
 {
     Uint32 flags;
     // flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
@@ -69,10 +69,9 @@ int init_window()
         SDL_Log("SDL_CreateWindowAndRenderer() failed: %s\n", SDL_GetError());
         return 1;
     }
-    SDL_SetWindowTitle(main_window, "pime");
+    SDL_SetWindowTitle(main_window, title);
     SDL_SetWindowPosition(main_window, 150, 10);
-    int texture_size=32;
-    SDL_SetWindowSize(main_window, texture_size*CHUNK_SIZE + PANEL_WINDOW, texture_size*CHUNK_SIZE + STATUS_LINES);
+    SDL_SetWindowSize(main_window, wx, wy);
     SDL_GetWindowSize(main_window, &window_width, &window_height);
     CONSOLE_LOG("window_width=%d window_height=%d\n", window_width, window_height);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);

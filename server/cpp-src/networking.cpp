@@ -8,5 +8,6 @@ InvList objects_to_destroy;
 
 Networked::Networked()
 {
+    CONSOLE_LOG("Networked\n");
     objects_to_create.add((InventoryElement *)this);
 }

@@ -133,8 +133,10 @@ enum object_textures_enum
     TEXTURE_wall_max
 };
 
-SDL_Texture * object_textures[TEXTURE_wall_max];
+SDL_Texture * places_textures[TEXTURE_wall_max];
 
 int window_width;
 int window_height;
 int tile_size;
+
+void hsv2rgb(int h, int s, int v, int* r, int* g, int* b) {}

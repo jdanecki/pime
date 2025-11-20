@@ -25,81 +25,31 @@ void put_element()
 void use_tile()
 {
     InventoryElement * object = get_item_at(player->location);
-    if (!object)
+
+    if (object)
     {
+        if (object->get_cid() == Class_Player)
+        {
+            CONSOLE_LOG("player=%p object=%p\n", player, object);
+            if (player == object) goto player_object;
+        }
+        if (Product * item = dynamic_cast<Product *>(player->hotbar[active_hotbar]))
+        {
+            CONSOLE_LOG("SDL: using %s on %s uid=%lx\n", item->get_name(), object->get_name(), object->uid);
+            send_packet_item_used_on_object(client, item->uid, object->uid);
+            return;
+        }
+
+        send_packet_pickup(client, object->uid);
+    }
+    else
+    {
+player_object:
         if (InventoryElement * item = player->hotbar[active_hotbar])
         {
             send_packet_item_used_on_tile(client, item->uid, player->location);
-            CONSOLE_LOG("plant seed\n");
         }
-
-        return;
     }
-
-    if (Product * item = dynamic_cast<Product *>(player->hotbar[active_hotbar]))
-    {
-        CONSOLE_LOG("SDL: using %s on %s\n", item->get_name(), object->get_name());
-        send_packet_item_used_on_object(client, item->uid, object->uid);
-        return;
-    }
-
-    send_packet_pickup(client, object->uid);
-    /*
-
-    for (int i = 0; i < CHUNK_SIZE*CHUNK_SIZE; i++)
-    {
-        Plant * p = world_table[map_y][map_x]->plants[i];
-        if (p)
-        {
-            int px,py;
-            p->get_posittion(&px, &py);
-            if ((px == x && py == y) && ((p->type == PLANTID_watermelon) || (p->type == PLANTID_pumpkin)) && (p->grown))
-            {
-                Element * el;
-                Element * el2;
-                switch (p->type) {
-                    case PLANTID_watermelon:
-                        el = new Element(base_elements[ID_WATERMELON]);
-                        el2 = new Element(base_elements[ID_WATERMELON_SEEDS]);
-                        break;
-                    case PLANTID_pumpkin:
-                        el = new Element(base_elements[ID_PUMPKIN]);
-                        el2 = new Element(base_elements[ID_PUMPKIN_SEEDS]);
-                        break;
-                }
-
-                el->set_posittion(x, y);
-                set_item_at(el, map_x, map_y, x, y);
-                el2->set_posittion(x, y);
-                set_item_at(el2, map_x, map_y, x, y);
-
-                free(world_table[map_y][map_x]->plants[i]);
-                world_table[map_y][map_x]->plants[i] = NULL;
-            }
-        }
-    }*/
-    /*            InventoryElement * el = player.hotbar[active_hotbar];
-        if (el)
-        {
-            if (el->use(player.map_x, player.map_y, player.x, player.y))
-                break;
-            if (plant_with_seed(el, player.map_x, player.map_y, player.x, player.y))
-                break;
-            if ((Element *)el && (Element *)el->get_base() && ((Element *)el)->get_base()->id == ID_WATER)
-            {
-                if (Plant ** pp = get_plant_at_ppos(&player))
-                {
-                    if (Plant * p = *pp)
-                    {
-                        p->water += 100;
-                        player.inventory->remove(el);
-                        player.hotbar[active_hotbar]=NULL;
-                        free(el);
-                        break;
-                    }
-                }
-            }
-        }*/
 }
 
 void action_tile(Player_action a, ItemLocation loc)

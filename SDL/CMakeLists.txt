@@ -41,6 +41,7 @@ set(SHARED_SOURCES
     implementations/alchemistSDL.cpp
     implementations/BeingSDL.cpp
     implementations/playerSDL.cpp
+    palette.cpp
 
     ${NETWORK_STUB}
 )

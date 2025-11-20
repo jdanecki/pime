@@ -1,8 +1,8 @@
 #include "tools.h"
 
-Fire::Fire(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_FIRE, Form_solid)
+Fire::Fire(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_FIRE, Form_solid, 1)
 {
-    actions = ACT_FIRE;
+    actions[0] = ACT_FIRE;
 }
 
 ProductServer * Fire::createFire(InventoryElement * el1, InventoryElement * el2)

@@ -7,7 +7,7 @@ Meat::Meat(InventoryElement * from) : IngredientServer(from, ING_MEAT, Form_soli
 
 bool Meat::action(Product_action action, Player * pl)
 {
-    CONSOLE_LOG("MEAT: %s %s\n", product_action_name[action], get_name());
+    CONSOLE_LOG("Meat: %s %s\n", product_action_name[action], get_name());
 
     InventoryElement * crafted = nullptr;
 

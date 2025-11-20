@@ -16,7 +16,7 @@ bool craft_entry(int product_id, int ingredients_num, const size_t * ingredients
     InventoryElement * crafted = nullptr;
     if (product_id < ING_COUNT)
     {
-        CONSOLE_LOG("crafting ingredient %d\n", product_id);
+        CONSOLE_LOG("crafting ingredient %d -> %s\n", product_id, ingredient_name[product_id]);
         if (ingredients_num < 1)
         {
             CONSOLE_LOG("too many to craft ingredient\n");
@@ -25,7 +25,7 @@ bool craft_entry(int product_id, int ingredients_num, const size_t * ingredients
         InventoryElement * el = player->get_item_by_uid(ingredients_ids[0]);
         if (!el)
         {
-            CONSOLE_LOG("craft from invalid element");
+            CONSOLE_LOG("craft from invalid element\n");
             return false;
         }
 
@@ -40,12 +40,12 @@ bool craft_entry(int product_id, int ingredients_num, const size_t * ingredients
             return false;
         }
 
-        CONSOLE_LOG("crafting product %d", product_id);
+        CONSOLE_LOG("crafting product %d -> %s\n", product_id, product_name[product_id]);
         InventoryElement * el1 = player->get_item_by_uid(ingredients_ids[0]);
         InventoryElement * el2 = player->get_item_by_uid(ingredients_ids[1]);
         if (!el1 || !el2)
         {
-            CONSOLE_LOG("craft from invalid element");
+            CONSOLE_LOG("craft from invalid element\n");
             return false;
         }
 

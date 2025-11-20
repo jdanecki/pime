@@ -2,10 +2,10 @@
 
 void chunk::add_object(InventoryElement * object, int x, int y)
 {
-    if (object->c_id == Class_Player)
-        objects.add(object);
-    else
-        objects.add_front(object);
+    //if (object->c_id == Class_Player)
+      //  objects.add(object);
+    //else
+    objects.add_front(object);
 
     if (object->c_id == Class_Plant || object->c_id == Class_Animal)
     {

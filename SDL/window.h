@@ -13,7 +13,7 @@ extern SDL_Window * main_window;
 extern int window_width;
 extern int window_height;
 
-int init_window();
+int init_window(const char *title, int wx, int wy);
 void clear_window();
 unsigned int color(int r, int g, int b, int a);
 void draw_rectangle(int x, int y, int w, int h, SDL_Color c0, SDL_Color c1, SDL_Color c2, SDL_Color c3);

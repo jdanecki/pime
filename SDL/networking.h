@@ -20,7 +20,6 @@ class NetClient
 class NetClient
 {
 };
-
 #include "networking_gen.h"
 #endif
 class UdpSocket

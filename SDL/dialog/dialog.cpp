@@ -5,6 +5,7 @@
 
 DialogElement::DialogElement(int id, SDL_Rect rect, enum DialogElementType c_id) : rect(rect), id(id), c_id(c_id)
 {
+    dialog = nullptr;
 }
 
 void DialogElement::draw(SDL_Renderer * renderer)
@@ -32,6 +33,9 @@ void DialogBox::draw(SDL_Renderer * renderer)
         SDL_RenderFillRect(renderer, &rect);
     else
         SDL_RenderDrawRect(renderer, &rect);
+
+   // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+   // SDL_RenderDrawRect(renderer, &rect);
 }
 
 DialogText::DialogText(int id, int x, int y, int size, SDL_Color color, std::string text) : DialogElement(id, {x, y, 0, 0}, DialogElementType::Text), size(size), color(color), text(text)
@@ -96,6 +100,7 @@ void Dialog::add(DialogElement * el)
 {
     elements.push_back(el);
     el->move(rect.x, rect.y);
+    el->dialog = this;
 }
 
 void Dialog::draw(SDL_Renderer * renderer)

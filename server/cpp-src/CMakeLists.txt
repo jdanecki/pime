@@ -22,12 +22,17 @@ add_library(server_cpp SHARED
     tools/pickaxe_handle.cpp
     tools/pickaxe.cpp
 
+    tools/hoe_blade.cpp
+    tools/hoe_handle.cpp
+    tools/hoe.cpp
+
     tools/knife_blade.cpp
     tools/knife_handle.cpp
     tools/knife.cpp
 
     tools/wall.cpp
     tools/hut.cpp
+    tools/tent.cpp
 
     tools/meat.cpp
     tools/roasted_meat.cpp
@@ -39,6 +44,11 @@ add_library(server_cpp SHARED
 
     tools/fruit.cpp
     tools/fruit_salad.cpp
+
+    tools/seed.cpp
+    tools/seedling.cpp
+
+    places/places.cpp
 )
 
 target_link_libraries(server_cpp pime)

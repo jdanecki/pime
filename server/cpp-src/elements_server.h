@@ -2,7 +2,7 @@
 #define ELEMENTS_SERVER_H
 
 #include "../../core/alchemist/elements.h"
-#include "../../core//player.h"
+#include "../../core/player.h"
 
 void to_bytes_binding(InventoryElement * el, unsigned char * buf);
 unsigned int get_packet_size_binding(InventoryElement * el);
@@ -18,10 +18,10 @@ extern "C"
 
 void destroy(InventoryElement * el);
 
-const int max_delay_move = 10; // 1 sec.
-const int max_delay_grow = 10; // 600=1 min.
+const int max_delay_move = 100; // 1 sec.
+const int max_delay_grow = 600; // 600=1 min.
 
-constexpr static const unsigned long TICK_DELAY = 100;
+const unsigned long TICK_DELAY = 100;
 
 class ElementServer : public Element
 {
@@ -34,6 +34,14 @@ class ElementServer : public Element
     bool player_action(Player_action action, Player * pl) override;
     bool action_drink();
     bool action_eat();
+    void show(bool details = true) override;
+    bool can_pickup() override;
+};
+
+class PlaceServer : public Place
+{
+  public:
+    PlaceServer(Place_id id);
     void show(bool details = true) override;
     bool can_pickup() override;
 };
@@ -116,8 +124,7 @@ class PlantServer : public Plant, public BeingServer
     PlantServer(BasePlant * base);
 
     void sow()
-    {
-        planted = 1;
+    {        
         change_phase(Plant_seedling);
     }
     void change_phase(Plant_phase p);
@@ -140,7 +147,7 @@ class IngredientServer : public Ingredient
 
   public:
     InventoryElement * el;
-    IngredientServer(InventoryElement * from, Ingredient_id i, Form f);
+    IngredientServer(InventoryElement * from, Ingredient_id id, Form f);
     bool action(Product_action action, Player * pl) override;
     bool can_pickup() override
     {
@@ -152,20 +159,26 @@ class ProductServer : public Product
 {
   public:
     int ing_count;
-    InventoryElement ** ings;
+    Ingredient ** ings;
 
-    void init(Product_id i, int c, Form f);
-    ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id i, Form f);
-    ProductServer(InventoryElement ** from, int count, Product_id i, Form f);
+    void init(int c, Form f);
+    ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id id, Form f, int act_cnt);
+    ProductServer(InventoryElement ** from, int count, Product_id id, Form f, int act_cnt);
     void show(bool details = true) override;
-    bool use(InventoryElement * object, Player * pl)
+    virtual bool use(InventoryElement * object, Player * pl)
     {
-        // if (!actions) return false;
-        if (actions == ACT_NOTHING)
+        if (!actions_count)
             return false;
-        CONSOLE_LOG("%s: %s %s\n", get_name(), product_action_name[actions], object->get_name());
-        return object->action(actions, pl);
+        //FIXME use more actions
+        CONSOLE_LOG("%s: %s %s\n", get_name(), product_action_name[actions[0]], object->get_name());
+        return object->action(actions[0], pl);
         // FIXME change properties of product after action
+    }
+    virtual bool use_tile(int map_x, int map_y, int x, int y, Player * pl)
+    {
+        if (!actions_count) return false;
+        CONSOLE_LOG("%s: %s tile (%d, %d): (%d, %d)\n", get_name(), product_action_name[actions[0]], map_x, map_y, x, y);
+        return true;
     }
     bool can_pickup() override
     {
@@ -177,5 +190,6 @@ AnimalServer * create_animal(BaseAnimal * base);
 PlantServer * create_plant(BasePlant * base);
 ElementServer * create_element(BaseElement * base);
 ScrollServer * create_scroll(Base * base);
+
 
 #endif

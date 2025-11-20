@@ -40,7 +40,18 @@ InventoryElement * find_in_world(ItemLocation * loc, size_t uid)
     switch (loc->tag)
     {
         case ItemLocation::Tag::Chunk:
-            return world_table[loc->chunk.map_y][loc->chunk.map_x]->find_by_id(uid);
+        {
+            for (int y=loc->chunk.map_y-1; y < loc->chunk.map_y + 2; y++)
+                for (int x=loc->chunk.map_x-1; x < loc->chunk.map_x + 2; x++)
+                {
+                    if (y > -1 && y < WORLD_SIZE  && x > -1 && x < WORLD_SIZE )
+                    {
+                        InventoryElement *el=world_table[y][x]->find_by_id(uid);
+                        if (el) return el;
+                    }
+                }
+            return nullptr;
+        }
         case ItemLocation::Tag::Player:
             abort();
             return nullptr;
@@ -67,11 +78,12 @@ InventoryElement * get_item_at(ItemLocation loc)
     {
         for (unsigned int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
         {
-            chunk * ch =world_table[cy][cx];
+            chunk * ch = world_table[cy][cx];
             if (!ch)
                 return nullptr;
             for (InventoryElement* el: ch->objects)
             {
+                if (el->c_id == Class_Player) continue;
                 if (el->check_rect(loc.get_world_x(), loc.get_world_y(), tile_size))
                 {
                     return el;

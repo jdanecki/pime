@@ -6,5 +6,9 @@ PickaxeHandle::PickaxeHandle(InventoryElement * from) : IngredientServer(from, I
 
 IngredientServer * PickaxeHandle::createPickaxeHandle(InventoryElement * from)
 {
-    return new PickaxeHandle(from);
+    if ((from->get_cid() == Class_Element  && from->get_form() == Form_solid) ||
+        from->get_cid() == Class_Plant)
+            return new PickaxeHandle(from);
+    else
+        return nullptr;
 }

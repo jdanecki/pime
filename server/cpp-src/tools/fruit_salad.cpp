@@ -1,8 +1,8 @@
 #include "tools.h"
 
-FruitSalad::FruitSalad(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_FRUIT_SALAD, Form_solid)
+FruitSalad::FruitSalad(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_FRUIT_SALAD, Form_solid, 1)
 {
-    actions = ACT_NOTHING;
+    actions[0] = ACT_INVITE;
 }
 
 ProductServer * FruitSalad::createFruitSalad(InventoryElement * el1, InventoryElement * el2)

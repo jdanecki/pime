@@ -36,7 +36,16 @@ void draw_texts()
     sprintf(text, "Hunger=%d Thirst=%d", player->hunger, player->thirst);
     write_text(tx, ty, text, (player->hunger < 100 || player->thirst < 100) ? Red : White, 15, 30);
 #ifdef USE_ENET
-    sprintf(text, "%s@[%d,%d][%d,%d]", player->get_name(), player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y);
+    int32_t pl_ch_x=player->location.chunk.map_x;
+    int32_t pl_ch_y=player->location.chunk.map_y;
+    unsigned int px=player->location.chunk.x;
+    unsigned int py=player->location.chunk.y;
+    chunk * ch = world_table[pl_ch_y][pl_ch_x];
+    int tile = ch->table[py][px].tile;
+    BaseElement * base = get_base_element(tile % tiles_textures_count);
+
+    sprintf(text, "%s@[%d,%d][%d,%d]:id=%d f=%d", player->get_name(),
+        pl_ch_x, pl_ch_y, px, py, base->id, base->form);
 #else
     sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), clan_names[player->get_clan()->id], player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
         player->location.chunk.y);
@@ -55,7 +64,9 @@ void draw_texts()
         }
         print_status(1, t);
         delete[] t;
-        if (player->checked_element == item->uid)
+       // item->location.show();
+
+        //if (player->checked_element == item->uid)
         {
             ty += 30;
             int count = 0;
@@ -72,6 +83,22 @@ void draw_texts()
                 delete props;
             }
         }
+    }
+    InventoryElement *el=player->hotbar[active_hotbar];
+    if (el)
+    {
+        if (el->get_cid() == Class_Product)
+        {
+            Product * pr=dynamic_cast<Product*>(el);
+            if (pr) {
+                sprintf(text, "%s %s", el->get_name(), product_action_name[pr->actions[0]]);
+            }
+        }
+        else
+        {
+            sprintf(text, "%s (%s)", el->get_name(), el->get_class_name());
+        }
+        write_text(window_width - PANEL_WINDOW + 10, window_height-60, text, Cyan, 13, 25);
     }
 }
 
@@ -154,7 +181,7 @@ void draw_maps()
         window_rec.w = 0;
         window_rec.h = 0;
     }*/
-    window_rec.x = window_width - PANEL_WINDOW;
+    window_rec.x = window_width - PANEL_WINDOW + 280;
     window_rec.y = 200; // window_height - WORLD_SIZE - STATUS_LINES;
 
     SDL_RenderCopy(renderer, map, NULL, &window_rec);
@@ -186,6 +213,28 @@ chunk * check_chunk(int cx, int cy)
         loaded_chunks[cy][cx] = CHUNK_LOADED;
     }
     return ch;
+}
+
+void render_element(InventoryElement *o, unsigned int ltx, unsigned int lty)
+{
+    Renderable * r = dynamic_cast<Renderable *>(o);
+    if (r)
+    {
+        int obj_world_x = o->location.get_world_x();
+        int obj_world_y = o->location.get_world_y();
+
+        int screen_x = obj_world_x - ltx;
+        int screen_y = obj_world_y - lty;
+
+        if (screen_x < CHUNK_SIZE && screen_y < CHUNK_SIZE)
+        {
+            r->render(screen_x * tile_size, screen_y * tile_size);
+        }
+    }
+    else
+    {
+        CONSOLE_LOG("unrenderable %d\n", o->get_cid());
+    }
 }
 
 bool draw_terrain()
@@ -221,8 +270,23 @@ bool draw_terrain()
                         SDL_Texture * texture = tiles_textures[tile % tiles_textures_count];
                         BaseElement * base = get_base_element(tile % tiles_textures_count);
                         if (base) {
-                            //SDL_SetTextureColorMod(texture, base->color.r, base->color.g, base->color.b);
-                            SDL_SetTextureColorMod(texture, tx * 15, ty*15, (tx+ty)*7);
+                            int r=base->color.r;
+                            int g=base->color.g;
+                            int b=base->color.b;
+                            switch (base->form)
+                            {
+                                case Form_solid:
+                                    break;
+                                case Form_liquid:
+                                    //b|=128;
+                                    break;
+                                case Form_gas:
+                                    //SDL_SetTextureAlphaMod(texture, 128);
+                                    break;
+                            }
+
+                            SDL_SetTextureColorMod(texture, r, g, b);
+                            //SDL_SetTextureColorMod(texture, tx * 15, ty*15, (tx+ty)*7);
                         }
                         SDL_RenderCopy(renderer, texture, NULL, &img_rect);
                     }
@@ -230,42 +294,44 @@ bool draw_terrain()
             }
         }
     }
-
-    // CONSOLE_LOG("%d,%d -> %d,%d\n", left_chunk_x, top_chunk_y, right_chunk_x, bottom_chunk_y);
-    for (int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
+  /*  for (int i=0; i < tiles_textures_count; i++)
     {
-        for (int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
+        SDL_Texture * texture = tiles_textures[i];
+        SDL_Rect img_rect = {i * tile_size, 16 * tile_size, tile_size, tile_size};
+        SDL_RenderCopy(renderer, texture, NULL, &img_rect);
+    }
+*/
+    // CONSOLE_LOG("%d,%d -> %d,%d\n", left_chunk_x, top_chunk_y, right_chunk_x, bottom_chunk_y);
+    for (unsigned int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
+    {
+        for (unsigned int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
         {
-            if (cx < 0 || cy < 0 || cx >= WORLD_SIZE || cy >= WORLD_SIZE)
+            if (cx >= WORLD_SIZE || cy >= WORLD_SIZE)
                 continue;
 
             chunk * ch = world_table[cy][cx];
             if (!ch)
                 continue;
 
-            for (InventoryElement * o : ch->objects)
+            ReversedView revert=ch->objects.reversed();
+            /*CONSOLE_LOG("cx=%d cy=%d head=%p next=%p prev=%p tail=%p elem=%d\n", cx, cy,
+                revert.list->head, revert.list->head->next, revert.list->head->prev,
+                revert.list->tail, revert.list->nr_elements);*/
+            //revert.show();
+            for (InventoryElement * o : revert)
             {
-                Renderable * r = dynamic_cast<Renderable *>(o);
-                if (o && r)
+                if (!o)
                 {
-                    int obj_world_x = o->location.get_world_x();
-                    int obj_world_y = o->location.get_world_y();
-
-                    int screen_x = obj_world_x - left_top_world_x;
-                    int screen_y = obj_world_y - left_top_world_y;
-
-                    if (screen_x < CHUNK_SIZE && screen_y < CHUNK_SIZE)
-                    {                        
-                        r->render(screen_x * tile_size, screen_y * tile_size);
-                    }
+                    CONSOLE_LOG("null object in chunk\n");
+                    return false;
                 }
-                else
-                {
-                    CONSOLE_LOG("unrenderable %d\n", o->get_cid());
-                }
+                if (o == player) continue;
+                render_element(o, left_top_world_x, left_top_world_y);
             }
         }
     }
+    render_element(player, left_top_world_x, left_top_world_y);
+
     return true;
 }
 
@@ -328,9 +394,11 @@ bool draw()
         draw_players();
         draw_npc();
         draw_texts();
-#ifdef USE_ENET
+/*
+ #ifdef USE_ENET
         draw_maps();
 #endif
+*/
     }
     if (status_line[0] != ' ')
     {

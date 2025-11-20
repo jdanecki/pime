@@ -73,14 +73,16 @@ move_player:
 
 bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement * object)
 {
-    ProductServer * i = dynamic_cast<ProductServer *>(item);
-    if (i)
+    ProductServer * prod = dynamic_cast<ProductServer *>(item);
+    if (prod)
     {
-        CONSOLE_LOG("%s: using %s on %s\n", get_name(), i->get_name(), object->get_name());
-        return i->use(object, this);
-    }
-    else
-        return false;
+        CONSOLE_LOG("%s: using %s on %s\n", get_name(), prod->get_name(), object->get_name());
+        if (prod->use(object, this))
+        {
+            return true;
+        }
+    }   
+    return false;
 }
 
 bool PlayerServer::action_on_object(Player_action a, InventoryElement * object)
@@ -138,9 +140,16 @@ bool PlayerServer::server_action_on_object(Server_action a, InventoryElement * o
     return true;
 }
 
+bool PlayerServer::use_product_on_tile(Product * prod, int map_x, int map_y, int x, int y)
+{
+    ProductServer * prod_serv = dynamic_cast<ProductServer *>(prod);
+    CONSOLE_LOG("%s: using %s on tile (%d,%d):(%d,%d)\n", get_name(), prod_serv->get_name(), map_x, map_y, x, y);
+    return prod_serv->use_tile(map_x, map_y, x, y, this);
+}
+
 bool PlayerServer::plant_with_seed(InventoryElement * el, int map_x, int map_y, int x, int y)
 {
-    // FIXME
+
 #if 0
     if (get_tile_at_ppos(this) == TILE_GRASS || get_tile_at_ppos(this) == TILE_DIRT)
     {
@@ -184,7 +193,7 @@ bool PlayerServer::plant_with_seed(InventoryElement * el, int map_x, int map_y, 
             world_table[map_y][map_x]->add_object(p, x, y);
             objects_to_create.add(p);
 
-            p->phase = Plant_seed;
+            p->phase = Plant_seedling;
             p->grown = false;
             p->age->value = 1;
 

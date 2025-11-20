@@ -128,24 +128,44 @@ class ElementsListIterator
     ListElement * le;
 
   public:
-    ElementsListIterator(ListElement * le) : le(le)
-    {
-    }
-    bool operator!=(ElementsListIterator & other)
+    ElementsListIterator(ListElement * le) : le(le) {}
+    bool operator!=(const ElementsListIterator & other) const
     {
         return le != other.le;
     }
-    ElementsListIterator operator++()
+    ElementsListIterator& operator++()
     {
         le = le->next;
         return *this;
     }
-    InventoryElement * operator*()
+    InventoryElement * operator*() const
     {
         return le->el.get();
     }
 };
 
+class ElementsListReverseIterator
+{
+    ListElement* le;
+
+  public:
+    ElementsListReverseIterator(ListElement* le) : le(le) {}
+    bool operator!=(const ElementsListReverseIterator & other) const
+    {
+        return le != other.le;
+    }
+
+    ElementsListReverseIterator& operator++() {
+        le = le->prev;
+        return *this;
+    }
+
+    InventoryElement* operator*() const {
+        return le->el.get();
+    }
+};
+
+class ReversedView;
 class ElementsList
 {
   protected:
@@ -163,6 +183,7 @@ class ElementsList
     ElementsList();
     virtual ~ElementsList()
     {
+        CONSOLE_LOG("~ElementsList %s\n", name);
         remove_all();
     }
     ListElement * find(void * what);
@@ -180,14 +201,22 @@ class ElementsList
     void copy_elements(ElementsList * dst);
     ListElement * get_random();
 
-    ElementsListIterator begin()
-    {
-        return head;
-    }
-    ElementsListIterator end()
-    {
-        return nullptr;
-    }
+    ElementsListIterator begin() { return head; }
+    ElementsListIterator end()   { return nullptr; }
+
+    ElementsListReverseIterator rbegin() { return tail; }
+    ElementsListReverseIterator rend()   { return nullptr; }
+
+    ReversedView reversed();
+};
+
+class ReversedView {    
+  public:
+    ElementsList* list;
+    ReversedView(ElementsList *list) : list(list) {}
+    void show() { list->show(false); }
+    ElementsListReverseIterator begin() { return list->rbegin(); }
+    ElementsListReverseIterator end()   { return list->rend(); }
 };
 
 typedef bool (*FindFunc)(InventoryElement * el, void * arg);

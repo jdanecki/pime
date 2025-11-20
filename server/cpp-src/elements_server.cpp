@@ -23,7 +23,7 @@ AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
     delay_for_grow = max_delay_grow;
     dst_loc_x = rand() % CHUNK_SIZE;
     dst_loc_y = rand() % CHUNK_SIZE;
-    max_age = new Property("max age", 100 + rand() % 1000);
+    max_age = new Property("max age", 1000 + rand() % 1000);
     age = new Property("age", 10 + rand() % max_age->value);
     size = 1.0 * age->value / max_age->value;
 }
@@ -156,30 +156,21 @@ PlantServer::PlantServer(BasePlant * base) : Plant(base)
 
     switch (phase)
     {
-        case Plant_seed:
-            age->value = 1;
-            planted = false;
-            size = 0.01;
-            break;
         case Plant_seedling:
-            age->value = seedling_time;
-            planted = true;
+            age->value = seedling_time;            
             size = 0.01;
             break;
         case Plant_growing:
-            age->value = growing_time;
-            planted = true;
+            age->value = growing_time;            
             size = 1.0 * age->value / max_age->value;
             break;
         case Plant_flowers:
-            age->value = flowers_time;
-            planted = true;
+            age->value = flowers_time;            
             size = 1.0;
             break;
         case Plant_fruits:
             age->value = max_age->value;
-            grown = true;
-            planted = true;
+            grown = true;            
             size = 1.0;
             break;
     }
@@ -280,11 +271,8 @@ bool PlantServer::grow()
     return !grown;
 }
 
-IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id i, Form f) : Ingredient(i)
+IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id id, Form f) : Ingredient(id),  el(from)
 {
-    c_id = Class_Ingredient;
-    el = from;
-    id = i;
     req_form = f;
 }
 
@@ -294,27 +282,26 @@ bool IngredientServer::action(Product_action action, Player * pl)
     return false;
 }
 
-void ProductServer::init(Product_id i, int c, Form f)
+void ProductServer::init(int c, Form f)
 {
-    id = i;
     ing_count = c;
     req_form = f;
 }
 
-ProductServer::ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id i, Form f) : Product(i)
+ProductServer::ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id id, Form f, int act_cnt) : Product(id, act_cnt)
 {
     c_id = Class_Product;
-    ings = (InventoryElement **)calloc(2, sizeof(InventoryElement));
-    ings[0] = el1;
-    ings[1] = el2;
-    init(i, 2, f);
+    ings = (Ingredient **)calloc(2, sizeof(Ingredient));
+    ings[0] = dynamic_cast<Ingredient *>(el1);
+    ings[1] = dynamic_cast<Ingredient *>(el2);
+    init(2, f);
 }
 
-ProductServer::ProductServer(InventoryElement ** from, int count, Product_id i, Form f) : Product(i)
+ProductServer::ProductServer(InventoryElement ** from, int count, Product_id id, Form f, int act_cnt) : Product(id, act_cnt)
 {
     c_id = Class_Product;
-    ings = from;
-    init(i, count, f);
+    ings = (Ingredient **)from;
+    init(count, f);
 }
 
 void ProductServer::show(bool details)
@@ -483,12 +470,13 @@ bool ElementServer::action_eat()
 
 void ElementServer::show(bool details)
 {
-    Element::show((details));
+    Element::show(details);
 }
 
 bool ElementServer::can_pickup()
 {
-    return mass.value < 10000;
+    //return mass.value < 10000;
+    return true;
 }
 
 void BeingServer::show(bool details)
@@ -506,7 +494,7 @@ bool BeingServer::grow()
     age->value++;
 
     if (age->value >= max_age->value)
-    {
+    {              
         alive = false;
     }
     return alive;
@@ -536,4 +524,20 @@ bool ScrollServer::player_action(Player_action action, Player * pl)
     }
 
     return true;
+}
+
+PlaceServer::PlaceServer(Place_id id): Place(id)
+{
+    //CONSOLE_LOG("PlaceServer::PlaceServer\n");
+}
+
+void PlaceServer::show(bool details)
+{
+    CONSOLE_LOG("PlaceServer\n");
+    Place::show(details);
+}
+
+bool PlaceServer::can_pickup()
+{
+    return false;
 }

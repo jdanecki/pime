@@ -1,28 +1,15 @@
 #include "alchemistSDL.h"
 
-SDL_Texture * ObjectSDL::get_texture()
-{ // FIXME
-#if 0
-    if (type == OBJECT_wall)
-    {
-        switch (base->id)
-        {
-            case ID_STONE:
-                return object_textures[TEXTURE_stone_wall];
-                break;
-            case ID_LOG:
-                return object_textures[TEXTURE_log_wall];
-                break;
-            case ID_LOG1:
-                return object_textures[TEXTURE_log1_wall];
-                break;
-            case ID_LOG2:
-                return object_textures[TEXTURE_log2_wall];
-                break;
-        }
-    }
-#endif
-    return NULL;
+void hsv2rgb(int h, int s, int v, int* r, int* g, int* b);
+
+SDL_Texture * PlaceSDL::get_texture()
+{
+    return places_textures[id];
+}
+
+PlaceSDL::PlaceSDL(Place data) : Place(data)
+{
+
 }
 
 ElementSDL::ElementSDL(Element data) : Element(data)
@@ -53,9 +40,12 @@ ElementSDL::ElementSDL(Element data) : Element(data)
  */
     float cx = width.value / 2.0f;
     float cy = height.value / 2.0f;
-    float rx = 5.0 + (rand() % width.value) / 2;
-    float ry = 5.0 + (rand() % height.value) / 2;
+    
+    float rx = width.value / 2;
+    float ry = height.value / 2;
+    int val=rand() % 100;
 
+    float ang_ofs= 1.0 * (-15 + rand() % 25);    
     for (unsigned int y = 0; y < height.value; y++)
     {
         for (unsigned int x = 0; x < width.value; x++)
@@ -69,30 +59,43 @@ ElementSDL::ElementSDL(Element data) : Element(data)
             unsigned char base = 100 + rand() % 40;
             float inter = 0.1 * (rand() % 9);
 
-            unsigned char r2 = (unsigned char)(get_base()->color.r * inter + base * (1.0 - inter));
-            unsigned char g2 = (unsigned char)(get_base()->color.g * inter + base * (1.0 - inter));
-            unsigned char b2 = (unsigned char)(get_base()->color.b * inter + base * (1.0 - inter));
-            c |= (b2 << 16) | (g2 << 8) | r2;
+            unsigned char r = (unsigned char)(get_base()->color.r * inter + base * (1.0 - inter));
+            unsigned char g = (unsigned char)(get_base()->color.g * inter + base * (1.0 - inter));
+            unsigned char b = (unsigned char)(get_base()->color.b * inter + base * (1.0 - inter));
+            c |= (b << 16) | (g << 8) | r;
 
             switch (f)
             {
                 case Form_solid:
                 {
-                    offset = 0.2f * sinf(angle * 5.0f + (float)(rand() % 100) / 50.0f);
+                    offset = 0.3f * sinf(angle * (6+ang_ofs) +  (float)(rand() % 100) / 50.0f);
                     pixels[y * width.value + x] = (distance <= 1.0f + offset) ? c : 0;
                     break;
                 }
                 case Form_liquid:
                     offset = 1.0f + 0.3f * sinf(angle * 6 + rand() % 100 / 50.0f);
-                    c &= 0xffff0f0f;
-
+                    //hsv2rgb(200 + (offset * 4), 100, 50 + val/2, &r, &g, &b);
+                    b+= offset*4;
+                    g+=val/2;
+                    c = (255<<24) | (b << 16) | (g << 8) | r;
                     pixels[y * width.value + x] = (distance <= offset) ? c : 0;
                     break;
                 case Form_gas:
-                    c |= 0xffff00 | get_base()->color.b;
-                    c = 0xffffffff; // FIXME - add gas elements on server
-                    pixels[y * width.value + x] = (distance <= 1.0f) ? c : 0;
+                {
+                    float noiseAmount = 1.15f;
+                    float deform = 1.0f + ((rand() % 1000) / 1000.0f - 0.5f) * noiseAmount;
+                    if (distance <= deform) {
+                        float edgeFade1 = 1.0f - sqrtf(distance / deform);
+                        float edgeFade2 = powf(edgeFade1, 1.5f);
+                        r+=10.0*edgeFade2;
+                        g+=10.0*edgeFade2;
+                        b+=10.0*edgeFade2;
+                        c = (((int)(255.0*edgeFade1)) <<24) | (b << 16) | (g << 8) | r;
+                    } else c =0;
+
+                    pixels[y * width.value + x] = c;
                     break;
+                }
             }
         }
     }

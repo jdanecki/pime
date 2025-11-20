@@ -18,10 +18,12 @@ void ListElement::add(ListElement * entry)
 {
     next = entry;
     entry->prev = this;
+    entry->next = nullptr;
 }
 
 void ListElement::show(bool details)
 {
+  //  CONSOLE_LOG("ListElement: %p next=%p prev=%p\n", this, next, prev);
     el.get()->show(details);
 }
 
@@ -29,7 +31,9 @@ void ElementsList::remove_all()
 {
     while (head)
     {
+//        CONSOLE_LOG("removing %p elements=%d\n", head, nr_elements);
         remove(head);
+  //      CONSOLE_LOG("removed: head=%p tail=%p elements=%d\n", head, tail, nr_elements);
     }
 }
 
@@ -123,6 +127,8 @@ ListElement * ElementsList::add(ListElement * entry)
     {
         head = entry;
         tail = entry;
+        entry->next=nullptr;
+        entry->prev=nullptr;
     }
     nr_elements++;
     return entry;
@@ -135,6 +141,7 @@ ListElement * ElementsList::add_front(ListElement * entry)
     if (head)
     {
         entry->next = head;
+        entry->prev=nullptr;
         head->prev = entry;
         head = entry;
     }
@@ -163,10 +170,10 @@ void ElementsList::remove(ListElement * el)
 
         if (tail == el) // only 1 element on the list
         {
-            if (head == tail)
-                tail = NULL;
+            tail = nullptr;
         }
-        free(head);
+      //  CONSOLE_LOG("EL: delete %p from %p %s\n", head, this, name);
+        delete head;
         nr_elements--;
         head = tmp;
         return;
@@ -185,7 +192,8 @@ void ElementsList::remove(ListElement * el)
             {
                 tail = cur;
             }
-            free(tmp);
+        //    CONSOLE_LOG("EL: delete %p from %p %s\n", tmp, this, name);
+            delete tmp;
             nr_elements--;
             return;
         }
@@ -217,6 +225,11 @@ InventoryElement ** InvList::find_by_fun(FindFunc fun, void * arg, int * count)
         *count = c;
         return a;
     }
+}
+
+ReversedView ElementsList::reversed()
+{
+    return ReversedView(this);
 }
 
 bool match_form(InventoryElement * el, void * arg)
@@ -261,7 +274,7 @@ InventoryElement ** InvList::find_id(int id, int * count)
 */
     if (!c)
     {
-        free(a);
+        delete a;
         return NULL;
     }
     else
@@ -291,22 +304,21 @@ InventoryElement * InvList::add_front(InventoryElement * el)
 }
 void InvList::remove(InventoryElement * el)
 {
-    if (!head)
-        return;
+    assert(head);
     ListElement * cur = head;
     ListElement * tmp;
     if (head->el.get() == el)
     {
         tmp = head->next;
-        if (!tail)
-        {
-            exit(0);
-        }
+        if (tmp)
+            tmp->prev = nullptr;
+        assert(tail);
+
         if (tail->el.get() == el) // only 1 element on the list
-        {
-            if (head == tail)
-                tail = NULL;
+        {           
+            tail = nullptr;
         }
+     //   CONSOLE_LOG("Inv: delete %p from %p %s\n", head, this, name);
         delete head;
         nr_elements--;
         head = tmp;
@@ -319,11 +331,14 @@ void InvList::remove(InventoryElement * el)
         if (cur->next->el.get() == el)
         {
             tmp = cur->next;
+            if (tmp && tmp->next)
+                tmp->next->prev = cur;
             cur->next = cur->next->next;
             if (tail->el.get() == el)
             {
                 tail = cur;
             }
+        //    CONSOLE_LOG("Inv: delete %p from %p %s\n", tmp, this, name);
             delete tmp;
             nr_elements--;
             return;

@@ -5,7 +5,8 @@
 #define WORLD_CENTER WORLD_SIZE / 2
 #define CHUNK_SIZE 17
 
-#define BASE_PLANTS 21
-#define BASE_ANIMALS 3
+#define BASE_PLANTS 22
+#define BASE_ANIMALS 4
+#define TILE_TEXTURES 15
 
 #endif // WORLD_PARAMS_H

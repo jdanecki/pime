@@ -1,10 +1,8 @@
 #include "tools.h"
 
-Pickaxe::Pickaxe(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_PICKAXE, Form_solid)
-{
-    /* actions = new Product_action[1];
-     actions[0]=ACT_HIT;*/
-    actions = ACT_HIT;
+Pickaxe::Pickaxe(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_PICKAXE, Form_solid, 1)
+{    
+    actions[0]=ACT_HIT;
 }
 
 ProductServer * Pickaxe::createPickaxe(InventoryElement * el1, InventoryElement * el2)

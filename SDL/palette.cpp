@@ -162,7 +162,7 @@ void hsv2rgb(int h, int s, int v, int* r, int* g, int* b)
     *b = roundf(255 * b1);
 }
 
-
+#ifdef SHOW_PALETTE
 void show_hsv_palette()
 {
     int r, g, b;
@@ -229,4 +229,5 @@ void show_rgb_palette(SDL_Texture * texture)
     SDL_UnlockTexture(texture);
     SDL_RenderCopy(renderer, texture, NULL, &window_rec);
 }
+#endif
 

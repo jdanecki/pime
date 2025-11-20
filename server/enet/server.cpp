@@ -6,6 +6,7 @@
 #include "../cpp-src/player_server.h"
 #include "../cpp-src/world_server.h"
 #include "../cpp-src/craft.h"
+#include "../cpp-src/places/places.h"
 #include "../cpp-src/networking.h"
 #include <math.h>
 #include <ncurses.h>
@@ -463,7 +464,8 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             if (el)
             {
                 InventoryElement * obj = find_in_world(&pl->player->location, oid);
-                if (!pl->player->use_item_on_object(el, obj))
+                CONSOLE_LOG("use item on object: oid=%lx obj=%p\n", oid, obj);
+                if (obj && !pl->player->use_item_on_object(el, obj))
                 {
                     p = new PacketActionFailed();
                     p->send(peer);
@@ -520,11 +522,25 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             InventoryElement * item = pl->player->get_item_by_uid(iid);
             if (item)
             {
-                if (!pl->player->plant_with_seed(item, map_x, map_y, x, y))
+                if (Product * prod = dynamic_cast<Product *>(item))
                 {
-                    p = new PacketActionFailed();
-                    p->send(peer);
-                    delete p;
+                    add_to_output("use product: %s on tile [%d,%d]:[%d,%d]\n", prod->get_name(), map_x, map_y, x, y);
+                    if (!pl->player->use_product_on_tile(prod,  map_x, map_y, x, y))
+                    {
+                        p = new PacketActionFailed();
+                        p->send(peer);
+                        delete p;
+                    }
+                }
+                else
+                {
+                    add_to_output("use item: %s on tile [%d,%d]:[%d,%d]\n", item->get_name(), map_x, map_y, x, y);
+                    /*if (!pl->player->plant_with_seed(item, map_x, map_y, x, y))
+                    {
+                        p = new PacketActionFailed();
+                        p->send(peer);
+                        delete p;
+                    }*/
                 }
             }
             break;
@@ -579,14 +595,14 @@ void send_updates()
     if (packets_to_send->nr_elements)
     {
         ListElement * el = packets_to_send->head;
-      //  add_to_output("sending updates elems=%d\n", packets_to_send->nr_elements);
+       // add_to_output("sending updates elems=%d\n", packets_to_send->nr_elements);
         while (el)
         {
             PacketToSend * p = (PacketToSend *)el;
             p->to_all();
             el = el->next;
         }
-      //  add_to_output("sent updates\n");
+       // add_to_output("sent updates\n");
     }
 
     if (packets_to_send1->nr_elements)
@@ -607,7 +623,7 @@ void send_updates()
         ListElement * el = objects_to_create.head;
         while (el)
         {
-        //    add_to_output("sending objects to create: %s id=%lx\n", el->el.get()->get_name(), el->el.get()->uid);
+            add_to_output("sending objects to create: %s id=%lx\n", el->el.get()->get_name(), el->el.get()->uid);
             Packet * p = new PacketObjectCreate(el->el.get());
             send_to_all(p);
             el = el->next;
@@ -637,6 +653,11 @@ void do_times(float prob, callback_fn f, chunk * ch, int id)
     }
 }
 
+void add_place(chunk * ch, Place_id id, int x, int y)
+{
+    ch->add_object(create_place(id), x, y);
+}
+
 void add_element(chunk * ch, int id)
 {
     BaseListElement * base_el = (BaseListElement *)base_elements.find(&id);
@@ -661,10 +682,7 @@ void load_chunk(int cx, int cy)
     chunk * ch = new chunk(cx, cy);
     Region * r = find_region(cx, cy);
 
-    for (int y = 0; y < CHUNK_SIZE; y++)
-        for (int x = 0; x < CHUNK_SIZE; x++)
-            ch->table[y][x].tile = r->terrain_type->id;
-
+try_again:
     for (int i = 0; i < r->rocks_count; i++)
     {
         do_times(r->rocks_types[i]->value, add_element, ch, r->rocks_types[i]->terrain->id);
@@ -674,13 +692,64 @@ void load_chunk(int cx, int cy)
         do_times(r->plants_types[i]->value, add_plant, ch, r->plants_types[i]->plant->id);
     }
 
+    if (!ch->objects.nr_elements) {
+        add_to_output("empty chunk, trying again %d\n", r->rocks_count);
+        goto try_again;
+    }
+
+    for (int y = 0; y < CHUNK_SIZE; y++)
+        for (int x = 0; x < CHUNK_SIZE; x++)
+        {
+            InventoryElement * closest_el=nullptr;
+            int min_dist = INT_MAX;
+            ListElement * cur=ch->objects.head;
+            while(cur)
+            {
+                InventoryElement * el=cur->el.get();
+                int dx = x - el->location.get_x();
+                int dy = y - el->location.get_y();
+                int dist=dx * dx + dy * dy;
+                if (dist < min_dist)
+                {
+                    min_dist = dist;
+                    closest_el=el;
+                }
+                cur=cur->next;
+            }
+            if (closest_el) {
+                ch->table[y][x].tile = closest_el->get_id();
+            }
+        }
+
+
+
     for (int i = 0; i < r->animals_count; i++)
     {
         do_times(r->animals_types[i]->value, add_animal, ch, r->animals_types[i]->animal->id);
     }
 
     // ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
+#if 0
+    int id;
 
+    for (id=0; id < all_base_elements_count; id++)
+    {
+        BaseListElement * el = (BaseListElement *)base_elements.find(&id);
+        ch->add_object(create_element((BaseElement *)(el->base)), id % 17, 14 + (id / 17));
+    }
+
+    for (id=0; id < BASE_PLANTS; id++)
+    {
+        BaseListElement * pl = (BaseListElement *)base_plants.find(&id);
+        ch->add_object(create_plant((BasePlant *)(pl->base)), id % CHUNK_SIZE, 3*(id / CHUNK_SIZE));
+    }
+
+    for (id=0; id < BASE_ANIMALS; id++)
+    {
+        BaseListElement * an = (BaseListElement *)base_animals.find(&id);
+        ch->add_object(create_animal((BaseAnimal *)(an->base)), id % CHUNK_SIZE, id / CHUNK_SIZE);
+    }
+#endif
     world_table[cy][cx] = ch;
 }
 
@@ -727,9 +796,22 @@ void generate()
     players = new InvList("Players");
     create_regions();
 
-    for (int i = 0; i < terrains_count; i++)
+    for (int i = 0; i < all_base_elements_count; i++)
     {
-        ListElement * entry = new BaseListElement(new BaseElement((Form)terrains[i]->form, terrains[i]->id));
+        Form f;
+        int id;
+
+        if (i < terrains_count)
+        {
+            f= (Form)terrains[i]->form;
+            id = terrains[i]->id;
+        }
+        else
+        {
+            f= (Form) (1 + rand() % 3);
+            id = i;
+        }
+        ListElement * entry = new BaseListElement(new BaseElement(f, id));
         base_elements.add(entry);
     }
     for (int i = 0; i < all_plants_count; i++)
@@ -849,7 +931,9 @@ int main()
     add_to_output("This is free software, and you are welcome to redistribute it under certain conditions.\n");
     add_to_output("See LICENSE file\n");
  //   trace_network = 1;
+
     srand(0);
+
     if (enet_initialize() != 0)
     {
         fprintf(stderr, "Can't initialize ENet\n");

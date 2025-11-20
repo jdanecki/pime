@@ -3,6 +3,6 @@
 
 #include "../../core/alchemist/elements.h"
 
-InventoryElement * craft_ing(int product_id, InventoryElement * el);
+InventoryElement * craft_ing(int ing_id, InventoryElement * el);
 
 #endif

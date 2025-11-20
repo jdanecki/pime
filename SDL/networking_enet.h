@@ -21,6 +21,7 @@ struct ObjectData
         Scroll,
         Player,
         Npc,
+        Place,
     };
 
     struct InvElement_Body
@@ -67,13 +68,19 @@ struct ObjectData
     {
         Npc data;
     };
+    struct Place_Body
+    {
+        Place data;
+    };
 
     ObjectData(Tag tag, size_t s) : tag(tag), size(s)
     {
+        CONSOLE_LOG("ObjectData: set size to %ld\n", size);
     }
     ObjectData(Tag tag) : tag(tag)
-    {
+    {        
         size = sizeof(struct ObjectData);
+        CONSOLE_LOG("ObjectData: size=%ld\n", size);
     }
 
     ~ObjectData()
@@ -85,7 +92,7 @@ struct ObjectData
     }
     static void * operator new(size_t size_base, size_t extra)
     {
-        CONSOLE_LOG("ObjectData: allocating %ld + %ld\n", size_base, extra);
+        CONSOLE_LOG("ObjectData: serial_data: allocating %ld + %ld\n", size_base, extra);
         return ::operator new(size_base + extra);
     }
 
@@ -107,6 +114,7 @@ struct ObjectData
         Scroll_Body scroll;
         Player_Body player;
         Npc_Body npc;
+        Place_Body place;
     };
     int id;
     unsigned char data[0];

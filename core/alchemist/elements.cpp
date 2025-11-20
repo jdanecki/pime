@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <assert.h>
 #include "elements.h"
 
 // #include "../tiles.h"
@@ -25,6 +26,9 @@ const char * ingredient_name[] = {
     "Pickaxe blade",
     "Pickaxe handle",
 
+    "Hoe blade",
+    "Hoe handle",
+
     "Wall",
     "Meat",
 
@@ -32,16 +36,21 @@ const char * ingredient_name[] = {
     "Tinder",
     "Stick",
     "Fruit",
+    "Seed",
+
 };
 
 const char * product_name[] = {
     "Axe",
     "Knife",
     "Pickaxe",
+    "Hoe",
     "Hut",
+    "Tent",
     "Fire",
     "Roasted meat",
     "Fruit Salad",
+    "Seedling",
 };
 
 const char * product_action_name[] = {
@@ -50,15 +59,20 @@ const char * product_action_name[] = {
     "hit",
     "stab",
     "fire",
+    "plow",
+    "plant",
+    "invite",
 };
 const char * player_action_name[] = {"drink", "eat", "read", "check"};
 
 const char * server_action_name[] = {"server show item", "server show chunk", "server trace network"};
 
-const char * object_names[] = {"wall"};
-const char * plant_phase_name[] = {"Seed", "Seedling", "Growing", "Flowers", "Fruits"};
+const char * places_names[] = {"field"};
+const char * place_states_names[] = {"plowed", "planted"};
+
+const char * plant_phase_name[] = {"Seedling", "Growing", "Flowers", "Fruits"};
 const char * class_name[] = {
-    "unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Scroll", "Plant", "Animal", "Player", "Npc", "Clan", "ListElement", "KnownElement", "BaseListElement"};
+    "unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Scroll", "Place", "Plant", "Animal", "Player", "Npc", "Clan", "ListElement", "KnownElement", "BaseListElement"};
 
 Base::Base(int index, Class_id c, const char * name) : name(name)
 {
@@ -79,7 +93,7 @@ const char * Base::get_name()
     return name.str;
 }
 
-BaseElement::BaseElement(Form f, int index) : Base(index, Class_BaseElement, create_name(5 - f)), form(f), color({rand() % 256, rand() % 256, rand() % 256}), density("", 0)
+BaseElement::BaseElement(Form f, int index) : Base(index, Class_BaseElement, create_name(5 - f)), form(f), density("", 0)
 {
     // CONSOLE_LOG("BaseElement index=%d name=%s\n", index, get_name());
 
@@ -87,13 +101,23 @@ BaseElement::BaseElement(Form f, int index) : Base(index, Class_BaseElement, cre
     {
         case Form_solid:
             density = Property("density", 50 + rand() % 2000);
+            color.r = rand() % 256;
+            color.g = rand() % 256;
+            color.b = rand() % 256;
             break;
         case Form_liquid:
             density = Property("density", 500 + rand() % 500);
+            color.r = rand() % 64;
+            color.g = rand() % 256;
+            color.b = 255;
             break;
         case Form_gas:
             density = Property("density", 1);
             edible.set_no_edible();
+            int r=rand() % 200;
+            color.r = r + rand() % 56;
+            color.g = r + rand() % 56;
+            color.b = r + rand() % 56;
             break;
     }
 }
@@ -105,7 +129,7 @@ void BaseElement::show(bool details)
     if (!details)
         return;
     density.show(); // gęstość
-    CONSOLE_LOG("   form = %s\n", Form_name[form]);
+    CONSOLE_LOG("   form = %s color(r:%d g:%d b:%d)\n", Form_name[form], color.r, color.g, color.b);
     switch (form)
     {
         case Form_solid:
@@ -118,8 +142,8 @@ void BaseElement::show(bool details)
 
 // called by networking.cpp:create_object
 Element::Element(BaseElement * b)
-    : InventoryElement(Class_Element), base(b), length("length", 10 + rand() % 200), width("width", 10 + rand() % 200), height("height", 10 + rand() % 200),
-//    : InventoryElement(Class_Element), base(b), length("length", 5 + rand() % 60), width("width", 5 + rand() % 60), height("height", 5 + rand() % 60),
+   // : InventoryElement(Class_Element), base(b), length("length", 10 + rand() % 200), width("width", 10 + rand() % 200), height("height", 10 + rand() % 200),
+    : InventoryElement(Class_Element), base(b), length("length", 5 + rand() % 60), width("width", 5 + rand() % 60), height("height", 5 + rand() % 60),
       volume("volume", length.value * width.value * height.value), sharpness("sharpness", 0), smoothness("smoothness", 0), mass("mass", b->density.value * volume.value / 1000)
 {
 }
@@ -181,13 +205,18 @@ void Ingredient::show(bool details)
     CONSOLE_LOG("form = %s", Form_name[req_form]);
 }
 
-Product::Product(Product_id i) : InventoryElement(Class_Product), quality("quality", 0), resilience("resilience", 0), usage("usage", 0)
-{
-    id = i;
+Product::Product(Product_id id, int actions_count) : InventoryElement(Class_Product),
+                                                    quality("quality", 0), resilience("resilience", 0), usage("usage", 0),
+                                                    actions_count(actions_count), id(id)
+{    
     c_id = Class_Product;
-    // actions = nullptr;
-    actions = ACT_NOTHING;
-    actions_count = 0;
+
+    assert(actions_count < 10);
+
+    for (int i=0; i < 10; i++)
+    {
+        actions[i] = ACT_NOTHING;
+    }
 }
 
 void Product::show(bool details)
@@ -199,8 +228,10 @@ void Product::show(bool details)
     quality.show();
     resilience.show();
     usage.show();
-
-    CONSOLE_LOG("action: %d -> %s\n", actions, product_action_name[actions]);
+    for (int i = 0; i < actions_count; i++)
+    {
+        CONSOLE_LOG("action[%d]: %d -> %s\n", i,  actions[i], product_action_name[actions[i]]);
+    }
 }
 
 void Animal::init(BaseAnimal * b)
@@ -264,4 +295,14 @@ Plant::Plant(int id) : base(get_base_plant(id))
 Scroll::Scroll(Base * b) : InventoryElement(Class_Scroll), base(b)
 {
     // CONSOLE_LOG("Scroll class=%s id=%d name=%s\n", class_name[b->c_id], b->id, b->get_name());
+}
+
+Place::Place(Place_id id, size_t uid): InventoryElement(Class_Place, uid), id(id)
+{
+
+}
+
+Place::Place(Place_id id): InventoryElement(Class_Place), id(id)
+{
+
 }

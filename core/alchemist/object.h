@@ -16,6 +16,7 @@ enum Class_id
     Class_Ingredient,
     Class_Product,
     Class_Scroll,
+    Class_Place,
 
     Class_Plant,  // base: BasePlant -> Base
     Class_Animal, // base: BaseAnimal->Base

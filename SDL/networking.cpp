@@ -88,6 +88,11 @@ InventoryElement * el_from_data(const ObjectData * data)
             el = new ElementSDL(data->element.data);
             break;
         }
+        case ObjectData::Tag::Place:
+        {
+            el = new PlaceSDL(data->place.data);
+            break;
+        }
         case ObjectData::Tag::Scroll:
             el = new ScrollSDL(data->scroll.data);
             break;
@@ -366,30 +371,7 @@ extern "C"
         if (el)
         {
             register_object(el);
-            add_object_to_world(el, el->location);
-            // switch (el->location.tag)
-            // {
-            //     case ItemLocation::Tag::Chunk:
-            //     {
-            //         int item_x = el->location.chunk.x;
-            //         int item_y = el->location.chunk.y;
-            //         int x = el->location.chunk.map_x;
-            //         int y = el->location.chunk.map_y;
-            //         if (world_table[y][x])
-            //         {
-            //             world_table[y][x]->add_object(el, item_x, item_y);
-            //         }
-            //         break;
-            //     }
-            //     case ItemLocation::Tag::Player:
-            //     {
-            //         int p_id = el->location.player.id;
-            //         players[p_id]->inventory->add(el);
-            //         update_hotbar();
-            //     }
-            // }
-            // CONSOLE_LOG("created object: %s\n", el->get_name());
-            // print_status(1, "created object: %s", el->get_name());
+            add_object_to_world(el, el->location);           
         }
         else
         {

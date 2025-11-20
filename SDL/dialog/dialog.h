@@ -14,12 +14,14 @@ enum class DialogElementType
     Dialog,
 };
 
+class Dialog;
 class DialogElement
 {
   protected:
     SDL_Rect rect;
 
   public:
+    Dialog *dialog;
     int id;
     enum DialogElementType c_id;
     DialogElement(int id, SDL_Rect rect, enum DialogElementType c_id);
@@ -39,22 +41,34 @@ class DialogElement
     {
         return id == i && c_id == c;
     }
+    virtual Dialog * get_dialog() {return dialog; }
+};
+
+class Dialog : public DialogElement
+{
+    std::list<DialogElement *> elements;
+    SDL_Color background_color;
+
+  public:
+    Dialog(SDL_Rect rect, SDL_Color background_color);
+    DialogElement * get_element_from_id(int id, enum DialogElementType c_id);
+    void add(DialogElement * el);
+    void draw(SDL_Renderer * renderer);
+    bool press(int x, int y, int button);
 };
 
 class DialogBox : public DialogElement
 {
-  protected:
-    bool fill;
-
   public:
     SDL_Color color;
-
+    bool fill;
     DialogBox(int id, SDL_Rect rect, SDL_Color color, bool fill);
     void draw(SDL_Renderer * renderer);
 };
 
 class DialogText : public DialogElement
 {
+
   protected:
     int size;
     SDL_Color color;
@@ -67,6 +81,7 @@ class DialogText : public DialogElement
 
 class DialogImage : public DialogElement
 {
+
   public:
     SDL_Texture * texture;
     DialogImage(int id, SDL_Rect rect, std::string filename);
@@ -76,6 +91,7 @@ class DialogImage : public DialogElement
 
 class DialogButton : public DialogElement
 {
+
   public:
     DialogBox * d_box;
     DialogText * d_text;
@@ -91,17 +107,5 @@ class DialogButton : public DialogElement
     }
 };
 
-class Dialog : public DialogElement
-{
-    std::list<DialogElement *> elements;
-    SDL_Color background_color;
-
-  public:
-    Dialog(SDL_Rect rect, SDL_Color background_color);
-    DialogElement * get_element_from_id(int id, enum DialogElementType c_id);
-    void add(DialogElement * el);
-    void draw(SDL_Renderer * renderer);
-    bool press(int x, int y, int button);
-};
 
 #endif

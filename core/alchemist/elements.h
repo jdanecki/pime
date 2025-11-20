@@ -19,6 +19,9 @@ enum Product_action
     ACT_HIT,
     ACT_STAB, // dźgnij
     ACT_FIRE,
+    ACT_PLOW, //oraj
+    ACT_PLANT,
+    ACT_INVITE,
 };
 
 extern const char * product_action_name[];
@@ -73,7 +76,7 @@ class BaseElement : public Base
 {
   public:
     Form form; // solid, liquid, gas
-    Color color;
+    Color color; //color for tile
     Property density;
     Solid solid;
 
@@ -95,6 +98,9 @@ class InventoryElement : public NetworkObject
     ItemLocation location;
 
     InventoryElement(Class_id c_id, size_t uid, ItemLocation location);
+    InventoryElement(Class_id c_id, size_t uid) : NetworkObject(c_id, uid)
+    {
+    }
     InventoryElement(Class_id c_id) : NetworkObject(c_id)
     {
     }
@@ -139,7 +145,7 @@ class InventoryElement : public NetworkObject
 
     virtual bool check_rect(unsigned int px, unsigned int py, int )
     {
-        return (px == location.get_x() && py == location.get_y());
+        return (px == location.get_world_x() && py == location.get_world_y());
     }
     size_t get_uid() const;
     virtual char * get_description()
@@ -173,37 +179,49 @@ class InventoryElement : public NetworkObject
     }
 };
 
-enum object_types
+enum Place_id
 {
-    OBJECT_wall,
+    PLACE_FIELD,
+    PLACES_COUNT,
 };
 
-extern const char * object_names[];
+extern const char * places_names[];
 
-#define OBJECTS 1
+enum Place_states
+{    
+    FIELD_PLOWED,
+    FIELD_PLANTED,
+};
 
-class Object : public InventoryElement
+extern const char * place_states_names[];
+
+class Place : public InventoryElement
 {
   public:
-    BaseElement * base;
-    enum object_types type;
+    Place_id id;
+    Place_states state;
 
-    Form get_form() override
-    {
-        return Form_solid;
-    }
-    const char * get_form_name() override
-    {
-        return Form_name[Form_solid];
-    }
     const char * get_name() override
     {
-        return object_names[type];
+        return places_names[id];
     }
+    Place(Place_id id, size_t uid);
+    Place(Place_id id);
     void show(bool details = true) override
     {
-        CONSOLE_LOG("Object type: %s", get_name());
-        base->show(details);
+        InventoryElement::show(details);
+        CONSOLE_LOG("Place type: %s state: %s\n", get_name(), place_states_names[state]);
+    }
+    char * get_description() override
+    {
+        char * buf = new char[128];
+        sprintf(buf, "%s: (%s)", get_name(), place_states_names[state]);
+        return buf;
+    }
+    virtual void show_state() {}
+    int get_id() override
+    {
+        return (int) id;
     }
 };
 
@@ -289,7 +307,7 @@ class Element : public InventoryElement
 
     Property ** get_properties(int * count) override
     {
-        *count = 7;
+        *count = 8;
         Form f = get_form();
         if (f == Form_solid)
             *count += 6;
@@ -301,21 +319,22 @@ class Element : public InventoryElement
         props[4] = &sharpness;
         props[5] = &smoothness;
         props[6] = &mass;
-        if (f)
+        props[7] = &get_base()->density;
+        if (f == Form_solid)
         {
-            props[7] = &get_base()->solid.tooling;
-            props[8] = &get_base()->solid.stretching;
-            props[9] = &get_base()->solid.squeezing;
-            props[10] = &get_base()->solid.bending;
-            props[11] = &get_base()->solid.solubility;
-            props[12] = &get_base()->solid.hardness;
+            props[8] = &get_base()->solid.tooling;
+            props[9] = &get_base()->solid.stretching;
+            props[10] = &get_base()->solid.squeezing;
+            props[11] = &get_base()->solid.bending;
+            props[12] = &get_base()->solid.solubility;
+            props[13] = &get_base()->solid.hardness;
         }
         return props;
     }
     char * get_description() override
     {
         char * buf = new char[128];
-        sprintf(buf, "%s %s: (%s)", get_form_name(), get_class_name(), get_name());
+        sprintf(buf, "%s %s: (%s) base=%d", get_form_name(), get_class_name(), get_name(), get_id());
         return buf;
     }
 
@@ -332,6 +351,9 @@ enum Ingredient_id
     ING_PICKAXE_BLADE,
     ING_PICKAXE_HANDLE,
 
+    ING_HOE_BLADE,
+    ING_HOE_HANDLE,
+
     ING_WALL,
 
     ING_MEAT,
@@ -341,6 +363,7 @@ enum Ingredient_id
     ING_STICK,
 
     ING_FRUIT,
+    ING_SEED,
 
     ING_COUNT,
 
@@ -351,11 +374,13 @@ enum Product_id
     PROD_AXE,
     PROD_KNIFE,
     PROD_PICKAXE,
+    PROD_HOE,
     PROD_HUT,
+    PROD_TENT,
     PROD_FIRE,
     PROD_ROASTED_MEAT,
     PROD_FRUIT_SALAD,
-
+    PROD_SEEDLING,
     PROD_COUNT
 };
 
@@ -419,8 +444,7 @@ class Product : public InventoryElement
     Property usage;      // [0..100] łatwy..trudny
     Form req_form;
 
-    // FIMXE change it to Product_action *
-    Product_action actions;
+    Product_action actions[10];
     int actions_count;
 
     Product_id id;
@@ -428,7 +452,7 @@ class Product : public InventoryElement
     {
         return id;
     }
-    Product(Product_id i);
+    Product(Product_id id, int actions_count);
     virtual void add_action(Product_action * a)
     {
     }
@@ -539,8 +563,7 @@ class Animal : public InventoryElement
 };
 
 enum Plant_phase
-{
-    Plant_seed = 0,
+{    
     Plant_seedling,
     Plant_growing,
     Plant_flowers,
@@ -581,8 +604,7 @@ class Plant : public InventoryElement
     unsigned int flowers_time;
 
   public:
-    float size;
-    bool planted;
+    float size;    
     int water;
 
     // shared with client
@@ -601,7 +623,7 @@ class Plant : public InventoryElement
         if (details)
         {
             get_base()->show(details);
-            CONSOLE_LOG("phase=%s grown=%d planted=%d times=%d/%d/%d/ water=%d \n", plant_phase_name[phase], grown, planted, seedling_time, growing_time, flowers_time, water);
+            CONSOLE_LOG("phase=%s grown=%d times=%d/%d/%d/ water=%d \n", plant_phase_name[phase], grown,  seedling_time, growing_time, flowers_time, water);
         }
     }
     BasePlant * get_base()

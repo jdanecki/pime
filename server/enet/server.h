@@ -316,6 +316,19 @@ ObjectData * convert_to_data(InventoryElement * el)
             obj->id = element->get_id();
             break;
         }
+        case Class_Place:
+        {
+            Place * place = dynamic_cast<Place *>(el);
+            //obj = new ObjectData(ObjectData::Tag::Place);
+            size_t new_size=sizeof(struct ObjectData)+sizeof(size_t);
+            obj = new (new_size) ObjectData(ObjectData::Tag::Place, new_size);
+            obj->place.data = *place;
+            obj->id = place->get_id();
+            size_t * pdata=(size_t*) &obj->data[0];
+            *pdata = place->get_uid();
+            CONSOLE_LOG("pdata=%lx size=%d\n", *pdata, obj->size);
+            break;
+        }
         case Class_Player:
         {
             Player * player = dynamic_cast<Player *>(el);
@@ -393,11 +406,12 @@ class PacketObjectCreate : public Packet
         unsigned char data[0];
         static void * operator new(size_t size_base, size_t extra)
         {
-       //     CONSOLE_LOG("PacketObjectCreate: serial_data: allocating %ld + %ld\n", size_base, extra);
+            CONSOLE_LOG("PacketObjectCreate: serial_data: allocating %ld + %ld\n", size_base, extra);
             return ::operator new(size_base + extra);
         }
         serial_data(size_t s) : size(s)
         {
+            CONSOLE_LOG("PacketObjectCreate: serial_data: set size to %ld\n", size);
         }
         static void operator delete(void * ptr)
         {
@@ -440,12 +454,19 @@ class PacketObjectCreate : public Packet
         /*      for (int i=0; i<100; i++)
                    CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
         */
-       // CONSOLE_LOG("PacketObjectCreate for objectData::Tag=%d\n", (int)obj->tag);
+        CONSOLE_LOG("PacketObjectCreate for objectData::Tag=%d size=%ld\n", (int)obj->tag, obj->size);
         switch (obj->tag)
         {
             case ObjectData::Tag::Element:
             {
                 new (&obj->element.data) Element(obj->id);
+                break;
+            }
+            case ObjectData::Tag::Place:
+            {
+                size_t * pdata=(size_t*) &obj->data[0];
+                CONSOLE_LOG("pdata=%lx\n", *pdata);
+                new (&obj->place.data) Place((Place_id)obj->id, *pdata);
                 break;
             }
             case ObjectData::Tag::Plant:

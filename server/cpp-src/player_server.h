@@ -16,6 +16,7 @@ class PlayerServer : public Player
     bool pickup(InventoryElement * item);
 
     PlayerServer(size_t uid);
+    bool use_product_on_tile(Product *prod, int map_x, int map_y, int x, int y);
 };
 
 PlayerServer * create_player(size_t id);

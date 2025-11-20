@@ -1,10 +1,8 @@
 #include "tools.h"
 
-Axe::Axe(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_AXE, Form_solid)
+Axe::Axe(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_AXE, Form_solid, 1)
 {
-    /* actions = new Product_action[1];
-     actions[0]=ACT_HIT;*/
-    actions = ACT_HIT;
+    actions[0]=ACT_HIT;
 }
 
 ProductServer * Axe::Axe::createAxe(InventoryElement * el1, InventoryElement * el2)

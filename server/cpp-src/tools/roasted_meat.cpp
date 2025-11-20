@@ -1,8 +1,9 @@
 #include "tools.h"
 
-RoastedMeat::RoastedMeat(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_ROASTED_MEAT, Form_solid)
+RoastedMeat::RoastedMeat(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_ROASTED_MEAT, Form_solid,0)
 {
-    actions = ACT_NOTHING;
+    //FIXME
+//    actions = ACT_NOTHING;
 }
 
 bool RoastedMeat::player_action(Player_action action, Player * pl)
