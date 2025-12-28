@@ -46,7 +46,7 @@ extern "C" fn get_object_by_id(_id: usize) -> *mut core::InventoryElement {
 
 #[no_mangle]
 extern "C" fn update_location(
-    id: usize,
+    id: core::NetworkObject,
     old_location: core::ItemLocation,
     location: core::ItemLocation,
 ) {

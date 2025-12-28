@@ -6,7 +6,7 @@
 class InventoryElement;
 extern "C" {
 /// <div rustbindgen hide></div>
-InventoryElement* get_object_by_id(size_t uid);
+NetworkObject* get_object_by_id(NetworkObject);
 }
 
 template <typename T> class SerializablePointer
@@ -20,7 +20,7 @@ template <typename T> class SerializablePointer
     {
       if (ptr)
         return ptr;
-      return (T*)(get_object_by_id(id.uid));
+      return (T*)(get_object_by_id(id));
     }
 };
 

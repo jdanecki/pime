@@ -24,6 +24,15 @@ impl serde::Serialize for SerializableCString {
     }
 }
 
+impl<T> serde::Serialize for SerializablePointer<T> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        self.id.serialize(serializer)
+    }
+}
+
 impl serde::Serialize for Base {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -33,71 +42,6 @@ impl serde::Serialize for Base {
         state.serialize_element(&self._base.c_id)?;
         state.serialize_element(&self._base.uid)?;
         state.serialize_element(&self.name)?;
-        state.end()
-    }
-}
-
-impl serde::Serialize for SerializablePointer<NetworkObject> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut state = serializer.serialize_tuple(2)?;
-        state.serialize_element(unsafe { &(*self.ptr).c_id })?;
-        state.serialize_element(unsafe { &(*self.ptr).uid })?;
-        state.end()
-    }
-}
-
-impl serde::Serialize for SerializablePointer<InventoryElement> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut state = serializer.serialize_tuple(2)?;
-        state.serialize_element(unsafe { &(*self.ptr)._base.c_id })?;
-        state.serialize_element(unsafe { &(*self.ptr)._base.uid })?;
-        state.end()
-    }
-}
-
-impl serde::Serialize for SerializablePointer<BaseElement> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        usize::serialize(unsafe { &(*self.ptr)._base._base.uid }, serializer)
-    }
-}
-
-impl serde::Serialize for SerializablePointer<BasePlant> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        usize::serialize(unsafe { &(*self.ptr)._base._base.uid }, serializer)
-    }
-}
-
-impl serde::Serialize for SerializablePointer<BaseAnimal> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        usize::serialize(unsafe { &(*self.ptr)._base._base.uid }, serializer)
-    }
-}
-
-impl serde::Serialize for SerializablePointer<Base> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut state = serializer.serialize_tuple(2)?;
-        unsafe {
-            state.serialize_element(&(*self.ptr)._base.c_id)?;
-            state.serialize_element(&(*self.ptr)._base.uid)?;
-        }
         state.end()
     }
 }
@@ -114,46 +58,6 @@ impl serde::Serialize for InventoryElement {
         }
         state.serialize_element(&self.location)?;
         state.end()
-    }
-}
-
-// impl serde::Serialize for Player {
-//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//     where
-//         S: serde::Serializer,
-//     {
-//         let mut state = serializer.serialize_tuple(6)?;
-//         unsafe {
-//             state.serialize_element(&self._base.get_uid())?;
-//         }
-//         state.serialize_element(&self.name)?;
-//         state.serialize_element(&self._base.location)?;
-//         state.serialize_element(&self.thirst)?;
-//         state.serialize_element(&self.hunger)?;
-//         state.serialize_element(&self.nutrition)?;
-//         state.end()
-//     }
-// }
-
-impl serde::Serialize for SerializablePointer<Player> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        if self.ptr != std::ptr::null_mut() {
-            usize::serialize(unsafe { &(*self.ptr)._base.get_uid() }, serializer)
-        } else {
-            usize::serialize(&0, serializer)
-        }
-    }
-}
-
-impl serde::Serialize for SerializablePointer<Clan> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        usize::serialize(unsafe { &(*self.ptr)._base.uid }, serializer)
     }
 }
 
@@ -199,17 +103,3 @@ impl serde::Serialize for ElementsList {
         }
     }
 }
-
-// impl serde::Serialize for Property {
-//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//     where
-//         S: serde::Serializer,
-//     {
-//         let mut state = serializer.serialize_tuple(2)?;
-//         let bytes = unsafe { CStr::from_ptr(self.name).to_bytes_with_nul() };
-//         state.serialize_element(&bytes)?;
-//         state.serialize_element(&self.value)?;
-//         state.end()
-//         // u32::serialize(&self.value, serializer)
-//     }
-// }

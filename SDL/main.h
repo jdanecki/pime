@@ -2,9 +2,9 @@
 #define MAIN_H
 
 #include "../core/world.h"
+#include "npc.h"
 #include "implementations/alchemistSDL.h"
 #include "implementations/playerSDL.h"
-#include "npc.h"
 #include "text.h"
 #include "window.h"
 #include <SDL2/SDL.h>

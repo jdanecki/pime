@@ -46,9 +46,9 @@ void update_hotbar()
     }
 }
 
-InventoryElement * remove_from_location(ItemLocation location, size_t uid)
+InventoryElement * remove_from_location(ItemLocation location, NetworkObject id)
 {
-    InventoryElement * el = get_object_by_id(uid);
+    InventoryElement * el = (InventoryElement*)get_object_by_id(id);
     if (!el)
         return nullptr;
     switch (location.tag)
@@ -60,7 +60,7 @@ InventoryElement * remove_from_location(ItemLocation location, size_t uid)
         }
         case ItemLocation::Tag::Player:
         {
-            Player * p = (Player *)get_object_by_id(location.player.id);
+            Player * p = (Player *)get_object_by_id(NetworkObject(location.player.c_id, location.player.id));
             if (p)
                 p->drop(el);
             if ((int)location.player.id == player->get_id())
@@ -295,11 +295,11 @@ extern "C"
 
     void update_item_location(LocationUpdateData data)
     {
-        size_t id = data.id;
+        NetworkObject id = data.id;
         ItemLocation & old_loc = data.old;
         ItemLocation & new_loc = data.new_;
 
-        printf("update item location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
+        printf("update item location uid=%lx old_tag=%d new_tag=%d\n", id.uid, (int)old_loc.tag, (int)new_loc.tag);
         old_loc.show();
         new_loc.show();
 
@@ -338,7 +338,7 @@ extern "C"
             }
             case ItemLocation::Tag::Player:
             {
-                Player * p = (Player *)get_object_by_id(new_loc.player.id);
+                Player * p = (Player *)get_object_by_id(NetworkObject(new_loc.player.c_id, new_loc.player.id));
                 if (p)
                     p->pickup(el);
                 if ((int)new_loc.player.id == player->get_id())
@@ -386,9 +386,9 @@ extern "C"
         }
     }
 
-    void destroy_object(uintptr_t id, ItemLocation location)
+    void destroy_object(NetworkObject id, ItemLocation location)
     {
-        InventoryElement * el = get_object_by_id(id);
+        InventoryElement * el = (InventoryElement*)get_object_by_id(id);
         if (el)
         {
             InventoryElement * removed = remove_from_location(location, id);
@@ -396,7 +396,7 @@ extern "C"
             {
                 abort();
             }
-            printf("SDL: destroy_object %ld", id);
+            printf("SDL: destroy_object %ld", id.uid);
             deregister_object(el);
             delete el;
         }

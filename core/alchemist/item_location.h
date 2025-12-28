@@ -17,6 +17,7 @@ struct ItemLocation
 
     struct Player_Body
     {
+        Class_id c_id;
         uintptr_t id;
     };
 

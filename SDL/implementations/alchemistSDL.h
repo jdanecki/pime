@@ -2,6 +2,7 @@
 #define ALCHEMIST_SDL_H
 
 #include "../../core/alchemist/elements.h"
+#include "../../core/player.h"
 #include "../networking.h"
 #include "../texture.h"
 #include "../window.h"

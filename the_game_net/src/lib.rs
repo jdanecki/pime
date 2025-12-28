@@ -1,3 +1,4 @@
+use core::NetworkObject;
 use nix::libc::{c_int, FIONREAD};
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -26,8 +27,6 @@ pub struct NetClient {
     not_confirmed_packets: HashMap<u32, Vec<u8>>,
 }
 
-static mut total_sent: usize = 0;
-
 impl NetClient {
     fn send(&mut self, data: &[u8]) {
         let mut buf = Vec::with_capacity(12 + data.len());
@@ -50,9 +49,6 @@ impl NetClient {
         self.not_confirmed_packets
             .insert(self.local_seq_num, data.to_vec());
         self.socket.send(&buf).unwrap();
-        unsafe {
-            total_sent += 1;
-        }
     }
 }
 
@@ -155,30 +151,13 @@ fn get_pending_bytes(socket: &UdpSocket) -> std::io::Result<usize> {
     }
 }
 
-static mut max_pending: usize = 0;
-static mut total_resv: usize = 0;
-static mut prev_resv: usize = 0;
-static mut prev_send: usize = 0;
-
 #[no_mangle]
 pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
     let mut buf = [0; 8096];
     let mut cnt = 0;
     loop {
-        if let Ok(pending) = get_pending_bytes(&client.socket) {
-            unsafe {
-                if pending > max_pending {
-                    println!("Bufor kernela zawiera {} max={}", pending, max_pending);
-                    max_pending = pending;
-                }
-            }
-        }
-
         if let Ok((amt, src)) = client.socket.recv_from(&mut buf) {
             cnt += 1;
-            unsafe {
-                total_resv += 1;
-            }
             let seq = u32::from_le_bytes(buf[0..4].try_into().unwrap());
             let ack = u32::from_le_bytes(buf[4..8].try_into().unwrap());
             let acks = u32::from_le_bytes(buf[8..12].try_into().unwrap());
@@ -288,10 +267,8 @@ pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
                                 i32::from(value[2]),
                                 &mut *(&mut value[0] as *mut u8 as *mut core::chunk_table),
                             );
-                            unsafe {
-                                if core::trace_network > 0 {
-                                    println!("SDL: PACKET_CHUNK_UPDATE OK");
-                                }
+                            if core::trace_network > 0 {
+                                println!("SDL: PACKET_CHUNK_UPDATE OK");
                             }
                         }
                     } else {
@@ -329,8 +306,8 @@ pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
                 },
                 core::PACKET_OBJECT_DESTROY => unsafe {
                     events::destroy_object(
-                        usize::from_le_bytes(value[1..9].try_into().unwrap()),
-                        bincode::deserialize(&value[9..]).expect("bad item location for destroy"),
+                        bincode::deserialize(&value[1..17]).expect("bad id for object destroy"),
+                        bincode::deserialize(&value[17..]).expect("bad item location for destroy"),
                     );
                 },
                 core::PACKET_FAILED_CRAFT => unsafe {
@@ -388,23 +365,30 @@ thread_local! {
 static WORLD: RefCell<World> = panic!("world not created yet");
 }
 
-struct CorePointer(*mut core::InventoryElement);
+struct CorePointer(*mut core::NetworkObject);
 unsafe impl Send for CorePointer {}
 unsafe impl Sync for CorePointer {}
 
-static OBJECTS: RwLock<Option<HashMap<usize, CorePointer>>> = RwLock::new(None);
+static OBJECTS: RwLock<Option<HashMap<NetworkObject, CorePointer>>> = RwLock::new(None);
 
 #[no_mangle]
-pub extern "C" fn get_object_by_id(uid: usize) -> *mut core::InventoryElement {
-    match OBJECTS.read().unwrap().as_ref().unwrap().get(&uid) {
-        Some(obj) => obj.0,
-        None => std::ptr::null_mut(),
+pub extern "C" fn get_object_by_id(id: NetworkObject) -> *mut core::NetworkObject {
+    match id.c_id {
+        core::Class_id_Class_BaseAnimal
+        | core::Class_id_Class_BaseElement
+        | core::Class_id_Class_BasePlant => get_base(id.c_id, id.uid as i32) as *mut NetworkObject,
+        // TODO Replace with num
+        ..13 => match OBJECTS.read().unwrap().as_ref().unwrap().get(&id) {
+            Some(obj) => obj.0,
+            None => std::ptr::null_mut(),
+        },
+        _ => panic!("Invalid class id {}", id.c_id),
     }
 }
 
 #[no_mangle]
-pub extern "C" fn register_object(o: *mut core::InventoryElement) {
-    let uid = unsafe { (*o)._base.uid };
+pub extern "C" fn register_object(o: *mut core::NetworkObject) {
+    let uid = unsafe { *o };
     OBJECTS
         .write()
         .unwrap()
@@ -415,7 +399,7 @@ pub extern "C" fn register_object(o: *mut core::InventoryElement) {
 
 #[no_mangle]
 pub extern "C" fn deregister_object(o: *mut core::InventoryElement) {
-    let uid = unsafe { (*o)._base.uid };
+    let uid = unsafe { (*o)._base };
     OBJECTS.write().unwrap().as_mut().unwrap().remove(&uid);
 }
 

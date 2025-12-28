@@ -27,6 +27,7 @@ impl ParseCallbacks for MacroCallback {
             "Player",
             "Skill",
             "InvList",
+            "NetworkObject",
         ];
         let co_cl = vec![
             "Element",
