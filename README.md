@@ -1,17 +1,56 @@
 # The Game aka pime aka alchemist
 
-## build
+## Build
 
-To build server and client run make
+### All versions
+To build server and client run:
 
-## run
+```
+make
+```
 
-### Server
-In server directory
+### Enet version
 
-    cargo run
+```
+make configure enet
+make enet
+```
 
-### SDL Client
-In SDL directory
+## Run
 
-    ./run_local.sh
+### Enet version
+
+* run server
+
+In server/enet/build run: 
+
+```
+./server_enet
+```
+
+* SDL client
+
+In SDL directory run:
+
+```
+./build/pime_SDL_enet
+```
+
+### Rust version 
+
+* run server
+
+In server directory run: 
+
+```
+cargo run
+```
+
+* SDL Client
+
+In SDL directory run: 
+
+```
+./run_local.sh
+```
+
