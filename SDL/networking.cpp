@@ -354,7 +354,7 @@ extern "C"
         InventoryElement * el = el_from_data(data);
         if (el)
         {
-            register_object(el);
+            register_object(el, el);
             add_object_to_world(el, el->location);
             // switch (el->location.tag)
             // {

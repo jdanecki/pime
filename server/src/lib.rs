@@ -20,7 +20,7 @@ pub static mut OBJECT_UPDATES: Vec<types::ObjectData> = vec![];
 // pub static mut CREATE_ITEMS: Vec<types::ObjectData> = vec![];
 pub static mut CREATE_ITEMS: Vec<*const core::InventoryElement> = vec![];
 
-pub static mut DESTROY_ITEMS: Vec<(usize, core::ItemLocation)> = vec![];
+pub static mut DESTROY_ITEMS: Vec<(core::NetworkObject, core::ItemLocation)> = vec![];
 pub static mut KNOWN_UPDATES: Vec<(i32, core::Class_id, i32)> = vec![];
 pub static mut CHECKED_UPDATES: Vec<(i32, usize)> = vec![];
 
@@ -60,7 +60,7 @@ extern "C" fn update_location(
 }
 
 #[no_mangle]
-extern "C" fn notify_destroy(id: usize, location: core::ItemLocation) {
+extern "C" fn notify_destroy(id: core::NetworkObject, location: core::ItemLocation) {
     unsafe {
         DESTROY_ITEMS.push((id, location));
     }
@@ -549,7 +549,14 @@ fn handle_packet(
                     let loc = (*item).location;
                     add_object_to_world(item, player._base._base.location);
                     player._base.drop(item);
-                    core::update_location((*item).get_uid(), loc, (*item).location);
+                    update_location(
+                        core::NetworkObject {
+                            c_id: (*item).get_cid(),
+                            uid: (*item).get_uid(),
+                        },
+                        loc,
+                        (*item).location,
+                    );
                     //let mut buf = vec![core::PACKET_PLAYER_ACTION_DROP];
                     //buf.extend_from_slice(&id.to_le_bytes());
                     //buf.extend_from_slice(&player_id.to_le_bytes());
@@ -619,7 +626,14 @@ fn handle_packet(
                     let el = player._base.get_item_by_uid(id);
                     println!("SERV: id after CRAFT{:?}", el);
                     if !el.is_null() {
-                        destroy_object(server, (*el).get_uid(), (*el).location);
+                        destroy_object(
+                            server,
+                            core::NetworkObject {
+                                c_id: (*el).get_cid(),
+                                uid: (*el).get_uid(),
+                            },
+                            (*el).location,
+                        );
                         player._base.drop(el);
                         println!("SERV: deleted {}", id);
                     } else {
@@ -629,7 +643,14 @@ fn handle_packet(
                         let id2 = usize::from_le_bytes(ingredients_ids[8..16].try_into().unwrap());
                         let el2 = player._base.get_item_by_uid(id2);
                         if !el2.is_null() {
-                            destroy_object(server, (*el2).get_uid(), (*el2).location);
+                            destroy_object(
+                                server,
+                                core::NetworkObject {
+                                    c_id: (*el2).get_cid(),
+                                    uid: (*el2).get_uid(),
+                                },
+                                (*el2).location,
+                            );
                             player._base.drop(el2);
                         } else {
                             println!("SERV: invalid id2 {}", id2);
@@ -710,7 +731,7 @@ fn send_location_updates(server: &mut Server) {
             println!("SERV:send_location_updates len={}", LOCATION_UPDATES.len());
             for update in LOCATION_UPDATES.iter() {
                 let mut data = vec![core::PACKET_LOCATION_UPDATE];
-                //    println!("SERV: send_location_updates id={}", update.id);
+                // println!("SERV: send_location_updates id={},{}", update.id.c_id, update.id.uid);
                 data.extend_from_slice(&bincode::serialize(update).unwrap()[..]);
                 server.broadcast(&data);
             }
@@ -756,9 +777,11 @@ fn send_destroy_updates(server: &mut Server) {
     }
 }
 
-fn destroy_object(server: &mut Server, id: usize, location: core::ItemLocation) {
+fn destroy_object(server: &mut Server, id: core::NetworkObject, location: core::ItemLocation) {
     let mut buf = vec![core::PACKET_OBJECT_DESTROY];
-    buf.extend_from_slice(&id.to_le_bytes());
+    println!("{id:?}");
+    buf.extend_from_slice(&bincode::serialize(&id).unwrap()[..]);
     buf.extend_from_slice(&bincode::serialize(&location).unwrap()[..]);
+    println!("{} {buf:?}", buf.len());
     server.broadcast(&buf);
 }

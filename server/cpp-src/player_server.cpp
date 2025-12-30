@@ -66,7 +66,7 @@ move_player:
 
     hunger--;
     thirst--;
-    update_location(get_uid(), old, location);
+    update_location(NetworkObject(get_cid(), get_uid()), old, location);
     printf("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
 }
 
@@ -199,7 +199,7 @@ bool PlayerServer::pickup(InventoryElement * item)
     ItemLocation old_location = item->location;
     remove_from_chunks(item);
     Player::pickup(item);
-    update_location(item->get_uid(), old_location, item->location);
+    update_location(NetworkObject(item->get_cid(), get_uid()), old_location, item->location);
     return true;
 }
 

@@ -3971,16 +3971,17 @@ impl SentencesList {
         SentencesList_enable(self, id)
     }
 }
-pub const Skill_type_SK_KAMIENIARSTWO: Skill_type = 0;
-pub const Skill_type_SK_MAGIA: Skill_type = 1;
-pub const Skill_type_SK_RZEMIOSLO: Skill_type = 2;
-pub const Skill_type_SK_WALKA: Skill_type = 3;
-pub const Skill_type_SK_WEDKARSTWO: Skill_type = 4;
-pub const Skill_type_SK_WIAZANIE: Skill_type = 5;
-pub const Skill_type_SK_ZIELARSTWO: Skill_type = 6;
-pub const Skill_type_SK_HODOWLA: Skill_type = 7;
-pub const Skill_type_SK_ZDUNSTWO: Skill_type = 8;
-pub const Skill_type_SK_NUM: Skill_type = 9;
+pub const Skill_type_SK_BRAK: Skill_type = 0;
+pub const Skill_type_SK_KAMIENIARSTWO: Skill_type = 1;
+pub const Skill_type_SK_MAGIA: Skill_type = 2;
+pub const Skill_type_SK_RZEMIOSLO: Skill_type = 3;
+pub const Skill_type_SK_WALKA: Skill_type = 4;
+pub const Skill_type_SK_WEDKARSTWO: Skill_type = 5;
+pub const Skill_type_SK_WIAZANIE: Skill_type = 6;
+pub const Skill_type_SK_ZIELARSTWO: Skill_type = 7;
+pub const Skill_type_SK_HODOWLA: Skill_type = 8;
+pub const Skill_type_SK_ZDUNSTWO: Skill_type = 9;
+pub const Skill_type_SK_NUM: Skill_type = 10;
 pub type Skill_type = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, serde :: Deserialize)]
@@ -4031,11 +4032,11 @@ extern "C" {
 pub struct Clan {
     pub _base: NetworkObject,
     pub id: ClanId,
-    pub skills: [Skill; 9usize],
+    pub skills: [Skill; 10usize],
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Clan"][::std::mem::size_of::<Clan>() - 56usize];
+    ["Size of Clan"][::std::mem::size_of::<Clan>() - 64usize];
     ["Alignment of Clan"][::std::mem::align_of::<Clan>() - 8usize];
     ["Offset of field: Clan::id"][::std::mem::offset_of!(Clan, id) - 16usize];
     ["Offset of field: Clan::skills"][::std::mem::offset_of!(Clan, skills) - 20usize];
@@ -4059,7 +4060,7 @@ pub struct Human_clan {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Human_clan"][::std::mem::size_of::<Human_clan>() - 56usize];
+    ["Size of Human_clan"][::std::mem::size_of::<Human_clan>() - 64usize];
     ["Alignment of Human_clan"][::std::mem::align_of::<Human_clan>() - 8usize];
 };
 extern "C" {
@@ -4081,7 +4082,7 @@ pub struct Dwarf_clan {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Dwarf_clan"][::std::mem::size_of::<Dwarf_clan>() - 56usize];
+    ["Size of Dwarf_clan"][::std::mem::size_of::<Dwarf_clan>() - 64usize];
     ["Alignment of Dwarf_clan"][::std::mem::align_of::<Dwarf_clan>() - 8usize];
 };
 extern "C" {
@@ -4103,7 +4104,7 @@ pub struct Elf_clan {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Elf_clan"][::std::mem::size_of::<Elf_clan>() - 56usize];
+    ["Size of Elf_clan"][::std::mem::size_of::<Elf_clan>() - 64usize];
     ["Alignment of Elf_clan"][::std::mem::align_of::<Elf_clan>() - 8usize];
 };
 extern "C" {
@@ -4125,7 +4126,7 @@ pub struct Niziolek_clan {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Niziolek_clan"][::std::mem::size_of::<Niziolek_clan>() - 56usize];
+    ["Size of Niziolek_clan"][::std::mem::size_of::<Niziolek_clan>() - 64usize];
     ["Alignment of Niziolek_clan"][::std::mem::align_of::<Niziolek_clan>() - 8usize];
 };
 extern "C" {
@@ -4202,14 +4203,14 @@ pub struct Player {
     pub known_elements: ElementsList,
     pub checked_element: usize,
     pub clan: SerializablePointer<Clan>,
-    pub player_skills: [Skill; 9usize],
+    pub player_skills: [Skill; 10usize],
     pub in_conversation: bool,
     pub welcomed: bool,
     pub talking_to: SerializablePointer<Player>,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Player"][::std::mem::size_of::<Player>() - 256usize];
+    ["Size of Player"][::std::mem::size_of::<Player>() - 264usize];
     ["Alignment of Player"][::std::mem::align_of::<Player>() - 8usize];
     ["Offset of field: Player::padding"][::std::mem::offset_of!(Player, padding) - 48usize];
     ["Offset of field: Player::name"][::std::mem::offset_of!(Player, name) - 56usize];
@@ -4228,9 +4229,9 @@ const _: () = {
     ["Offset of field: Player::player_skills"]
         [::std::mem::offset_of!(Player, player_skills) - 192usize];
     ["Offset of field: Player::in_conversation"]
-        [::std::mem::offset_of!(Player, in_conversation) - 228usize];
-    ["Offset of field: Player::welcomed"][::std::mem::offset_of!(Player, welcomed) - 229usize];
-    ["Offset of field: Player::talking_to"][::std::mem::offset_of!(Player, talking_to) - 232usize];
+        [::std::mem::offset_of!(Player, in_conversation) - 232usize];
+    ["Offset of field: Player::welcomed"][::std::mem::offset_of!(Player, welcomed) - 233usize];
+    ["Offset of field: Player::talking_to"][::std::mem::offset_of!(Player, talking_to) - 240usize];
 };
 extern "C" {
     #[link_name = "\u{1}_ZN6Player6pickupEP16InventoryElement"]
@@ -4621,7 +4622,7 @@ pub struct Npc {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Npc"][::std::mem::size_of::<Npc>() - 256usize];
+    ["Size of Npc"][::std::mem::size_of::<Npc>() - 264usize];
     ["Alignment of Npc"][::std::mem::align_of::<Npc>() - 8usize];
 };
 extern "C" {

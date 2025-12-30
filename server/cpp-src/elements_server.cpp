@@ -9,7 +9,7 @@ extern unsigned long get_time_ms();
 
 void destroy(InventoryElement * el)
 {
-    notify_destroy(el->get_uid(), el->location);
+    notify_destroy(NetworkObject(el->get_cid(), el->get_uid()), el->location);
     if (el->location.tag == ItemLocation::Tag::Chunk)
     {
         world_table[el->location.chunk.map_y][el->location.chunk.map_x]->remove_object(el);
@@ -140,7 +140,7 @@ void AnimalServer::move()
     location.chunk.x = _x;
     location.chunk.y = _y;
 
-    update_location(uid, l, location);
+    update_location(NetworkObject(c_id, uid), l, location);
 }
 
 bool AnimalServer::tick()

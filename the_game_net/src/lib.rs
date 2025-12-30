@@ -96,7 +96,7 @@ pub extern "C" fn init(
                     bincode::deserialize::<World>(&buf[9..amt]).expect("failed to create world"),
                 );
                 WORLD.with_borrow(|world| {
-                    //                    println!("{:#?}", world);
+                    println!("WORLD \n\n{:#?}", world);
                 });
                 break;
             };
@@ -306,8 +306,9 @@ pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
                 },
                 core::PACKET_OBJECT_DESTROY => unsafe {
                     events::destroy_object(
-                        bincode::deserialize(&value[1..17]).expect("bad id for object destroy"),
-                        bincode::deserialize(&value[17..]).expect("bad item location for destroy"),
+                        bincode::deserialize(&value[1..13]).expect("bad id for object destroy"),
+                        bincode::deserialize(&value[13..amt])
+                            .expect("bad item location for destroy"),
                     );
                 },
                 core::PACKET_FAILED_CRAFT => unsafe {
@@ -365,36 +366,43 @@ thread_local! {
 static WORLD: RefCell<World> = panic!("world not created yet");
 }
 
-struct CorePointer(*mut core::NetworkObject);
+struct CorePointer(*mut std::ffi::c_void);
 unsafe impl Send for CorePointer {}
 unsafe impl Sync for CorePointer {}
 
 static OBJECTS: RwLock<Option<HashMap<NetworkObject, CorePointer>>> = RwLock::new(None);
 
 #[no_mangle]
-pub extern "C" fn get_object_by_id(id: NetworkObject) -> *mut core::NetworkObject {
-    match id.c_id {
+pub extern "C" fn get_object_by_id(id: NetworkObject) -> *mut std::ffi::c_void {
+    let ptr = match id.c_id {
         core::Class_id_Class_BaseAnimal
         | core::Class_id_Class_BaseElement
-        | core::Class_id_Class_BasePlant => get_base(id.c_id, id.uid as i32) as *mut NetworkObject,
+        | core::Class_id_Class_BasePlant => {
+            get_base(id.c_id, id.uid as i32) as *mut std::ffi::c_void
+        }
         // TODO Replace with num
         ..13 => match OBJECTS.read().unwrap().as_ref().unwrap().get(&id) {
             Some(obj) => obj.0,
             None => std::ptr::null_mut(),
         },
         _ => panic!("Invalid class id {}", id.c_id),
-    }
+    };
+    // if ptr != std::ptr::null_mut() {
+    //     println!("{ptr:?}");
+    //     println!("{:?}\n\n", unsafe { *(ptr as *mut core::BasePlant) });
+    // }
+    ptr
 }
 
 #[no_mangle]
-pub extern "C" fn register_object(o: *mut core::NetworkObject) {
-    let uid = unsafe { *o };
+pub extern "C" fn register_object(id: &core::NetworkObject, o: *mut std::ffi::c_void) {
+    let id = id.clone();
     OBJECTS
         .write()
         .unwrap()
         .as_mut()
         .unwrap()
-        .insert(uid, CorePointer(o));
+        .insert(id, CorePointer(o));
 }
 
 #[no_mangle]
@@ -405,8 +413,10 @@ pub extern "C" fn deregister_object(o: *mut core::InventoryElement) {
 
 #[no_mangle]
 pub extern "C" fn get_base_element(id: i32) -> *mut core::BaseElement {
+    // println!("get base el id {id}");
     WORLD.with_borrow(|world| {
-        Rc::downgrade(&world.terrains[id as usize].clone())
+        // println!("{:?}\n\n", world.terrains[id as usize]);
+        Rc::downgrade(&world.terrains[id as usize])
             .as_ptr()
             .cast_mut()
     })
@@ -414,17 +424,23 @@ pub extern "C" fn get_base_element(id: i32) -> *mut core::BaseElement {
 
 #[no_mangle]
 pub extern "C" fn get_base_plant(id: i32) -> *mut core::BasePlant {
+    // println!("get id {id}");
     WORLD.with_borrow(|world| {
-        Rc::downgrade(&world.plants[id as usize].clone())
+        println!("{:?}", world.plants[id as usize]);
+        let ptr = Rc::downgrade(&world.plants[id as usize])
             .as_ptr()
-            .cast_mut()
+            .cast_mut();
+        println!("{ptr:?}");
+        println!("{:?}", unsafe { *ptr });
+        ptr
     })
 }
 
 #[no_mangle]
 pub extern "C" fn get_base_animal(id: i32) -> *mut core::BaseAnimal {
+    // println!("get base an id {id}");
     WORLD.with_borrow(|world| {
-        Rc::downgrade(&world.animals[id as usize].clone())
+        Rc::downgrade(&world.animals[id as usize])
             .as_ptr()
             .cast_mut()
     })
