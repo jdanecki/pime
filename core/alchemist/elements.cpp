@@ -74,16 +74,15 @@ const char * plant_phase_name[] = {"Seedling", "Growing", "Flowers", "Fruits"};
 const char * class_name[] = {
     "unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Scroll", "Place", "Plant", "Animal", "Player", "Npc", "Clan", "ListElement", "KnownElement", "BaseListElement"};
 
-Base::Base(int index, Class_id c, const char * name) : name(name)
+Base::Base(int index, Class_id c, const char * name) : name(name), NetworkObject(c, index)
 {
-    id = index;
     c_id = c;
     edible.eating_by = 1; // only by animals
 }
 
 void Base::show(bool details)
 {
-    CONSOLE_LOG("Base name=%s class:%s id=%d \n", get_name(), class_name[c_id], id);
+    CONSOLE_LOG("Base name=%s class:%s id=%d \n", get_name(), class_name[c_id], uid);
     if (details)
         edible.show();
 }
@@ -242,7 +241,6 @@ void Animal::init(BaseAnimal * b)
 
 BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(7))
 {
-    id = index;
     carnivorous = rand() % 2;
     swimming = rand() % 2;
     flying = rand() % 2;

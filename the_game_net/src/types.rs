@@ -2,9 +2,9 @@ use crate::core;
 use serde::{Deserialize, Serialize};
 
 #[repr(C)]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct LocationUpdateData {
-    pub id: usize,
+    pub id: core::NetworkObject,
     pub old: core::ItemLocation,
     pub new: core::ItemLocation,
 }
@@ -22,6 +22,7 @@ pub enum ObjectData {
     Scroll { data: core::Scroll },
     Player { data: core::Player },
     Npc { data: core::Npc },
+    Place { data: core::Place },
 }
 
 #[repr(C)]

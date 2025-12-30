@@ -69,7 +69,7 @@ class Player : public InventoryElement
 
     SerializablePointer<Clan> clan;
     Clan* get_clan() {return clan.get();}
-    Skills player_skills;
+    Skill player_skills[SK_NUM];
 
     bool in_conversation;
     bool welcomed;

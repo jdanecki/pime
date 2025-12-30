@@ -2,15 +2,15 @@ use crate::core;
 use serde::{Deserialize, Serialize};
 
 #[repr(C)]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct LocationUpdateData {
-    pub id: usize,
+    pub id: core::NetworkObject,
     pub old: core::ItemLocation,
     pub new: core::ItemLocation,
 }
 
 #[repr(C)]
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 #[allow(dead_code)]
 pub enum ObjectData {
     InvElement { data: core::InventoryElement },
@@ -22,6 +22,7 @@ pub enum ObjectData {
     Scroll { data: core::Scroll },
     Player { data: core::Player },
     Npc { data: core::Npc },
+    Place { data: core::Place },
 }
 
 #[repr(C)]

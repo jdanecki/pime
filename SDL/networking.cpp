@@ -40,18 +40,15 @@ void update_hotbar()
         if (i >= 10)
             break;
         if (le->el.get())
-        {
-            player->hotbar[i] = le->el.get();
-            CONSOLE_LOG("player=%p hotbar[%d] inv=%lx\n", player, i, (le->el.get())->get_uid());
-        }
+            player->hotbar[i] = (InventoryElement*)le->el.get();
         le = le->next;
         i++;
     }
 }
 
-InventoryElement * remove_from_location(ItemLocation location, size_t uid)
+InventoryElement * remove_from_location(ItemLocation location, NetworkObject id)
 {
-    InventoryElement * el = get_object_by_id(uid);
+    InventoryElement * el = (InventoryElement*)get_object_by_id(id);
     if (!el)
         return nullptr;
     switch (location.tag)
@@ -63,7 +60,7 @@ InventoryElement * remove_from_location(ItemLocation location, size_t uid)
         }
         case ItemLocation::Tag::Player:
         {
-            Player * p = (Player *)get_object_by_id(location.player.id);
+            Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, location.player.id));
             if (p)
                 p->drop(el);
             if ((int)location.player.id == player->get_id())
@@ -310,7 +307,7 @@ extern "C"
 
     void update_item_location(LocationUpdateData data)
     {
-        size_t id = data.id;
+        NetworkObject id = data.id;
         ItemLocation & old_loc = data.old;
         ItemLocation & new_loc = data.new_;
 
@@ -327,6 +324,7 @@ extern "C"
             //      old_loc.chunk.x, old_loc.chunk.y,
             //      new_loc.chunk.map_x, new_loc.chunk.map_y,
             //      new_loc.chunk.x, new_loc.chunk.y);
+            send_packet_request_item(client, id.uid);
 
             return;
         }
@@ -354,7 +352,7 @@ extern "C"
             }
             case ItemLocation::Tag::Player:
             {
-                Player * p = (Player *)get_object_by_id(new_loc.player.id);
+                Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, new_loc.player.id));
                 if (p)
                     p->pickup(el);
                 if ((int)new_loc.player.id == player->get_id())
@@ -370,7 +368,7 @@ extern "C"
         InventoryElement * el = el_from_data(data);
         if (el)
         {
-            register_object(el);
+            register_object(el, el);
             add_object_to_world(el, el->location);           
         }
         else
@@ -379,9 +377,9 @@ extern "C"
         }
     }
 
-    void destroy_object(uintptr_t id, ItemLocation location)
+    void destroy_object(NetworkObject id, ItemLocation location)
     {
-        InventoryElement * el = get_object_by_id(id);
+        InventoryElement * el = (InventoryElement*)get_object_by_id(id);
         if (el)
         {
             InventoryElement * removed = remove_from_location(location, id);
@@ -389,7 +387,7 @@ extern "C"
             {
                 abort();
             }
-          //  CONSOLE_LOG("SDL: destroy_object %ld", id);
+           CONSOLE_LOG("SDL: destroy_object %ld", id.uid);
             deregister_object(el);
             delete el;
         }
@@ -400,11 +398,13 @@ extern "C"
 
     void failed_craft()
     {
+        printf("craft FAILED\n");
         print_status(1, "failed craft");
     }
 
     void action_failed()
     {
+        printf("action FAILED\n");
         print_status(1, "action failed");
     }
 #ifndef USE_ENET

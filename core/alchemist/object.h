@@ -2,8 +2,6 @@
 #define OBJECT_H
 
 #include <cstddef>
-#include "serialization.h"
-#include "ncurses-output.h"
 
 enum Class_id
 {

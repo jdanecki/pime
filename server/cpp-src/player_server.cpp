@@ -66,9 +66,8 @@ move_player:
 
     hunger--;
     thirst--;
-    update_location(get_uid(), old, location);
-   // CONSOLE_LOG("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
-    notify_update(this);
+    update_location(NetworkObject(get_cid(), get_uid()), old, location);
+    // printf("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
 }
 
 bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement * object)
@@ -216,18 +215,19 @@ bool PlayerServer::pickup(InventoryElement * item)
     ItemLocation old_location = item->location;
     remove_from_chunks(item);
     Player::pickup(item);
-    update_location(item->get_uid(), old_location, item->location);
+    update_location(NetworkObject(item->get_cid(), item->get_uid()), old_location, item->location);
     return true;
 }
 
 PlayerServer::PlayerServer(size_t uid) : Player(uid, SerializableCString("player"), ItemLocation::center(), 50 + rand() % 100, 50 + rand() % 100, 50 + rand() % 100)
 {
     CONSOLE_LOG("PlayerServer: uid=%ld\n", uid);
-    objects_to_create.add(this);
+    notify_create(this);
 }
 
 PlayerServer * create_player(size_t id)
 {
+    printf("CREATE PLAYER SERVER\n\n");
     return new PlayerServer(id);
 }
 

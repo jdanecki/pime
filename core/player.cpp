@@ -1,6 +1,7 @@
 #include "clan.h"
 #include "tiles.h"
 #include "player.h"
+#include <string.h>
 
 extern void print_status(int i, const char * format, ...);
 
@@ -74,8 +75,7 @@ Player::Player(size_t uid, SerializableCString && name, ItemLocation location, i
     welcomed = false;
 
     checked_element = 0;
-
-    clan.get()->skills->copy_elements(&player_skills);
+    memcpy(player_skills, clan.get()->skills, sizeof(player_skills));
     show(true);
 }
 
@@ -119,7 +119,8 @@ void Player::show(bool details)
         "%s %s clan=%s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan_names[clan.get()->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
     if (details)
     {
-        player_skills.show(true);
+        // FIXME
+        // player_skills.show(true);
         if (get_talking_to())
         {
             CONSOLE_LOG("%s is talking to %s\n", get_name(), get_talking_to()->get_name());

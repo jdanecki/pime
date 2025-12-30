@@ -2,6 +2,9 @@
 #define EL_LIST_H
 
 #include "elements.h"
+//FIXME
+// #include "object.h"
+// #include "serialization-rust.h"
 
 class ListElement
 {
@@ -11,7 +14,7 @@ class ListElement
     Class_id c_id;
 
   public:
-    SerializablePointer<InventoryElement> el;
+    SerializablePointer<NetworkObject> el;
     ListElement *next, *prev;
 
     void add(ListElement * entry);
@@ -30,9 +33,10 @@ class ListElement
     virtual void show(bool details = true);
     virtual bool tick()
     {
-        return el.get()->tick();
+        return ((InventoryElement*)(el.get()))->tick();
     }
     ListElement(InventoryElement * entry);
+    ListElement(NetworkObject* entry);
     ListElement() : c_id(Class_ListElement), el(nullptr), next(nullptr), prev(nullptr)
     {
         enable();
@@ -114,7 +118,7 @@ class BaseListElement : public ListElement
     bool check(void * what)
     {
         int * pid = (int *)what;
-        return (*pid == base->id);
+        return (*pid == base->uid);
     }
     size_t get_size()
     {
@@ -128,20 +132,14 @@ class ElementsListIterator
     ListElement * le;
 
   public:
-    ElementsListIterator(ListElement * le) : le(le) {}
-    bool operator!=(const ElementsListIterator & other) const
-    {
-        return le != other.le;
-    }
-    ElementsListIterator& operator++()
-    {
-        le = le->next;
-        return *this;
-    }
-    InventoryElement * operator*() const
-    {
-        return le->el.get();
-    }
+    ElementsListIterator(ListElement *le);
+    bool operator!=(const ElementsListIterator& other);
+    ElementsListIterator operator++();
+    InventoryElement* operator*();
+
+    ElementsListIterator next();
+    bool equal(const ElementsListIterator& other);
+    InventoryElement* get();
 };
 
 class ElementsListReverseIterator
@@ -161,7 +159,7 @@ class ElementsListReverseIterator
     }
 
     InventoryElement* operator*() const {
-        return le->el.get();
+        return (InventoryElement*)le->el.get();
     }
 };
 
@@ -200,9 +198,9 @@ class ElementsList
     void tick();
     void copy_elements(ElementsList * dst);
     ListElement * get_random();
-
-    ElementsListIterator begin() { return head; }
-    ElementsListIterator end()   { return nullptr; }
+    
+    ElementsListIterator begin() const;
+    ElementsListIterator end() const;
 
     ElementsListReverseIterator rbegin() { return tail; }
     ElementsListReverseIterator rend()   { return nullptr; }

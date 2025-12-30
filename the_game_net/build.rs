@@ -24,6 +24,11 @@ impl ParseCallbacks for MacroCallback {
             "Solid",
             "Property",
             "BaseElement",
+            "Player",
+            "Skill",
+            "InvList",
+            "NetworkObject",
+            "Place",
         ];
         let debug = vec![
             "Element",
@@ -35,6 +40,7 @@ impl ParseCallbacks for MacroCallback {
             "Scroll",
             "Player",
             "Npc",
+            "Place",
         ];
         let copy = vec![
             "BaseElement",
@@ -55,6 +61,9 @@ impl ParseCallbacks for MacroCallback {
         }
         if copy.contains(&info.name) {
             der.append(&mut vec![String::from("Clone, Copy")])
+        }
+        if info.name == "NetworkObject" {
+            der.append(&mut vec![String::from("PartialEq, Eq")])
         }
         // if info.name == "Test" {
         //     vec!["PartialEq".into()]
@@ -88,7 +97,7 @@ fn main() {
         .generate()
         .expect("Unable to generate bindings");
 
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap()).join("core_bindings.rs");
+    let out_path = PathBuf::from("src/core_bindings.rs");
     bindings
         .write_to_file(out_path)
         .expect("Couldn't write bindings!");

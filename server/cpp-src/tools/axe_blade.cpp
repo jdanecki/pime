@@ -3,6 +3,7 @@
 
 AxeBlade::AxeBlade(InventoryElement * from) : IngredientServer(from, ING_AXE_BLADE, Form_solid)
 {
+    printf("AXE constr\n");
 }
 
 IngredientServer * AxeBlade::AxeBlade::createAxeBlade(InventoryElement * from)

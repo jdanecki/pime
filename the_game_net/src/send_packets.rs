@@ -91,3 +91,12 @@ pub extern "C" fn send_packet_request_chunk(client: &mut NetClient, x: i32, y: i
 
     client.send(&buf);
 }
+
+#[no_mangle]
+pub extern "C" fn send_packet_request_item(client: &mut NetClient, id: usize) {
+    let mut buf = vec![core::PACKET_REQUEST_ITEM];
+    buf.extend_from_slice(&id.to_le_bytes());
+    // println!("SDL: send_packet_request_chunk {} {}", x, y);
+
+    client.send(&buf);
+}

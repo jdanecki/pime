@@ -137,7 +137,7 @@ ScrollSDL::ScrollSDL(Scroll data) : Scroll(data)
     {
         case Class_BaseElement:
         {
-            BaseElement * el = get_base_element(b->id);
+            BaseElement * el = get_base_element(b->uid);
             c = el->color;
             break;
         }

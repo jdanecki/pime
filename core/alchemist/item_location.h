@@ -4,6 +4,7 @@
 
 extern unsigned int get_world_pos(unsigned int chunk, unsigned int pos);
 
+/// <div rustbindgen hide></div>
 struct ItemLocation
 {
     enum class Tag
@@ -22,6 +23,7 @@ struct ItemLocation
 
     struct Player_Body
     {
+        // Class_id c_id;
         uintptr_t id;
     };
 

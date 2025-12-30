@@ -6,44 +6,58 @@ const char * clan_names[] = {"Animal", "Human", "Dwarf", "Elf", "Niziolek"};
 
 Clan::Clan(ClanId id):  NetworkObject(Class_Clan), id(id)
 {    
-    skills = new Skills();
 }
 
 Human_clan::Human_clan() : Clan(Clan_Human)
 {    
-    skills->add(SK_RZEMIOSLO);
-    skills->add(SK_WALKA);
-    skills->add(SK_ZIELARSTWO);
-    skills->add(SK_WIAZANIE);
-    skills->add(SK_KAMIENIARSTWO);
-    skills->add(SK_WEDKARSTWO);
-    skills->add(SK_HODOWLA);
-    skills->add(SK_ZDUNSTWO);
+    skills[SK_KAMIENIARSTWO].experience = 3;
+    skills[SK_MAGIA].experience = 3;
+    skills[SK_RZEMIOSLO].experience = 3;
+    skills[SK_WALKA].experience = 3;
+    skills[SK_WEDKARSTWO].experience = 3;
+    skills[SK_WIAZANIE].experience = 3;
+    skills[SK_ZIELARSTWO].experience = 3;
+    skills[SK_HODOWLA].experience = 3;
+    skills[SK_ZDUNSTWO].experience = 3;
 }
 
 Dwarf_clan::Dwarf_clan() : Clan(Clan_Dwarf)
 {
-    skills->add(SK_RZEMIOSLO);
-    skills->add(SK_WALKA);
-    skills->add(SK_KAMIENIARSTWO);
+    skills[SK_KAMIENIARSTWO].experience = 5;
+    skills[SK_MAGIA].experience = 1;
+    skills[SK_RZEMIOSLO].experience = 5;
+    skills[SK_WALKA].experience = 5;
+    skills[SK_WEDKARSTWO].experience = 1;
+    skills[SK_WIAZANIE].experience = 1;
+    skills[SK_ZIELARSTWO].experience = 1;
+    skills[SK_HODOWLA].experience = 1;
+    skills[SK_ZDUNSTWO].experience = 1;
 }
 
 Elf_clan::Elf_clan() : Clan(Clan_Elf)
 {
-
-    skills->add(SK_WALKA);
-    skills->add(SK_MAGIA);
-    skills->add(SK_ZIELARSTWO);
+    skills[SK_KAMIENIARSTWO].experience = 1;
+    skills[SK_MAGIA].experience = 5;
+    skills[SK_RZEMIOSLO].experience = 1;
+    skills[SK_WALKA].experience = 5;
+    skills[SK_WEDKARSTWO].experience = 1;
+    skills[SK_WIAZANIE].experience = 1;
+    skills[SK_ZIELARSTWO].experience = 5;
+    skills[SK_HODOWLA].experience = 5;
+    skills[SK_ZDUNSTWO].experience = 1;
 }
 
 Niziolek_clan::Niziolek_clan() : Clan(Clan_Niziolek)
 {    
-    skills->add(SK_RZEMIOSLO);
-    skills->add(SK_ZIELARSTWO);
-    skills->add(SK_WIAZANIE);
-    skills->add(SK_WEDKARSTWO);
-    skills->add(SK_HODOWLA);
-    skills->add(SK_ZDUNSTWO);
+    skills[SK_KAMIENIARSTWO].experience = 1;
+    skills[SK_MAGIA].experience = 1;
+    skills[SK_RZEMIOSLO].experience = 1;
+    skills[SK_WALKA].experience = 1;
+    skills[SK_WEDKARSTWO].experience = 5;
+    skills[SK_WIAZANIE].experience = 5;
+    skills[SK_ZIELARSTWO].experience = 5;
+    skills[SK_HODOWLA].experience = 1;
+    skills[SK_ZDUNSTWO].experience = 1;
 }
 
 Clan * get_clan_by_id(ClanId id)

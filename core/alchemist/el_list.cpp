@@ -14,6 +14,14 @@ ListElement::ListElement(InventoryElement * entry) : el(entry), c_id(Class_ListE
     enabled = true;
 }
 
+ListElement::ListElement(NetworkObject * entry) : el(entry)
+{
+    next = nullptr;
+    prev = nullptr;
+    enabled = true;
+}
+
+
 void ListElement::add(ListElement * entry)
 {
     next = entry;
@@ -24,7 +32,8 @@ void ListElement::add(ListElement * entry)
 void ListElement::show(bool details)
 {
   //  CONSOLE_LOG("ListElement: %p next=%p prev=%p\n", this, next, prev);
-    el.get()->show(details);
+  // FIXME
+    // el.get()->show(details);
 }
 
 void ElementsList::remove_all()
@@ -36,6 +45,42 @@ void ElementsList::remove_all()
   //      CONSOLE_LOG("removed: head=%p tail=%p elements=%d\n", head, tail, nr_elements);
     }
 }
+
+ElementsListIterator::ElementsListIterator(ListElement* le): le(le) {};
+
+bool ElementsListIterator::operator!=(const ElementsListIterator& other)
+{
+    return le != other.le;
+}
+
+ElementsListIterator ElementsListIterator::operator++()
+{
+    le = le->next;
+    return *this;
+}
+
+InventoryElement* ElementsListIterator::operator*()
+{
+    return (InventoryElement*)le->el.get();
+}
+
+bool ElementsListIterator::equal(const ElementsListIterator& other)
+{
+    return (*this != other);
+}
+
+ElementsListIterator ElementsListIterator::next()
+{
+    return ++*this;
+}
+
+InventoryElement* ElementsListIterator::get()
+{
+    return **this;
+}
+
+ElementsListIterator ElementsList::begin() const {return head;}
+ElementsListIterator ElementsList::end() const {return nullptr;}
 
 ElementsList::ElementsList(const char * n)
 {
@@ -172,7 +217,6 @@ void ElementsList::remove(ListElement * el)
         {
             tail = nullptr;
         }
-      //  CONSOLE_LOG("EL: delete %p from %p %s\n", head, this, name);
         delete head;
         nr_elements--;
         head = tmp;
@@ -192,7 +236,6 @@ void ElementsList::remove(ListElement * el)
             {
                 tail = cur;
             }
-        //    CONSOLE_LOG("EL: delete %p from %p %s\n", tmp, this, name);
             delete tmp;
             nr_elements--;
             return;
@@ -203,28 +246,30 @@ void ElementsList::remove(ListElement * el)
 
 InventoryElement ** InvList::find_by_fun(FindFunc fun, void * arg, int * count)
 {
-    ListElement * cur = head;
-    InventoryElement ** a = (InventoryElement **)calloc(nr_elements, sizeof(InventoryElement *));
-    int c = 0;
-    while (cur)
-    {
-        if (fun(cur->el.get(), arg))
-        {
-            a[c] = cur->el.get();
-            c++;
-        }
-        cur = cur->next;
-    }
-    if (!c)
-    {
-        free(a);
-        return NULL;
-    }
-    else
-    {
-        *count = c;
-        return a;
-    }
+    // ListElement * cur = head;
+    // InventoryElement ** a = (InventoryElement **)calloc(nr_elements, sizeof(InventoryElement *));
+    // int c = 0;
+    // while (cur)
+    // {
+    //     if (fun(cur->el.get(), arg))
+    //     {
+    //         a[c] = cur->el.get();
+    //         c++;
+    //     }
+    //     cur = cur->next;
+    // }
+    // if (!c)
+    // {
+    //     free(a);
+    //     return NULL;
+    // }
+    // else
+    // {
+    //     *count = c;
+    //     return a;
+    // }
+    *count = 0;
+    return nullptr;
 }
 
 ReversedView ElementsList::reversed()
@@ -251,7 +296,9 @@ bool match_class(InventoryElement * el, void * arg)
 
 InventoryElement ** InvList::find_class(Class_id cl, int * count)
 {
-    return find_by_fun(match_class, &cl, count);
+    *count = 0;
+    return nullptr;
+    // return find_by_fun(match_class, &cl, count);
 }
 
 InventoryElement ** InvList::find_id(int id, int * count)
@@ -304,7 +351,8 @@ InventoryElement * InvList::add_front(InventoryElement * el)
 }
 void InvList::remove(InventoryElement * el)
 {
-    assert(head);
+    if (!head)
+        return;
     ListElement * cur = head;
     ListElement * tmp;
     if (head->el.get() == el)

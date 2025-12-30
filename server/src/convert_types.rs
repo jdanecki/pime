@@ -13,6 +13,7 @@ pub fn convert_to_data(el: *const core::InventoryElement) -> ObjectData {
         }
         core::Class_id_Class_Ingredient => {
             let ingredient = unsafe { &*(el as *const core::Ingredient) };
+            println!("{:?}", ingredient._base.location);
             ObjectData::Ingredient { data: *ingredient }
         }
         core::Class_id_Class_Product => {
@@ -28,15 +29,18 @@ pub fn convert_to_data(el: *const core::InventoryElement) -> ObjectData {
             ObjectData::Animal { data: *animal }
         }
         core::Class_id_Class_Player => {
-            println!("PLAYERRRRRRRRRRRRRRRRR");
             let player = unsafe { &*(el as *const core::Player) };
-            println!("{}", size_of::<ObjectData>());
             ObjectData::Player { data: *player }
         }
         core::Class_id_Class_Npc => {
             let npc = unsafe { &*(el as *const core::Npc) };
             println!(" NPC {:?}", unsafe { npc._base._base.get_cid() });
             ObjectData::Npc { data: *npc }
+        }
+        core::Class_id_Class_Place => {
+            let place = unsafe { &*(el as *const core::Place) };
+            println!(" NPC {:?}", unsafe { place._base.get_cid() });
+            ObjectData::Place { data: *place }
         }
         _ => {
             println!("WRONG CLASS ID {}", unsafe { (*el).get_cid() });

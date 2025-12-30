@@ -1,5 +1,6 @@
 #include "tools.h"
 #include "../../../core/world.h"
+#include "../places/places.h"
 
 Hoe::Hoe(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_HOE, Form_solid, 1)
 {
@@ -17,8 +18,6 @@ ProductServer * Hoe::createHoe(InventoryElement * el1, InventoryElement * el2)
     return nullptr;
 }
 
-extern void add_place(chunk * ch, Place_id id, int x, int y);
-
 bool Hoe::use_tile(int map_x, int map_y, int x, int y, Player * pl)
 {
     bool ret=ProductServer::use_tile(map_x, map_y, x, y, pl);
@@ -26,6 +25,6 @@ bool Hoe::use_tile(int map_x, int map_y, int x, int y, Player * pl)
 
     chunk * ch=world_table[map_y][map_x];
     CONSOLE_LOG("tile: %d\n", ch->table[y][x].tile);
-    add_place(ch, PLACE_FIELD, x, y);
+    ch->add_object(create_place(PLACE_FIELD), x, y);
     return true;
 }

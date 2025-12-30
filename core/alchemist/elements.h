@@ -45,11 +45,9 @@ enum Server_action
 
 extern const char * server_action_name[];
 
-class Base
+class Base: public NetworkObject
 {
   public:
-    Class_id c_id;
-    int id;
     Edible edible;
 
     SerializableCString name;
@@ -251,7 +249,7 @@ class Scroll : public InventoryElement
     }
     int get_id() override
     {
-        return get_base()->id;
+        return get_base()->uid;
     }
     void show(bool details) override
     {
@@ -298,7 +296,7 @@ class Element : public InventoryElement
     }
     int get_id() override
     {
-        return get_base()->id;
+        return get_base()->uid;
     }
     Class_id get_base_cid() override
     {
@@ -537,7 +535,7 @@ class Animal : public InventoryElement
     }
     int get_id() override
     {
-        return get_base()->id;
+        return get_base()->uid;
     }
 
     Class_id get_base_cid() override
@@ -636,7 +634,7 @@ class Plant : public InventoryElement
     }
     int get_id() override
     {
-        return get_base()->id;
+        return get_base()->uid;
     }
     Class_id get_base_cid() override
     {
