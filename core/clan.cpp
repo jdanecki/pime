@@ -64,10 +64,10 @@ Clan * get_clan_by_id(ClanId id)
 {
     switch ((int) id)
     {
-        case 0: return new Human_clan();
-        case 1: return new Dwarf_clan();
-        case 2: return new Elf_clan();
-        case 3: return new Niziolek_clan();
+        case 1: return new Human_clan();
+        case 2: return new Dwarf_clan();
+        case 3: return new Elf_clan();
+        case 4: return new Niziolek_clan();
     }
     return nullptr;
 }
