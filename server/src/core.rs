@@ -3,7 +3,10 @@ include!("core_bindings.rs");
 
 include!("../../core/alchemist/item_location.rs");
 
-use serde::{ser::SerializeTuple, Serialize};
+use serde::{
+    ser::{SerializeSeq, SerializeTuple},
+    Serialize,
+};
 use std::{
     ffi::{CStr, CString},
     ptr::addr_of_mut,
@@ -92,14 +95,11 @@ impl serde::Serialize for ElementsList {
         }
         assert!(data.len() == len);
         println!("LIST HAS {len} ELEMENTS");
-        if len > 0 {
-            let mut state = serializer.serialize_tuple(data.len())?;
-            for d in data {
-                state.serialize_element(&d)?;
-            }
-            state.end()
-        } else {
-            usize::serialize(&0, serializer)
+        let mut state = serializer.serialize_seq(Some(data.len() + 1))?;
+        state.serialize_element(&data.len());
+        for d in data {
+            state.serialize_element(&d)?;
         }
+        state.end()
     }
 }

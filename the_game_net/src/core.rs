@@ -163,10 +163,11 @@ impl<'de> serde::Deserialize<'de> for ElementsList {
                         for _ in 0..num {
                             if let Some(o) = seq.next_element()? {
                                 let mut o: NetworkObject = o;
-                                let mut le = ListElement::new1(&mut o as *mut NetworkObject);
-                                a.add(&mut le as *mut ListElement);
+                                let mut le =
+                                    Box::new(ListElement::new1(&mut o as *mut NetworkObject));
+                                a.add(Box::into_raw(le));
                             } else {
-                                panic!("WTF");
+                                panic!("List claims to have more elements than it really has");
                             }
                         }
                         return Ok(a);
@@ -176,7 +177,7 @@ impl<'de> serde::Deserialize<'de> for ElementsList {
             }
         }
 
-        deserializer.deserialize_tuple(6, ElementsListVisitor)
+        deserializer.deserialize_seq(ElementsListVisitor)
     }
 }
 

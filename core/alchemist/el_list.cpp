@@ -210,7 +210,7 @@ void ElementsList::remove(ListElement * el)
             if (head == tail)
                 tail = NULL;
         }
-        free(head);
+        delete head;
         nr_elements--;
         head = tmp;
         return;
@@ -228,7 +228,7 @@ void ElementsList::remove(ListElement * el)
             {
                 tail = cur;
             }
-            free(tmp);
+            delete tmp;
             nr_elements--;
             return;
         }
