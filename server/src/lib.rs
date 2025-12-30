@@ -677,10 +677,10 @@ fn handle_packet(
         } => unsafe {
             println!("SERV: ItemUsedOnTile iid={iid} map_x={map_x} map_y={map_y} x={x} y={y}");
             let item = player._base.get_item_by_uid(iid);
-            if player.plant_with_seed(item, map_x, map_y, x, y) {
-                println!("SERV: planted OK");
+            if player.use_product_on_tile(item as *mut core::Product, map_x, map_y, x, y) {
+                println!("SERV: use product OK");
             } else {
-                println!("SERV: failed to plant");
+                println!("SERV: failed to use product");
             }
         },
         ClientEvent::RequestChunk { x, y } => unsafe {

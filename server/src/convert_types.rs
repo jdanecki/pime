@@ -37,6 +37,11 @@ pub fn convert_to_data(el: *const core::InventoryElement) -> ObjectData {
             println!(" NPC {:?}", unsafe { npc._base._base.get_cid() });
             ObjectData::Npc { data: *npc }
         }
+        core::Class_id_Class_Place => {
+            let place = unsafe { &*(el as *const core::Place) };
+            println!(" NPC {:?}", unsafe { place._base.get_cid() });
+            ObjectData::Place { data: *place }
+        }
         _ => {
             println!("WRONG CLASS ID {}", unsafe { (*el).get_cid() });
             println!("{:?}", el);
