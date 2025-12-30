@@ -165,6 +165,7 @@ impl<'de> serde::Deserialize<'de> for ElementsList {
                                 let mut o: NetworkObject = o;
                                 let mut le =
                                     Box::new(ListElement::new1(&mut o as *mut NetworkObject));
+                                le.el.ptr = std::ptr::null_mut();
                                 a.add(Box::into_raw(le));
                             } else {
                                 panic!("List claims to have more elements than it really has");

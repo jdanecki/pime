@@ -370,19 +370,19 @@ thread_local! {
 static WORLD: RefCell<World> = panic!("world not created yet");
 }
 
-struct CorePointer(*mut std::ffi::c_void);
+struct CorePointer(*mut core::InventoryElement);
 unsafe impl Send for CorePointer {}
 unsafe impl Sync for CorePointer {}
 
 static OBJECTS: RwLock<Option<HashMap<NetworkObject, CorePointer>>> = RwLock::new(None);
 
 #[no_mangle]
-pub extern "C" fn get_object_by_id(id: NetworkObject) -> *mut std::ffi::c_void {
+pub extern "C" fn get_object_by_id(id: NetworkObject) -> *mut core::InventoryElement {
     let ptr = match id.c_id {
         core::Class_id_Class_BaseAnimal
         | core::Class_id_Class_BaseElement
         | core::Class_id_Class_BasePlant => {
-            get_base(id.c_id, id.uid as i32) as *mut std::ffi::c_void
+            get_base(id.c_id, id.uid as i32) as *mut core::InventoryElement
         }
         // TODO Replace with num
         ..14 => match OBJECTS.read().unwrap().as_ref().unwrap().get(&id) {
@@ -406,7 +406,7 @@ pub extern "C" fn register_object(id: &core::NetworkObject, o: *mut std::ffi::c_
         .unwrap()
         .as_mut()
         .unwrap()
-        .insert(id, CorePointer(o));
+        .insert(id, CorePointer(o as *mut core::InventoryElement));
 }
 
 #[no_mangle]

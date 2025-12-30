@@ -64,8 +64,6 @@ move_player:
         add_object_to_world(this, this->location);
     }
 
-    hunger--;
-    thirst--;
     update_location(NetworkObject(get_cid(), get_uid()), old, location);
     // CONSOLE_LOG("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
 }
@@ -142,6 +140,10 @@ bool PlayerServer::server_action_on_object(Server_action a, InventoryElement * o
 bool PlayerServer::use_product_on_tile(Product * prod, int map_x, int map_y, int x, int y)
 {
     ProductServer * prod_serv = dynamic_cast<ProductServer *>(prod);
+    if (!prod_serv)
+    {
+        return false;
+    }
     CONSOLE_LOG("%s: using %s on tile (%d,%d):(%d,%d)\n", get_name(), prod_serv->get_name(), map_x, map_y, x, y);
     return prod_serv->use_tile(map_x, map_y, x, y, this);
 }
@@ -219,7 +221,19 @@ bool PlayerServer::pickup(InventoryElement * item)
     return true;
 }
 
-PlayerServer::PlayerServer(size_t uid) : Player(uid, SerializableCString("player"), ItemLocation::center(), 50 + rand() % 100, 50 + rand() % 100, 50 + rand() % 100)
+bool PlayerServer::tick()
+{
+    if (hunger_delay-- <= 0) 
+    {
+        hunger -= 1;
+        thirst -= 1;
+        hunger_delay = hunger_delay_max;
+        notify_update(this);
+    }
+    return true;
+}
+
+PlayerServer::PlayerServer(size_t uid) : Player(uid, SerializableCString("player"), ItemLocation::center(), 50 + rand() % 100, 50 + rand() % 100, 50 + rand() % 100), hunger_delay(60), hunger_delay_max(600)
 {
     CONSOLE_LOG("PlayerServer: uid=%ld\n", uid);
     notify_create(this);

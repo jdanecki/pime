@@ -131,7 +131,7 @@ class InventoryElement : public NetworkObject
     {
         return class_name[c_id];
     }
-    virtual int get_id()
+    virtual size_t get_id()
     {
         return -1;
     }
@@ -216,9 +216,9 @@ class Place : public InventoryElement
         return buf;
     }
     virtual void show_state() {}
-    int get_id() override
+    size_t get_id() override
     {
-        return (int) id;
+        return (size_t) id;
     }
 };
 
@@ -246,7 +246,7 @@ class Scroll : public InventoryElement
     {
         return get_base()->get_name();
     }
-    int get_id() override
+    size_t get_id() override
     {
         return get_base()->uid;
     }
@@ -293,7 +293,7 @@ class Element : public InventoryElement
     {
         return Form_name[get_form()];
     }
-    int get_id() override
+    size_t get_id() override
     {
         return get_base()->uid;
     }
@@ -407,7 +407,7 @@ class Ingredient : public InventoryElement
         *count = 3;
         return props;
     }
-    int get_id()
+    size_t get_id()
     {
         return id;
     }
@@ -445,7 +445,7 @@ class Product : public InventoryElement
     int actions_count;
 
     Product_id id;
-    int get_id() override
+    size_t get_id() override
     {
         return id;
     }
@@ -532,7 +532,7 @@ class Animal : public InventoryElement
     {
         return base.get();
     }
-    int get_id() override
+    size_t get_id() override
     {
         return get_base()->uid;
     }
@@ -631,7 +631,7 @@ class Plant : public InventoryElement
     {
         return get_base()->get_name();
     }
-    int get_id() override
+    size_t get_id() override
     {
         return get_base()->uid;
     }

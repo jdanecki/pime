@@ -7,7 +7,8 @@ void chunk::add_object(InventoryElement * object, int x, int y)
     //else
     objects.add_front(object);
 
-    if (object->c_id == Class_Plant || object->c_id == Class_Animal)
+    Class_id cid = object->c_id;
+    if (cid == Class_Animal || cid == Class_Plant || cid == Class_Player )
     {
         beings.add(object);
     }

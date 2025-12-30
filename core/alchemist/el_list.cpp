@@ -351,8 +351,9 @@ InventoryElement * InvList::add_front(InventoryElement * el)
 }
 void InvList::remove(InventoryElement * el)
 {
-    if (!head)
-        return;
+    assert(head);
+    // if (!head)
+    //     return;
     ListElement * cur = head;
     ListElement * tmp;
     if (head->el.get() == el)

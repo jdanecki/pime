@@ -4484,7 +4484,7 @@ impl Player {
 }
 extern "C" {
     #[link_name = "\u{1}_ZN6Player6get_idEv"]
-    pub fn Player_get_id(this: *mut ::std::os::raw::c_void) -> ::std::os::raw::c_int;
+    pub fn Player_get_id(this: *mut ::std::os::raw::c_void) -> usize;
 }
 extern "C" {
     #[link_name = "\u{1}_ZN6Player4showEb"]
