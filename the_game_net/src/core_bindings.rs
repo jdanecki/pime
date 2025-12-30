@@ -2950,19 +2950,16 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ItemLocation_Player_Body {
-    pub c_id: Class_id,
     pub id: usize,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
     ["Size of ItemLocation_Player_Body"]
-        [::std::mem::size_of::<ItemLocation_Player_Body>() - 16usize];
+        [::std::mem::size_of::<ItemLocation_Player_Body>() - 8usize];
     ["Alignment of ItemLocation_Player_Body"]
         [::std::mem::align_of::<ItemLocation_Player_Body>() - 8usize];
-    ["Offset of field: ItemLocation_Player_Body::c_id"]
-        [::std::mem::offset_of!(ItemLocation_Player_Body, c_id) - 0usize];
     ["Offset of field: ItemLocation_Player_Body::id"]
-        [::std::mem::offset_of!(ItemLocation_Player_Body, id) - 8usize];
+        [::std::mem::offset_of!(ItemLocation_Player_Body, id) - 0usize];
 };
 #[repr(C)]
 #[derive(Copy, Clone)]

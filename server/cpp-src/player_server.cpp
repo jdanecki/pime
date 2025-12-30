@@ -199,7 +199,7 @@ bool PlayerServer::pickup(InventoryElement * item)
     ItemLocation old_location = item->location;
     remove_from_chunks(item);
     Player::pickup(item);
-    update_location(NetworkObject(item->get_cid(), get_uid()), old_location, item->location);
+    update_location(NetworkObject(item->get_cid(), item->get_uid()), old_location, item->location);
     return true;
 }
 
@@ -211,6 +211,7 @@ PlayerServer::PlayerServer(size_t uid) : Player(uid, SerializableCString("player
 
 PlayerServer * create_player(size_t id)
 {
+    printf("CREATE PLAYER SERVER\n\n");
     return new PlayerServer(id);
 }
 

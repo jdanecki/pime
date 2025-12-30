@@ -26,6 +26,7 @@ void chunk::add_object(InventoryElement * object)
 {
     int x = rand() % CHUNK_SIZE;
     int y = rand() % CHUNK_SIZE;
+    printf("class %d, %d %d, %ld\n", object->get_cid(), x, y, object->get_uid());
     add_object(object, x, y);
 }
 
@@ -42,6 +43,7 @@ InventoryElement * chunk::find_by_id(size_t id)
         if (el->uid == id)
             return el;
     }
+    printf("FAILED\n");
     return nullptr;
 }
 

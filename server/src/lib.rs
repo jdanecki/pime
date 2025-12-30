@@ -709,11 +709,11 @@ fn send_game_updates(server: &mut Server) {
         if OBJECT_UPDATES.len() > 0 {
             let mut data = vec![core::PACKET_OBJECT_UPDATE];
             let obj_data = &bincode::serialize(&OBJECT_UPDATES[..]).unwrap()[..];
-            println!(
-                "sending {} updates size {}",
-                OBJECT_UPDATES.len(),
-                obj_data.len()
-            );
+            // println!(
+            //     "sending {} updates size {}",
+            //     OBJECT_UPDATES.len(),
+            //     obj_data.len()
+            // );
             data.extend_from_slice(obj_data);
             server.broadcast(&data);
             OBJECT_UPDATES.clear();
@@ -728,10 +728,13 @@ fn send_game_updates(server: &mut Server) {
 fn send_location_updates(server: &mut Server) {
     unsafe {
         if LOCATION_UPDATES.len() > 0 {
-            println!("SERV:send_location_updates len={}", LOCATION_UPDATES.len());
+            // println!("SERV:send_location_updates len={}", LOCATION_UPDATES.len());
             for update in LOCATION_UPDATES.iter() {
                 let mut data = vec![core::PACKET_LOCATION_UPDATE];
-                // println!("SERV: send_location_updates id={},{}", update.id.c_id, update.id.uid);
+                println!(
+                    "SERV: send_location_updates id={:?},",
+                    update // update.id.c_id, update.id.uid
+                );
                 data.extend_from_slice(&bincode::serialize(update).unwrap()[..]);
                 server.broadcast(&data);
             }

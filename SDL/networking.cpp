@@ -60,7 +60,7 @@ InventoryElement * remove_from_location(ItemLocation location, NetworkObject id)
         }
         case ItemLocation::Tag::Player:
         {
-            Player * p = (Player *)get_object_by_id(NetworkObject(location.player.c_id, location.player.id));
+            Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, location.player.id));
             if (p)
                 p->drop(el);
             if ((int)location.player.id == player->get_id())
@@ -299,9 +299,9 @@ extern "C"
         ItemLocation & old_loc = data.old;
         ItemLocation & new_loc = data.new_;
 
-        printf("update item location uid=%lx old_tag=%d new_tag=%d\n", id.uid, (int)old_loc.tag, (int)new_loc.tag);
-        old_loc.show();
-        new_loc.show();
+        // printf("update item location uid=%lx old_tag=%d new_tag=%d\n", id.uid, (int)old_loc.tag, (int)new_loc.tag);
+        // old_loc.show();
+        // new_loc.show();
 
         InventoryElement * el = remove_from_location(old_loc, id);
         if (!el)
@@ -338,7 +338,7 @@ extern "C"
             }
             case ItemLocation::Tag::Player:
             {
-                Player * p = (Player *)get_object_by_id(NetworkObject(new_loc.player.c_id, new_loc.player.id));
+                Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, new_loc.player.id));
                 if (p)
                     p->pickup(el);
                 if ((int)new_loc.player.id == player->get_id())
@@ -407,11 +407,13 @@ extern "C"
 
     void failed_craft()
     {
+        printf("craft FAILED\n");
         print_status(1, "failed craft");
     }
 
     void action_failed()
     {
+        printf("action FAILED\n");
         print_status(1, "action failed");
     }
 #ifndef USE_ENET
