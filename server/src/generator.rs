@@ -37,61 +37,6 @@ pub fn show_world() {
     });
 }
 
-#[no_mangle]
-pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
-    WORLD.with_borrow(|world| {
-        let region = world
-            .regions
-            .iter()
-            .min_by_key(|r| {
-                r.coords.distance_squared(&Coords {
-                    x: map_x as i32,
-                    y: map_y as i32,
-                })
-            })
-            .unwrap();
-        unsafe {
-            println!("SERV: load_chunk map_x={} map_y={}", map_x, map_y);
-            //            println!("SERV: load_chunk map_x={} map_y={}  {:#?}", map_x, map_y, region);
-            let mut chunk = Box::new(core::chunk::new(map_x, map_y));
-            for y in 0..core::CHUNK_SIZE as usize {
-                for x in 0..core::CHUNK_SIZE as usize {
-                    chunk.table[y][x] = core::tile {
-                        tile: region.terrain_type.get_id() as i32,
-                    };
-                    //DEBUG stuff
-                    //chunk.table[y][x] = core::tile { tile: ((x + y)  % 10) as i32};
-                }
-            }
-            //println!("{:?}", region.rocks_types);
-            for (rock, num) in region.rocks_types.iter() {
-                chunk.add_object1(core::create_element(
-                    rock.get_base() as *const core::BaseElement as *mut core::BaseElement
-                ) as *mut core::InventoryElement);
-            }
-
-            chunk.add_object1(core::create_npc() as *mut core::InventoryElement);
-
-            for (plant, num) in region.active_plants.iter() {
-                chunk.add_object1(core::create_plant(
-                    plant.get_base() as *const core::BasePlant as *mut core::BasePlant
-                ) as *mut core::InventoryElement);
-                chunk.add_object1(
-                    core::create_scroll(plant.get_base() as *const core::BasePlant
-                        as *mut core::BasePlant
-                        as *mut core::Base) as *mut core::InventoryElement,
-                );
-            }
-            // for (animal, num) in region.active_animals.iter() {
-            //     chunk.add_object1(core::create_animal(
-            //         animal.get_base() as *const core::BaseAnimal as *mut core::BaseAnimal
-            //     ) as *mut core::InventoryElement);
-            // }
-            core::world_table[map_y as usize][map_x as usize] = Box::into_raw(chunk);
-        }
-    });
-}
-
 // #[no_mangle]
 // pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
 //     WORLD.with_borrow(|world| {
@@ -120,65 +65,120 @@ pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
 //             }
 //             //println!("{:?}", region.rocks_types);
 //             for (rock, num) in region.rocks_types.iter() {
-//                 // TODO remove +1 for each object
-//                 let prob = num * 3.0 + 1.0;
-//                 //                println!("element {prob} {:?}", rock);
-//                 do_times(prob, || {
-//                     chunk.add_object1(core::create_element(rock.get_base()
-//                         as *const core::BaseElement
-//                         as *mut core::BaseElement)
-//                         as *mut core::InventoryElement);
-//                 });
-//                 let prob_scroll = 2.0;
-//                 do_times(prob, || {
-//                     chunk.add_object1(core::create_scroll(rock.get_base()
-//                         as *const core::BaseElement
-//                         as *mut core::BaseElement
-//                         as *mut core::Base)
-//                         as *mut core::InventoryElement);
-//                 });
+//                 chunk.add_object1(core::create_element(
+//                     rock.get_base() as *const core::BaseElement as *mut core::BaseElement
+//                 ) as *mut core::InventoryElement);
 //             }
 
 //             chunk.add_object1(core::create_npc() as *mut core::InventoryElement);
 
 //             for (plant, num) in region.active_plants.iter() {
-//                 let prob = num / region.size as f32 + 1.0;
-//                 //println!("plant {prob}");
-//                 do_times(prob, || {
-//                     chunk.add_object1(core::create_plant(
-//                         plant.get_base() as *const core::BasePlant as *mut core::BasePlant
-//                     ) as *mut core::InventoryElement);
-//                 });
-//                 let prob_scroll = 2.0;
-//                 do_times(prob_scroll, || {
-//                     chunk.add_object1(core::create_scroll(
-//                         plant.get_base() as *const core::BasePlant as *mut core::BasePlant
-//                             as *mut core::Base,
-//                     ) as *mut core::InventoryElement);
-//                 });
+//                 chunk.add_object1(core::create_plant(
+//                     plant.get_base() as *const core::BasePlant as *mut core::BasePlant
+//                 ) as *mut core::InventoryElement);
+//                 chunk.add_object1(
+//                     core::create_scroll(plant.get_base() as *const core::BasePlant
+//                         as *mut core::BasePlant
+//                         as *mut core::Base) as *mut core::InventoryElement,
+//                 );
 //             }
 //             for (animal, num) in region.active_animals.iter() {
-//                 let prob = num / region.size as f32 + 1.0;
-//                 //println!("animal {prob}");
-//                 do_times(prob, || {
-//                     chunk.add_object1(core::create_animal(animal.get_base()
-//                         as *const core::BaseAnimal
-//                         as *mut core::BaseAnimal)
-//                         as *mut core::InventoryElement);
-//                 });
-//                 let prob_scroll = 2.0;
-//                 do_times(prob, || {
-//                     chunk.add_object1(core::create_scroll(animal.get_base()
-//                         as *const core::BaseAnimal
-//                         as *mut core::BaseAnimal
-//                         as *mut core::Base)
-//                         as *mut core::InventoryElement);
-//                 });
+//                 chunk.add_object1(core::create_animal(
+//                     animal.get_base() as *const core::BaseAnimal as *mut core::BaseAnimal
+//                 ) as *mut core::InventoryElement);
 //             }
 //             core::world_table[map_y as usize][map_x as usize] = Box::into_raw(chunk);
 //         }
 //     });
 // }
+
+#[no_mangle]
+pub extern "C" fn load_chunk(map_x: i32, map_y: i32) {
+    WORLD.with_borrow(|world| {
+        let region = world
+            .regions
+            .iter()
+            .min_by_key(|r| {
+                r.coords.distance_squared(&Coords {
+                    x: map_x as i32,
+                    y: map_y as i32,
+                })
+            })
+            .unwrap();
+        unsafe {
+            println!("SERV: load_chunk map_x={} map_y={}", map_x, map_y);
+            //            println!("SERV: load_chunk map_x={} map_y={}  {:#?}", map_x, map_y, region);
+            let mut chunk = Box::new(core::chunk::new(map_x, map_y));
+            for y in 0..core::CHUNK_SIZE as usize {
+                for x in 0..core::CHUNK_SIZE as usize {
+                    chunk.table[y][x] = core::tile {
+                        tile: region.terrain_type.get_id() as i32,
+                    };
+                    //DEBUG stuff
+                    //chunk.table[y][x] = core::tile { tile: ((x + y)  % 10) as i32};
+                }
+            }
+            //println!("{:?}", region.rocks_types);
+            for (rock, num) in region.rocks_types.iter() {
+                // TODO remove +1 for each object
+                let prob = num * 3.0 + 1.0;
+                //                println!("element {prob} {:?}", rock);
+                do_times(prob, || {
+                    chunk.add_object1(core::create_element(rock.get_base()
+                        as *const core::BaseElement
+                        as *mut core::BaseElement)
+                        as *mut core::InventoryElement);
+                });
+                let prob_scroll = 2.0;
+                do_times(prob, || {
+                    chunk.add_object1(core::create_scroll(rock.get_base()
+                        as *const core::BaseElement
+                        as *mut core::BaseElement
+                        as *mut core::Base)
+                        as *mut core::InventoryElement);
+                });
+            }
+
+            chunk.add_object1(core::create_npc() as *mut core::InventoryElement);
+
+            for (plant, num) in region.active_plants.iter() {
+                let prob = num / region.size as f32 + 1.0;
+                //println!("plant {prob}");
+                do_times(prob, || {
+                    chunk.add_object1(core::create_plant(
+                        plant.get_base() as *const core::BasePlant as *mut core::BasePlant
+                    ) as *mut core::InventoryElement);
+                });
+                let prob_scroll = 2.0;
+                do_times(prob_scroll, || {
+                    chunk.add_object1(core::create_scroll(
+                        plant.get_base() as *const core::BasePlant as *mut core::BasePlant
+                            as *mut core::Base,
+                    ) as *mut core::InventoryElement);
+                });
+            }
+            for (animal, num) in region.active_animals.iter() {
+                let prob = num / region.size as f32 + 1.0;
+                //println!("animal {prob}");
+                do_times(prob, || {
+                    chunk.add_object1(core::create_animal(animal.get_base()
+                        as *const core::BaseAnimal
+                        as *mut core::BaseAnimal)
+                        as *mut core::InventoryElement);
+                });
+                let prob_scroll = 2.0;
+                do_times(prob, || {
+                    chunk.add_object1(core::create_scroll(animal.get_base()
+                        as *const core::BaseAnimal
+                        as *mut core::BaseAnimal
+                        as *mut core::Base)
+                        as *mut core::InventoryElement);
+                });
+            }
+            core::world_table[map_y as usize][map_x as usize] = Box::into_raw(chunk);
+        }
+    });
+}
 
 fn do_times<F>(prob: f32, mut f: F)
 where

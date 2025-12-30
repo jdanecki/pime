@@ -119,6 +119,9 @@ pub enum ClientEvent<'a> {
         x: i32,
         y: i32,
     },
+    RequestItem {
+        id: usize,
+    },
     Whatever,
 }
 
@@ -232,6 +235,9 @@ impl<'a> From<&'a [u8]> for ClientEvent<'a> {
             },
             core::PACKET_PLAYER_UPDATE => ClientEvent::Whatever,
             core::PACKET_KEEP_ALIVE => ClientEvent::Whatever,
+            core::PACKET_REQUEST_ITEM => ClientEvent::RequestItem {
+                id: usize::from_le_bytes(value[1..9].try_into().unwrap()),
+            },
             _ => panic!("invalid event {:?}", value),
         }
     }
@@ -686,8 +692,23 @@ fn handle_packet(
                 }
             }
         },
+        ClientEvent::RequestItem { id } => {
+            let loc = &player._base._base.location;
+            unsafe {
+                let el = find_in_world(
+                    loc as *const core::ItemLocation as *mut core::ItemLocation,
+                    id,
+                );
+                if el != std::ptr::null_mut() {
+                    let obj = vec![convert_to_data(el)];
+                    let mut data = vec![core::PACKET_OBJECT_CREATE];
+                    data.extend_from_slice(&bincode::serialize(&obj).unwrap());
+                    server.send_to_reliable(&data, peer);
+                }
+            }
+        } // println!("player {} alive", player._base.id) },
         //FIXME change id to get_id()
-        ClientEvent::Whatever => {} // println!("player {} alive", player._base.id) },
+        ClientEvent::Whatever => {}
     }
 }
 
@@ -731,10 +752,10 @@ fn send_location_updates(server: &mut Server) {
             // println!("SERV:send_location_updates len={}", LOCATION_UPDATES.len());
             for update in LOCATION_UPDATES.iter() {
                 let mut data = vec![core::PACKET_LOCATION_UPDATE];
-                println!(
-                    "SERV: send_location_updates id={:?},",
-                    update // update.id.c_id, update.id.uid
-                );
+                // println!(
+                //     "SERV: send_location_updates id={:?},",
+                //     update // update.id.c_id, update.id.uid
+                // );
                 data.extend_from_slice(&bincode::serialize(update).unwrap()[..]);
                 server.broadcast(&data);
             }

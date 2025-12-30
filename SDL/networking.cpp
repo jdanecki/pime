@@ -312,6 +312,7 @@ extern "C"
             //     old_loc.chunk.x, old_loc.chunk.y,
             //     new_loc.chunk.map_x, new_loc.chunk.map_y,
             //     new_loc.chunk.x, new_loc.chunk.y);
+            send_packet_request_item(client, id.uid);
 
             return;
         }

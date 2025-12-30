@@ -541,7 +541,8 @@ pub const PACKET_ACTION_FAILED: PacketType = 20;
 pub const PACKET_KNOWLEDGE_UPDATE: PacketType = 21;
 pub const PACKET_CHECKED_UPDATE: PacketType = 22;
 pub const PACKET_ELEMENTS_LIST: PacketType = 23;
-pub const PACKET_COUNT: PacketType = 24;
+pub const PACKET_REQUEST_ITEM: PacketType = 24;
+pub const PACKET_COUNT: PacketType = 25;
 extern "C" {
     pub static mut packet_type_names: [*const ::std::os::raw::c_char; 0usize];
 }

@@ -426,12 +426,9 @@ pub extern "C" fn get_base_element(id: i32) -> *mut core::BaseElement {
 pub extern "C" fn get_base_plant(id: i32) -> *mut core::BasePlant {
     // println!("get id {id}");
     WORLD.with_borrow(|world| {
-        println!("{:?}", world.plants[id as usize]);
         let ptr = Rc::downgrade(&world.plants[id as usize])
             .as_ptr()
             .cast_mut();
-        println!("{ptr:?}");
-        println!("{:?}", unsafe { *ptr });
         ptr
     })
 }

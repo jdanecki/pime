@@ -43,7 +43,6 @@ InventoryElement * chunk::find_by_id(size_t id)
         if (el->uid == id)
             return el;
     }
-    printf("FAILED\n");
     return nullptr;
 }
 
