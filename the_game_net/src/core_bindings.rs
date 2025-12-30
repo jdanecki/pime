@@ -4113,7 +4113,7 @@ extern "C" {
     pub static mut clan_names: [*const ::std::os::raw::c_char; 0usize];
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, serde :: Deserialize)]
 pub struct Clan {
     pub _base: NetworkObject,
     pub id: ClanId,

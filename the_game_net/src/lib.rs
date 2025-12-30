@@ -114,8 +114,12 @@ pub extern "C" fn init(
 
     client.socket.set_nonblocking(true).unwrap();
 
-    Box::into_raw(client)
+    let ptr = Box::into_raw(client);
+    unsafe { CLIENT = ptr }
+    ptr
 }
+
+static mut CLIENT: *mut NetClient = std::ptr::null_mut();
 
 fn init_internal(server_ip: &str) -> Result<NetClient, Box<dyn Error>> {
     let socket = UdpSocket::bind("0.0.0.0:0")?;
@@ -387,10 +391,10 @@ pub extern "C" fn get_object_by_id(id: NetworkObject) -> *mut std::ffi::c_void {
         },
         _ => panic!("Invalid class id {}", id.c_id),
     };
-    // if ptr != std::ptr::null_mut() {
-    //     println!("{ptr:?}");
-    //     println!("{:?}\n\n", unsafe { *(ptr as *mut core::BasePlant) });
-    // }
+    if ptr == std::ptr::null_mut() {
+        println!("REQUEST {:?}", id);
+        send_packets::send_packet_request_item(unsafe { &mut *CLIENT }, id.uid);
+    }
     ptr
 }
 

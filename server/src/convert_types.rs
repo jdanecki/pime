@@ -40,6 +40,10 @@ pub fn convert_to_data(el: *const core::InventoryElement) -> ObjectData {
             let place = unsafe { &*(el as *const core::Place) };
             ObjectData::Place { data: *place }
         }
+        core::Class_id_Class_Clan => {
+            let clan = unsafe { &*((el as usize + 8) as *const core::Clan) };
+            ObjectData::Clan { data: *clan }
+        }
         _ => {
             println!("WRONG CLASS ID {}", unsafe { (*el)._base.get_cid() });
             println!("{:?}", el);

@@ -72,10 +72,10 @@ InventoryElement * remove_from_location(ItemLocation location, NetworkObject id)
     return el;
 }
 
-InventoryElement * el_from_data(const ObjectData * data)
+NetworkObject * el_from_data(const ObjectData * data)
 {
    // CONSOLE_LOG("CREATING OBJECT for tag: %d\n", (int)data->tag);
-    InventoryElement * el = nullptr;
+    NetworkObject * el = nullptr;
     switch (data->tag)
     {
         case ObjectData::Tag::InvElement:
@@ -131,6 +131,9 @@ InventoryElement * el_from_data(const ObjectData * data)
 #endif
             break;
 
+        case ObjectData::Tag::Clan:
+            el = new Clan(data->clan.data);
+            break;
         default:
             CONSOLE_LOG("UNKNOWN Tag: %d\n", (int)data->tag);
             abort();
@@ -365,11 +368,19 @@ extern "C"
 
     void create_object(const ObjectData * data)
     {
-        InventoryElement * el = el_from_data(data);
-        if (el)
+        NetworkObject * object = el_from_data(data);
+        if (object)
         {
-            register_object(el, el);
-            add_object_to_world(el, el->location);           
+            if (object->c_id != Class_Clan) 
+            {
+                InventoryElement* el = (InventoryElement*)object;
+                register_object(el, el);
+                add_object_to_world(el, el->location);
+            }
+            else
+            {
+                register_object(object, object);
+            }
         }
         else
         {

@@ -23,6 +23,7 @@ pub enum ObjectData {
     Player { data: core::Player },
     Npc { data: core::Npc },
     Place { data: core::Place },
+    Clan { data: core::Clan },
 }
 
 #[repr(C)]

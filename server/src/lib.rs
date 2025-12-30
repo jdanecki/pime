@@ -695,10 +695,15 @@ fn handle_packet(
         ClientEvent::RequestItem { id } => {
             let loc = &player._base._base.location;
             unsafe {
-                let el = find_in_world(
+                let mut el = find_in_world(
                     loc as *const core::ItemLocation as *mut core::ItemLocation,
                     id,
                 );
+                if el == std::ptr::null_mut() {
+                    if player._base.clan.id.uid == id {
+                        el = (player._base.clan.ptr as usize - 8) as *mut core::InventoryElement;
+                    }
+                }
                 if el != std::ptr::null_mut() {
                     let obj = vec![convert_to_data(el)];
                     let mut data = vec![core::PACKET_OBJECT_CREATE];

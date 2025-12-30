@@ -29,6 +29,7 @@ impl ParseCallbacks for MacroCallback {
             "InvList",
             "NetworkObject",
             "Place",
+            "Clan",
         ];
         let debug = vec![
             "Element",
