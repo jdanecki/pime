@@ -6,10 +6,13 @@
 #include <SDL2/SDL_image.h>
 #include <dirent.h>
 #include <stdio.h>
+#include <assert.h>
 
 struct player_textures Player_textures;
 
 int tiles_textures_count;
+int base_plants_count;
+int base_animals_count;
 SDL_Texture ** tiles_textures;
 
 SDL_Texture * ing_textures[ING_COUNT];
@@ -18,7 +21,7 @@ SDL_Surface * scroll_surface;
 SDL_Texture * animal_textures[BASE_ANIMALS];
 SDL_Texture * plant_textures[BASE_PLANTS];
 
-SDL_Texture * object_textures[TEXTURE_wall_max];
+SDL_Texture * places_textures[PLACES_COUNT];
 
 SDL_Texture * load_texture(const char * texture_name)
 {
@@ -26,7 +29,7 @@ SDL_Texture * load_texture(const char * texture_name)
     SDL_Surface * loadedSurface = IMG_Load(texture_name);
     if (loadedSurface == NULL)
     {
-        printf("Unable to load texture: %s error: %s\n", texture_name, SDL_GetError());
+        CONSOLE_LOG("Unable to load texture: %s error: %s\n", texture_name, SDL_GetError());
         exit(0);
     }
     else
@@ -35,7 +38,7 @@ SDL_Texture * load_texture(const char * texture_name)
 
         if (texture == NULL)
         {
-            printf("Unable to create texture: %s error: %s\n", texture_name, SDL_GetError());
+            CONSOLE_LOG("Unable to create texture: %s error: %s\n", texture_name, SDL_GetError());
             exit(0);
         }
         SDL_FreeSurface(loadedSurface);
@@ -50,13 +53,13 @@ void add_items_texture(int id, const char * file)
 
 void add_ing_texture(int id, const char * file)
 {
-    printf("adding ing texture: %s\n", file);
+    CONSOLE_LOG("adding ing texture: %s\n", file);
     ing_textures[id] = load_texture(file);
 }
 
 void add_prod_texture(int id, const char * file)
 {
-    printf("adding product texture: %s\n", file);
+    CONSOLE_LOG("adding product texture: %s\n", file);
     prod_textures[id] = load_texture(file);
 }
 
@@ -85,7 +88,7 @@ int add_textures_from_dir(SDL_Texture ** to, int i, const char * dir_path)
                 continue;
             }
             sprintf(path, "%s/%s", dir_path, namelist[n]->d_name);
-            printf("adding texture: %s\n", path);
+            CONSOLE_LOG("adding texture: %s\n", path);
             to[i++] = load_texture(path);
             free(namelist[n]);
         }
@@ -99,7 +102,7 @@ void load_textures()
 {
     Player_textures.npc = IMG_Load("textures/player.png");
     // SDL_PIXELFORMAT_ABGR8888 for surface
-    // printf("surface format=%x %s rgba=%x argb=%x\n", surface->format->format, SDL_GetPixelFormatName(surface->format->format), SDL_PIXELFORMAT_RGBA8888, SDL_PIXELFORMAT_ARGB8888);
+    // CONSOLE_LOG("surface format=%x %s rgba=%x argb=%x\n", surface->format->format, SDL_GetPixelFormatName(surface->format->format), SDL_PIXELFORMAT_RGBA8888, SDL_PIXELFORMAT_ARGB8888);
     /*
     bajt 0: R
     bajt 1: G
@@ -115,10 +118,9 @@ Field:     A          B          G        R
 
     int i = 0;
 
-    // FIXME check number of tiles textures
-    tiles_textures = new SDL_Texture *[20];
-
+    tiles_textures = new SDL_Texture *[TILE_TEXTURES];
     tiles_textures_count = add_textures_from_dir(tiles_textures, i, "textures/game_tiles");
+    assert(tiles_textures_count == TILE_TEXTURES);
 
     add_ing_texture(ING_AXE_BLADE, "textures/items/ingredients/axe_blade.png");
     add_ing_texture(ING_AXE_HANDLE, "textures/items/ingredients/axe_handle.png");
@@ -126,37 +128,39 @@ Field:     A          B          G        R
     add_ing_texture(ING_KNIFE_HANDLE, "textures/items/ingredients/knife_handle.png");
     add_ing_texture(ING_PICKAXE_BLADE, "textures/items/ingredients/pickaxe_blade.png");
     add_ing_texture(ING_PICKAXE_HANDLE, "textures/items/ingredients/pickaxe_handle.png");
+    add_ing_texture(ING_HOE_BLADE, "textures/items/ingredients/hoe_blade.png");
+    add_ing_texture(ING_HOE_HANDLE, "textures/items/ingredients/hoe_handle.png");
     add_ing_texture(ING_WALL, "textures/items/ingredients/wall.png");
     add_ing_texture(ING_MEAT, "textures/items/ingredients/meat.png");
     add_ing_texture(ING_LOG, "textures/items/ingredients/log.png");
     add_ing_texture(ING_STICK, "textures/items/ingredients/stick.png");
     add_ing_texture(ING_TINDER, "textures/items/ingredients/tinder.png");
     add_ing_texture(ING_FRUIT, "textures/items/ingredients/fruit.png");
+    add_ing_texture(ING_SEED, "textures/items/ingredients/seed.png");
 
     add_prod_texture(PROD_AXE, "textures/items/products/axe.png");
     add_prod_texture(PROD_KNIFE, "textures/items/products/knife.png");
     add_prod_texture(PROD_PICKAXE, "textures/items/products/pickaxe.png");
+    add_prod_texture(PROD_HOE, "textures/items/products/hoe.png");
     add_prod_texture(PROD_FIRE, "textures/items/products/fire.png");
     add_prod_texture(PROD_ROASTED_MEAT, "textures/items/products/roasted_meat.png");
     add_prod_texture(PROD_FRUIT_SALAD, "textures/items/products/fruit_salad.png");
+    add_prod_texture(PROD_SEEDLING, "textures/items/products/seedling.png");
 
     add_prod_texture(PROD_HUT, "textures/objects/hut.png");
+    add_prod_texture(PROD_TENT, "textures/objects/tent.png");
 
     i = 0;
-    i = add_textures_from_dir(plant_textures, i, "textures/plants");
+    base_plants_count = add_textures_from_dir(plant_textures, i, "textures/plants");
+    assert(base_plants_count == BASE_PLANTS);
 
-    animal_textures[0] = load_texture("textures/animals/pig.png");
-    animal_textures[1] = load_texture("textures/animals/boar.png");
+    i=0;
+    base_animals_count = add_textures_from_dir(animal_textures, i, "textures/animals");
+    assert(base_animals_count == BASE_ANIMALS);
 
     scroll_surface = IMG_Load("textures/scroll.png");
 
-// FIXME
-#if 0
-    object_textures[TEXTURE_stone_wall] = load_texture("textures/objects/stone_wall.png");
-    object_textures[TEXTURE_log_wall] = load_texture("textures/objects/log_wall.png");
-    object_textures[TEXTURE_log1_wall] = load_texture("textures/objects/log1_wall.png");
-    object_textures[TEXTURE_log2_wall] = load_texture("textures/objects/log2_wall.png");
-#endif
+    places_textures[PLACE_FIELD] = load_texture("textures/objects/field.png");
 }
 
 SDL_Texture * add_texture_color(SDL_Surface * s, Color c)

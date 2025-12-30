@@ -7,8 +7,6 @@ UPPERCASE=`echo $ING_NAME | tr 'a-z' 'A-Z'`
 first_letter=$(echo "${ING_NAME:0:1}" | tr '[:lower:]' '[:upper:]')
 CLASS_NAME="$first_letter${ING_NAME:1}"
 
-HEADER_FILE=
 cat template_ing.cpp | sed "s/HEADER/$ING_NAME/" | sed "s/CLASS_NAME/$CLASS_NAME/g" | sed "s/ING/ING_$UPPERCASE/ " > $ING_NAME.cpp
-cat template_ing.h | sed "s/TEMPLATE/$UPPERCASE/" | sed "s/CLASS_NAME/$CLASS_NAME/" > $ING_NAME.h
 
 

@@ -2,7 +2,6 @@
 #define OBJECT_H
 
 #include <cstddef>
-// FIXME @jacek add enet
 
 enum Class_id
 {
@@ -15,6 +14,7 @@ enum Class_id
     Class_Ingredient,
     Class_Product,
     Class_Scroll,
+    Class_Place,
 
     Class_Plant,  // base: BasePlant -> Base
     Class_Animal, // base: BaseAnimal->Base
@@ -22,17 +22,22 @@ enum Class_id
     Class_Npc,
 
     Class_Clan,
+
+    Class_ListElement,
+    Class_KnownElement,
+    Class_BaseListElement,
 };
 
 class NetworkObject
 {
-public:
+  public:
     NetworkObject(Class_id id);
     NetworkObject(Class_id id, size_t uid);
+    NetworkObject()
+    {
+    }
     Class_id c_id;
     size_t uid;
 };
-
-
 
 #endif

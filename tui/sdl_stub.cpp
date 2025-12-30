@@ -1,5 +1,8 @@
 #include "../core/alchemist/elements.h"
 
+#define BASE_ANIMALS 3
+#define BASE_PLANTS 21
+
 extern "C"
 {
     struct SDL_Texture
@@ -28,6 +31,7 @@ extern "C"
     SDL_Texture * plant_textures[BASE_PLANTS];
 
     typedef uint32_t Uint32;
+    typedef uint8_t Uint8;
 
     SDL_Texture * SDL_CreateTexture(SDL_Renderer * renderer, Uint32 format, int access, int w, int h)
     {
@@ -109,6 +113,10 @@ extern "C"
         SDL_Texture * sneak_icon;
     };
     struct player_textures Player_textures;
+    int SDL_SetRenderDrawColor(SDL_Renderer * renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a) { return 0; }
+    int SDL_RenderDrawRect(SDL_Renderer * renderer, const SDL_Rect * rect) { return 0; }
+
+
 }
 
 SDL_Texture * add_texture_color(SDL_Surface * s, Color c)
@@ -125,4 +133,10 @@ enum object_textures_enum
     TEXTURE_wall_max
 };
 
-SDL_Texture * object_textures[TEXTURE_wall_max];
+SDL_Texture * places_textures[TEXTURE_wall_max];
+
+int window_width;
+int window_height;
+int tile_size;
+
+void hsv2rgb(int h, int s, int v, int* r, int* g, int* b) {}

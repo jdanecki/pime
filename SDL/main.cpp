@@ -61,29 +61,32 @@ void intro()
     // new_state.c_cc[VMIN] = 1;
     // tcsetattr(0, TCSANOW, &new_state);
 
-    // printf("Do you want music y/n? ");
-    // a=getchar();
-    // if (a=='y')
-    // {
-    //     printf("\nInitializing music\n");
-    //     if (init_music())
-    //         printf("Failed to initialize music!\n"); ;
-    //     load_music();
+    // CONSOLE_LOG("Do you want music y/n? ");
+    //  a=getchar();
+    //  if (a=='y')
+    //  {
+    //     CONSOLE_LOG("\nInitializing music\n");
+    //      if (init_music())
+    //         CONSOLE_LOG("Failed to initialize music!\n"); ;
+    //      load_music();
 
     //     Mix_PlayChannel(0, music.music_one, 99999);
     //     Mix_PlayChannel(1, music.music_two, 99999);
     //     Mix_Volume(0, 0);
     //     Mix_Volume(1, 0);
     //     Mix_Pause(1);
-    // } else printf("\nGame without music\n");
+    // } elseCONSOLE_LOG("\nGame without music\n");
     // tcflush(0, TCIFLUSH);
     // tcsetattr(0, TCSANOW, &state);
 }
 
 int init_SDL()
 {
-    if (init_window())
+    int texture_size=32;
+    if (init_window("pime", texture_size*CHUNK_SIZE + PANEL_WINDOW, texture_size*CHUNK_SIZE + STATUS_LINES))
+    {
         return 1;
+    }
     if (load_font())
         return 1;
 
@@ -95,7 +98,7 @@ int init_SDL()
         ret = stat("textures", &statbuf);
         if (ret)
         {
-            printf("missing directory with textures\n");
+            CONSOLE_LOG("missing directory with textures\n");
             return 2;
         }
     }
@@ -124,32 +127,34 @@ int dst_map_y;
 
 void do_auto_explore()
 {
-    if ((dst_map_x == player->location.chunk.map_x) && (dst_map_y == player->location.chunk.map_y)) {
+    if ((dst_map_x == player->location.chunk.map_x) && (dst_map_y == player->location.chunk.map_y))
+    {
         int dx = 5 - (rand() % 11);
         int dy = 5 - (rand() % 11);
 
-       if (player->location.chunk.map_y+dy >= 0 &&
-           player->location.chunk.map_y+dy < WORLD_SIZE &&
-           player->location.chunk.map_x +dx >= 0 &&
-           player->location.chunk.map_x+dx < WORLD_SIZE)
-       {
-            if (!world_table[player->location.chunk.map_y+dy][player->location.chunk.map_x+dx])
-           {
-                dst_map_x=player->location.chunk.map_x + dx;
-                dst_map_y=player->location.chunk.map_y + dy;
+        if (player->location.chunk.map_y + dy >= 0 && player->location.chunk.map_y + dy < WORLD_SIZE && player->location.chunk.map_x + dx >= 0 && player->location.chunk.map_x + dx < WORLD_SIZE)
+        {
+            if (!world_table[player->location.chunk.map_y + dy][player->location.chunk.map_x + dx])
+            {
+                dst_map_x = player->location.chunk.map_x + dx;
+                dst_map_y = player->location.chunk.map_y + dy;
             }
-       }
+        }
     }
-    if (dst_map_x > player->location.chunk.map_x) send_packet_move(client, 1, 0);
-    if (dst_map_x < player->location.chunk.map_x) send_packet_move(client, -1, 0);
-    if (dst_map_y > player->location.chunk.map_y) send_packet_move(client, 0, 1);
-    if (dst_map_y < player->location.chunk.map_y) send_packet_move(client, 0, -1);
+    if (dst_map_x > player->location.chunk.map_x)
+        send_packet_move(client, 1, 0);
+    if (dst_map_x < player->location.chunk.map_x)
+        send_packet_move(client, -1, 0);
+    if (dst_map_y > player->location.chunk.map_y)
+        send_packet_move(client, 0, 1);
+    if (dst_map_y < player->location.chunk.map_y)
+        send_packet_move(client, 0, -1);
 }
 
 void loop()
 {
-    dst_map_x=player->location.chunk.map_x;
-    dst_map_y=player->location.chunk.map_y;
+    dst_map_x = player->location.chunk.map_x;
+    dst_map_y = player->location.chunk.map_y;
 
     print_status(0, "Welcome in game!");
 
@@ -163,7 +168,8 @@ void loop()
         // TODO disconnect
         network_tick(client);
 
-        if (auto_explore) {
+        if (auto_explore)
+        {
             do_auto_explore();
         }
         if (draw())
@@ -180,8 +186,8 @@ int main(int argc, char * argv[])
     const char * ip;
     if (argc < 2)
     {
-        printf("usage: ./pime_SDL <ip> [port]\n");
-        printf("using localhost 127.0.0.1\n");
+        CONSOLE_LOG("usage: ./pime_SDL <ip> [port]\n");
+        CONSOLE_LOG("using localhost 127.0.0.1\n");
         ip = "127.0.0.1";
     }
     else

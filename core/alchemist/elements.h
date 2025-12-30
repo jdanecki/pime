@@ -19,6 +19,9 @@ enum Product_action
     ACT_HIT,
     ACT_STAB, // dźgnij
     ACT_FIRE,
+    ACT_PLOW, //oraj
+    ACT_PLANT,
+    ACT_INVITE,
 };
 
 extern const char * product_action_name[];
@@ -49,10 +52,15 @@ class Base: public NetworkObject
 
     SerializableCString name;
     Base(int index, Class_id c, const char * name);
-    virtual ~Base() {}
+    virtual ~Base()
+    {
+    }
     virtual void show(bool details = true);
     const char * get_name();
-    virtual size_t get_size() { return sizeof(Base); }
+    virtual size_t get_size()
+    {
+        return sizeof(Base);
+    }
 };
 
 struct Color
@@ -66,13 +74,16 @@ class BaseElement : public Base
 {
   public:
     Form form; // solid, liquid, gas
-    Color color;
+    Color color; //color for tile
     Property density;
     Solid solid;
 
     BaseElement(Form f, int index);
     void show(bool details = true);
-    virtual size_t get_size() { return sizeof(BaseElement); }
+    virtual size_t get_size()
+    {
+        return sizeof(BaseElement);
+    }
 };
 
 class chunk;
@@ -85,22 +96,28 @@ class InventoryElement : public NetworkObject
     ItemLocation location;
 
     InventoryElement(Class_id c_id, size_t uid, ItemLocation location);
+    InventoryElement(Class_id c_id, size_t uid) : NetworkObject(c_id, uid)
+    {
+    }
     InventoryElement(Class_id c_id) : NetworkObject(c_id)
-    {}
-    // InventoryElement() {}
+    {
+    }
+    InventoryElement()
+    {
+    }
     virtual bool action(Product_action action, Player * pl)
     {
-        printf("INV: %s %s\n", product_action_name[action], get_name());
+        CONSOLE_LOG("INV: %s %s\n", product_action_name[action], get_name());
         return false;
     }
     virtual bool player_action(Player_action action, Player * pl)
     {
-        printf("INV: %s %s\n", player_action_name[action], get_name());
+        CONSOLE_LOG("INV: %s %s\n", player_action_name[action], get_name());
         return false;
     }
     virtual void show(bool details = true)
     {
-        printf("%s: uid=%lx @[%d,%d][%d,%d]\n", get_class_name(), uid, location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
+        CONSOLE_LOG("%s: uid=%lx id=%d @[%d,%d][%d,%d]\n", get_class_name(), uid, get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
     }
     virtual bool tick()
     {
@@ -123,13 +140,10 @@ class InventoryElement : public NetworkObject
         return c_id;
     }
     Class_id get_cid() const;
-    int get_x()
+
+    virtual bool check_rect(unsigned int px, unsigned int py, int )
     {
-        return location.chunk.x;
-    }
-    int get_y()
-    {
-        return location.chunk.y;
+        return (px == location.get_world_x() && py == location.get_world_y());
     }
     size_t get_uid() const;
     virtual char * get_description()
@@ -163,37 +177,49 @@ class InventoryElement : public NetworkObject
     }
 };
 
-enum object_types
+enum Place_id
 {
-    OBJECT_wall,
+    PLACE_FIELD,
+    PLACES_COUNT,
 };
 
-extern const char * object_names[];
+extern const char * places_names[];
 
-#define OBJECTS 1
+enum Place_states
+{    
+    FIELD_PLOWED,
+    FIELD_PLANTED,
+};
 
-class Object : public InventoryElement
+extern const char * place_states_names[];
+
+class Place : public InventoryElement
 {
   public:
-    BaseElement * base;
-    enum object_types type;
+    Place_id id;
+    Place_states state;
 
-    Form get_form() override
-    {
-        return Form_solid;
-    }
-    const char * get_form_name() override
-    {
-        return Form_name[Form_solid];
-    }
     const char * get_name() override
     {
-        return object_names[type];
+        return places_names[id];
     }
+    Place(Place_id id, size_t uid);
+    Place(Place_id id);
     void show(bool details = true) override
     {
-        printf("Object type: %s", get_name());
-        base->show(details);
+        InventoryElement::show(details);
+        CONSOLE_LOG("Place type: %s state: %s\n", get_name(), place_states_names[state]);
+    }
+    char * get_description() override
+    {
+        char * buf = new char[128];
+        sprintf(buf, "%s: (%s)", get_name(), place_states_names[state]);
+        return buf;
+    }
+    virtual void show_state() {}
+    int get_id() override
+    {
+        return (int) id;
     }
 };
 
@@ -279,7 +305,7 @@ class Element : public InventoryElement
 
     Property ** get_properties(int * count) override
     {
-        *count = 7;
+        *count = 8;
         Form f = get_form();
         if (f == Form_solid)
             *count += 6;
@@ -291,23 +317,25 @@ class Element : public InventoryElement
         props[4] = &sharpness;
         props[5] = &smoothness;
         props[6] = &mass;
-        if (f)
+        props[7] = &get_base()->density;
+        if (f == Form_solid)
         {
-            props[7] = &get_base()->solid.tooling;
-            props[8] = &get_base()->solid.stretching;
-            props[9] = &get_base()->solid.squeezing;
-            props[10] = &get_base()->solid.bending;
-            props[11] = &get_base()->solid.solubility;
-            props[12] = &get_base()->solid.hardness;
+            props[8] = &get_base()->solid.tooling;
+            props[9] = &get_base()->solid.stretching;
+            props[10] = &get_base()->solid.squeezing;
+            props[11] = &get_base()->solid.bending;
+            props[12] = &get_base()->solid.solubility;
+            props[13] = &get_base()->solid.hardness;
         }
         return props;
     }
     char * get_description() override
     {
         char * buf = new char[128];
-        sprintf(buf, "%s %s: (%s)", get_form_name(), get_class_name(), get_name());
+        sprintf(buf, "%s %s: (%s) base=%d", get_form_name(), get_class_name(), get_name(), get_id());
         return buf;
     }
+
 };
 
 enum Ingredient_id
@@ -321,6 +349,9 @@ enum Ingredient_id
     ING_PICKAXE_BLADE,
     ING_PICKAXE_HANDLE,
 
+    ING_HOE_BLADE,
+    ING_HOE_HANDLE,
+
     ING_WALL,
 
     ING_MEAT,
@@ -330,6 +361,7 @@ enum Ingredient_id
     ING_STICK,
 
     ING_FRUIT,
+    ING_SEED,
 
     ING_COUNT,
 
@@ -340,11 +372,13 @@ enum Product_id
     PROD_AXE,
     PROD_KNIFE,
     PROD_PICKAXE,
+    PROD_HOE,
     PROD_HUT,
+    PROD_TENT,
     PROD_FIRE,
     PROD_ROASTED_MEAT,
     PROD_FRUIT_SALAD,
-
+    PROD_SEEDLING,
     PROD_COUNT
 };
 
@@ -394,7 +428,7 @@ class Ingredient : public InventoryElement
     }
     bool action(Product_action action, Player * pl)
     {
-        printf("ING: %s %s\n", product_action_name[action], get_name());
+        CONSOLE_LOG("ING: %s %s\n", product_action_name[action], get_name());
         return false;
     }
 };
@@ -408,8 +442,7 @@ class Product : public InventoryElement
     Property usage;      // [0..100] łatwy..trudny
     Form req_form;
 
-    // FIMXE change it to Product_action *
-    Product_action actions;
+    Product_action actions[10];
     int actions_count;
 
     Product_id id;
@@ -417,7 +450,7 @@ class Product : public InventoryElement
     {
         return id;
     }
-    Product(Product_id i);
+    Product(Product_id id, int actions_count);
     virtual void add_action(Product_action * a)
     {
     }
@@ -459,14 +492,17 @@ class BaseAnimal : public Base
     BaseAnimal(int index);
     void show(bool details = true)
     {
-        printf("BaseAnimal:\n");
-        printf("carnivorous=%d\n", carnivorous);
-        printf("swimming=%d\n", swimming);
-        printf("flying=%d\n", flying);
+        CONSOLE_LOG("BaseAnimal:\n");
+        CONSOLE_LOG("carnivorous=%d\n", carnivorous);
+        CONSOLE_LOG("swimming=%d\n", swimming);
+        CONSOLE_LOG("flying=%d\n", flying);
         if (details)
             Base::show(details);
     }
-    virtual size_t get_size() { return sizeof(BaseAnimal); }
+    virtual size_t get_size()
+    {
+        return sizeof(BaseAnimal);
+    }
 };
 
 class Animal : public InventoryElement
@@ -509,7 +545,7 @@ class Animal : public InventoryElement
 
     bool action(Product_action action, Player * pl) override
     {
-        printf("ANIMAL: %s %s\n", product_action_name[action], get_name());
+        CONSOLE_LOG("ANIMAL: %s %s\n", product_action_name[action], get_name());
         return false;
     }
     const char * get_name() override
@@ -525,8 +561,7 @@ class Animal : public InventoryElement
 };
 
 enum Plant_phase
-{
-    Plant_seed = 0,
+{    
     Plant_seedling,
     Plant_growing,
     Plant_flowers,
@@ -543,13 +578,16 @@ class BasePlant : public Base
     BasePlant(int index);
     void show(bool details = true)
     {
-        printf("BasePlant:\n");
-        printf("flowers=%d\n", flowers);
-        printf("leaves=%d\n", leaves);
+        CONSOLE_LOG("BasePlant:\n");
+        CONSOLE_LOG("flowers=%d\n", flowers);
+        CONSOLE_LOG("leaves=%d\n", leaves);
         if (details)
             Base::show(details);
     }
-    virtual size_t get_size() { return sizeof(BasePlant); }
+    virtual size_t get_size()
+    {
+        return sizeof(BasePlant);
+    }
 };
 
 class Plant : public InventoryElement
@@ -564,8 +602,7 @@ class Plant : public InventoryElement
     unsigned int flowers_time;
 
   public:
-    float size;
-    bool planted;
+    float size;    
     int water;
 
     // shared with client
@@ -580,11 +617,11 @@ class Plant : public InventoryElement
     void show(bool details = true) override
     {
         InventoryElement::show(details);
-        printf("%s\n", get_base()->get_name());
+        CONSOLE_LOG("%s\n", get_base()->get_name());
         if (details)
         {
             get_base()->show(details);
-            printf("phase=%s grown=%d planted=%d times=%d/%d/%d/ water=%d \n", plant_phase_name[phase], grown, planted, seedling_time, growing_time, flowers_time, water);
+            CONSOLE_LOG("phase=%s grown=%d times=%d/%d/%d/ water=%d \n", plant_phase_name[phase], grown,  seedling_time, growing_time, flowers_time, water);
         }
     }
     BasePlant * get_base()
@@ -605,7 +642,7 @@ class Plant : public InventoryElement
     }
     bool action(Product_action action, Player * pl)
     {
-        printf("PLANT: %s %s\n", product_action_name[action], get_name());
+        CONSOLE_LOG("PLANT: %s %s\n", product_action_name[action], get_name());
         return false;
     }
 
@@ -624,8 +661,5 @@ class Plant : public InventoryElement
         return props;
     }
 };
-
-#define BASE_ANIMALS 40
-#define BASE_PLANTS 10
 
 #endif

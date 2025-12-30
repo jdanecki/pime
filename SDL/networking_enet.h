@@ -21,6 +21,7 @@ struct ObjectData
         Scroll,
         Player,
         Npc,
+        Place,
     };
 
     struct InvElement_Body
@@ -67,25 +68,31 @@ struct ObjectData
     {
         Npc data;
     };
+    struct Place_Body
+    {
+        Place data;
+    };
 
     ObjectData(Tag tag, size_t s) : tag(tag), size(s)
     {
+        CONSOLE_LOG("ObjectData: set size to %ld\n", size);
     }
     ObjectData(Tag tag) : tag(tag)
-    {
+    {        
         size = sizeof(struct ObjectData);
+        CONSOLE_LOG("ObjectData: size=%ld\n", size);
     }
 
     ~ObjectData()
     {
     }
-    static void* operator new(size_t size)
+    static void * operator new(size_t size)
     {
         return ::operator new(size);
     }
     static void * operator new(size_t size_base, size_t extra)
     {
-        printf("ObjectData: allocating %ld + %ld\n", size_base, extra);
+        CONSOLE_LOG("ObjectData: serial_data: allocating %ld + %ld\n", size_base, extra);
         return ::operator new(size_base + extra);
     }
 
@@ -107,6 +114,7 @@ struct ObjectData
         Scroll_Body scroll;
         Player_Body player;
         Npc_Body npc;
+        Place_Body place;
     };
     int id;
     unsigned char data[0];
@@ -178,4 +186,3 @@ void send_packet_craft(NetClient * client, uintptr_t prod_id, uintptr_t ingredie
 void send_packet_request_chunk(NetClient * client, int32_t x, int32_t y);
 
 ObjectData foo();
-

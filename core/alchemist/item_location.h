@@ -1,4 +1,10 @@
 /// <div rustbindgen hide></div>
+#ifndef ITEM_LOCATION_H
+#define ITEM_LOCATION_H
+
+extern unsigned int get_world_pos(unsigned int chunk, unsigned int pos);
+
+/// <div rustbindgen hide></div>
 struct ItemLocation
 {
     enum class Tag
@@ -11,8 +17,8 @@ struct ItemLocation
     {
         int32_t map_x;
         int32_t map_y;
-        int32_t x;
-        int32_t y;
+        unsigned int x;
+        unsigned int y;
     };
 
     struct Player_Body
@@ -39,8 +45,26 @@ struct ItemLocation
     {
         if (tag == Tag::Chunk)
         {
-            printf("map_x:%d map_y:%d x:%d y:%d\n", chunk.map_x, chunk.map_y, chunk.x, chunk.y);
-        } else
-            printf("player: %lu\n", player.id);
+            CONSOLE_LOG("map_x:%d map_y:%d x:%d y:%d\n", chunk.map_x, chunk.map_y, chunk.x, chunk.y);
+        }
+        else
+            CONSOLE_LOG("player: %lu\n", player.id);
+    }
+    unsigned int get_world_x()
+    {
+        return get_world_pos(chunk.map_x, chunk.x);
+    }
+    unsigned int get_world_y()
+    {
+        return get_world_pos(chunk.map_y, chunk.y);
+    }
+    unsigned int get_x()
+    {
+        return chunk.x;
+    }
+    unsigned int get_y()
+    {
+        return chunk.y;
     }
 };
+#endif

@@ -16,6 +16,10 @@ template <typename T> class SerializablePointer
     }
 };
 
+template <typename T> SerializablePointer<T>::SerializablePointer(T * p) : ptr(p)
+{
+}
+
 class SerializableCString
 {
   public:

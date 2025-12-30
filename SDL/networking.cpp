@@ -20,7 +20,7 @@ InventoryElement * find_by_uid(size_t uid, int chunk_x, int chunk_y)
 {
     if (!world_table[chunk_y][chunk_x])
         return nullptr;
-    for(InventoryElement* el: world_table[chunk_y][chunk_x]->objects)
+    for (InventoryElement * el : world_table[chunk_y][chunk_x]->objects)
     {
         if (el->uid == uid)
             return el;
@@ -74,7 +74,7 @@ InventoryElement * remove_from_location(ItemLocation location, NetworkObject id)
 
 InventoryElement * el_from_data(const ObjectData * data)
 {
-    printf("CREATING OBJECT for tag: %d\n", (int)data->tag);
+   // CONSOLE_LOG("CREATING OBJECT for tag: %d\n", (int)data->tag);
     InventoryElement * el = nullptr;
     switch (data->tag)
     {
@@ -83,6 +83,11 @@ InventoryElement * el_from_data(const ObjectData * data)
         case ObjectData::Tag::Element:
         {
             el = new ElementSDL(data->element.data);
+            break;
+        }
+        case ObjectData::Tag::Place:
+        {
+            el = new PlaceSDL(data->place.data);
             break;
         }
         case ObjectData::Tag::Scroll:
@@ -106,8 +111,8 @@ InventoryElement * el_from_data(const ObjectData * data)
             el = new PlayerSDL(data->player.data);
             if (my_id == el->uid)
             {
-                player = (PlayerSDL*)el;
-                printf("new player uid=%ld name=%s\n", player->uid, player->get_name());
+                player = (PlayerSDL *)el;
+                CONSOLE_LOG("new player uid=%ld name=%s\n", player->uid, player->get_name());
             }
             break;
 #ifdef DISABLE_NPC
@@ -122,12 +127,12 @@ InventoryElement * el_from_data(const ObjectData * data)
 #if !defined(DISABLE_NPC) && !defined(USE_ENET)
             el = new NpcSDL(data->npc.data);
             el->c_id = Class_Npc;
-            printf("creating NPC");
+            CONSOLE_LOG("creating NPC");
 #endif
-        break;
+            break;
 
         default:
-            printf("UNKNOWN Tag: %d\n", (int)data->tag);
+            CONSOLE_LOG("UNKNOWN Tag: %d\n", (int)data->tag);
             abort();
     }
     return el;
@@ -142,7 +147,7 @@ extern "C"
         if (pl_id != player->get_id())
             return;
 
-        printf("knowledge update for player %d cid=%s id=%d\n", pl_id, class_name[cid], id);
+        CONSOLE_LOG("knowledge update for player %d cid=%s id=%d\n", pl_id, class_name[cid], id);
         Player * p = players[pl_id];
         if (!p)
             return;
@@ -154,7 +159,7 @@ extern "C"
         if (pl_id != player->get_id())
             return;
 
-        printf("checked update for player %d el=%lx\n", pl_id, el);
+        CONSOLE_LOG("checked update for player %d el=%lx\n", pl_id, el);
         Player * p = players[pl_id];
         if (!p)
             return;
@@ -171,7 +176,7 @@ extern "C"
         //     }
         //     /*for (int i = 0; i < 25; i++)
         //     {
-        //         printf("%d, ", data[i]);
+        //        CONSOLE_LOG("%d, ", data[i]);
         //     }*/
         //     Player * p = players[id];
         //     p->map_x = map_x;
@@ -185,7 +190,7 @@ extern "C"
         //     p->thirst = thirst;
         //     p->hunger = hunger;
 
-        //     //  printf("updated player %ld: %d %d %d %d\n", id, map_x, map_y, x, y);
+        //     // CONSOLE_LOG("updated player %ld: %d %d %d %d\n", id, map_x, map_y, x, y);
         // }
     }
 
@@ -194,7 +199,7 @@ extern "C"
         data = (chunk_table *)((char *)(data) + 3);
         if (!world_table[y][x])
         {
-            printf("SDL: update_chunk new x=%d y=%d\n", x, y);
+            CONSOLE_LOG("SDL: update_chunk new x=%d y=%d\n", x, y);
             // world_table[y][x] = (chunk*)calloc(1, sizeof(chunk));
             // world_table[y][x]->objects = InvList();
             world_table[y][x] = new chunk(x, y);
@@ -202,9 +207,9 @@ extern "C"
             /*printf("got %d items\n[", item_num);
             for (int i = 0; i < 1027 + item_num*20; i++)
             {
-                printf("%d, ", data[i]);
+               CONSOLE_LOG("%d, ", data[i]);
             }
-            printf("\n");*/
+           CONSOLE_LOG("\n");*/
         }
     }
 
@@ -220,12 +225,12 @@ extern "C"
         player->location.chunk.x = 8;
         player->location.chunk.y = 8;
 
-        printf("seed: %ld\n", seed);
+        CONSOLE_LOG("seed: %ld\n", seed);
         srand(seed);
         init_sentences();
         init_questions();
         init_answers();
-        printf("got id %ld\n", id);
+        CONSOLE_LOG("got id %ld\n", id);
         print_status(1, "player %ld connected", id);
     }
 
@@ -235,10 +240,15 @@ extern "C"
         Class_id c_id = data->inv_element.data.c_id;
 
         InventoryElement * el = find_by_uid(data->inv_element.data.uid, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
-
+        //FIXME why we get el=NULL?
+        //  CONSOLE_LOG("update_object: el=%p chunk[%d,%d]\n", el, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
+        if (el)
+        {
+           // CONSOLE_LOG("update_object: el->cid=%x c_id=%x\n", el->c_id, c_id);
+        }
         if (el && el->c_id == c_id)
         {
-            //  printf("SDL update_object: %s %s\n", class_name[c_id],  el->get_name());
+            // CONSOLE_LOG("SDL update_object: %s %s\n", class_name[c_id],  el->get_name());
             switch (c_id)
             {
                 case Class_Element:
@@ -263,26 +273,28 @@ extern "C"
                 {
                     Plant * plant = dynamic_cast<Plant *>(el);
                     *plant = data->plant.data;
-                    //  printf("%s size=%f\n", plant->get_name(), plant->size);
+                    // CONSOLE_LOG("%s size=%f\n", plant->get_name(), plant->size);
                     break;
                 }
                 case Class_Animal:
                 {
                     Animal * animal = dynamic_cast<Animal *>(el);
                     *animal = data->animal.data;
-                    //      printf("%s size=%f\n", animal->get_name(), animal->size);
+                    //     CONSOLE_LOG("%s size=%f\n", animal->get_name(), animal->size);
                     break;
                 }
                 case Class_Player:
                 {
                     Player * player = dynamic_cast<Player *>(el);
+                    //CONSOLE_LOG("update_object: player=%p inv_elems=%d\n", player, player->inventory.nr_elements);
                     *player = data->player.data;
+                    //CONSOLE_LOG("update_object: -> update: inv_elems=%d\n", player->inventory.nr_elements);
                     break;
                 }
                 default:
                     break;
             }
-            // printf("%s updated\n", el->get_name());
+            // CONSOLE_LOG("%s updated\n", el->get_name());
         }
         else
         {
@@ -299,19 +311,19 @@ extern "C"
         ItemLocation & old_loc = data.old;
         ItemLocation & new_loc = data.new_;
 
-        // printf("update item location uid=%lx old_tag=%d new_tag=%d\n", id.uid, (int)old_loc.tag, (int)new_loc.tag);
-        // old_loc.show();
-        // new_loc.show();
-
+        /*CONSOLE_LOG("update item location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
+        old_loc.show();
+        new_loc.show();
+*/
         InventoryElement * el = remove_from_location(old_loc, id);
         if (!el)
         { // FIXME
-            // printf("SDL: not found item %lu to remove on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
-            //     id,
-            //     old_loc.chunk.map_x, old_loc.chunk.map_y,
-            //     old_loc.chunk.x, old_loc.chunk.y,
-            //     new_loc.chunk.map_x, new_loc.chunk.map_y,
-            //     new_loc.chunk.x, new_loc.chunk.y);
+            // CONSOLE_LOG("SDL: not found item %lu to remove on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
+            //      id,
+            //      old_loc.chunk.map_x, old_loc.chunk.map_y,
+            //      old_loc.chunk.x, old_loc.chunk.y,
+            //      new_loc.chunk.map_x, new_loc.chunk.map_y,
+            //      new_loc.chunk.x, new_loc.chunk.y);
             send_packet_request_item(client, id.uid);
 
             return;
@@ -327,13 +339,14 @@ extern "C"
                     new_loc.chunk.map_x, new_loc.chunk.map_y,
                     new_loc.chunk.x, new_loc.chunk.y);
 */
-                ItemLocation old_l;
+                /*ItemLocation old_l;
                 ItemLocation new_l;
                 old_l.chunk.x = old_loc.chunk.x;
                 old_l.chunk.y = old_loc.chunk.y;
                 new_l.chunk.x = new_loc.chunk.x;
-                new_l.chunk.y = new_loc.chunk.y;
-                el->update_item_location(old_l, new_l);
+                new_l.chunk.y = new_loc.chunk.y;*/
+                //el->update_item_location(old_l, new_l);
+                el->update_item_location(old_loc, new_loc);
                 add_object_to_world(el, new_loc);
                 break;
             }
@@ -356,34 +369,11 @@ extern "C"
         if (el)
         {
             register_object(el, el);
-            add_object_to_world(el, el->location);
-            // switch (el->location.tag)
-            // {
-            //     case ItemLocation::Tag::Chunk:
-            //     {
-            //         int item_x = el->location.chunk.x;
-            //         int item_y = el->location.chunk.y;
-            //         int x = el->location.chunk.map_x;
-            //         int y = el->location.chunk.map_y;
-            //         if (world_table[y][x])
-            //         {
-            //             world_table[y][x]->add_object(el, item_x, item_y);
-            //         }
-            //         break;
-            //     }
-            //     case ItemLocation::Tag::Player:
-            //     {
-            //         int p_id = el->location.player.id;
-            //         players[p_id]->inventory->add(el);
-            //         update_hotbar();
-            //     }
-            // }
-            // printf("created object: %s\n", el->get_name());
-            // print_status(1, "created object: %s", el->get_name());
+            add_object_to_world(el, el->location);           
         }
         else
         {
-            printf("SDL: inexisting chunk\n");
+            CONSOLE_LOG("SDL: inexisting chunk\n");
         }
     }
 
@@ -397,13 +387,13 @@ extern "C"
             {
                 abort();
             }
-            printf("SDL: destroy_object %ld", id.uid);
+           CONSOLE_LOG("SDL: destroy_object %ld", id.uid);
             deregister_object(el);
             delete el;
         }
         // else
         //  item on not loaded chunk
-        //     printf("SDL: deleting inexisting item %ld\n", id);
+        //    CONSOLE_LOG("SDL: deleting inexisting item %ld\n", id);
     }
 
     void failed_craft()

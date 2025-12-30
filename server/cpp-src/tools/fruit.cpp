@@ -5,8 +5,8 @@ Fruit::Fruit(InventoryElement * from) : IngredientServer(from, ING_FRUIT, Form_s
 }
 
 IngredientServer * Fruit::createFruit(InventoryElement * from)
-{
-    if (from->get_base_cid() == Class_BasePlant && dynamic_cast<Plant *>(from)->phase == Plant_fruits)
+{    
+    if (from->get_cid() == Class_Plant && dynamic_cast<Plant *>(from)->phase == Plant_fruits)
         return new Fruit(from);
     else
         return nullptr;

@@ -4,6 +4,7 @@ project(pime)
 set(CMAKE_BUILD_TYPE Debug)
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch -Wno-reorder")
 
 if(USE_ENET)
     set(PIME_TARGET_NAME pime_enet)
@@ -30,7 +31,8 @@ add_library(${PIME_TARGET_NAME} SHARED
 	)
 
 if(USE_ENET)
-    target_compile_definitions(${PIME_TARGET_NAME} PRIVATE USE_ENET)
+    target_compile_definitions(${PIME_TARGET_NAME} PRIVATE USE_ENET )
+    add_definitions(${enet_CFLAGS} )
 endif()
 
 

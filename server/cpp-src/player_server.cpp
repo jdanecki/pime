@@ -3,7 +3,7 @@
 #include "networking.h"
 #include "world_server.h"
 #include "../../core/packet_types.h"
-#include <cstdio>
+#include <stdio.h>
 
 bool check_and_load_chunk(int new_map_x, int new_map_y)
 {
@@ -31,7 +31,7 @@ void PlayerServer::move(int dx, int dy)
     int new_map_x = location.chunk.map_x;
     int new_map_y = location.chunk.map_y;
 
-    printf("SERV: player move dx=%d dy=%d\n", dx, dy);
+ //   CONSOLE_LOG("SERV: player move dx=%d dy=%d\n", dx, dy);
 
     if (!((new_x >= 0 && new_x < CHUNK_SIZE) && (new_y >= 0 && new_y < CHUNK_SIZE)))
     {
@@ -67,37 +67,46 @@ move_player:
     hunger--;
     thirst--;
     update_location(NetworkObject(get_cid(), get_uid()), old, location);
-    printf("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
+    // printf("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
 }
 
 bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement * object)
 {
-    ProductServer * i = dynamic_cast<ProductServer *>(item);
-    if (i)
+    ProductServer * prod = dynamic_cast<ProductServer *>(item);
+    if (prod)
     {
-        printf("%s: using %s on %s\n", get_name(), i->get_name(), object->get_name());
-        return i->use(object, this);
-    }
-    else
-        return false;
+        CONSOLE_LOG("%s: using %s on %s\n", get_name(), prod->get_name(), object->get_name());
+        if (prod->use(object, this))
+        {
+            return true;
+        }
+    }   
+    return false;
 }
 
 bool PlayerServer::action_on_object(Player_action a, InventoryElement * object)
 {
     if (!object)
         return false;
-    printf("%s action: %s on %s\n", get_name(), player_action_name[a], object->get_name());
+    CONSOLE_LOG("%s action: %s on %s\n", get_name(), player_action_name[a], object->get_name());
     switch (a)
     {
         case PLAYER_CHECK:
-            printf("checking %s:\n", object->get_name());
+            CONSOLE_LOG("checking %s:\n", object->get_name());
             if (set_checked(object->uid))
             {
                 notify_checked(get_id(), object->uid);
             }
             else
             {
-                printf("%s: already checked this item\n", object->get_name());
+                CONSOLE_LOG("%s: already checked this item\n", object->get_name());
+            }
+            break;
+        case PLAYER_EAT:
+        case PLAYER_DRINK:
+            if (object->player_action(a, this))
+            {
+                notify_update(this);
             }
             break;
         default:
@@ -110,9 +119,9 @@ bool PlayerServer::action_on_object(Player_action a, InventoryElement * object)
 bool PlayerServer::server_action_on_object(Server_action a, InventoryElement * object)
 {
     if (object)
-        printf("%s server action: %s on %s\n", get_name(), server_action_name[a], object->get_name());
+        CONSOLE_LOG("%s server action: %s on %s\n", get_name(), server_action_name[a], object->get_name());
     else
-        printf("%s server action: %s\n", get_name(), server_action_name[a]);
+        CONSOLE_LOG("%s server action: %s\n", get_name(), server_action_name[a]);
     switch (a)
     {
         case SERVER_SHOW_ITEM:
@@ -130,9 +139,16 @@ bool PlayerServer::server_action_on_object(Server_action a, InventoryElement * o
     return true;
 }
 
+bool PlayerServer::use_product_on_tile(Product * prod, int map_x, int map_y, int x, int y)
+{
+    ProductServer * prod_serv = dynamic_cast<ProductServer *>(prod);
+    CONSOLE_LOG("%s: using %s on tile (%d,%d):(%d,%d)\n", get_name(), prod_serv->get_name(), map_x, map_y, x, y);
+    return prod_serv->use_tile(map_x, map_y, x, y, this);
+}
+
 bool PlayerServer::plant_with_seed(InventoryElement * el, int map_x, int map_y, int x, int y)
 {
-    // FIXME
+
 #if 0
     if (get_tile_at_ppos(this) == TILE_GRASS || get_tile_at_ppos(this) == TILE_DIRT)
     {
@@ -176,7 +192,7 @@ bool PlayerServer::plant_with_seed(InventoryElement * el, int map_x, int map_y, 
             world_table[map_y][map_x]->add_object(p, x, y);
             objects_to_create.add(p);
 
-            p->phase = Plant_seed;
+            p->phase = Plant_seedling;
             p->grown = false;
             p->age->value = 1;
 
@@ -193,7 +209,7 @@ bool PlayerServer::pickup(InventoryElement * item)
 {
     if (!item->can_pickup())
     {
-        printf("can't pickup %s\n", item->get_name());
+        CONSOLE_LOG("can't pickup %s\n", item->get_name());
         return false;
     }
     ItemLocation old_location = item->location;
@@ -203,9 +219,9 @@ bool PlayerServer::pickup(InventoryElement * item)
     return true;
 }
 
-PlayerServer::PlayerServer(size_t uid) : Player(uid, SerializableCString("player"), ItemLocation::center(), 1, 2, 3)
+PlayerServer::PlayerServer(size_t uid) : Player(uid, SerializableCString("player"), ItemLocation::center(), 50 + rand() % 100, 50 + rand() % 100, 50 + rand() % 100)
 {
-    printf("PlayerServer: uid=%ld\n", uid);
+    CONSOLE_LOG("PlayerServer: uid=%ld\n", uid);
     notify_create(this);
 }
 

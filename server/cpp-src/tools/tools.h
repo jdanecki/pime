@@ -33,9 +33,16 @@ GENERATE_TOOL(Axe)
 GENERATE_TOOL(Knife)
 GENERATE_TOOL(Pickaxe)
 
+GENERATE_PRODUCT(Hoe, bool use_tile(int map_x, int map_y, int x, int y, Player * pl);)
+GENERATE_INGREDIENT(HoeBlade, )
+GENERATE_INGREDIENT(HoeHandle, )
+
 GENERATE_PRODUCT(Fire, )
 GENERATE_INGREDIENT(Stick, )
 GENERATE_INGREDIENT(Tinder, )
+
+GENERATE_INGREDIENT(Seed, )
+GENERATE_PRODUCT(Seedling, bool use(InventoryElement * object, Player * pl); )
 
 GENERATE_PRODUCT(RoastedMeat, bool player_action(Player_action, Player *);)
 GENERATE_INGREDIENT(Meat, bool action(Product_action, Player *);)
@@ -43,7 +50,8 @@ GENERATE_INGREDIENT(Meat, bool action(Product_action, Player *);)
 GENERATE_PRODUCT(FruitSalad, bool player_action(Player_action, Player *);)
 GENERATE_INGREDIENT(Fruit, )
 
-GENERATE_PRODUCT(Hut, )
+GENERATE_PRODUCT(Hut, bool can_pickup();)
+GENERATE_PRODUCT(Tent, )
 GENERATE_INGREDIENT(Log, )
 GENERATE_INGREDIENT(Wall, )
 

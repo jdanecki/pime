@@ -381,7 +381,7 @@ pub extern "C" fn get_object_by_id(id: NetworkObject) -> *mut std::ffi::c_void {
             get_base(id.c_id, id.uid as i32) as *mut std::ffi::c_void
         }
         // TODO Replace with num
-        ..13 => match OBJECTS.read().unwrap().as_ref().unwrap().get(&id) {
+        ..14 => match OBJECTS.read().unwrap().as_ref().unwrap().get(&id) {
             Some(obj) => obj.0,
             None => std::ptr::null_mut(),
         },

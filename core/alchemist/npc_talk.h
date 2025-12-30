@@ -17,7 +17,7 @@ class Sentence : public ListElement
     }
     void show(bool details = true)
     {
-        printf("%s\n", text);
+        CONSOLE_LOG("%s\n", text);
     }
     bool check(void * what)
     {

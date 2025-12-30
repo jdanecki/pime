@@ -6,7 +6,7 @@ KnifeBlade::KnifeBlade(InventoryElement * from) : IngredientServer(from, ING_KNI
 
 IngredientServer * KnifeBlade::createKnifeBlade(InventoryElement * from)
 {
-    if (from->get_base_cid() == Class_BaseElement)
+    if (from->get_cid() == Class_Element && from->get_form() == Form_solid)
         return new KnifeBlade(from);
     else
         return nullptr;

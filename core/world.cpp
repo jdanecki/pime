@@ -1,6 +1,7 @@
 #include "world.h"
 #include "player.h"
 
+int tile_size;
 chunk * world_table[WORLD_SIZE][WORLD_SIZE];
 Chunk_state loaded_chunks[WORLD_SIZE][WORLD_SIZE];
 
@@ -39,7 +40,18 @@ InventoryElement * find_in_world(ItemLocation * loc, size_t uid)
     switch (loc->tag)
     {
         case ItemLocation::Tag::Chunk:
-            return world_table[loc->chunk.map_y][loc->chunk.map_x]->find_by_id(uid);
+        {
+            for (int y=loc->chunk.map_y-1; y < loc->chunk.map_y + 2; y++)
+                for (int x=loc->chunk.map_x-1; x < loc->chunk.map_x + 2; x++)
+                {
+                    if (y > -1 && y < WORLD_SIZE  && x > -1 && x < WORLD_SIZE )
+                    {
+                        InventoryElement *el=world_table[y][x]->find_by_id(uid);
+                        if (el) return el;
+                    }
+                }
+            return nullptr;
+        }
         case ItemLocation::Tag::Player:
             abort();
             return nullptr;
@@ -48,122 +60,35 @@ InventoryElement * find_in_world(ItemLocation * loc, size_t uid)
     return nullptr;
 }
 
-int get_world_x(ItemLocation loc)
-{
-    return loc.chunk.map_x * CHUNK_SIZE + loc.chunk.x;
-}
-int get_world_y(ItemLocation loc)
-{
-    return loc.chunk.map_y * CHUNK_SIZE + loc.chunk.y;
-}
 
 int get_tile_at(ItemLocation loc)
 {
     return world_table[loc.chunk.map_y][loc.chunk.map_x]->table[loc.chunk.y][loc.chunk.x].tile;
 }
 
-// FIXME do we stil need these get_*_at functions?
-//              if (b_x == x && b_y == y)
-//              {
-//                  return &world_table[chunk_y][chunk_x]->beings[i];
-//              }
-//          }
-//      }*/
-//      return NULL;
-//  }
-
-// Being ** get_being_at_ppos(Player * player)
-// {
-//     return get_being_at(player->map_x, player->map_y, player->x, player->y);
-// }
-
-Animal ** get_animal_at(int chunk_x, int chunk_y, int x, int y)
-{
-    // TODO
-    /*for (int i = 0; i < 128; i++)
-    {
-        Animal *a = world_table[chunk_y][chunk_x]->animals[i];
-        if (a)
-        {
-            int b_x, b_y;
-            a->get_posittion(&b_x, &b_y);
-
-            if (b_x == x && b_y == y)
-            {
-                return &world_table[chunk_y][chunk_x]->animals[i];
-            }
-        }
-    }*/
-    return NULL;
-}
-// Animal ** get_animal_at_ppos(Player * player)
-// {
-// return get_animal_at(player->map_x, player->map_y, player->x, player->y);
-// }
-
-Object ** get_object_at(int chunk_x, int chunk_y, int x, int y)
-{
-    // TODO
-    /*for (int i = 0; i < 128; i++)
-    {
-        Object * o = world_table[chunk_y][chunk_x]->objects[i];
-        if (o)
-        {
-            int b_x, b_y;
-            o->get_posittion(&b_x, &b_y);
-
-            if (b_x == x && b_y == y)
-            {
-                return &world_table[chunk_y][chunk_x]->objects[i];
-            }
-        }
-    }*/
-    return NULL;
-}
-
-// Object ** get_object_at_ppos(Player * player)
-// {
-//     return get_object_at(player->map_x, player->map_y, player->x, player->y);
-// }
-
-Plant ** get_plant_at(int chunk_x, int chunk_y, int x, int y)
-{
-    // TODO
-    /*for (int i = 0; i < 128; i++)
-    {
-        Plant *p = world_table[chunk_y][chunk_x]->plants[i];
-        if (p)
-        {
-            int b_x, b_y;
-            p->get_posittion(&b_x, &b_y);
-
-            if (b_x == x && b_y == y)
-            {
-                return &world_table[chunk_y][chunk_x]->plants[i];
-            }
-        }
-    }*/
-    return NULL;
-}
-
-// Plant ** get_plant_at_ppos(Player * player)
-// {
-//     return get_plant_at(player->map_x, player->map_y, player->x, player->y);
-// }
-
 InventoryElement * get_item_at(ItemLocation loc)
-{
+{ //loc is player position
     if (loc.tag == ItemLocation::Tag::Player)
         abort();
 
-    chunk * ch = world_table[loc.chunk.map_y][loc.chunk.map_x];
-    if (!ch)
-        return nullptr;
-    for (InventoryElement* el: ch->objects)
+    unsigned int left_chunk_x, right_chunk_x, top_chunk_y, bottom_chunk_y, left_top_world_x, left_top_world_y;
+    get_chunks_around(loc, &left_chunk_x, &right_chunk_x, &top_chunk_y, &bottom_chunk_y, &left_top_world_x, &left_top_world_y);
+
+    for (unsigned int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
     {
-        if (el->get_x() == loc.chunk.x && el->get_y() == loc.chunk.y)
+        for (unsigned int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
         {
-            return el;
+            chunk * ch = world_table[cy][cx];
+            if (!ch)
+                return nullptr;
+            for (InventoryElement* el: ch->objects)
+            {
+                if (el->c_id == Class_Player) continue;
+                if (el->check_rect(loc.get_world_x(), loc.get_world_y(), tile_size))
+                {
+                    return el;
+                }
+            }
         }
     }
     return nullptr;
@@ -174,4 +99,26 @@ InventoryElement * get_item_at_ppos(Player * player)
     return get_item_at(player->location);
 }
 
-// FIXME do we need these functions
+unsigned int get_world_pos(unsigned int chunk, unsigned int pos)
+{
+    return chunk * CHUNK_SIZE + pos;
+}
+
+void get_chunks_around(ItemLocation loc, unsigned int *left_chunk_x, unsigned int *right_chunk_x,
+    unsigned int *top_chunk_y, unsigned int *bottom_chunk_y,
+    unsigned int *left_top_world_x, unsigned int *left_top_world_y)
+{
+    unsigned int player_world_x = loc.get_world_x();
+    unsigned int player_world_y = loc.get_world_y();
+
+    *left_top_world_x = player_world_x - CHUNK_SIZE / 2;
+    *left_top_world_y = player_world_y - CHUNK_SIZE / 2;
+
+    *left_chunk_x = *left_top_world_x / CHUNK_SIZE;
+    *right_chunk_x = (*left_top_world_x + CHUNK_SIZE - 1) / CHUNK_SIZE;
+
+    *top_chunk_y = *left_top_world_y / CHUNK_SIZE;
+    *bottom_chunk_y = (*left_top_world_y + CHUNK_SIZE - 1) / CHUNK_SIZE;
+
+}
+

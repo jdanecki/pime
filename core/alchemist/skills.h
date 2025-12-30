@@ -7,9 +7,10 @@
 class Skill
 {
 public:
+    Skill_type type;
     int experience;
     Skill();
-    void use();
+    int use();
 };
 
 const char * gsn(Skill_type t);

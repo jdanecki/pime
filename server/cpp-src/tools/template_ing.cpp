@@ -4,14 +4,6 @@ CLASS_NAME::CLASS_NAME(InventoryElement * from) : IngredientServer(from, ING, Fo
 {
 }
 
-bool CLASS_NAME::check_ing()
-{
-    if ((el->get_base_cid() == Class_BaseElement) || (el->get_base_cid() == Class_BasePlant))
-        return new CLASS_NAME(from);
-    else
-        return nullptr;
-}
-
 IngredientServer * CLASS_NAME::createCLASS_NAME(InventoryElement * from)
 {
     return new CLASS_NAME(from);

@@ -14,14 +14,14 @@ Edible::~Edible()
 
 void Edible::show()
 {
-    printf("      *** Edible ***\n");
-    printf("eating by: %x -> ", eating_by);
+    CONSOLE_LOG("      *** Edible ***\n");
+    CONSOLE_LOG("eating by: %x -> ", eating_by);
     for (int i = 0; i < 5; i++)
     {
         if (eating_by & (1 << i))
-            printf("%s ", clan_names[i]);
+            CONSOLE_LOG("%s ", clan_names[i]);
     }
-    puts("");
+    CONSOLE_LOG("\n");
     caloric.show();
     irrigation.show();
     poison.show();
@@ -118,7 +118,7 @@ Solid::~Solid()
 
 void Solid::show()
 {
-    printf("      *** Solid ***\n");
+    CONSOLE_LOG("      *** Solid ***\n");
 
     tooling.show();
     stretching.show(); // rozciąganie

@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include "../core/alchemist/ncurses-output.h"
 
 TTF_Font * font;
 
@@ -24,7 +25,7 @@ int load_font()
     ret = stat(FONT_NAME, &statbuf);
     if (ret)
     {
-        printf("load_font(%s): %s\n", FONT_NAME, strerror(errno));
+        CONSOLE_LOG("load_font(%s): %s\n", FONT_NAME, strerror(errno));
         return 1;
     }
     font = TTF_OpenFont(FONT_NAME, 128);

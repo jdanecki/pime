@@ -2,13 +2,10 @@
 
 void chunk::add_object(InventoryElement * object, int x, int y)
 {
-#ifndef CORE_FOR_CLIENT
-//    printf("adding object %s uid=%lx\n", object->get_name(), object->uid);
-#endif
-    if (object->c_id == Class_Player)
-        objects.add(object);
-    else
-        objects.add_front(object);
+    //if (object->c_id == Class_Player)
+      //  objects.add(object);
+    //else
+    objects.add_front(object);
 
     if (object->c_id == Class_Plant || object->c_id == Class_Animal)
     {
@@ -38,7 +35,7 @@ void chunk::remove_object(InventoryElement * object)
 
 InventoryElement * chunk::find_by_id(size_t id)
 {
-    for (InventoryElement* el: objects)
+    for (InventoryElement * el : objects)
     {
         if (el->uid == id)
             return el;
@@ -48,11 +45,13 @@ InventoryElement * chunk::find_by_id(size_t id)
 
 chunk::chunk(int map_x, int map_y) : map_x(map_x), map_y(map_y)
 {
+    objects.name = "objects";
+    beings.name = "beings";
 }
 
 void chunk::show()
 {
-    printf("chunk[%d, %d] obj=%d bei=%d tile=%d\n", map_x, map_y, objects.nr_elements, beings.nr_elements, table[0][0].tile);
+    CONSOLE_LOG("chunk[%d, %d] obj=%d bei=%d tile=%d\n", map_x, map_y, objects.nr_elements, beings.nr_elements, table[0][0].tile);
     if (objects.nr_elements)
         objects.show(false);
 }

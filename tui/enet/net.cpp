@@ -19,15 +19,51 @@ class ObjectElement : public ListElement
     bool check(void *what)
     {
         uintptr_t * uid=(uintptr_t*)what;
-        return *uid == el->uid;
+        return *uid == el.get()->uid;
     }
 };
+
+void add_base_elements(PacketElementsList * list, int i)
+{
+    switch (list->get_c_id()) {
+        case Class_BaseElement:
+        {
+            BaseElement * base_el = &((BaseElement*) list->get_data())[i];
+            base_elements.add(new BaseListElement(new BaseElement(*base_el)));
+            break;
+        }
+        case Class_BasePlant:
+        {
+            BasePlant * base_el = &((BasePlant*) list->get_data())[i];
+            base_plants.add(new BaseListElement(new BasePlant(*base_el)));
+            break;
+        }
+        case Class_BaseAnimal:
+        {
+            BaseAnimal * base_el = &((BaseAnimal*) list->get_data())[i];
+            base_animals.add(new BaseListElement(new BaseAnimal(*base_el)));
+            break;
+        }
+    }
+}
+
+extern void update_hotbar();
+void add_elements(PacketElementsList * list, int i)
+{
+    size_t uid= ((size_t*) list->get_data())[i];
+    Player * p = (Player *)get_object_by_id(list->get_pl_id());
+    if (p)
+        p->pickup(get_object_by_id(uid));
+
+    printf("player=%p [%d]=%lx elems=%d\n", p, i, uid,p->inventory.nr_elements);
+    update_hotbar();
+}
 
 bool handle_packet(ENetPacket * packet)
 {
     bool ret = false;
     unsigned char * data = packet->data;
-    printf("Received length=%lu: %d\n", packet->dataLength, *data);
+  //  printf("Received length=%lu: %d\n", packet->dataLength, *data);
 
     Packet * p = check_packet('R', data, packet->dataLength);
     if (!p)
@@ -105,26 +141,17 @@ bool handle_packet(ENetPacket * packet)
             PacketElementsList * list = dynamic_cast<PacketElementsList *>(p);
             for (int i=0; i < list->get_nr_elements(); i++)
             {
-                switch (list->get_c_id()) {
-                    case Class_BaseElement:
-                    {
-                        BaseElement * base_el = &((BaseElement*) list->get_data())[i];
-                        base_elements.add(new BaseListElement(new BaseElement(*base_el)));
+                switch(list->get_list_c_id())
+                {
+                    case Class_BaseListElement:
+                        add_base_elements(list, i);
                         break;
-                    }
-                    case Class_BasePlant:
-                    {
-                        BasePlant * base_el = &((BasePlant*) list->get_data())[i];
-                        base_plants.add(new BaseListElement(new BasePlant(*base_el)));
+                    case Class_ListElement:
+                        add_elements(list, i);
                         break;
-                    }
-                    case Class_BaseAnimal:
-                    {
-                        BaseAnimal * base_el = &((BaseAnimal*) list->get_data())[i];
-                        base_animals.add(new BaseListElement(new BaseAnimal(*base_el)));
-                        break;
-                    }
                 }
+
+
             }
             ret = true;
             break;
@@ -137,7 +164,7 @@ bool handle_packet(ENetPacket * packet)
 
 NetClient * init(const char * server_ip, const char * port)
 {
-    trace_network = 1;
+    //trace_network = 1;
 
     if (enet_initialize() != 0)
     {
@@ -230,16 +257,17 @@ unsigned int network_tick(NetClient * client)
 
     return recv;
 }
+
 InventoryElement * get_object_by_id(uintptr_t uid)
 {
     ListElement *el = objects.find(&uid);
-    return el ? el->el : nullptr;
+    return el ? el->el.get() : nullptr;
 }
 
 void register_object(InventoryElement * o)
 {
     ObjectElement *obj = new ObjectElement(o);
-    printf("register_object: uid=%lx\n", o->uid);
+   // printf("register_object: uid=%lx\n", o->uid);
     objects.add(obj);
 }
 

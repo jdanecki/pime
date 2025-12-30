@@ -28,6 +28,7 @@ impl ParseCallbacks for MacroCallback {
             "Skill",
             "InvList",
             "NetworkObject",
+            "Place",
         ];
         let debug = vec![
             "Element",
@@ -39,6 +40,7 @@ impl ParseCallbacks for MacroCallback {
             "Scroll",
             "Player",
             "Npc",
+            "Place",
         ];
         let copy = vec![
             "BaseElement",

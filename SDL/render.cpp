@@ -4,26 +4,22 @@
 #include "texture.h"
 #include "window.h"
 #include <SDL2/SDL_render.h>
-#include <cstddef>
-#include <cstdio>
+#include <stddef.h>
+#include <stdio.h>
 #include "dialog/d_craft.h"
-#include <cassert>
+#include <assert.h>
 #include "dialog/d_hotbar.h"
 #include "implementations/playerSDL.h"
 
-extern SDL_Texture* map;
+extern SDL_Texture * map;
 
 // TODO move it
 int active_hotbar = 0;
-int width;
-int tx;
-int game_size;
-int tile_dungeon_size;
 
-int left_chunk_x;
-int right_chunk_x;
-int top_chunk_y;
-int bottom_chunk_y;
+unsigned int left_chunk_x;
+unsigned int right_chunk_x;
+unsigned int top_chunk_y;
+unsigned int bottom_chunk_y;
 
 DHotbar hotbar;
 
@@ -35,12 +31,21 @@ extern NetClient * client;
 void draw_texts()
 {
     int ty = 10;
+    int tx = window_width - PANEL_WINDOW + 10;
 
     sprintf(text, "Hunger=%d Thirst=%d", player->hunger, player->thirst);
     write_text(tx, ty, text, (player->hunger < 100 || player->thirst < 100) ? Red : White, 15, 30);
 #ifdef USE_ENET
-    sprintf(text, "%s@[%d,%d][%d,%d]", player->get_name(), player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
-        player->location.chunk.y);
+    int32_t pl_ch_x=player->location.chunk.map_x;
+    int32_t pl_ch_y=player->location.chunk.map_y;
+    unsigned int px=player->location.chunk.x;
+    unsigned int py=player->location.chunk.y;
+    chunk * ch = world_table[pl_ch_y][pl_ch_x];
+    int tile = ch->table[py][px].tile;
+    BaseElement * base = get_base_element(tile % tiles_textures_count);
+
+    sprintf(text, "%s@[%d,%d][%d,%d]:id=%d f=%d", player->get_name(),
+        pl_ch_x, pl_ch_y, px, py, base->id, base->form);
 #else
     if (player->c_id != 0) 
         sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), player->get_clan() ? clan_names[player->get_clan()->id] : "", player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
@@ -60,7 +65,9 @@ void draw_texts()
         }
         print_status(1, t);
         delete[] t;
-        if (player->checked_element == item->uid)
+       // item->location.show();
+
+        //if (player->checked_element == item->uid)
         {
             ty += 30;
             int count = 0;
@@ -78,10 +85,26 @@ void draw_texts()
             }
         }
     }
+    InventoryElement *el=player->hotbar[active_hotbar];
+    if (el)
+    {
+        if (el->get_cid() == Class_Product)
+        {
+            Product * pr=dynamic_cast<Product*>(el);
+            if (pr) {
+                sprintf(text, "%s %s", el->get_name(), product_action_name[pr->actions[0]]);
+            }
+        }
+        else
+        {
+            sprintf(text, "%s (%s)", el->get_name(), el->get_class_name());
+        }
+        write_text(window_width - PANEL_WINDOW + 10, window_height-60, text, Cyan, 13, 25);
+    }
 }
 
 #ifdef USE_ENET
-//int wait_for_chunk;
+// int wait_for_chunk;
 
 void draw_maps()
 {
@@ -89,7 +112,7 @@ void draw_maps()
     int pitch, x, y;
 
     SDL_LockTexture(map, NULL, (void **)&pixels, &pitch);
-//    bool sent_request = false;
+    //    bool sent_request = false;
 
     int start_x = player->location.chunk.map_x - 5;
     int start_y = player->location.chunk.map_y - 5;
@@ -111,9 +134,9 @@ void draw_maps()
             if (chunk)
             {
                 int tile = chunk->table[y][x].tile;
-                //BaseElement * b = get_base_element(tile);
+                // BaseElement * b = get_base_element(tile);
                 unsigned long c = 0xff000000 + tile;
-                //unsigned long c = 0xff000000 | (b->color.r) | (b->color.g << 8) | (b->color.b << 16);
+                // unsigned long c = 0xff000000 | (b->color.r) | (b->color.g << 8) | (b->color.b << 16);
                 pixels[y * WORLD_SIZE + x] = c;
             }
             else
@@ -123,7 +146,7 @@ void draw_maps()
                 {
                     if (!sent_request)
                     {
-                        printf("request_chunk: %d %d\n", x, y);
+                       CONSOLE_LOG("request_chunk: %d %d\n", x, y);
                         send_packet_request_chunk(client, x, y);
                         sent_request = true;
                     }
@@ -159,7 +182,7 @@ void draw_maps()
         window_rec.w = 0;
         window_rec.h = 0;
     }*/
-    window_rec.x = width + 10;
+    window_rec.x = window_width - PANEL_WINDOW + 280;
     window_rec.y = 200; // window_height - WORLD_SIZE - STATUS_LINES;
 
     SDL_RenderCopy(renderer, map, NULL, &window_rec);
@@ -182,7 +205,7 @@ chunk * check_chunk(int cx, int cy)
         }
         else
         {
-            printf("waiting for chunk %d %d\n", cx, cy);
+            CONSOLE_LOG("waiting for chunk %d %d\n", cx, cy);
             return nullptr;
         }
     }
@@ -193,48 +216,48 @@ chunk * check_chunk(int cx, int cy)
     return ch;
 }
 
-bool draw_terrain()
+void render_element(InventoryElement *o, unsigned int ltx, unsigned int lty)
 {
-    width = window_width - PANEL_WINDOW;
-    tx = width + 10;
-
-    if (width < window_height)
+    Renderable * r = dynamic_cast<Renderable *>(o);
+    if (r)
     {
-        game_size = width;
-        tile_dungeon_size = width / (CHUNK_SIZE);
+        int obj_world_x = o->location.get_world_x();
+        int obj_world_y = o->location.get_world_y();
+
+        int screen_x = obj_world_x - ltx;
+        int screen_y = obj_world_y - lty;
+
+        if (screen_x < CHUNK_SIZE && screen_y < CHUNK_SIZE)
+        {
+            r->render(screen_x * tile_size, screen_y * tile_size);
+        }
     }
     else
     {
-        game_size = window_height;
-        tile_dungeon_size = window_height / (CHUNK_SIZE);
+        CONSOLE_LOG("unrenderable %d\n", o->get_cid());
     }
+}
 
-    int player_world_x = get_world_x(player->location);
-    int player_world_y = get_world_y(player->location);
+bool draw_terrain()
+{
+    unsigned int left_top_world_x, left_top_world_y;
 
-    int left_top_world_x = player_world_x - CHUNK_SIZE / 2;
-    int left_top_world_y = player_world_y - CHUNK_SIZE / 2;
+    get_chunks_around(player->location, &left_chunk_x, &right_chunk_x, &top_chunk_y, &bottom_chunk_y, &left_top_world_x, &left_top_world_y);
 
-    left_chunk_x = left_top_world_x / CHUNK_SIZE;
-    right_chunk_x = (left_top_world_x + CHUNK_SIZE - 1) / CHUNK_SIZE;
-
-    top_chunk_y = left_top_world_y / CHUNK_SIZE;
-    bottom_chunk_y = (left_top_world_y + CHUNK_SIZE - 1) / CHUNK_SIZE;
-
-    for (int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
+    for (unsigned int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
     {
-        for (int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
+        for (unsigned int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
         {
             chunk * ch = check_chunk(cx, cy);
             if (!ch)
                 return false;
 
-            for (int ty = 0; ty < CHUNK_SIZE; ++ty)
+            for (unsigned int ty = 0; ty < CHUNK_SIZE; ++ty)
             {
-                for (int tx = 0; tx < CHUNK_SIZE; ++tx)
+                for (unsigned int tx = 0; tx < CHUNK_SIZE; ++tx)
                 {
-                    int world_x = cx * CHUNK_SIZE + tx;
-                    int world_y = cy * CHUNK_SIZE + ty;
+                    int world_x = get_world_pos(cx, tx);
+                    int world_y = get_world_pos(cy, ty);
 
                     int screen_x = world_x - left_top_world_x;
                     int screen_y = world_y - left_top_world_y;
@@ -243,70 +266,89 @@ bool draw_terrain()
                     {
                         int tile = ch->table[ty][tx].tile;
 
-                        SDL_Rect img_rect = {screen_x * tile_dungeon_size, screen_y * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
+                        SDL_Rect img_rect = {screen_x * tile_size, screen_y * tile_size, tile_size, tile_size};
 
                         SDL_Texture * texture = tiles_textures[tile % tiles_textures_count];
                         BaseElement * base = get_base_element(tile % tiles_textures_count);
-                        if (base)
-                            SDL_SetTextureColorMod(texture, base->color.r, base->color.g, base->color.b);
+                        if (base) {
+                            int r=base->color.r;
+                            int g=base->color.g;
+                            int b=base->color.b;
+                            switch (base->form)
+                            {
+                                case Form_solid:
+                                    break;
+                                case Form_liquid:
+                                    //b|=128;
+                                    break;
+                                case Form_gas:
+                                    //SDL_SetTextureAlphaMod(texture, 128);
+                                    break;
+                            }
+
+                            SDL_SetTextureColorMod(texture, r, g, b);
+                            //SDL_SetTextureColorMod(texture, tx * 15, ty*15, (tx+ty)*7);
+                        }
                         SDL_RenderCopy(renderer, texture, NULL, &img_rect);
                     }
                 }
             }
         }
     }
-
-    //  printf("%d,%d -> %d,%d\n", left_chunk_x, top_chunk_y, right_chunk_x, bottom_chunk_y);
-    for (int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
+  /*  for (int i=0; i < tiles_textures_count; i++)
     {
-        for (int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
+        SDL_Texture * texture = tiles_textures[i];
+        SDL_Rect img_rect = {i * tile_size, 16 * tile_size, tile_size, tile_size};
+        SDL_RenderCopy(renderer, texture, NULL, &img_rect);
+    }
+*/
+    // CONSOLE_LOG("%d,%d -> %d,%d\n", left_chunk_x, top_chunk_y, right_chunk_x, bottom_chunk_y);
+    for (unsigned int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
+    {
+        for (unsigned int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
         {
-            if (cx < 0 || cy < 0 || cx >= WORLD_SIZE || cy >= WORLD_SIZE)
+            if (cx >= WORLD_SIZE || cy >= WORLD_SIZE)
                 continue;
 
             chunk * ch = world_table[cy][cx];
             if (!ch)
                 continue;
 
-            for(InventoryElement* o: ch->objects)
+            ReversedView revert=ch->objects.reversed();
+            /*CONSOLE_LOG("cx=%d cy=%d head=%p next=%p prev=%p tail=%p elem=%d\n", cx, cy,
+                revert.list->head, revert.list->head->next, revert.list->head->prev,
+                revert.list->tail, revert.list->nr_elements);*/
+            //revert.show();
+            for (InventoryElement * o : revert)
             {
-                Renderable * r = dynamic_cast<Renderable *>(o);
-                if (o && r)
+                if (!o)
                 {
-                    int obj_world_x = cx * CHUNK_SIZE + o->get_x();
-                    int obj_world_y = cy * CHUNK_SIZE + o->get_y();
-
-                    int screen_x = obj_world_x - left_top_world_x;
-                    int screen_y = obj_world_y - left_top_world_y;
-
-                    if (screen_x >= 0 && screen_x < CHUNK_SIZE && screen_y >= 0 && screen_y < CHUNK_SIZE)
-                    {
-                        SDL_Rect img_rect = {screen_x * tile_dungeon_size, screen_y * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
-                        r->render(&img_rect);
-                    }
+                    CONSOLE_LOG("null object in chunk\n");
+                    return false;
                 }
-                else
-                {
-                    printf("unrenderable %d\n", o->get_cid());
-                }
+                if (o == player) continue;
+                render_element(o, left_top_world_x, left_top_world_y);
             }
         }
     }
+    render_element(player, left_top_world_x, left_top_world_y);
+
     return true;
 }
 
 void draw_players()
 {
-    // render GUI
-    int icon_size = game_size / 10;
+    int w=window_width - PANEL_WINDOW;
+    int icon_size = w / 10;
+    int x = (int)(w - (icon_size * 1.1));
     if (player->running)
     {
-        SDL_Rect running_icon_rect = {(int)(game_size - (icon_size * 1.1)), 0, icon_size, icon_size};
+        SDL_Rect running_icon_rect = {x, 0, icon_size, icon_size};
         SDL_RenderCopy(renderer, Player_textures.run_icon, NULL, &running_icon_rect);
     }
     if (player->sneaking)
     {
-        SDL_Rect sneaking_icon_rect = {(int)(game_size - (icon_size * 1.1)), 0, icon_size, icon_size};
+        SDL_Rect sneaking_icon_rect = {x, 0, icon_size, icon_size};
         SDL_RenderCopy(renderer, Player_textures.sneak_icon, NULL, &sneaking_icon_rect);
     }
 }
@@ -316,7 +358,7 @@ void draw_npc()
     // FIXME
     if (!current_npc)
         return;
-    SDL_Rect img_rect = {5 * tile_dungeon_size, 5 * tile_dungeon_size, tile_dungeon_size, tile_dungeon_size};
+    SDL_Rect img_rect = {5 * tile_size, 5 * tile_size, tile_size, tile_size};
     static int tick = 0;
     static int dir = 1;
     int side;
@@ -353,6 +395,11 @@ bool draw()
         draw_players();
         draw_npc();
         draw_texts();
+/*
+ #ifdef USE_ENET
+        draw_maps();
+#endif
+*/
     }
     if (status_line[0] != ' ')
     {

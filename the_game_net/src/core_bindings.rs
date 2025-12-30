@@ -506,15 +506,14 @@ pub const _PRINTF_NAN_LEN_MAX: u32 = 4;
 pub const RENAME_NOREPLACE: u32 = 1;
 pub const RENAME_EXCHANGE: u32 = 2;
 pub const RENAME_WHITEOUT: u32 = 4;
-pub const _GLIBCXX_CSTDIO: u32 = 1;
 pub const _GLIBCXX_STDLIB_H: u32 = 1;
-pub const OBJECTS: u32 = 1;
-pub const BASE_ANIMALS: u32 = 40;
-pub const BASE_PLANTS: u32 = 10;
-pub const BIOMES: u32 = 3;
-pub const CHUNK_SIZE: u32 = 17;
 pub const WORLD_SIZE: u32 = 256;
 pub const WORLD_CENTER: u32 = 128;
+pub const CHUNK_SIZE: u32 = 17;
+pub const BASE_PLANTS: u32 = 22;
+pub const BASE_ANIMALS: u32 = 4;
+pub const TILE_TEXTURES: u32 = 15;
+pub const BIOMES: u32 = 3;
 pub const WORLD_SCALE: f64 = 100.0;
 pub type PacketType = ::std::os::raw::c_uchar;
 pub const PACKET_UNKNOWN: PacketType = 0;
@@ -579,11 +578,15 @@ pub const Class_id_Class_Element: Class_id = 4;
 pub const Class_id_Class_Ingredient: Class_id = 5;
 pub const Class_id_Class_Product: Class_id = 6;
 pub const Class_id_Class_Scroll: Class_id = 7;
-pub const Class_id_Class_Plant: Class_id = 8;
-pub const Class_id_Class_Animal: Class_id = 9;
-pub const Class_id_Class_Player: Class_id = 10;
-pub const Class_id_Class_Npc: Class_id = 11;
-pub const Class_id_Class_Clan: Class_id = 12;
+pub const Class_id_Class_Place: Class_id = 8;
+pub const Class_id_Class_Plant: Class_id = 9;
+pub const Class_id_Class_Animal: Class_id = 10;
+pub const Class_id_Class_Player: Class_id = 11;
+pub const Class_id_Class_Npc: Class_id = 12;
+pub const Class_id_Class_Clan: Class_id = 13;
+pub const Class_id_Class_ListElement: Class_id = 14;
+pub const Class_id_Class_KnownElement: Class_id = 15;
+pub const Class_id_Class_BaseListElement: Class_id = 16;
 pub type Class_id = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, serde :: Deserialize, PartialEq, Eq)]
@@ -2923,6 +2926,13 @@ pub type Form = ::std::os::raw::c_uint;
 extern "C" {
     pub static mut Form_name: [*const ::std::os::raw::c_char; 0usize];
 }
+extern "C" {
+    #[link_name = "\u{1}_Z13get_world_posjj"]
+    pub fn get_world_pos(
+        chunk: ::std::os::raw::c_uint,
+        pos: ::std::os::raw::c_uint,
+    ) -> ::std::os::raw::c_uint;
+}
 pub const ItemLocation_Tag_Chunk: ItemLocation_Tag = 0;
 pub const ItemLocation_Tag_Player: ItemLocation_Tag = 1;
 pub type ItemLocation_Tag = ::std::os::raw::c_int;
@@ -2931,8 +2941,8 @@ pub type ItemLocation_Tag = ::std::os::raw::c_int;
 pub struct ItemLocation_Chunk_Body {
     pub map_x: i32,
     pub map_y: i32,
-    pub x: i32,
-    pub y: i32,
+    pub x: ::std::os::raw::c_uint,
+    pub y: ::std::os::raw::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -2987,6 +2997,9 @@ pub const Product_action_ACT_CUT: Product_action = 1;
 pub const Product_action_ACT_HIT: Product_action = 2;
 pub const Product_action_ACT_STAB: Product_action = 3;
 pub const Product_action_ACT_FIRE: Product_action = 4;
+pub const Product_action_ACT_PLOW: Product_action = 5;
+pub const Product_action_ACT_PLANT: Product_action = 6;
+pub const Product_action_ACT_INVITE: Product_action = 7;
 pub type Product_action = ::std::os::raw::c_uint;
 extern "C" {
     pub static mut product_action_name: [*const ::std::os::raw::c_char; 0usize];
@@ -3155,24 +3168,54 @@ impl InventoryElement {
         __bindgen_tmp.assume_init()
     }
 }
-pub const object_types_OBJECT_wall: object_types = 0;
-pub type object_types = ::std::os::raw::c_uint;
+pub const Place_id_PLACE_FIELD: Place_id = 0;
+pub const Place_id_PLACES_COUNT: Place_id = 1;
+pub type Place_id = ::std::os::raw::c_uint;
 extern "C" {
-    pub static mut object_names: [*const ::std::os::raw::c_char; 0usize];
+    pub static mut places_names: [*const ::std::os::raw::c_char; 0usize];
+}
+pub const Place_states_FIELD_PLOWED: Place_states = 0;
+pub const Place_states_FIELD_PLANTED: Place_states = 1;
+pub type Place_states = ::std::os::raw::c_uint;
+extern "C" {
+    pub static mut place_states_names: [*const ::std::os::raw::c_char; 0usize];
 }
 #[repr(C)]
-pub struct Object {
+#[derive(serde :: Deserialize, Debug, Clone, Copy)]
+pub struct Place {
     pub _base: InventoryElement,
-    pub base: *mut BaseElement,
-    pub type_: object_types,
+    pub id: Place_id,
+    pub state: Place_states,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Object"][::std::mem::size_of::<Object>() - 64usize];
-    ["Alignment of Object"][::std::mem::align_of::<Object>() - 8usize];
-    ["Offset of field: Object::base"][::std::mem::offset_of!(Object, base) - 48usize];
-    ["Offset of field: Object::type_"][::std::mem::offset_of!(Object, type_) - 56usize];
+    ["Size of Place"][::std::mem::size_of::<Place>() - 56usize];
+    ["Alignment of Place"][::std::mem::align_of::<Place>() - 8usize];
+    ["Offset of field: Place::id"][::std::mem::offset_of!(Place, id) - 48usize];
+    ["Offset of field: Place::state"][::std::mem::offset_of!(Place, state) - 52usize];
 };
+extern "C" {
+    #[link_name = "\u{1}_ZN5PlaceC1E8Place_idm"]
+    pub fn Place_Place(this: *mut Place, id: Place_id, uid: usize);
+}
+extern "C" {
+    #[link_name = "\u{1}_ZN5PlaceC1E8Place_id"]
+    pub fn Place_Place1(this: *mut Place, id: Place_id);
+}
+impl Place {
+    #[inline]
+    pub unsafe fn new(id: Place_id, uid: usize) -> Self {
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        Place_Place(__bindgen_tmp.as_mut_ptr(), id, uid);
+        __bindgen_tmp.assume_init()
+    }
+    #[inline]
+    pub unsafe fn new1(id: Place_id) -> Self {
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        Place_Place1(__bindgen_tmp.as_mut_ptr(), id);
+        __bindgen_tmp.assume_init()
+    }
+}
 #[repr(C)]
 #[derive(serde :: Deserialize, Debug, Clone, Copy)]
 pub struct Scroll {
@@ -3246,22 +3289,28 @@ pub const Ingredient_id_ING_KNIFE_BLADE: Ingredient_id = 2;
 pub const Ingredient_id_ING_KNIFE_HANDLE: Ingredient_id = 3;
 pub const Ingredient_id_ING_PICKAXE_BLADE: Ingredient_id = 4;
 pub const Ingredient_id_ING_PICKAXE_HANDLE: Ingredient_id = 5;
-pub const Ingredient_id_ING_WALL: Ingredient_id = 6;
-pub const Ingredient_id_ING_MEAT: Ingredient_id = 7;
-pub const Ingredient_id_ING_LOG: Ingredient_id = 8;
-pub const Ingredient_id_ING_TINDER: Ingredient_id = 9;
-pub const Ingredient_id_ING_STICK: Ingredient_id = 10;
-pub const Ingredient_id_ING_FRUIT: Ingredient_id = 11;
-pub const Ingredient_id_ING_COUNT: Ingredient_id = 12;
+pub const Ingredient_id_ING_HOE_BLADE: Ingredient_id = 6;
+pub const Ingredient_id_ING_HOE_HANDLE: Ingredient_id = 7;
+pub const Ingredient_id_ING_WALL: Ingredient_id = 8;
+pub const Ingredient_id_ING_MEAT: Ingredient_id = 9;
+pub const Ingredient_id_ING_LOG: Ingredient_id = 10;
+pub const Ingredient_id_ING_TINDER: Ingredient_id = 11;
+pub const Ingredient_id_ING_STICK: Ingredient_id = 12;
+pub const Ingredient_id_ING_FRUIT: Ingredient_id = 13;
+pub const Ingredient_id_ING_SEED: Ingredient_id = 14;
+pub const Ingredient_id_ING_COUNT: Ingredient_id = 15;
 pub type Ingredient_id = ::std::os::raw::c_uint;
 pub const Product_id_PROD_AXE: Product_id = 0;
 pub const Product_id_PROD_KNIFE: Product_id = 1;
 pub const Product_id_PROD_PICKAXE: Product_id = 2;
-pub const Product_id_PROD_HUT: Product_id = 3;
-pub const Product_id_PROD_FIRE: Product_id = 4;
-pub const Product_id_PROD_ROASTED_MEAT: Product_id = 5;
-pub const Product_id_PROD_FRUIT_SALAD: Product_id = 6;
-pub const Product_id_PROD_COUNT: Product_id = 7;
+pub const Product_id_PROD_HOE: Product_id = 3;
+pub const Product_id_PROD_HUT: Product_id = 4;
+pub const Product_id_PROD_TENT: Product_id = 5;
+pub const Product_id_PROD_FIRE: Product_id = 6;
+pub const Product_id_PROD_ROASTED_MEAT: Product_id = 7;
+pub const Product_id_PROD_FRUIT_SALAD: Product_id = 8;
+pub const Product_id_PROD_SEEDLING: Product_id = 9;
+pub const Product_id_PROD_COUNT: Product_id = 10;
 pub type Product_id = ::std::os::raw::c_uint;
 extern "C" {
     pub static mut ingredient_name: [*const ::std::os::raw::c_char; 0usize];
@@ -3318,13 +3367,13 @@ pub struct Product {
     pub resilience: Property,
     pub usage: Property,
     pub req_form: Form,
-    pub actions: Product_action,
+    pub actions: [Product_action; 10usize],
     pub actions_count: ::std::os::raw::c_int,
     pub id: Product_id,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Product"][::std::mem::size_of::<Product>() - 120usize];
+    ["Size of Product"][::std::mem::size_of::<Product>() - 160usize];
     ["Alignment of Product"][::std::mem::align_of::<Product>() - 8usize];
     ["Offset of field: Product::padding"][::std::mem::offset_of!(Product, padding) - 48usize];
     ["Offset of field: Product::quality"][::std::mem::offset_of!(Product, quality) - 56usize];
@@ -3333,18 +3382,22 @@ const _: () = {
     ["Offset of field: Product::req_form"][::std::mem::offset_of!(Product, req_form) - 104usize];
     ["Offset of field: Product::actions"][::std::mem::offset_of!(Product, actions) - 108usize];
     ["Offset of field: Product::actions_count"]
-        [::std::mem::offset_of!(Product, actions_count) - 112usize];
-    ["Offset of field: Product::id"][::std::mem::offset_of!(Product, id) - 116usize];
+        [::std::mem::offset_of!(Product, actions_count) - 148usize];
+    ["Offset of field: Product::id"][::std::mem::offset_of!(Product, id) - 152usize];
 };
 extern "C" {
-    #[link_name = "\u{1}_ZN7ProductC1E10Product_id"]
-    pub fn Product_Product(this: *mut Product, i: Product_id);
+    #[link_name = "\u{1}_ZN7ProductC1E10Product_idi"]
+    pub fn Product_Product(
+        this: *mut Product,
+        id: Product_id,
+        actions_count: ::std::os::raw::c_int,
+    );
 }
 impl Product {
     #[inline]
-    pub unsafe fn new(i: Product_id) -> Self {
+    pub unsafe fn new(id: Product_id, actions_count: ::std::os::raw::c_int) -> Self {
         let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
-        Product_Product(__bindgen_tmp.as_mut_ptr(), i);
+        Product_Product(__bindgen_tmp.as_mut_ptr(), id, actions_count);
         __bindgen_tmp.assume_init()
     }
 }
@@ -3408,11 +3461,10 @@ impl Animal {
         __bindgen_tmp.assume_init()
     }
 }
-pub const Plant_phase_Plant_seed: Plant_phase = 0;
-pub const Plant_phase_Plant_seedling: Plant_phase = 1;
-pub const Plant_phase_Plant_growing: Plant_phase = 2;
-pub const Plant_phase_Plant_flowers: Plant_phase = 3;
-pub const Plant_phase_Plant_fruits: Plant_phase = 4;
+pub const Plant_phase_Plant_seedling: Plant_phase = 0;
+pub const Plant_phase_Plant_growing: Plant_phase = 1;
+pub const Plant_phase_Plant_flowers: Plant_phase = 2;
+pub const Plant_phase_Plant_fruits: Plant_phase = 3;
 pub type Plant_phase = ::std::os::raw::c_uint;
 extern "C" {
     pub static mut plant_phase_name: [*const ::std::os::raw::c_char; 0usize];
@@ -3452,7 +3504,6 @@ pub struct Plant {
     pub growing_time: ::std::os::raw::c_uint,
     pub flowers_time: ::std::os::raw::c_uint,
     pub size: f32,
-    pub planted: bool,
     pub water: ::std::os::raw::c_int,
     pub phase: Plant_phase,
     pub grown: bool,
@@ -3467,10 +3518,9 @@ const _: () = {
     ["Offset of field: Plant::growing_time"][::std::mem::offset_of!(Plant, growing_time) - 76usize];
     ["Offset of field: Plant::flowers_time"][::std::mem::offset_of!(Plant, flowers_time) - 80usize];
     ["Offset of field: Plant::size"][::std::mem::offset_of!(Plant, size) - 84usize];
-    ["Offset of field: Plant::planted"][::std::mem::offset_of!(Plant, planted) - 88usize];
-    ["Offset of field: Plant::water"][::std::mem::offset_of!(Plant, water) - 92usize];
-    ["Offset of field: Plant::phase"][::std::mem::offset_of!(Plant, phase) - 96usize];
-    ["Offset of field: Plant::grown"][::std::mem::offset_of!(Plant, grown) - 100usize];
+    ["Offset of field: Plant::water"][::std::mem::offset_of!(Plant, water) - 88usize];
+    ["Offset of field: Plant::phase"][::std::mem::offset_of!(Plant, phase) - 92usize];
+    ["Offset of field: Plant::grown"][::std::mem::offset_of!(Plant, grown) - 96usize];
 };
 extern "C" {
     #[link_name = "\u{1}_ZN5PlantC1EP9BasePlant"]
@@ -3491,6 +3541,7 @@ pub struct ListElement__bindgen_vtable(::std::os::raw::c_void);
 pub struct ListElement {
     pub vtable_: *const ListElement__bindgen_vtable,
     pub enabled: bool,
+    pub c_id: Class_id,
     pub el: SerializablePointer<NetworkObject>,
     pub next: *mut ListElement,
     pub prev: *mut ListElement,
@@ -3501,6 +3552,7 @@ const _: () = {
     ["Alignment of ListElement"][::std::mem::align_of::<ListElement>() - 8usize];
     ["Offset of field: ListElement::enabled"]
         [::std::mem::offset_of!(ListElement, enabled) - 8usize];
+    ["Offset of field: ListElement::c_id"][::std::mem::offset_of!(ListElement, c_id) - 12usize];
     ["Offset of field: ListElement::el"][::std::mem::offset_of!(ListElement, el) - 16usize];
     ["Offset of field: ListElement::next"][::std::mem::offset_of!(ListElement, next) - 40usize];
     ["Offset of field: ListElement::prev"][::std::mem::offset_of!(ListElement, prev) - 48usize];
@@ -3638,6 +3690,20 @@ impl ElementsListIterator {
     }
 }
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ElementsListReverseIterator {
+    pub le: *mut ListElement,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of ElementsListReverseIterator"]
+        [::std::mem::size_of::<ElementsListReverseIterator>() - 8usize];
+    ["Alignment of ElementsListReverseIterator"]
+        [::std::mem::align_of::<ElementsListReverseIterator>() - 8usize];
+    ["Offset of field: ElementsListReverseIterator::le"]
+        [::std::mem::offset_of!(ElementsListReverseIterator, le) - 0usize];
+};
+#[repr(C)]
 pub struct ElementsList__bindgen_vtable(::std::os::raw::c_void);
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -3717,6 +3783,10 @@ extern "C" {
     pub fn ElementsList_end(this: *const ElementsList) -> ElementsListIterator;
 }
 extern "C" {
+    #[link_name = "\u{1}_ZN12ElementsList8reversedEv"]
+    pub fn ElementsList_reversed(this: *mut ElementsList) -> ReversedView;
+}
+extern "C" {
     #[link_name = "\u{1}_ZN12ElementsListC1EPKc"]
     pub fn ElementsList_ElementsList(this: *mut ElementsList, n: *const ::std::os::raw::c_char);
 }
@@ -3778,6 +3848,10 @@ impl ElementsList {
         ElementsList_end(self)
     }
     #[inline]
+    pub unsafe fn reversed(&mut self) -> ReversedView {
+        ElementsList_reversed(self)
+    }
+    #[inline]
     pub unsafe fn new(n: *const ::std::os::raw::c_char) -> Self {
         let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
         ElementsList_ElementsList(__bindgen_tmp.as_mut_ptr(), n);
@@ -3790,6 +3864,17 @@ impl ElementsList {
         __bindgen_tmp.assume_init()
     }
 }
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ReversedView {
+    pub list: *mut ElementsList,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of ReversedView"][::std::mem::size_of::<ReversedView>() - 8usize];
+    ["Alignment of ReversedView"][::std::mem::align_of::<ReversedView>() - 8usize];
+    ["Offset of field: ReversedView::list"][::std::mem::offset_of!(ReversedView, list) - 0usize];
+};
 pub type FindFunc = ::std::option::Option<
     unsafe extern "C" fn(el: *mut InventoryElement, arg: *mut ::std::os::raw::c_void) -> bool,
 >;
@@ -3984,17 +4069,19 @@ pub type Skill_type = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, serde :: Deserialize)]
 pub struct Skill {
+    pub type_: Skill_type,
     pub experience: ::std::os::raw::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Skill"][::std::mem::size_of::<Skill>() - 4usize];
+    ["Size of Skill"][::std::mem::size_of::<Skill>() - 8usize];
     ["Alignment of Skill"][::std::mem::align_of::<Skill>() - 4usize];
-    ["Offset of field: Skill::experience"][::std::mem::offset_of!(Skill, experience) - 0usize];
+    ["Offset of field: Skill::type_"][::std::mem::offset_of!(Skill, type_) - 0usize];
+    ["Offset of field: Skill::experience"][::std::mem::offset_of!(Skill, experience) - 4usize];
 };
 extern "C" {
     #[link_name = "\u{1}_ZN5Skill3useEv"]
-    pub fn Skill_use(this: *mut Skill);
+    pub fn Skill_use(this: *mut Skill) -> ::std::os::raw::c_int;
 }
 extern "C" {
     #[link_name = "\u{1}_ZN5SkillC1Ev"]
@@ -4002,7 +4089,7 @@ extern "C" {
 }
 impl Skill {
     #[inline]
-    pub unsafe fn use_(&mut self) {
+    pub unsafe fn use_(&mut self) -> ::std::os::raw::c_int {
         Skill_use(self)
     }
     #[inline]
@@ -4034,7 +4121,7 @@ pub struct Clan {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Clan"][::std::mem::size_of::<Clan>() - 64usize];
+    ["Size of Clan"][::std::mem::size_of::<Clan>() - 104usize];
     ["Alignment of Clan"][::std::mem::align_of::<Clan>() - 8usize];
     ["Offset of field: Clan::id"][::std::mem::offset_of!(Clan, id) - 16usize];
     ["Offset of field: Clan::skills"][::std::mem::offset_of!(Clan, skills) - 20usize];
@@ -4058,7 +4145,7 @@ pub struct Human_clan {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Human_clan"][::std::mem::size_of::<Human_clan>() - 64usize];
+    ["Size of Human_clan"][::std::mem::size_of::<Human_clan>() - 104usize];
     ["Alignment of Human_clan"][::std::mem::align_of::<Human_clan>() - 8usize];
 };
 extern "C" {
@@ -4080,7 +4167,7 @@ pub struct Dwarf_clan {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Dwarf_clan"][::std::mem::size_of::<Dwarf_clan>() - 64usize];
+    ["Size of Dwarf_clan"][::std::mem::size_of::<Dwarf_clan>() - 104usize];
     ["Alignment of Dwarf_clan"][::std::mem::align_of::<Dwarf_clan>() - 8usize];
 };
 extern "C" {
@@ -4102,7 +4189,7 @@ pub struct Elf_clan {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Elf_clan"][::std::mem::size_of::<Elf_clan>() - 64usize];
+    ["Size of Elf_clan"][::std::mem::size_of::<Elf_clan>() - 104usize];
     ["Alignment of Elf_clan"][::std::mem::align_of::<Elf_clan>() - 8usize];
 };
 extern "C" {
@@ -4124,7 +4211,7 @@ pub struct Niziolek_clan {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Niziolek_clan"][::std::mem::size_of::<Niziolek_clan>() - 64usize];
+    ["Size of Niziolek_clan"][::std::mem::size_of::<Niziolek_clan>() - 104usize];
     ["Alignment of Niziolek_clan"][::std::mem::align_of::<Niziolek_clan>() - 8usize];
 };
 extern "C" {
@@ -4208,7 +4295,7 @@ pub struct Player {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Player"][::std::mem::size_of::<Player>() - 264usize];
+    ["Size of Player"][::std::mem::size_of::<Player>() - 304usize];
     ["Alignment of Player"][::std::mem::align_of::<Player>() - 8usize];
     ["Offset of field: Player::padding"][::std::mem::offset_of!(Player, padding) - 48usize];
     ["Offset of field: Player::name"][::std::mem::offset_of!(Player, name) - 56usize];
@@ -4227,9 +4314,9 @@ const _: () = {
     ["Offset of field: Player::player_skills"]
         [::std::mem::offset_of!(Player, player_skills) - 192usize];
     ["Offset of field: Player::in_conversation"]
-        [::std::mem::offset_of!(Player, in_conversation) - 232usize];
-    ["Offset of field: Player::welcomed"][::std::mem::offset_of!(Player, welcomed) - 233usize];
-    ["Offset of field: Player::talking_to"][::std::mem::offset_of!(Player, talking_to) - 240usize];
+        [::std::mem::offset_of!(Player, in_conversation) - 272usize];
+    ["Offset of field: Player::welcomed"][::std::mem::offset_of!(Player, welcomed) - 273usize];
+    ["Offset of field: Player::talking_to"][::std::mem::offset_of!(Player, talking_to) - 280usize];
 };
 extern "C" {
     #[link_name = "\u{1}_ZN6Player6pickupEP16InventoryElement"]
@@ -4537,33 +4624,12 @@ extern "C" {
     pub fn find_in_world(loc: *mut ItemLocation, uid: usize) -> *mut InventoryElement;
 }
 extern "C" {
-    #[link_name = "\u{1}_Z11get_world_x12ItemLocation"]
-    pub fn get_world_x(loc: ItemLocation) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    #[link_name = "\u{1}_Z11get_world_y12ItemLocation"]
-    pub fn get_world_y(loc: ItemLocation) -> ::std::os::raw::c_int;
-}
-extern "C" {
     #[link_name = "\u{1}_Z11get_item_at12ItemLocation"]
     pub fn get_item_at(loc: ItemLocation) -> *mut InventoryElement;
 }
 extern "C" {
     #[link_name = "\u{1}_Z11get_tile_at12ItemLocation"]
     pub fn get_tile_at(loc: ItemLocation) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    #[link_name = "\u{1}_Z13get_object_atiiii"]
-    pub fn get_object_at(
-        chunk_x: ::std::os::raw::c_int,
-        chunk_y: ::std::os::raw::c_int,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-    ) -> *mut *mut Object;
-}
-extern "C" {
-    #[link_name = "\u{1}_Z18get_object_at_pposP6Player"]
-    pub fn get_object_at_ppos(player: *mut Player) -> *mut *mut Object;
 }
 extern "C" {
     #[link_name = "\u{1}_Z12get_plant_atiiii"]
@@ -4613,6 +4679,21 @@ extern "C" {
     #[link_name = "\u{1}_Z12check_chunksv"]
     pub fn check_chunks() -> bool;
 }
+extern "C" {
+    #[link_name = "\u{1}_Z17get_chunks_around12ItemLocationPjS0_S0_S0_S0_S0_"]
+    pub fn get_chunks_around(
+        loc: ItemLocation,
+        left_chunk_x: *mut ::std::os::raw::c_uint,
+        right_chunk_x: *mut ::std::os::raw::c_uint,
+        top_chunk_y: *mut ::std::os::raw::c_uint,
+        bottom_chunk_y: *mut ::std::os::raw::c_uint,
+        ltwx: *mut ::std::os::raw::c_uint,
+        ltwy: *mut ::std::os::raw::c_uint,
+    );
+}
+extern "C" {
+    pub static mut tile_size: ::std::os::raw::c_int;
+}
 #[repr(C)]
 #[derive(serde :: Deserialize, Debug, Clone, Copy)]
 pub struct Npc {
@@ -4620,7 +4701,7 @@ pub struct Npc {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of Npc"][::std::mem::size_of::<Npc>() - 264usize];
+    ["Size of Npc"][::std::mem::size_of::<Npc>() - 304usize];
     ["Alignment of Npc"][::std::mem::align_of::<Npc>() - 8usize];
 };
 extern "C" {

@@ -28,6 +28,7 @@ impl ParseCallbacks for MacroCallback {
             "Skill",
             "InvList",
             "NetworkObject",
+            "Place",
         ];
         let co_cl = vec![
             "Element",
@@ -48,6 +49,7 @@ impl ParseCallbacks for MacroCallback {
             "InvList",
             "ElementsList",
             "Skills",
+            "Place",
         ];
         let debug = vec![
             "Element",
@@ -59,6 +61,7 @@ impl ParseCallbacks for MacroCallback {
             "Scroll",
             "Player",
             "Npc",
+            "Place",
         ];
         if ser.contains(&info.name) {
             der.append(&mut vec![String::from("serde::Serialize")]);

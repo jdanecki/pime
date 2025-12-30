@@ -8,7 +8,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 
-add_definitions(-DCORE_FOR_CLIENT -DUSE_ENET)
+add_definitions(-DUSE_ENET)
 set(USE_ENET ON)
 add_subdirectory(../../core core)
 

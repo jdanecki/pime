@@ -2,12 +2,16 @@
 #define EL_LIST_H
 
 #include "elements.h"
-#include "object.h"
-#include "serialization-rust.h"
+//FIXME
+// #include "object.h"
+// #include "serialization-rust.h"
 
 class ListElement
 {
     bool enabled;
+
+  protected:
+    Class_id c_id;
 
   public:
     SerializablePointer<NetworkObject> el;
@@ -33,7 +37,7 @@ class ListElement
     }
     ListElement(InventoryElement * entry);
     ListElement(NetworkObject* entry);
-    ListElement() : el(nullptr), next(nullptr), prev(nullptr)
+    ListElement() : c_id(Class_ListElement), el(nullptr), next(nullptr), prev(nullptr)
     {
         enable();
     }
@@ -44,7 +48,14 @@ class ListElement
     virtual ~ListElement()
     {
     }
-    virtual size_t get_size() { return sizeof(ListElement); }
+    virtual size_t get_size()
+    {
+        return sizeof(size_t);
+    } // only uid size
+    Class_id get_cid()
+    {
+        return c_id;
+    }
 };
 
 struct ElId
@@ -64,6 +75,7 @@ class KnownElement : public ListElement
         elid.c_id = t;
         elid.id = i;
         known = false;
+        c_id = Class_KnownElement;
     }
 
     bool is_known()
@@ -73,7 +85,7 @@ class KnownElement : public ListElement
     void set_known()
     {
         known = true;
-        printf("learning %s %d\n", class_name[elid.c_id], elid.id);
+        CONSOLE_LOG("learning %s %d\n", class_name[elid.c_id], elid.id);
     }
 
     bool check(void * what)
@@ -89,25 +101,36 @@ class KnownElement : public ListElement
     {
         return elid.id;
     }
+    size_t get_size()
+    {
+        return sizeof(KnownElement);
+    }
 };
 
 class BaseListElement : public ListElement
 {
   public:
     Base * base;
-    BaseListElement(Base * base) : base(base) {}
+    BaseListElement(Base * base) : base(base)
+    {
+        c_id = Class_BaseListElement;
+    }
     bool check(void * what)
     {
-        int *pid = (int *)what;
+        int * pid = (int *)what;
         return (*pid == base->uid);
     }
-    size_t get_size() { return base->get_size() ; }
+    size_t get_size()
+    {
+        return base->get_size();
+    }
     void show(bool details = true);
 };
 
 class ElementsListIterator
 {
-    ListElement* le;
+    ListElement * le;
+
   public:
     ElementsListIterator(ListElement *le);
     bool operator!=(const ElementsListIterator& other);
@@ -119,10 +142,34 @@ class ElementsListIterator
     InventoryElement* get();
 };
 
+class ElementsListReverseIterator
+{
+    ListElement* le;
+
+  public:
+    ElementsListReverseIterator(ListElement* le) : le(le) {}
+    bool operator!=(const ElementsListReverseIterator & other) const
+    {
+        return le != other.le;
+    }
+
+    ElementsListReverseIterator& operator++() {
+        le = le->prev;
+        return *this;
+    }
+
+    InventoryElement* operator*() const {
+        return (InventoryElement*)le->el.get();
+    }
+};
+
+class ReversedView;
 class ElementsList
 {
-   protected:    
-    void virtual copy(ListElement *el) {}
+  protected:
+    void virtual copy(ListElement * el)
+    {
+    }
 
   public:
     void remove_all();
@@ -134,6 +181,7 @@ class ElementsList
     ElementsList();
     virtual ~ElementsList()
     {
+        CONSOLE_LOG("~ElementsList %s\n", name);
         remove_all();
     }
     ListElement * find(void * what);
@@ -152,8 +200,21 @@ class ElementsList
     ListElement * get_random();
     
     ElementsListIterator begin() const;
-
     ElementsListIterator end() const;
+
+    ElementsListReverseIterator rbegin() { return tail; }
+    ElementsListReverseIterator rend()   { return nullptr; }
+
+    ReversedView reversed();
+};
+
+class ReversedView {    
+  public:
+    ElementsList* list;
+    ReversedView(ElementsList *list) : list(list) {}
+    void show() { list->show(false); }
+    ElementsListReverseIterator begin() { return list->rbegin(); }
+    ElementsListReverseIterator end()   { return list->rend(); }
 };
 
 typedef bool (*FindFunc)(InventoryElement * el, void * arg);

@@ -7,7 +7,7 @@ Meat::Meat(InventoryElement * from) : IngredientServer(from, ING_MEAT, Form_soli
 
 bool Meat::action(Product_action action, Player * pl)
 {
-    printf("MEAT: %s %s\n", product_action_name[action], get_name());
+    CONSOLE_LOG("Meat: %s %s\n", product_action_name[action], get_name());
 
     InventoryElement * crafted = nullptr;
 
@@ -20,7 +20,8 @@ bool Meat::action(Product_action action, Player * pl)
             crafted = craft_prod((int)PROD_ROASTED_MEAT, this, nullptr /*fire*/);
             // delete fire;
             // break;
-            if (crafted) return true;
+            if (crafted)
+                return true;
         }
         default:
             return false;

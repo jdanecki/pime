@@ -21,10 +21,14 @@ client-clean: tui-clean tui-rust-clean tui-enet-clean
 serv-clean: serv-rust-clean serv-enet-clean
 
 tui-core:
-	make -C core/alchemist-tui/ -j $(nproc)
+	make -C core/alchemist-tui/ -j $(shell nproc)
 
 tui-clean:	
 	make -C core/alchemist-tui clean
 
 format:
 	./format-all.sh
+
+lines:
+	find . -name *.cpp -o -name *.h  -exec wc -l {} \; | awk '{s+=$$1} END { print s} '
+

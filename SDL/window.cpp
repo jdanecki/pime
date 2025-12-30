@@ -1,6 +1,7 @@
 #include "window.h"
 #include <SDL2/SDL.h>
 #include <time.h>
+#include "../core/alchemist/ncurses-output.h"
 
 SDL_Renderer * renderer;
 SDL_Window * main_window;
@@ -49,7 +50,7 @@ unsigned long get_time_usec()
     return (t.tv_sec * 1000000 + t.tv_nsec / 1000);
 }
 
-int init_window()
+int init_window(const char *title, int wx, int wy)
 {
     Uint32 flags;
     // flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
@@ -61,31 +62,32 @@ int init_window()
     }
 
     unsigned long t2 = get_time_usec();
-    printf("Time it took to initialize SDL2: %ldms\n", (t2 - t1) / 1000);
+    CONSOLE_LOG("Time it took to initialize SDL2: %ldms\n", (t2 - t1) / 1000);
 
     if (SDL_CreateWindowAndRenderer(0, 0, flags, &main_window, &renderer) < 0)
     {
         SDL_Log("SDL_CreateWindowAndRenderer() failed: %s\n", SDL_GetError());
         return 1;
     }
-    SDL_SetWindowTitle(main_window, "pime");
+    SDL_SetWindowTitle(main_window, title);
     SDL_SetWindowPosition(main_window, 150, 10);
-    SDL_SetWindowSize(main_window, GAME_WINDOW + PANEL_WINDOW, GAME_WINDOW + STATUS_LINES);
+    SDL_SetWindowSize(main_window, wx, wy);
     SDL_GetWindowSize(main_window, &window_width, &window_height);
+    CONSOLE_LOG("window_width=%d window_height=%d\n", window_width, window_height);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_ShowWindow(main_window);
 
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags))
     {
-        printf("\nUnable to initialize sdl_image:  %s\n", IMG_GetError());
+        CONSOLE_LOG("\nUnable to initialize sdl_image:  %s\n", IMG_GetError());
         return 1;
     }
 
     SDL_Surface * icon = IMG_Load("textures/pime.png");
     if (icon == NULL)
     {
-        printf("\nUnable to load image %s! SDL_image Error: %s\n", "textures/pime.png", IMG_GetError());
+        CONSOLE_LOG("\nUnable to load image %s! SDL_image Error: %s\n", "textures/pime.png", IMG_GetError());
         return 1;
     }
     SDL_SetWindowIcon(main_window, icon);
@@ -94,7 +96,7 @@ int init_window()
     TTF_Init();
 
     unsigned long t3 = get_time_usec();
-    printf("Time it took to initialize SDL2 modules (img, window, renderer): %ldms\n ", (t3 - t1) / 1000);
+    CONSOLE_LOG("Time it took to initialize SDL2 modules (img, window, renderer): %ldms\n ", (t3 - t1) / 1000);
 
     return 0;
 }
@@ -108,4 +110,26 @@ void clear_window()
 unsigned int color(int r, int g, int b, int a)
 {
     return (a << 24) | (b << 16) | (g << 8) | r;
+}
+
+void update_window_size()
+{
+    int width;
+    SDL_GetWindowSize(main_window, &window_width, &window_height);
+
+    width = window_width - PANEL_WINDOW;
+
+    if (width < window_height)
+    {
+        tile_size = width / CHUNK_SIZE;
+    }
+    else
+    {
+        tile_size = window_height / CHUNK_SIZE;
+    }
+    if (tile_size < 32)
+        tile_size = 32;
+
+    SDL_SetWindowSize(main_window, (tile_size * CHUNK_SIZE) + PANEL_WINDOW, tile_size * CHUNK_SIZE + STATUS_LINES);
+    SDL_GetWindowSize(main_window, &window_width, &window_height);
 }
