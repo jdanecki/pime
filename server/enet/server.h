@@ -234,8 +234,8 @@ class PacketElementsList : public Packet
     }
     void copy_list_element(ListElement * el, serial_data * pdata, int i)
     {
-        InventoryElement * inv = el->el.get();
-        size_t uid = inv->get_uid();
+        NetworkObject * obj = el->el.get();
+        size_t uid = obj->get_uid();
         size_t * dst = &((size_t *)(&pdata->data))[i];
         *dst = uid;
     //    CONSOLE_LOG("copy_list_element: [%d/%d]=%lx\n", i, pdata->nr_elements, uid);
@@ -482,7 +482,7 @@ class PacketObjectCreate : public Packet
             case ObjectData::Tag::Player:
                 new (&obj->player.data.inventory) InvList("inventory");
                 new (&obj->player.data.known_elements) ElementsList("known elements");
-                new (&obj->player.data.player_skills) Skills();
+                new (obj->player.data.player_skills) Skills();
                 new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
                 // talking_to
                 // relations

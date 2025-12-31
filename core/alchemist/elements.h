@@ -145,7 +145,7 @@ class InventoryElement : public NetworkObject
     {
         return (px == location.get_world_x() && py == location.get_world_y());
     }
-    size_t get_uid() const;
+
     virtual char * get_description()
     {
         char * buf = new char[128];

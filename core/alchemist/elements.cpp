@@ -82,7 +82,7 @@ Base::Base(int index, Class_id c, const char * name) : name(name), NetworkObject
 
 void Base::show(bool details)
 {
-    CONSOLE_LOG("Base name=%s class:%s id=%d \n", get_name(), class_name[c_id], uid);
+    CONSOLE_LOG("Base name=%s class:%s id=%ld \n", get_name(), class_name[c_id], uid);
     if (details)
         edible.show();
 }
@@ -161,10 +161,6 @@ Class_id InventoryElement::get_cid() const
     return c_id;
 }
 
-size_t InventoryElement::get_uid() const
-{
-    return uid;
-}
 
 void Element::show(bool details)
 {
