@@ -269,6 +269,7 @@ BaseAnimal * get_base_animal(int32_t id)
 }
 
 ElementsList *players, *packets_to_send, *packets_to_send1;
+InvList objects_to_create;
 int players_id;
 
 ENetHost * server;
@@ -325,7 +326,7 @@ void send_to_all(Packet * p)
     while (pl_el)
     {
         PlayerClient * pl = (PlayerClient *)pl_el;
-     //   add_to_output("[%d/%d] sending to player: %d\n", i, players->nr_elements, pl->player->get_id());
+//        add_to_output("[%d/%d] sending to player: %d\n", i, players->nr_elements, pl->player->get_id());
         p->send(pl->peer);
         pl_el = pl_el->next;
         i++;
@@ -595,14 +596,14 @@ void send_updates()
     if (packets_to_send->nr_elements)
     {
         ListElement * el = packets_to_send->head;
-        add_to_output("sending updates elems=%d\n", packets_to_send->nr_elements);
+//        add_to_output("sending updates elems=%d\n", packets_to_send->nr_elements);
         while (el)
         {
             PacketToSend * p = (PacketToSend *)el;
             p->to_all();
             el = el->next;
         }
-        add_to_output("sent updates\n");
+//        add_to_output("sent updates\n");
     }
 
     if (packets_to_send1->nr_elements)
@@ -617,22 +618,22 @@ void send_updates()
         }
       //  add_to_output("sent updates1\n");
     }
-/*
+
     if (objects_to_create.nr_elements)
     {
         ListElement * el = objects_to_create.head;
         while (el)
         {
-            add_to_output("sending objects to create: %s id=%lx\n", el->el.get()->get_name(), el->el.get()->uid);
+//            add_to_output("sending objects to create: %s id=%lx\n", static_cast<InventoryElement*> (el->el.get())->get_name(), el->el.get()->uid);
             Packet * p = new PacketObjectCreate(el->el.get());
             send_to_all(p);
             el = el->next;
         }
     }
-  */
+
     packets_to_send->remove_all();
     packets_to_send1->remove_all();
-    //objects_to_create.remove_all();
+    objects_to_create.remove_all();
 }
 
 int random_bool(double probability)
@@ -771,7 +772,8 @@ void notify_update(const InventoryElement * el)
 
 void notify_create(const InventoryElement * el)
 {
-    add_packet_to_send(new PacketObjectCreate((InventoryElement *)el));
+    //add_packet_to_send(new PacketObjectCreate((InventoryElement *)el));
+    objects_to_create.add((InventoryElement*)el);
 }
 
 void update_location(NetworkObject id, ItemLocation old_loc, ItemLocation new_loc)
