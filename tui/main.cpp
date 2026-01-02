@@ -29,7 +29,7 @@ void set_terminal()
     setbuf(stdout, nullptr);
     tcgetattr(0, &old_stdin);
     stdin_tty = old_stdin;
-    stdin_tty.c_lflag &= ~(ECHO | ICANON | ECHOE | ISIG);
+    stdin_tty.c_lflag &= ~(ECHO | ICANON | ECHOE); // | ISIG);
     stdin_tty.c_cc[VMIN] = 1;
     stdin_tty.c_cc[VTIME] = 0;
     tcsetattr(0, TCSANOW, &stdin_tty);

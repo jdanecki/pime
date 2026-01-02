@@ -204,7 +204,7 @@ extern "C"
             // world_table[y][x]->objects = InvList();
             world_table[y][x] = new chunk(x, y);
             memcpy(world_table[y][x]->table, &data[0], CHUNK_SIZE * CHUNK_SIZE * sizeof(int));
-            /*printf("got %d items\n[", item_num);
+            /*CONSOLE_LOG("got %d items\n[", item_num);
             for (int i = 0; i < 1027 + item_num*20; i++)
             {
                CONSOLE_LOG("%d, ", data[i]);
@@ -286,9 +286,9 @@ extern "C"
                 case Class_Player:
                 {
                     Player * player = dynamic_cast<Player *>(el);
-                    //CONSOLE_LOG("update_object: player=%p inv_elems=%d\n", player, player->inventory.nr_elements);
+                    CONSOLE_LOG("update_object: player=%p inv_elems=%d\n", player, player->inventory.nr_elements);
                     *player = data->player.data;
-                    //CONSOLE_LOG("update_object: -> update: inv_elems=%d\n", player->inventory.nr_elements);
+                    CONSOLE_LOG("update_object: -> update: inv_elems=%d\n", player->inventory.nr_elements);
                     break;
                 }
                 default:
@@ -332,7 +332,7 @@ extern "C"
         {
             case ItemLocation::Tag::Chunk:
             {
-                /*printf("SDL: update item location %s:%s on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
+                /*CONSOLE_LOG("SDL: update item location %s:%s on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
                     el->get_class_name(), el->get_name(),
                     old_loc.chunk.map_x, old_loc.chunk.map_y,
                     old_loc.chunk.x, old_loc.chunk.y,
@@ -398,13 +398,13 @@ extern "C"
 
     void failed_craft()
     {
-        printf("craft FAILED\n");
+        CONSOLE_LOG("craft FAILED\n");
         print_status(1, "failed craft");
     }
 
     void action_failed()
     {
-        printf("action FAILED\n");
+        CONSOLE_LOG("action FAILED\n");
         print_status(1, "action failed");
     }
 #ifndef USE_ENET

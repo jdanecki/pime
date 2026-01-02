@@ -117,8 +117,8 @@ class BaseListElement : public ListElement
     }
     bool check(void * what)
     {
-        size_t * pid = (size_t *)what;
-        return (*pid == base->uid);
+        int * pid = (int *)what;
+        return (((size_t)(*pid)) == base->uid);
     }
     size_t get_size()
     {

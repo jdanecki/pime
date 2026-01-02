@@ -23,7 +23,7 @@ void chunk::add_object(InventoryElement * object)
 {
     int x = rand() % CHUNK_SIZE;
     int y = rand() % CHUNK_SIZE;
-    printf("class %d, %d %d, %ld\n", object->get_cid(), x, y, object->get_uid());
+//    CONSOLE_LOG("class %d, %d %d, %ld\n", object->get_cid(), x, y, object->get_uid());
     add_object(object, x, y);
 }
 

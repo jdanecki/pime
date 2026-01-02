@@ -44,8 +44,8 @@ void draw_texts()
     int tile = ch->table[py][px].tile;
     BaseElement * base = get_base_element(tile % tiles_textures_count);
 
-    sprintf(text, "%s@[%d,%d][%d,%d]:id=%d f=%d", player->get_name(),
-        pl_ch_x, pl_ch_y, px, py, base->id, base->form);
+    sprintf(text, "%s@[%d,%d][%d,%d]:id=%ld f=%d", player->get_name(),
+        pl_ch_x, pl_ch_y, px, py, base->uid, base->form);
 #else
     if (player->c_id != 0) 
         sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), player->get_clan() ? clan_names[player->get_clan()->id] : "", player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,

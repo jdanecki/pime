@@ -450,7 +450,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
                 ItemLocation location = el->location;
                 add_object_to_world(el, pl->player->location);
                 pl->player->drop(el);
-                update_location(el->uid, location, el->location);
+                update_location(*el, location, el->location);
             }
             break;
         }
@@ -595,14 +595,14 @@ void send_updates()
     if (packets_to_send->nr_elements)
     {
         ListElement * el = packets_to_send->head;
-       // add_to_output("sending updates elems=%d\n", packets_to_send->nr_elements);
+        add_to_output("sending updates elems=%d\n", packets_to_send->nr_elements);
         while (el)
         {
             PacketToSend * p = (PacketToSend *)el;
             p->to_all();
             el = el->next;
         }
-       // add_to_output("sent updates\n");
+        add_to_output("sent updates\n");
     }
 
     if (packets_to_send1->nr_elements)
@@ -617,7 +617,7 @@ void send_updates()
         }
       //  add_to_output("sent updates1\n");
     }
-
+/*
     if (objects_to_create.nr_elements)
     {
         ListElement * el = objects_to_create.head;
@@ -629,9 +629,10 @@ void send_updates()
             el = el->next;
         }
     }
+  */
     packets_to_send->remove_all();
     packets_to_send1->remove_all();
-    objects_to_create.remove_all();
+    //objects_to_create.remove_all();
 }
 
 int random_bool(double probability)
@@ -705,7 +706,7 @@ try_again:
             ListElement * cur=ch->objects.head;
             while(cur)
             {
-                InventoryElement * el=cur->el.get();
+                InventoryElement * el=static_cast<InventoryElement *>(cur->el.get());
                 int dx = x - el->location.get_x();
                 int dy = y - el->location.get_y();
                 int dist=dx * dx + dy * dy;
@@ -755,14 +756,12 @@ try_again:
 
 void add_packet_to_send(Packet * p)
 {
-    if (players->nr_elements)
-        packets_to_send->add(new PacketToSend(p));
+    packets_to_send->add(new PacketToSend(p));
 }
 
 void add_packet_to_send1(Packet * p)
-{
-    if (players->nr_elements)
-        packets_to_send1->add(new PacketToSend(p));
+{    
+    packets_to_send1->add(new PacketToSend(p));
 }
 
 void notify_update(const InventoryElement * el)
@@ -770,17 +769,22 @@ void notify_update(const InventoryElement * el)
     add_packet_to_send(new PacketObjectUpdate((InventoryElement *)el));
 }
 
-void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc)
+void notify_create(const InventoryElement * el)
+{
+    add_packet_to_send(new PacketObjectCreate((InventoryElement *)el));
+}
+
+void update_location(NetworkObject id, ItemLocation old_loc, ItemLocation new_loc)
 {
     /*CONSOLE_LOG("update location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
      old_loc.show();
      new_loc.show();
  */
-    add_packet_to_send(new PacketLocationUpdate(id, old_loc, new_loc));
+    add_packet_to_send(new PacketLocationUpdate(id.uid, old_loc, new_loc));
 }
-void notify_destroy(size_t id, ItemLocation location)
+void notify_destroy(NetworkObject id, ItemLocation location)
 {
-    add_packet_to_send(new PacketObjectDestroy(id, location));
+    add_packet_to_send(new PacketObjectDestroy(id.uid, location));
 }
 void notify_knowledge(size_t pl_id, Class_id cid, int id)
 {

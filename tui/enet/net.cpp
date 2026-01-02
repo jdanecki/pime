@@ -51,11 +51,11 @@ extern void update_hotbar();
 void add_elements(PacketElementsList * list, int i)
 {
     size_t uid= ((size_t*) list->get_data())[i];
-    Player * p = (Player *)get_object_by_id(list->get_pl_id());
+    Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, list->get_pl_id()));
     if (p)
-        p->pickup(get_object_by_id(uid));
+        p->pickup(get_object_by_id(NetworkObject(Class_Element, uid)));
 
-    printf("player=%p [%d]=%lx elems=%d\n", p, i, uid,p->inventory.nr_elements);
+    printf("player=%p [%d]=%lx elems=%d\n", p, i, uid, p->inventory.nr_elements);
     update_hotbar();
 }
 
@@ -111,7 +111,7 @@ bool handle_packet(ENetPacket * packet)
         {
             PacketObjectDestroy * obj = dynamic_cast<PacketObjectDestroy *>(p);
 
-            destroy_object(obj->get_id(), obj->get_location());
+            destroy_object(NetworkObject(Class_Unknown, obj->get_id()), obj->get_location());
             ret = true;
             break;
         }
@@ -258,13 +258,13 @@ unsigned int network_tick(NetClient * client)
     return recv;
 }
 
-InventoryElement * get_object_by_id(uintptr_t uid)
+InventoryElement * get_object_by_id(NetworkObject uid)
 {
-    ListElement *el = objects.find(&uid);
-    return el ? el->el.get() : nullptr;
+    ListElement *el = objects.find(&uid.uid);
+    return el ? static_cast<InventoryElement*>(el->el.get()) : nullptr;
 }
 
-void register_object(InventoryElement * o)
+void register_object(InventoryElement * o, void * )
 {
     ObjectElement *obj = new ObjectElement(o);
    // printf("register_object: uid=%lx\n", o->uid);
@@ -358,5 +358,11 @@ void send_packet_craft(NetClient * client, uintptr_t prod_id, uintptr_t ingredie
 void send_packet_request_chunk(NetClient * client, int32_t cx, int32_t cy)
 {
     Packet * p = new PacketRequestChunk(cx, cy);
+    p->send(client->peer);
+}
+
+void send_packet_request_item(NetClient * client, size_t id)
+{
+    Packet * p = new PacketRequestItem(id);
     p->send(client->peer);
 }

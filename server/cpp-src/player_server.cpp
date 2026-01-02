@@ -67,7 +67,7 @@ move_player:
     hunger--;
     thirst--;
     update_location(NetworkObject(get_cid(), get_uid()), old, location);
-    // printf("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
+    // CONSOLE_LOG("SERV: player moved [%d,%d][%d,%d]\n", new_map_x, new_map_y, new_x, new_y);
 }
 
 bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement * object)
@@ -227,7 +227,7 @@ PlayerServer::PlayerServer(size_t uid) : Player(uid, SerializableCString("player
 
 PlayerServer * create_player(size_t id)
 {
-    printf("CREATE PLAYER SERVER\n\n");
+    CONSOLE_LOG("CREATE PLAYER SERVER\n\n");
     return new PlayerServer(id);
 }
 

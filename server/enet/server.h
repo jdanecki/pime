@@ -303,14 +303,14 @@ class PacketElementsList : public Packet
 };
 
 #ifdef SERVER_CODE
-ObjectData * convert_to_data(InventoryElement * el)
+ObjectData * convert_to_data(NetworkObject * el)
 {
     ObjectData * obj = nullptr;
     switch (el->c_id)
     {
         case Class_Element:
         {
-            Element * element = dynamic_cast<Element *>(el);
+            Element * element = static_cast<Element *>(el);
             obj = new ObjectData(ObjectData::Tag::Element);
             obj->element.data = *element;
             obj->id = element->get_id();
@@ -318,7 +318,7 @@ ObjectData * convert_to_data(InventoryElement * el)
         }
         case Class_Place:
         {
-            Place * place = dynamic_cast<Place *>(el);
+            Place * place = static_cast<Place *>(el);
             //obj = new ObjectData(ObjectData::Tag::Place);
             size_t new_size=sizeof(struct ObjectData)+sizeof(size_t);
             obj = new (new_size) ObjectData(ObjectData::Tag::Place, new_size);
@@ -331,7 +331,7 @@ ObjectData * convert_to_data(InventoryElement * el)
         }
         case Class_Player:
         {
-            Player * player = dynamic_cast<Player *>(el);
+            Player * player = static_cast<Player *>(el);
             obj = new ObjectData(ObjectData::Tag::Player);
             obj->player.data = *player;
             if (player->inventory.nr_elements)
@@ -346,21 +346,21 @@ ObjectData * convert_to_data(InventoryElement * el)
         }
         case Class_Ingredient:
         {
-            Ingredient * ing = dynamic_cast<Ingredient *>(el);
+            Ingredient * ing = static_cast<Ingredient *>(el);
             obj = new ObjectData(ObjectData::Tag::Ingredient);
             obj->ingredient.data = *ing;
             break;
         }
         case Class_Product:
         {
-            Product * prod = dynamic_cast<Product *>(el);
+            Product * prod = static_cast<Product *>(el);
             obj = new ObjectData(ObjectData::Tag::Product);
             obj->product.data = *prod;
             break;
         }
         case Class_Plant:
         {
-            Plant * plant = dynamic_cast<Plant *>(el);
+            Plant * plant = static_cast<Plant *>(el);
             obj = new ObjectData(ObjectData::Tag::Plant);
             obj->plant.data = *plant;
             obj->id = plant->get_id();
@@ -368,7 +368,7 @@ ObjectData * convert_to_data(InventoryElement * el)
         }
         case Class_Animal:
         {
-            Animal * animal = dynamic_cast<Animal *>(el);
+            Animal * animal = static_cast<Animal *>(el);
             obj = new ObjectData(ObjectData::Tag::Animal);
             obj->animal.data = *animal;
             obj->id = animal->get_id();
@@ -376,14 +376,14 @@ ObjectData * convert_to_data(InventoryElement * el)
         }
         case Class_Scroll:
         {
-            Scroll * scroll = dynamic_cast<Scroll *>(el);
+            Scroll * scroll = static_cast<Scroll *>(el);
             obj = new ObjectData(ObjectData::Tag::Scroll);
             obj->scroll.data = *scroll;
             break;
         }
         case Class_Npc:
         {
-            Npc * npc = dynamic_cast<Npc *>(el);
+            Npc * npc = static_cast<Npc *>(el);
             obj = new ObjectData(ObjectData::Tag::Npc);
             obj->npc.data = *npc;
             break;
@@ -421,7 +421,7 @@ class PacketObjectCreate : public Packet
 
   public:
     ObjectData * obj;
-    PacketObjectCreate(InventoryElement * el) : Packet(PACKET_OBJECT_CREATE)
+    PacketObjectCreate(NetworkObject * el) : Packet(PACKET_OBJECT_CREATE)
     {
 #ifdef SERVER_CODE
         obj = convert_to_data(el);
@@ -482,7 +482,7 @@ class PacketObjectCreate : public Packet
             case ObjectData::Tag::Player:
                 new (&obj->player.data.inventory) InvList("inventory");
                 new (&obj->player.data.known_elements) ElementsList("known elements");
-                new (obj->player.data.player_skills) Skills();
+                //new (obj->player.data.player_skills) Skills();
                 new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
                 // talking_to
                 // relations
@@ -573,7 +573,7 @@ class PacketObjectUpdate : public Packet
                 new (&obj->player.data.inventory) InvList("inventory");
             //    CONSOLE_LOG("ObjectUpdate for player initialized: inv_elems=%d\n", obj->player.data.inventory.nr_elements);
                 new (&obj->player.data.known_elements) ElementsList("known elements");
-                new (&obj->player.data.player_skills) Skills();
+                //new (&obj->player.data.player_skills) Skills();
                 new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
                 // talking_to
                 // relations
@@ -715,7 +715,7 @@ class PacketLocationUpdate : public Packet
     PacketLocationUpdate(size_t i, ItemLocation old_loc, ItemLocation new_loc) : Packet(PACKET_LOCATION_UPDATE)
     {
         data.t = t;
-        data.location.id = i;
+        data.location.id = NetworkObject(Class_Unknown, i);
         data.location.old = old_loc;
         data.location.new_ = new_loc;
     }
@@ -766,6 +766,47 @@ class PacketRequestChunk : public Packet
         data.cy = cy;
     }
     PacketRequestChunk() : Packet(PACKET_REQUEST_CHUNK)
+    {
+    }
+    bool update(unsigned char * net_data, size_t s)
+    {
+        if (check_size(s))
+        {
+            pdata = (struct serial_data *)net_data;
+            return true;
+        }
+        return false;
+    }
+    int send(ENetPeer * peer)
+    {
+        return send_data(peer, &data, sizeof(struct serial_data));
+    }
+    bool check_size(int s)
+    {
+        return s == sizeof(struct serial_data);
+    }
+};
+
+class PacketRequestItem : public Packet
+{
+    struct serial_data
+    {
+        PacketType t;
+        size_t id;
+    } data, *pdata __attribute__((packed));
+
+  public:
+    int get_id()
+    {
+        return pdata->id;
+    }
+
+    PacketRequestItem(size_t id) : Packet(PACKET_REQUEST_ITEM)
+    {
+        data.t = t;
+        data.id = id;
+    }
+    PacketRequestItem() : Packet(PACKET_REQUEST_ITEM)
     {
     }
     bool update(unsigned char * net_data, size_t s)

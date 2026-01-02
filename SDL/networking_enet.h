@@ -122,7 +122,7 @@ struct ObjectData
 
 struct LocationUpdateData
 {
-    uintptr_t id;
+    NetworkObject id;
     ItemLocation old;
     ItemLocation new_;
 };
@@ -131,9 +131,9 @@ NetClient * init(const char * server_ip, const char * port);
 
 uint32_t network_tick(NetClient * client);
 
-InventoryElement * get_object_by_id(uintptr_t uid);
+InventoryElement *get_object_by_id(NetworkObject uid);
 
-void register_object(InventoryElement * o);
+void register_object(InventoryElement * o, void *);
 
 void deregister_object(InventoryElement * o);
 
@@ -157,7 +157,7 @@ extern void update_item_location(LocationUpdateData data);
 
 extern void create_object(const ObjectData * data);
 
-extern void destroy_object(uintptr_t id, ItemLocation location);
+extern void destroy_object(NetworkObject id, ItemLocation location);
 
 extern void failed_craft();
 
@@ -184,5 +184,7 @@ void send_packet_item_used_on_tile(NetClient * client, uintptr_t iid, ItemLocati
 void send_packet_craft(NetClient * client, uintptr_t prod_id, uintptr_t ingredients_num, const uintptr_t * iid);
 
 void send_packet_request_chunk(NetClient * client, int32_t x, int32_t y);
+
+void send_packet_request_item(NetClient * client, size_t id);
 
 ObjectData foo();
