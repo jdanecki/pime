@@ -3,10 +3,10 @@
 #include <string.h>
 #include <assert.h>
 #include <new>
-#include "../../core/packet_types.h"
-#include "../../core/tiles.h"
-#include "../../core/world.h"
-#include "../../SDL/networking.h"
+#include "../core/packet_types.h"
+#include "../core/tiles.h"
+#include "../core/world.h"
+#include "../SDL/networking.h"
 
 extern ElementsList base_elements;
 extern ElementsList base_plants;

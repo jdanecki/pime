@@ -1,5 +1,5 @@
 #include "tools.h"
-#include "../../../core/world.h"
+#include "../../core/world.h"
 #include "../places/places.h"
 
 Hoe::Hoe(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_HOE, Form_solid, 1)

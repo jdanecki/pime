@@ -1,31 +1,31 @@
-all: serv client 
-#tui tui-core
+all: serv client client-tui
+#   	tui-core
 
 serv:
-	make -C server/enet/build
+	ninja -C server/build
 
 client: 
-	make -C SDL/build pime_SDL
+	ninja -C SDL/build
 
-tui:
-	make -C tui/enet/build
+client-tui:
+	ninja -C tui/build
 
 tui-core:
-	make -C core/alchemist-tui
+	ninja -C core/alchemist-tui
 
 clean: serv-clean client-clean tui-clean tui-core-clean
 
-serv-clean:	
-	make -C server/enet/build clean
+serv-clean:
+	ninja -C server/build clean
 
 client-clean:
-	make -C SDL/build clean
+	ninja -C SDL/build clean
 
 tui-clean:
-	make -C tui/enet/build clean
+	ninja -C tui/build clean
 
 tui-core-clean:	
-	make -C core/alchemist-tui clean
+	ninja -C core/alchemist-tui clean
 
 format:
 	./format-all.sh

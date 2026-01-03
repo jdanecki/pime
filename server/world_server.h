@@ -1,7 +1,7 @@
 #ifndef WORLD_SERVER_H
 #define WORLD_SERVER_H
 
-#include "../../core/world.h"
+#include "../core/world.h"
 #include <ctime>
 
 void generator();

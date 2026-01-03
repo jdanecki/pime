@@ -10,5 +10,5 @@ pushd ../core/alchemist
 popd
 
 cd build
-cmake -DMULTI_USER=${MULTI_USER} ..
+cmake -DMULTI_USER=${MULTI_USER} -GNinja ..
 

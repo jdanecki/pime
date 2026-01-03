@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <climits>
-#include "../../../core/alchemist/ncurses-output.h"
-#include "../../../core/world_params.h"
+#include "../../core/alchemist/ncurses-output.h"
+#include "../../core/world_params.h"
 
 #define REGIONS_NUM 16
 

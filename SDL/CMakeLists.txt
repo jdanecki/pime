@@ -47,7 +47,7 @@ set(SHARED_LIBRARIES
     m
 )
 
-add_executable(pime_SDL ${SHARED_SOURCES} ../tui/enet/net.cpp)
+add_executable(pime_SDL ${SHARED_SOURCES} ../tui/net.cpp)
 target_link_libraries(pime_SDL
     pime ${SHARED_LIBRARIES} enet
 )

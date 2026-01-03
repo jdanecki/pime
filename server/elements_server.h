@@ -1,8 +1,8 @@
 #ifndef ELEMENTS_SERVER_H
 #define ELEMENTS_SERVER_H
 
-#include "../../core/alchemist/elements.h"
-#include "../../core/player.h"
+#include "../core/alchemist/elements.h"
+#include "../core/player.h"
 
 void to_bytes_binding(InventoryElement * el, unsigned char * buf);
 unsigned int get_packet_size_binding(InventoryElement * el);

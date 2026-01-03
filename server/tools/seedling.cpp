@@ -1,5 +1,5 @@
 #include "tools.h"
-#include "../../../core/world.h"
+#include "../../core/world.h"
 
 extern ElementsList base_plants;
 

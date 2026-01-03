@@ -326,7 +326,7 @@ void loop()
     }
     for (;;)
     {
-        printf("\r%s%d@[%d,%d][%d,%d] %c: ", player->get_name(), player->get_id(),
+        printf("\r%s%ld@[%d,%d][%d,%d] %c: ", player->get_name(), player->get_id(),
             player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y, submenu ? submenu : '#');
 
         char c = check_key();

@@ -1,10 +1,10 @@
 #include <stdint.h>
-#include "../../core/alchemist/elements.h"
-#include "../../core/tiles.h"
+#include "../core/alchemist/elements.h"
+#include "../core/tiles.h"
 #include <enet/enet.h>
-#include "../../SDL/networking.h"
+#include "../SDL/networking.h"
 #include <cstring>
-#include "../../server/enet/server.h"
+#include "../server/server.h"
 
 ElementsList base_elements("base elements");
 ElementsList base_plants("base plants");

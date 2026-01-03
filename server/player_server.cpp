@@ -2,7 +2,7 @@
 #include "elements_server.h"
 #include "networking.h"
 #include "world_server.h"
-#include "../../core/packet_types.h"
+#include "../core/packet_types.h"
 #include <stdio.h>
 
 bool check_and_load_chunk(int new_map_x, int new_map_y)

@@ -14,6 +14,7 @@ add_subdirectory(../core core)
 
 add_executable(pime_tui
     main.cpp 
+    net.cpp
     ../SDL/networking.cpp 
     ../SDL/player_actions.cpp
     sdl_stub.cpp
@@ -23,31 +24,9 @@ add_executable(pime_tui
     implementations/playerSDL.cpp
 )
 
-include(ExternalProject)
-
-# Set default ExternalProject root directory
-set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/Rust)
-
-# Add rust_example as a CMake target
-ExternalProject_Add(
-    the_game_networking
-    DOWNLOAD_COMMAND ""
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND cargo build
-    BINARY_DIR "${CMAKE_SOURCE_DIR}/../the_game_net/"
-    BUILD_ALWAYS 1
-    INSTALL_COMMAND ""
-    LOG_BUILD ON)
-
-# Create dependency of Example on rust_example
-add_dependencies(pime_tui the_game_networking)
-
-target_link_directories(pime_tui PRIVATE ${CMAKE_SOURCE_DIR}/../the_game_net/target/debug/)
-set(NETWORKING_LIB the_game_net)
-
 target_link_libraries(pime_tui
     -lm 
     pime
-    ${NETWORKING_LIB}
+    enet
 )
 
