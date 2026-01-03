@@ -389,7 +389,7 @@ ObjectData * convert_to_data(NetworkObject * el)
             break;
         }
         default:
-            CONSOLE_LOG("Unknown class ID=%d in convert_to_data\n", el->c_id);
+        //    CONSOLE_LOG("Unknown class ID=%d in convert_to_data\n", el->c_id);
             assert(0);
             break;
     }
@@ -406,12 +406,12 @@ class PacketObjectCreate : public Packet
         unsigned char data[0];
         static void * operator new(size_t size_base, size_t extra)
         {
-            CONSOLE_LOG("PacketObjectCreate: serial_data: allocating %ld + %ld\n", size_base, extra);
+    //        CONSOLE_LOG("PacketObjectCreate: serial_data: allocating %ld + %ld\n", size_base, extra);
             return ::operator new(size_base + extra);
         }
         serial_data(size_t s) : size(s)
         {
-            CONSOLE_LOG("PacketObjectCreate: serial_data: set size to %ld\n", size);
+    //        CONSOLE_LOG("PacketObjectCreate: serial_data: set size to %ld\n", size);
         }
         static void operator delete(void * ptr)
         {

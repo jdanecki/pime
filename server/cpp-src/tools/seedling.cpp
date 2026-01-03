@@ -19,6 +19,8 @@ ProductServer * Seedling::createSeedling(InventoryElement * el1, InventoryElemen
 
 bool Seedling::use(InventoryElement * object, Player * pl)
 {
-    CONSOLE_LOG("%s: %s on %s\n", get_name(), product_action_name[actions[0]], object->get_name());
+    CONSOLE_LOG("%s: %s on %s @[%d,%d][%d,%d]\n", get_name(), product_action_name[actions[0]],
+        object->get_name(), object->location.chunk.map_x, object->location.chunk.map_y,
+        object->location.get_x(), object->location.get_y());
     return false;
 }

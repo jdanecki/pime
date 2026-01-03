@@ -13,6 +13,8 @@
 #include <sys/ioctl.h>
 #include "generator/generator.h"
 
+#define DEBUG 1
+
 #define RED "$COLOR_PAIR_1_"
 #define GREEN "$COLOR_PAIR_2_"
 #define ORANGE "$COLOR_PAIR_3_"
@@ -927,6 +929,7 @@ char handle_command()
     return 0;
 }
 
+
 int main()
 {
     ncurses_init();
@@ -990,6 +993,9 @@ int main()
                 unsigned short * port = new unsigned short;
                 *port = event.peer->address.port;
                 event.peer->data = (void *)port;
+#if DEBUG
+                enet_peer_timeout(event.peer, 5 * 60 * 1000, 5 * 60 * 1000, 5 * 60 * 1000); // 5 minutes
+#endif
                 break;
             }
             case ENET_EVENT_TYPE_RECEIVE:
