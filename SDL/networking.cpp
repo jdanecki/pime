@@ -63,7 +63,7 @@ InventoryElement * remove_from_location(ItemLocation location, NetworkObject id)
             Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, location.player.id));
             if (p)
                 p->drop(el);
-            if ((int)location.player.id == player->get_id())
+            if (location.player.id == player->get_id())
             {
                 update_hotbar();
             }
@@ -72,10 +72,10 @@ InventoryElement * remove_from_location(ItemLocation location, NetworkObject id)
     return el;
 }
 
-InventoryElement * el_from_data(const ObjectData * data)
+NetworkObject * el_from_data(const ObjectData * data)
 {
    // CONSOLE_LOG("CREATING OBJECT for tag: %d\n", (int)data->tag);
-    InventoryElement * el = nullptr;
+    NetworkObject * el = nullptr;
     switch (data->tag)
     {
         case ObjectData::Tag::InvElement:
@@ -131,6 +131,9 @@ InventoryElement * el_from_data(const ObjectData * data)
 #endif
             break;
 
+        case ObjectData::Tag::Clan:
+            el = new Clan(data->clan.data);
+            break;
         default:
             CONSOLE_LOG("UNKNOWN Tag: %d\n", (int)data->tag);
             abort();
@@ -324,7 +327,10 @@ extern "C"
             //      old_loc.chunk.x, old_loc.chunk.y,
             //      new_loc.chunk.map_x, new_loc.chunk.map_y,
             //      new_loc.chunk.x, new_loc.chunk.y);
-            send_packet_request_item(client, id.uid);
+            if (new_loc.tag == ItemLocation::Tag::Chunk 
+                && new_loc.chunk.map_x == player->location.chunk.map_x
+                && new_loc.chunk.map_y == player->location.chunk.map_y)
+                send_packet_request_item(client, id.uid);
 
             return;
         }
@@ -365,11 +371,15 @@ extern "C"
 
     void create_object(const ObjectData * data)
     {
-        InventoryElement * el = el_from_data(data);
-        if (el)
+        NetworkObject * object = el_from_data(data);
+        if (object)
         {
-            register_object(el, el);
-            add_object_to_world(el, el->location);           
+            register_object(object);
+            if (object->c_id != Class_Clan) 
+            {
+                InventoryElement* el = (InventoryElement*)object;
+                add_object_to_world(el, el->location);
+            }
         }
         else
         {

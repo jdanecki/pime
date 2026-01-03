@@ -22,6 +22,7 @@ struct ObjectData
         Player,
         Npc,
         Place,
+        Clan,
     };
 
     struct InvElement_Body
@@ -72,6 +73,10 @@ struct ObjectData
     {
         Place data;
     };
+    struct Clan_Body
+    {
+        Clan data;
+    };
 
     ObjectData(Tag tag, size_t s) : tag(tag), size(s)
     {
@@ -115,6 +120,7 @@ struct ObjectData
         Player_Body player;
         Npc_Body npc;
         Place_Body place;
+        Clan_Body clan;
     };
     int id;
     unsigned char data[0];
@@ -133,9 +139,9 @@ uint32_t network_tick(NetClient * client);
 
 InventoryElement *get_object_by_id(NetworkObject uid);
 
-void register_object(InventoryElement * o, void *);
+void register_object(NetworkObject * o);
 
-void deregister_object(InventoryElement * o);
+void deregister_object(NetworkObject * o);
 
 BaseElement * get_base_element(size_t id);
 

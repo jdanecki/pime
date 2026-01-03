@@ -32,9 +32,9 @@ InventoryElement * Player::get_item_by_uid(size_t id)
     return NULL;
 }
 
-int Player::get_id()
+size_t Player::get_id()
 {
-    return (int)uid;
+    return uid;
 }
 
 // Player::Player(int id) : InventoryElement(Class_Player), id(id), name(new char[16])

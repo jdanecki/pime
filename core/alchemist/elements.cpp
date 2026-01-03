@@ -156,11 +156,6 @@ Element::Element(int id) : base(get_base_element(id))
 InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : NetworkObject(c_id, uid), location(location)
 {
 }
-Class_id InventoryElement::get_cid() const
-{
-    return c_id;
-}
-
 
 void Element::show(bool details)
 {

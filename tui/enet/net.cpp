@@ -264,14 +264,14 @@ InventoryElement * get_object_by_id(NetworkObject uid)
     return el ? static_cast<InventoryElement*>(el->el.get()) : nullptr;
 }
 
-void register_object(InventoryElement * o, void * )
+void register_object(NetworkObject * o)
 {
-    ObjectElement *obj = new ObjectElement(o);
+    ObjectElement *obj = new ObjectElement((InventoryElement*)o);
    // printf("register_object: uid=%lx\n", o->uid);
     objects.add(obj);
 }
 
-void deregister_object(InventoryElement * o)
+void deregister_object(NetworkObject * o)
 {
     ListElement * obj= objects.find(&o->uid);
     objects.remove(obj);

@@ -82,7 +82,7 @@ class Player : public InventoryElement
     void pickup(InventoryElement * item);
     void drop(InventoryElement * item);
     InventoryElement * get_item_by_uid(size_t id);
-    int get_id();
+    size_t get_id();
     // Player(int uid);
     Player(size_t uid, SerializableCString&& name, ItemLocation location, int thirst, int hunger, int nutrition);
     int conversation(Player * who, Sentence * s, InventoryElement * el);

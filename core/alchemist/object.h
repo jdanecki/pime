@@ -34,10 +34,8 @@ class NetworkObject
     NetworkObject(Class_id id);
     NetworkObject(Class_id id, size_t uid);
     NetworkObject() {}
-    size_t get_uid() const
-    {
-        return uid;
-    }
+    size_t get_uid() const;
+    Class_id get_cid() const;
 
     Class_id c_id;
     size_t uid;
