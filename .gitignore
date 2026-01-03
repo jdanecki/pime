@@ -7,3 +7,6 @@ core/packet_types.h
 core/alchemist/skills_names.h
 core/alchemist/skills_type.h
 *.o
+*.os
+compile_commands.json
+.cache
