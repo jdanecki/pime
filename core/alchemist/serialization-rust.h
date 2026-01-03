@@ -6,7 +6,7 @@
 class InventoryElement;
 extern "C" {
 /// <div rustbindgen hide></div>
-InventoryElement* get_object_by_id(NetworkObject);
+NetworkObject* get_object_by_id(NetworkObject);
 }
 
 template <typename T> class SerializablePointer

@@ -292,14 +292,14 @@ pub extern "C" fn network_tick(client: &mut NetClient) -> u32 {
                     );
                 },
                 core::PACKET_OBJECT_CREATE => unsafe {
-                    println!("len {}, value {:?}", amt, &value[1..amt]);
+                    // println!("len {}, value {:?}", amt, &value[1..amt]);
                     let obj: Vec<ObjectData> =
                         bincode::deserialize(&value[1..amt]).expect(&format!(
                             "Failed to create item from data amt {} {:?}",
                             amt,
                             &value[1..amt]
                         ));
-                    println!("{:?}", obj);
+                    // println!("{:?}", obj);
                     for o in obj {
                         events::create_object(&o);
                     }
@@ -370,19 +370,19 @@ thread_local! {
 static WORLD: RefCell<World> = panic!("world not created yet");
 }
 
-struct CorePointer(*mut core::InventoryElement);
+struct CorePointer(*mut core::NetworkObject);
 unsafe impl Send for CorePointer {}
 unsafe impl Sync for CorePointer {}
 
 static OBJECTS: RwLock<Option<HashMap<NetworkObject, CorePointer>>> = RwLock::new(None);
 
 #[no_mangle]
-pub extern "C" fn get_object_by_id(id: NetworkObject) -> *mut core::InventoryElement {
+pub extern "C" fn get_object_by_id(id: NetworkObject) -> *mut core::NetworkObject {
     let ptr = match id.c_id {
         core::Class_id_Class_BaseAnimal
         | core::Class_id_Class_BaseElement
         | core::Class_id_Class_BasePlant => {
-            get_base(id.c_id, id.uid as i32) as *mut core::InventoryElement
+            (get_base(id.c_id, id.uid as i32) as usize + 8) as *mut core::NetworkObject
         }
         // TODO Replace with num
         ..14 => match OBJECTS.read().unwrap().as_ref().unwrap().get(&id) {
@@ -392,27 +392,25 @@ pub extern "C" fn get_object_by_id(id: NetworkObject) -> *mut core::InventoryEle
         _ => panic!("Invalid class id {}", id.c_id),
     };
     if ptr == std::ptr::null_mut() {
-        println!("REQUEST {:?}", id);
+        // println!("REQUEST {:?}", id);
         send_packets::send_packet_request_item(unsafe { &mut *CLIENT }, id.uid);
     }
     ptr
 }
 
 #[no_mangle]
-pub extern "C" fn register_object(id: &core::NetworkObject, o: *mut std::ffi::c_void) {
-    let id = id.clone();
+pub extern "C" fn register_object(id: &mut core::NetworkObject) {
     OBJECTS
         .write()
         .unwrap()
         .as_mut()
         .unwrap()
-        .insert(id, CorePointer(o as *mut core::InventoryElement));
+        .insert(id.clone(), CorePointer(id as *mut core::NetworkObject));
 }
 
 #[no_mangle]
-pub extern "C" fn deregister_object(o: *mut core::InventoryElement) {
-    let uid = unsafe { (*o)._base };
-    OBJECTS.write().unwrap().as_mut().unwrap().remove(&uid);
+pub extern "C" fn deregister_object(id: &core::NetworkObject) {
+    OBJECTS.write().unwrap().as_mut().unwrap().remove(id);
 }
 
 #[no_mangle]

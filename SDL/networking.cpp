@@ -374,15 +374,11 @@ extern "C"
         NetworkObject * object = el_from_data(data);
         if (object)
         {
+            register_object(object);
             if (object->c_id != Class_Clan) 
             {
                 InventoryElement* el = (InventoryElement*)object;
-                register_object(el, el);
                 add_object_to_world(el, el->location);
-            }
-            else
-            {
-                register_object(object, object);
             }
         }
         else
