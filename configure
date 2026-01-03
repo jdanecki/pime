@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e 
+
 pushd  core
 ./generate_packet_types.sh
 popd
@@ -13,10 +15,6 @@ pushd SDL
 popd
 
 pushd server
-./configure
-popd
-
-pushd tui
 ./configure
 popd
 
