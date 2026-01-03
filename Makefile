@@ -30,6 +30,11 @@ tui-core-clean:
 format:
 	./format-all.sh
 
+distclean:
+	rm -rf SDL/build
+	rm -rf server/build
+	rm -rf tui/build
+
 lines:
 	find . -name *.cpp -o -name *.h  -exec wc -l {} \; | awk '{s+=$$1} END { print s} '
 

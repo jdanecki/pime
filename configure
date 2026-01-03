@@ -16,7 +16,7 @@ pushd server
 ./configure
 popd
 
-pushd tui/enet
+pushd tui
 ./configure
 popd
 

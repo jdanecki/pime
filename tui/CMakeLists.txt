@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(pime-tui)
 
-find_package(PkgConfig)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(enet REQUIRED libenet)
 
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch")
