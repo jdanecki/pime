@@ -1,0 +1,22 @@
+#!/bin/bash
+
+pushd  core
+./generate_packet_types.sh
+popd
+
+pushd tui
+./configure
+popd
+
+pushd SDL
+./configure
+popd
+
+pushd server
+./configure
+popd
+
+pushd tui/enet
+./configure
+popd
+
