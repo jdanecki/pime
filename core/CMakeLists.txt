@@ -6,13 +6,7 @@ set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch -Wno-reorder")
 
-if(USE_ENET)
-    set(PIME_TARGET_NAME pime_enet)
-else()
-    set(PIME_TARGET_NAME pime)
-endif()
-
-add_library(${PIME_TARGET_NAME} SHARED
+add_library(pime SHARED
     world.cpp 
     player.cpp 
     tiles.cpp 
@@ -30,9 +24,6 @@ add_library(${PIME_TARGET_NAME} SHARED
     alchemist/object.cpp
 	)
 
-if(USE_ENET)
-    target_compile_definitions(${PIME_TARGET_NAME} PRIVATE USE_ENET )
-    add_definitions(${enet_CFLAGS} )
-endif()
+add_definitions(${enet_CFLAGS} )
 
 

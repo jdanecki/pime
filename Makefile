@@ -1,23 +1,17 @@
-all: configure serv client tui tui-core
-
-configure:
-	cd  core; ./generate_packet_types.sh
-	cd tui; ./configure
-	cd SDL; ./configure USE_ENET
-	cd server/enet; ./configure
-	cd tui/enet; ./configure
+all: serv client 
+#tui tui-core
 
 serv:
-	make -C server/enet/build -j $(shell nproc)
+	make -C server/enet/build
 
 client: 
-	make -C SDL/build -j $(shell nproc) pime_SDL_enet
+	make -C SDL/build pime_SDL
 
 tui:
-	make -C tui/enet/build -j $(shell nproc)
+	make -C tui/enet/build
 
 tui-core:
-	make -C core/alchemist-tui/ -j $(shell nproc)
+	make -C core/alchemist-tui
 
 clean: serv-clean client-clean tui-clean tui-core-clean
 

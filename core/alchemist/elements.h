@@ -117,7 +117,7 @@ class InventoryElement : public NetworkObject
     }
     virtual void show(bool details = true)
     {
-        CONSOLE_LOG("%s: uid=%lx id=%d @[%d,%d][%d,%d]\n", get_class_name(), uid, get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
+        CONSOLE_LOG("%s: uid=%lx id=%ld @[%d,%d][%d,%d]\n", get_class_name(), uid, get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
     }
     virtual bool tick()
     {
@@ -278,9 +278,7 @@ class Element : public InventoryElement
     }
     void show(bool details = true) override;
     Element(BaseElement * b);
-#ifdef USE_ENET
     Element(int id);
-#endif
     Form get_form() override
     {
         return get_base()->form;
@@ -331,7 +329,7 @@ class Element : public InventoryElement
     char * get_description() override
     {
         char * buf = new char[128];
-        sprintf(buf, "%s %s: (%s) base=%d", get_form_name(), get_class_name(), get_name(), get_id());
+        sprintf(buf, "%s %s: (%s) base=%ld", get_form_name(), get_class_name(), get_name(), get_id());
         return buf;
     }
 
@@ -513,9 +511,7 @@ class Animal : public InventoryElement
   public:
     float size;
     Animal(BaseAnimal * b);
-#ifdef USE_ENET
     Animal(int id);
-#endif
     void show(bool details = true) override
     {
         InventoryElement::show(details);
@@ -610,9 +606,7 @@ class Plant : public InventoryElement
     bool grown;
 
     Plant(BasePlant * b);
-#ifdef USE_ENET
     Plant(int id);
-#endif
     void show(bool details = true) override
     {
         InventoryElement::show(details);

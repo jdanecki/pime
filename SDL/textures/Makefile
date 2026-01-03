@@ -1,5 +1,5 @@
 CXX := g++
-CXXFLAGS := -g -DUSE_ENET
+CXXFLAGS := -g
 LDFLAGS := -lSDL2 -lSDL2_image -lSDL2_ttf
 OBJDIR := build
 

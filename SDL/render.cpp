@@ -35,7 +35,6 @@ void draw_texts()
 
     sprintf(text, "Hunger=%d Thirst=%d", player->hunger, player->thirst);
     write_text(tx, ty, text, (player->hunger < 100 || player->thirst < 100) ? Red : White, 15, 30);
-#ifdef USE_ENET
     int32_t pl_ch_x=player->location.chunk.map_x;
     int32_t pl_ch_y=player->location.chunk.map_y;
     unsigned int px=player->location.chunk.x;
@@ -46,11 +45,6 @@ void draw_texts()
 
     sprintf(text, "%s@[%d,%d][%d,%d]:id=%ld f=%d", player->get_name(),
         pl_ch_x, pl_ch_y, px, py, base->uid, base->form);
-#else
-    if (player->c_id != 0) 
-        sprintf(text, "%s (%s)@[%d,%d][%d,%d]", player->get_name(), player->get_clan() ? clan_names[player->get_clan()->id] : "", player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x,
-        player->location.chunk.y);
-#endif
     write_text(tx, window_height - 150, text, White, 15, 30);
 
     InventoryElement * item = get_item_at_ppos(player);
@@ -103,7 +97,6 @@ void draw_texts()
     }
 }
 
-#ifdef USE_ENET
 // int wait_for_chunk;
 
 void draw_maps()
@@ -187,7 +180,6 @@ void draw_maps()
 
     SDL_RenderCopy(renderer, map, NULL, &window_rec);
 }
-#endif
 
 chunk * check_chunk(int cx, int cy)
 {
@@ -397,9 +389,7 @@ bool draw()
         draw_npc();
         draw_texts();
 /*
- #ifdef USE_ENET
         draw_maps();
-#endif
 */
     }
     if (status_line[0] != ' ')

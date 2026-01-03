@@ -1,7 +1,7 @@
 CXX := g++
-CXXFLAGS := -g -DUSE_ENET
-LDFLAGS := -lSDL2 -lSDL2_image -lSDL2_ttf -L../build/core-enet -lpime_enet \
-           -Wl,-rpath,'$$ORIGIN/../build/core-enet'
+CXXFLAGS := -g
+LDFLAGS := -lSDL2 -lSDL2_image -lSDL2_ttf -L../build/core -lpime \
+           -Wl,-rpath,'$$ORIGIN/../build/core'
 
 SDL_FILES := ../window.cpp ../text.cpp ../texture.cpp ../implementations/alchemistSDL.cpp \
              ../palette.cpp

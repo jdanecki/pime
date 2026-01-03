@@ -8,11 +8,9 @@
 #include "el_list.h"
 #include "names.h"
 
-#ifdef USE_ENET
 BaseElement * get_base_element(size_t id);
 BasePlant * get_base_plant(size_t id);
 BaseAnimal * get_base_animal(size_t id);
-#endif
 
 ElementsList * base_list;
 
@@ -146,13 +144,9 @@ Element::Element(BaseElement * b)
       volume("volume", length.value * width.value * height.value), sharpness("sharpness", 0), smoothness("smoothness", 0), mass("mass", b->density.value * volume.value / 1000)
 {
 }
-#ifdef USE_ENET
 Element::Element(int id) : base(get_base_element(id))
 {
 }
-#endif
-
-// called by the_game_net/core.rs
 InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : NetworkObject(c_id, uid), location(location)
 {
 }
@@ -244,11 +238,9 @@ Animal::Animal(BaseAnimal * b) : InventoryElement(Class_Animal), base(b)
     init(b);
 }
 
-#ifdef USE_ENET
 Animal::Animal(int id) : base(get_base_animal(id))
 {
 }
-#endif
 
 BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(5))
 {
@@ -275,11 +267,9 @@ Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)
     init(b);
 }
 
-#ifdef USE_ENET
 Plant::Plant(int id) : base(get_base_plant(id))
 {
 }
-#endif
 
 Scroll::Scroll(Base * b) : InventoryElement(Class_Scroll), base(b)
 {

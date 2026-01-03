@@ -44,12 +44,7 @@ struct PlayerRelation
 
 class Player : public InventoryElement
 {
-    size_t padding; // FIXME
-#ifdef USE_ENET
   public:
-#else
-  protected:
-#endif
     SerializableCString name;
 
     // FIXME

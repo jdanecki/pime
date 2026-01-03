@@ -16,12 +16,10 @@ unsigned long max_time;
 bool finish;
 
 NetClient * client;
-#ifdef USE_ENET
 extern ElementsList objects;
 extern ElementsList base_elements;
 extern ElementsList base_plants;
 extern ElementsList base_animals;
-#endif
 
 struct termios old_stdin, stdin_tty;
 void set_terminal()
@@ -119,10 +117,8 @@ void help_question_mark()
     printf("e/E - show item at player location in client/server\n");
     printf("h - help\n");
     printf("i - show inventory\n");
-#ifdef USE_ENET
     printf("o - show objects\n");
     printf("B - show base elements\n");
-#endif
     printf("p/P - show player/players\n");
     printf("r - return to main menu\n");
 }
@@ -142,11 +138,9 @@ bool do_key_question_mark(char k)
                 }
             };
             break;
-#ifdef USE_ENET
         case 'B':
             base_elements.show(true);
             break;
-#endif            
         case 'c':
             show_chunk(player->location);
             break;
@@ -186,11 +180,9 @@ bool do_key_question_mark(char k)
             }
             break;
         }
-#ifdef USE_ENET
         case 'o':
             objects.show(false);
             break;
-#endif
     }
     return false;
 }
@@ -326,19 +318,12 @@ void loop()
     print_status(0, "Welcome in PIME - TUI version for debug!");
     unsigned int total_recv = 0;
 
-#ifdef USE_ENET
     while(!player->name.str[0])
     {
         printf("waiting for data\n");
         network_tick(client);
         sleep(1);
     }
-#else
-        network_tick(client);
-        sleep(1);
-        network_tick(client);
-#endif
-
     for (;;)
     {
         printf("\r%s%d@[%d,%d][%d,%d] %c: ", player->get_name(), player->get_id(),

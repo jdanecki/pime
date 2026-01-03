@@ -9,11 +9,6 @@ pushd ../core/alchemist
 ./generate_files.sh
 popd
 
-if [ "$1" != "USE_ENET" ]
-then
-	./update_network_bindings.sh
-fi
-
 cd build
 cmake -DMULTI_USER=${MULTI_USER} ..
 

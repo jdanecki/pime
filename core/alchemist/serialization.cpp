@@ -1,5 +1,8 @@
-#ifdef USE_ENET
-#include "serialization-enet.cpp"
-#else
-#include "serialization-rust.cpp"
-#endif
+#include "serialization.h"
+#include <cstring>
+
+SerializableCString::SerializableCString(const char * s)
+{
+    strncpy(str, s, sizeof(str) - 1);    
+    str[sizeof(str) - 1] = 0;
+}

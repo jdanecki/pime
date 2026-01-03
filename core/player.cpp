@@ -116,7 +116,7 @@ void Player::stop_conversation()
 void Player::show(bool details)
 {
     CONSOLE_LOG(
-        "%s %s clan=%s id=%d @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan_names[clan.get()->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
+        "%s %s clan=%s id=%ld @ [%d,%d]:[%d,%d]\n", class_name[c_id], get_name(), clan_names[clan.get()->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
     if (details)
     {
         // FIXME

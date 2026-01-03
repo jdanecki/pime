@@ -15,11 +15,9 @@ class Property
     {
         value = v;
     }
-#ifdef USE_ENET
     Property()
     {
     }
-#endif
     void show()
     {
         CONSOLE_LOG("%s = %u\n", name.str, value);
