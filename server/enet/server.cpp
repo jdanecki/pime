@@ -246,7 +246,7 @@ ElementsList base_elements("base elements");
 ElementsList base_plants("base plants");
 ElementsList base_animals("base animals");
 
-BaseElement * get_base_element(int32_t id)
+BaseElement * get_base_element(size_t id)
 {
     BaseListElement * el = (BaseListElement *)base_elements.find(&id);
     if (!el)
@@ -254,7 +254,7 @@ BaseElement * get_base_element(int32_t id)
     return (BaseElement *)((el)->base);
 }
 
-BasePlant * get_base_plant(int32_t id)
+BasePlant * get_base_plant(size_t id)
 {
     BaseListElement * el = (BaseListElement *)base_plants.find(&id);
     if (!el)
@@ -262,7 +262,7 @@ BasePlant * get_base_plant(int32_t id)
     return (BasePlant *)((el)->base);
 }
 
-BaseAnimal * get_base_animal(int32_t id)
+BaseAnimal * get_base_animal(size_t id)
 {
     BaseListElement * el = (BaseListElement *)base_animals.find(&id);
     if (!el)
@@ -312,7 +312,7 @@ class PlayerClient : public ListElement
         }
         return false;
     }
-    void show()
+    void show(bool details = true)
     {
         char hostname[64];
         enet_address_get_host_ip(&peer->address, hostname, 64);
@@ -643,7 +643,7 @@ int random_bool(double probability)
     return ((double)rand() / RAND_MAX) < probability;
 }
 
-typedef void (*callback_fn)(chunk * ch, int id);
+typedef void (*callback_fn)(chunk * ch, size_t id);
 
 void do_times(float prob, callback_fn f, chunk * ch, int id)
 {
@@ -662,19 +662,19 @@ void add_place(chunk * ch, Place_id id, int x, int y)
     ch->add_object(create_place(id), x, y);
 }
 
-void add_element(chunk * ch, int id)
+void add_element(chunk * ch, size_t id)
 {
     BaseListElement * base_el = (BaseListElement *)base_elements.find(&id);
     ch->add_object(create_element((BaseElement *)(base_el->base)));
 }
 
-void add_plant(chunk * ch, int id)
+void add_plant(chunk * ch, size_t id)
 {
     BaseListElement * base_el = (BaseListElement *)base_plants.find(&id);
     ch->add_object(create_plant((BasePlant *)(base_el->base)));
 }
 
-void add_animal(chunk * ch, int id)
+void add_animal(chunk * ch, size_t id)
 {
     BaseListElement * base_el = (BaseListElement *)base_animals.find(&id);
     ch->add_object(create_animal((BaseAnimal *)(base_el->base)));

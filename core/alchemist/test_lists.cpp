@@ -1,19 +1,19 @@
 #include "el_list.h"
 
-BasePlant * get_base_plant(int32_t id)
+BasePlant * get_base_plant(size_t id)
 {
-    printf("get_base_plant id=%d\n", id);
+    printf("get_base_plant id=%ld\n", id);
     return nullptr;
 }
-BaseAnimal * get_base_animal(int32_t id)
+BaseAnimal * get_base_animal(size_t id)
 {
-    printf("get_base_animal id=%d\n", id);
+    printf("get_base_animal id=%ld\n", id);
     return nullptr;
 }
 
-BaseElement * get_base_element(int32_t id)
+BaseElement * get_base_element(size_t id)
 {
-    printf("get_base_element id=%d\n", id);
+    printf("get_base_element id=%ld\n", id);
     return nullptr;
 }
 
@@ -29,16 +29,9 @@ void test_loops()
     ListElement *el3=new ListElement(new Element(new BaseElement(Form_solid, 1)));
     list.add_front(el3);
 
-    list.show(false);
-
+    list.show(true);
+#if 0
     printf("--- range based for loop\n");
-    /*
-    auto && __range = list;
-    for (auto __it = __range.begin(); __it != __range.end(); ++__it) {
-        InventoryElement* el = *__it;
-        ...
-    }
-    */
     for (InventoryElement * el : list)
     {
         el->show(false);
@@ -49,6 +42,8 @@ void test_loops()
     {
         el->show(false);
     }
+#endif
+
 #if 0
     printf("--- for loop with iterator\n");
     for (ElementsListIterator it = list.begin(); it != list.end(); ++it)
@@ -124,9 +119,9 @@ void test_element_on_2_Invlists()
 
 int main()
 {
-//    test_loops();
+    test_loops();
     //test_element_on_2_lists();
-    test_element_on_2_Invlists();
+//    test_element_on_2_Invlists();
 
     return 0;
 

@@ -119,6 +119,5 @@ void get_chunks_around(ItemLocation loc, unsigned int *left_chunk_x, unsigned in
 
     *top_chunk_y = *left_top_world_y / CHUNK_SIZE;
     *bottom_chunk_y = (*left_top_world_y + CHUNK_SIZE - 1) / CHUNK_SIZE;
-
 }
 

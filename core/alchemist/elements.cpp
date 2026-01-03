@@ -9,9 +9,9 @@
 #include "names.h"
 
 #ifdef USE_ENET
-BaseElement * get_base_element(int32_t id);
-BasePlant * get_base_plant(int32_t id);
-BaseAnimal * get_base_animal(int32_t id);
+BaseElement * get_base_element(size_t id);
+BasePlant * get_base_plant(size_t id);
+BaseAnimal * get_base_animal(size_t id);
 #endif
 
 ElementsList * base_list;

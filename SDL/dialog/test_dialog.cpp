@@ -18,18 +18,18 @@ int active_hotbar = 0;
 
 NetClient * client;
 
-BasePlant * get_base_plant(int32_t id)
+BasePlant * get_base_plant(size_t id)
 {
     printf("get_base_plant id=%d\n", id);
     return nullptr;
 }
-BaseAnimal * get_base_animal(int32_t id)
+BaseAnimal * get_base_animal(size_t id)
 {
     printf("get_base_animal id=%d\n", id);
     return nullptr;
 }
 
-BaseElement * get_base_element(int32_t id)
+BaseElement * get_base_element(size_t id)
 {
     printf("get_base_element id=%d\n", id);
     return nullptr;

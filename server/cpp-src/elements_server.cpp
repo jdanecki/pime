@@ -395,6 +395,7 @@ bool ElementServer::action_hit()
 
         return true;
     }
+    CONSOLE_LOG("ELEMENT_SERVER: action_hit failed: wrong form %s\n", Form_name[b->form]);
     return false;
 }
 

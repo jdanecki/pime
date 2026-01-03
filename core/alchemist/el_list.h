@@ -2,9 +2,6 @@
 #define EL_LIST_H
 
 #include "elements.h"
-//FIXME
-// #include "object.h"
-// #include "serialization-rust.h"
 
 class ListElement
 {
@@ -117,8 +114,8 @@ class BaseListElement : public ListElement
     }
     bool check(void * what)
     {
-        int * pid = (int *)what;
-        return (((size_t)(*pid)) == base->uid);
+        size_t * pid = (size_t *)what;
+        return (*pid == base->uid);
     }
     size_t get_size()
     {

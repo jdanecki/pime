@@ -80,7 +80,7 @@ struct ObjectData
     ObjectData(Tag tag) : tag(tag)
     {        
         size = sizeof(struct ObjectData);
-        CONSOLE_LOG("ObjectData: size=%ld\n", size);
+    //    CONSOLE_LOG("ObjectData: size=%ld\n", size);
     }
 
     ~ObjectData()
@@ -137,11 +137,11 @@ void register_object(InventoryElement * o, void *);
 
 void deregister_object(InventoryElement * o);
 
-BaseElement * get_base_element(int32_t id);
+BaseElement * get_base_element(size_t id);
 
-BasePlant * get_base_plant(int32_t id);
+BasePlant * get_base_plant(size_t id);
 
-BaseAnimal * get_base_animal(int32_t id);
+BaseAnimal * get_base_animal(size_t id);
 
 Base * get_base(uint32_t c_id, int32_t id);
 

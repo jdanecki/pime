@@ -48,6 +48,7 @@ class Renderable
         float scale = get_scale();
         if (scale < 0.01)
             return;
+
         SDL_Rect img_rect = {x, y, (int)(w * scale), (int)(h * scale)};
         int ww = window_width - PANEL_WINDOW;
         int wh = window_height - STATUS_LINES;
@@ -100,6 +101,7 @@ class Renderable
         unsigned int by = y + ((unsigned int)(h * scale) / t_size);
 
         if (scale < 0.01) {
+        //    CONSOLE_LOG("px=%d  [x=%d..%d) py=%d [y=%d..%d) scale=%f\n", px, x, rx, py, y, by, scale);
             return false;
         }
         bool ret= (

@@ -179,7 +179,7 @@ class ProductServer : public Product
     virtual bool use_tile(int map_x, int map_y, int x, int y, Player * pl)
     {
         if (!actions_count) return false;
-        CONSOLE_LOG("%s: %s tile (%d, %d): (%d, %d)\n", get_name(), product_action_name[actions[0]], map_x, map_y, x, y);
+        CONSOLE_LOG("ProductServer(%s): %s tile (%d, %d): (%d, %d)\n", get_name(), product_action_name[actions[0]], map_x, map_y, x, y);
         return true;
     }
     bool can_pickup() override

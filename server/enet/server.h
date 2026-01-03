@@ -326,7 +326,7 @@ ObjectData * convert_to_data(NetworkObject * el)
             obj->id = place->get_id();
             size_t * pdata=(size_t*) &obj->data[0];
             *pdata = place->get_uid();
-            CONSOLE_LOG("pdata=%lx size=%d\n", *pdata, obj->size);
+       //     CONSOLE_LOG("pdata=%lx size=%d\n", *pdata, obj->size);
             break;
         }
         case Class_Player:

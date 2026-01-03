@@ -1,29 +1,36 @@
-all: configure serv client
+all: configure serv client tui tui-core
 
-include Makefile-enet Makefile-rust
-
-serv: serv-rust serv-enet
-
-client: client-enet client-rust tui-core tui-enet tui-rust
-
-configure: configure-enet configure-rust
-
-configure-common:
+configure:
 	cd  core; ./generate_packet_types.sh
 	cd tui; ./configure
-	
-clean: client-clean serv-clean
+	cd SDL; ./configure USE_ENET
+	cd server/enet; ./configure
+	cd tui/enet; ./configure
 
-client-clean: tui-clean tui-rust-clean tui-enet-clean
-	make -C SDL/build clean
-	cd the_game_net; cargo clean
+serv:
+	make -C server/enet/build -j $(shell nproc)
 
-serv-clean: serv-rust-clean serv-enet-clean
+client: 
+	make -C SDL/build -j $(shell nproc) pime_SDL_enet
+
+tui:
+	make -C tui/enet/build -j $(shell nproc)
 
 tui-core:
 	make -C core/alchemist-tui/ -j $(shell nproc)
 
-tui-clean:	
+clean: serv-clean client-clean tui-clean tui-core-clean
+
+serv-clean:	
+	make -C server/enet/build clean
+
+client-clean:
+	make -C SDL/build clean
+
+tui-clean:
+	make -C tui/enet/build clean
+
+tui-core-clean:	
 	make -C core/alchemist-tui clean
 
 format:

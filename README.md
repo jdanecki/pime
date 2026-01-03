@@ -35,22 +35,3 @@ In SDL directory run:
 ```
 ./build/pime_SDL_enet
 ```
-
-### Rust version 
-
-* run server
-
-In server directory run: 
-
-```
-cargo run
-```
-
-* SDL Client
-
-In SDL directory run: 
-
-```
-./run_local.sh
-```
-

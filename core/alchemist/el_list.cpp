@@ -32,8 +32,7 @@ void ListElement::add(ListElement * entry)
 void ListElement::show(bool details)
 {
   //  CONSOLE_LOG("ListElement: %p next=%p prev=%p\n", this, next, prev);
-  // FIXME
-    // el.get()->show(details);
+    (static_cast<InventoryElement*>(el.get()))->show(details);
 }
 
 void ElementsList::remove_all()
@@ -113,11 +112,13 @@ ListElement * ElementsList::find(void * what)
 void ElementsList::show(bool details)
 {
     ListElement * cur = head;
-    CONSOLE_LOG("--- %s (%d) ---\n", name, nr_elements);
+    int i=1;
     while (cur)
     {
+        CONSOLE_LOG("--- %s (%d/%d) ---\n", name, i, nr_elements);
         cur->show(details);
         cur = cur->next;
+        i++;
     }
 }
 

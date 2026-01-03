@@ -92,7 +92,7 @@ void draw_texts()
         {
             Product * pr=dynamic_cast<Product*>(el);
             if (pr) {
-                sprintf(text, "%s %s", el->get_name(), product_action_name[pr->actions[0]]);
+                sprintf(text, "%s -> %s", el->get_name(), product_action_name[pr->actions[0]]);
             }
         }
         else
@@ -230,6 +230,7 @@ void render_element(InventoryElement *o, unsigned int ltx, unsigned int lty)
         if (screen_x < CHUNK_SIZE && screen_y < CHUNK_SIZE)
         {
             r->render(screen_x * tile_size, screen_y * tile_size);
+//            CONSOLE_LOG("render %s@[%d,%d]\n", o->get_name(), screen_x, screen_y);
         }
     }
     else
