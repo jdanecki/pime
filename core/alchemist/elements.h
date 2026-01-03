@@ -139,7 +139,6 @@ class InventoryElement : public NetworkObject
     {
         return c_id;
     }
-    Class_id get_cid() const;
 
     virtual bool check_rect(unsigned int px, unsigned int py, int )
     {

@@ -602,6 +602,14 @@ const _: () = {
     ["Offset of field: NetworkObject::uid"][::std::mem::offset_of!(NetworkObject, uid) - 8usize];
 };
 extern "C" {
+    #[link_name = "\u{1}_ZNK13NetworkObject7get_uidEv"]
+    pub fn NetworkObject_get_uid(this: *const NetworkObject) -> usize;
+}
+extern "C" {
+    #[link_name = "\u{1}_ZNK13NetworkObject7get_cidEv"]
+    pub fn NetworkObject_get_cid(this: *const NetworkObject) -> Class_id;
+}
+extern "C" {
     #[link_name = "\u{1}_ZN13NetworkObjectC1E8Class_id"]
     pub fn NetworkObject_NetworkObject(this: *mut NetworkObject, id: Class_id);
 }
@@ -610,6 +618,14 @@ extern "C" {
     pub fn NetworkObject_NetworkObject1(this: *mut NetworkObject, id: Class_id, uid: usize);
 }
 impl NetworkObject {
+    #[inline]
+    pub unsafe fn get_uid(&self) -> usize {
+        NetworkObject_get_uid(self)
+    }
+    #[inline]
+    pub unsafe fn get_cid(&self) -> Class_id {
+        NetworkObject_get_cid(self)
+    }
     #[inline]
     pub unsafe fn new(id: Class_id) -> Self {
         let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
@@ -3136,14 +3152,6 @@ const _: () = {
         [::std::mem::offset_of!(InventoryElement, location) - 24usize];
 };
 extern "C" {
-    #[link_name = "\u{1}_ZNK16InventoryElement7get_cidEv"]
-    pub fn InventoryElement_get_cid(this: *const InventoryElement) -> Class_id;
-}
-extern "C" {
-    #[link_name = "\u{1}_ZNK16InventoryElement7get_uidEv"]
-    pub fn InventoryElement_get_uid(this: *const InventoryElement) -> usize;
-}
-extern "C" {
     #[link_name = "\u{1}_ZN16InventoryElementC1E8Class_idm12ItemLocation"]
     pub fn InventoryElement_InventoryElement(
         this: *mut InventoryElement,
@@ -3153,14 +3161,6 @@ extern "C" {
     );
 }
 impl InventoryElement {
-    #[inline]
-    pub unsafe fn get_cid(&self) -> Class_id {
-        InventoryElement_get_cid(self)
-    }
-    #[inline]
-    pub unsafe fn get_uid(&self) -> usize {
-        InventoryElement_get_uid(self)
-    }
     #[inline]
     pub unsafe fn new(c_id: Class_id, uid: usize, location: ItemLocation) -> Self {
         let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();

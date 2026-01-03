@@ -557,8 +557,8 @@ fn handle_packet(
                     player._base.drop(item);
                     update_location(
                         core::NetworkObject {
-                            c_id: (*item).get_cid(),
-                            uid: (*item).get_uid(),
+                            c_id: (*item)._base.get_cid(),
+                            uid: (*item)._base.get_uid(),
                         },
                         loc,
                         (*item).location,
@@ -635,8 +635,8 @@ fn handle_packet(
                         destroy_object(
                             server,
                             core::NetworkObject {
-                                c_id: (*el).get_cid(),
-                                uid: (*el).get_uid(),
+                                c_id: (*el)._base.get_cid(),
+                                uid: (*el)._base.get_uid(),
                             },
                             (*el).location,
                         );
@@ -652,8 +652,8 @@ fn handle_packet(
                             destroy_object(
                                 server,
                                 core::NetworkObject {
-                                    c_id: (*el2).get_cid(),
-                                    uid: (*el2).get_uid(),
+                                    c_id: (*el2)._base.get_cid(),
+                                    uid: (*el2)._base.get_uid(),
                                 },
                                 (*el2).location,
                             );

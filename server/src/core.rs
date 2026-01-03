@@ -56,8 +56,8 @@ impl serde::Serialize for InventoryElement {
     {
         let mut state = serializer.serialize_tuple(3)?;
         unsafe {
-            state.serialize_element(&self.get_cid())?;
-            state.serialize_element(&self.get_uid())?;
+            state.serialize_element(&self._base.get_cid())?;
+            state.serialize_element(&self._base.get_uid())?;
         }
         state.serialize_element(&self.location)?;
         state.end()
