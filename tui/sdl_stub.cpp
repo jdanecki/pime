@@ -137,6 +137,5 @@ SDL_Texture * places_textures[TEXTURE_wall_max];
 
 int window_width=800;
 int window_height=600;
-int tile_size=32;
 
 void hsv2rgb(int h, int s, int v, int* r, int* g, int* b) {}

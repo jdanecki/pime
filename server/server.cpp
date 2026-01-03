@@ -13,7 +13,7 @@
 #include <sys/ioctl.h>
 #include "generator/generator.h"
 
-#define DEBUG 1
+//#define DEBUG 1
 
 #define RED "$COLOR_PAIR_1_"
 #define GREEN "$COLOR_PAIR_2_"

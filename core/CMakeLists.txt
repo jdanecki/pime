@@ -6,7 +6,7 @@ set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch -Wno-reorder")
 
-add_library(pime SHARED
+add_library(pime STATIC
     world.cpp 
     player.cpp 
     tiles.cpp 
@@ -25,5 +25,3 @@ add_library(pime SHARED
 	)
 
 add_definitions(${enet_CFLAGS} )
-
-
