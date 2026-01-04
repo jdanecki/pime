@@ -1,0 +1,2 @@
+option('multi_user', type : 'boolean', value : true, description : 'Enable multi-user networking (default: true)')
+option('enet_cflags', type: 'string', value: '', description: 'Additional C/C++ flags from enet (equivalent to enet_CFLAGS)')
