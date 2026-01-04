@@ -30,6 +30,7 @@ WINDOW * status;
 
 char in_buf[INPUT_SIZE + 1];
 char ** out_buf;
+int show_key=0;
 
 int history_up;
 int buf_pos;
@@ -98,6 +99,7 @@ void print_help()
     add_to_output("5 - show base elements\n");
     add_to_output("6 - show base plants\n");
     add_to_output("7 - show base animals\n");
+    add_to_output("# - show keys\n");
 }
 
 void clear_history()
@@ -134,6 +136,7 @@ char handle_pressed(int pressed)
     switch (pressed)
     {
         case KEY_BACKSPACE:
+        case 8:
             if (strlen(in_buf))
             {
                 in_buf[strlen(in_buf) - 1] = '\0';
@@ -164,6 +167,9 @@ char handle_pressed(int pressed)
             history_up -= 5;
             if (history_up < 0)
                 history_up = 0;
+            break;
+        case '#':
+             show_key^=1;
             break;
     }
     return 0;
@@ -987,6 +993,9 @@ int main()
     {
         ncurses_tick();
         int ch = wgetch(in_w);
+        if (show_key) {
+            if (ch!=ERR) add_to_output("key=%d ", ch);
+        }
         if (ch != ERR && handle_pressed(ch))
             break;
         switch (event.type)
