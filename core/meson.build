@@ -1,6 +1,4 @@
-run_target('generate_packet_types',
-  command: ['bash', '-lc', 'cd @SOURCE_DIR@ && ./generate_packet_types.sh']
-)
+run_command(['bash', meson.global_source_root() + '/core/generate_packet_types.sh'], check: true)
 subdir('alchemist')
 
 src = [

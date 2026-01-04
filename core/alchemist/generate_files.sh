@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd "$(dirname "$(realpath "$0")")"
+
 create_inline_file()
 {
   local INPUT_FILE="$1.txt"  
