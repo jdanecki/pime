@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include "server.h"
+#include "../core/packets.h"
 #include "../core/alchemist/el_list.h"
 #include "player_server.h"
 #include "world_server.h"

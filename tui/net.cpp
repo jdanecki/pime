@@ -4,7 +4,7 @@
 #include <enet/enet.h>
 #include "../SDL/networking.h"
 #include <cstring>
-#include "../server/server.h"
+#include "../core/packets.h"
 
 ElementsList base_elements("base elements");
 ElementsList base_plants("base plants");

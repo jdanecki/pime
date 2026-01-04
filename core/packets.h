@@ -3,9 +3,9 @@
 #include <string.h>
 #include <assert.h>
 #include <new>
-#include "../core/packet_types.h"
-#include "../core/tiles.h"
-#include "../core/world.h"
+#include "packet_types.h"
+#include "tiles.h"
+#include "world.h"
 #include "../SDL/networking.h"
 
 extern ElementsList base_elements;

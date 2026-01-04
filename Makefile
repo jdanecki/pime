@@ -56,3 +56,7 @@ tests:
 	make -C server/tests
 	make -C core/alchemist/tests
 
+rebuild: distclean
+	./configure
+	+$(BUILD_TOOL) 2d
+
