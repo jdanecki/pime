@@ -25,7 +25,6 @@ add_subdirectory(../core core)
 add_executable(pime_tui
     main.cpp 
     net.cpp
-    ../SDL/networking.cpp 
     ../SDL/player_actions.cpp
     sdl_stub.cpp
     

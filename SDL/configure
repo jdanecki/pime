@@ -1,6 +1,5 @@
 #!/bin/bash
 
-MULTI_USER=ON
 if [ ! -d build ] 
 then
     mkdir build
@@ -10,6 +9,6 @@ pushd ../core/alchemist
 popd
 
 pushd build
-cmake -DMULTI_USER=${MULTI_USER} "${GENERATOR}" ..
+cmake "${GENERATOR}" ..
 popd
 

@@ -1,6 +1,6 @@
 #include "npc.h"
 #include "menu.h"
-#include "networking.h"
+#include "../core/networking.h"
 #include "texture.h"
 #include "window.h"
 #include <SDL2/SDL_render.h>
@@ -10,6 +10,7 @@
 
 NpcSDL * current_npc;
 extern int active_hotbar;
+
 
 SDL_Texture * create_npc_texture()
 {

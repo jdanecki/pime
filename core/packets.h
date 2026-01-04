@@ -6,7 +6,7 @@
 #include "packet_types.h"
 #include "tiles.h"
 #include "world.h"
-#include "../SDL/networking.h"
+#include "networking.h"
 
 extern ElementsList base_elements;
 extern ElementsList base_plants;
@@ -639,8 +639,7 @@ class PacketChunkUpdate : public Packet
         if (check_size(s))
         {
             pdata = (struct serial_data *)net_data;
-            // rust version adds packet type, x, y as 3 bytes
-            ptable = (chunk_table *)(((unsigned char *)&pdata->table) - 3);
+            ptable = (chunk_table *)(((unsigned char *)&pdata->table));
             return true;
         }
         return false;

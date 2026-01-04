@@ -1,5 +1,5 @@
 #include "BeingSDL.h"
-#include "../networking.h"
+#include "../../core/networking.h"
 
 /*SDL_Texture * BeingSDL::get_texture()
 {

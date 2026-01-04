@@ -2,15 +2,22 @@
 #include "../core/alchemist/elements.h"
 #include "../core/tiles.h"
 #include <enet/enet.h>
-#include "../SDL/networking.h"
+#include "../core/networking.h"
 #include <cstring>
 #include "../core/packets.h"
+#include "../SDL/implementations/playerSDL.h"
+#include "../SDL/implementations/BeingSDL.h"
 
 ElementsList base_elements("base elements");
 ElementsList base_plants("base plants");
 ElementsList base_animals("base animals");
 
 ElementsList objects("objects");
+
+extern PlayerSDL * player;
+#define PLAYER_NUM 16
+extern PlayerSDL * players[PLAYER_NUM];
+extern void print_status(int i, const char * format, ...);
 
 class ObjectElement : public ListElement
 {
@@ -59,6 +66,225 @@ void add_elements(PacketElementsList * list, int i)
     printf("player=%s [%d]=%lx inv.elements=%d\n", p->get_name(), i, uid, p->inventory.nr_elements);
     update_hotbar();
 }
+
+void knowledge_update(size_t pl_id, Class_id cid, int id)
+{
+    if (pl_id != player->get_id())
+        return;
+
+    CONSOLE_LOG("knowledge update for player %ld cid=%s id=%d\n", pl_id, class_name[cid], id);
+    Player * p = players[pl_id];
+    if (!p)
+        return;
+    p->set_known(cid, id);
+}
+
+void got_id(size_t id, int64_t seed)
+{
+    my_id = id;
+    // players[id] = new Player(id, SerializableCString("player"), ItemLocation::center(), 0, 0, 0);
+    // player = players[id];
+
+    player = (PlayerSDL *)calloc(sizeof(PlayerSDL), 1);
+    player->location.chunk.map_x = 128;
+    player->location.chunk.map_y = 128;
+    player->location.chunk.x = 8;
+    player->location.chunk.y = 8;
+
+    CONSOLE_LOG("seed: %ld\n", seed);
+    srand(seed);
+    init_sentences();
+    init_questions();
+    init_answers();
+    CONSOLE_LOG("got id %ld\n", id);
+    print_status(1, "player %ld connected", id);
+}
+
+void checked_update(size_t pl_id, size_t el)
+{
+    if (pl_id != player->get_id())
+        return;
+
+    CONSOLE_LOG("checked update for player %ld el=%lx\n", pl_id, el);
+    Player * p = players[pl_id];
+    if (!p)
+        return;
+    p->set_checked(el);
+}
+
+NetworkObject * el_from_data(const ObjectData * data)
+{
+   // CONSOLE_LOG("CREATING OBJECT for tag: %d\n", (int)data->tag);
+    NetworkObject * el = nullptr;
+    switch (data->tag)
+    {
+        case ObjectData::Tag::InvElement:
+            break;
+        case ObjectData::Tag::Element:
+        {
+            el = new ElementSDL(data->element.data);
+            break;
+        }
+        case ObjectData::Tag::Place:
+        {
+            el = new PlaceSDL(data->place.data);
+            break;
+        }
+        case ObjectData::Tag::Scroll:
+            el = new ScrollSDL(data->scroll.data);
+            break;
+        case ObjectData::Tag::Ingredient:
+            el = new IngredientSDL(data->ingredient.data);
+            break;
+        case ObjectData::Tag::Product:
+            el = new ProductSDL(data->product.data);
+            break;
+        case ObjectData::Tag::Plant:
+        {
+            el = new PlantSDL(data->plant.data);
+            break;
+        }
+        case ObjectData::Tag::Animal:
+            el = new AnimalSDL(data->animal.data);
+            break;
+        case ObjectData::Tag::Player:
+            el = new PlayerSDL(data->player.data);
+            if (my_id == el->uid)
+            {
+                player = (PlayerSDL *)el;
+                CONSOLE_LOG("new player uid=%ld name=%s\n", player->uid, player->get_name());
+            }
+            break;
+#ifdef DISABLE_NPC
+#warning DISABLE_NPC
+#endif
+
+        case ObjectData::Tag::Npc:
+#if !defined(DISABLE_NPC)
+            el = new NpcSDL(data->npc.data);
+            el->c_id = Class_Npc;
+            CONSOLE_LOG("creating NPC");
+#endif
+            break;
+
+        case ObjectData::Tag::Clan:
+            el = new Clan(data->clan.data);
+            break;
+        default:
+            CONSOLE_LOG("UNKNOWN Tag: %d\n", (int)data->tag);
+            abort();
+    }
+    return el;
+}
+
+
+InventoryElement * remove_from_location(ItemLocation location, NetworkObject id)
+{
+    InventoryElement * el = (InventoryElement*)get_object_by_id(id);
+    if (!el)
+        return nullptr;
+    switch (location.tag)
+    {
+        case ItemLocation::Tag::Chunk:
+        {
+            remove_from_chunks(el);
+            break;
+        }
+        case ItemLocation::Tag::Player:
+        {
+            Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, location.player.id));
+            if (p)
+                p->drop(el);
+            if (location.player.id == player->get_id())
+            {
+                update_hotbar();
+            }
+        }
+    }
+    return el;
+}
+
+void destroy_object(NetworkObject id, ItemLocation location)
+{
+    InventoryElement * el = (InventoryElement*)get_object_by_id(id);
+    if (el)
+    {
+        InventoryElement * removed = remove_from_location(location, id);
+        if (removed == nullptr)
+        {
+            abort();
+        }
+       CONSOLE_LOG("SDL: destroy_object %ld", id.uid);
+        deregister_object(el);
+        delete el;
+    }
+    // else
+    //  item on not loaded chunk
+    //    CONSOLE_LOG("SDL: deleting inexisting item %ld\n", id);
+}
+
+
+void update_item_location(LocationUpdateData data)
+{
+    NetworkObject id = data.id;
+    ItemLocation & old_loc = data.old;
+    ItemLocation & new_loc = data.new_;
+
+    /*CONSOLE_LOG("update item location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
+    old_loc.show();
+    new_loc.show();
+*/
+    InventoryElement * el = remove_from_location(old_loc, id);
+    if (!el)
+    { // FIXME
+        // CONSOLE_LOG("SDL: not found item %lu to remove on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
+        //      id,
+        //      old_loc.chunk.map_x, old_loc.chunk.map_y,
+        //      old_loc.chunk.x, old_loc.chunk.y,
+        //      new_loc.chunk.map_x, new_loc.chunk.map_y,
+        //      new_loc.chunk.x, new_loc.chunk.y);
+        if (new_loc.tag == ItemLocation::Tag::Chunk
+            && new_loc.chunk.map_x == player->location.chunk.map_x
+            && new_loc.chunk.map_y == player->location.chunk.map_y)
+            send_packet_request_item(client, id.uid);
+
+        return;
+    }
+    switch (new_loc.tag)
+    {
+        case ItemLocation::Tag::Chunk:
+        {
+            /*CONSOLE_LOG("SDL: update item location %s:%s on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
+                el->get_class_name(), el->get_name(),
+                old_loc.chunk.map_x, old_loc.chunk.map_y,
+                old_loc.chunk.x, old_loc.chunk.y,
+                new_loc.chunk.map_x, new_loc.chunk.map_y,
+                new_loc.chunk.x, new_loc.chunk.y);
+*/
+            /*ItemLocation old_l;
+            ItemLocation new_l;
+            old_l.chunk.x = old_loc.chunk.x;
+            old_l.chunk.y = old_loc.chunk.y;
+            new_l.chunk.x = new_loc.chunk.x;
+            new_l.chunk.y = new_loc.chunk.y;*/
+            //el->update_item_location(old_l, new_l);
+            el->update_item_location(old_loc, new_loc);
+            add_object_to_world(el, new_loc);
+            break;
+        }
+        case ItemLocation::Tag::Player:
+        {
+            Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, new_loc.player.id));
+            if (p)
+                p->pickup(el);
+            if (new_loc.player.id == player->get_id())
+            {
+                update_hotbar(); // FIXME - remove only one element
+            }
+        }
+    }
+}
+
 
 bool handle_packet(ENetPacket * packet)
 {

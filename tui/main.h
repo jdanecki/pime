@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../core/tiles.h"
-#include "../SDL/networking.h"
+#include "../core/networking.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <termios.h>

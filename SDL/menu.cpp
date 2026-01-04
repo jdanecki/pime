@@ -4,7 +4,7 @@
 #include "../core/tiles.h"
 #include "../core/world.h"
 #include "music.h"
-#include "networking.h"
+#include "../core/networking.h"
 #include "npc.h"
 #include "text.h"
 #include "texture.h"

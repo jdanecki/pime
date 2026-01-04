@@ -1,9 +1,9 @@
 #ifndef NETWORKING_H
 #define NETWORKING_H
 
-#include "../core/world.h"
-#include "../core/player.h"
-#include "../core/npc.h"
+#include "world.h"
+#include "player.h"
+#include "npc.h"
 
 #include <cstdarg>
 #include <cstdint>
@@ -210,5 +210,7 @@ void send_packet_request_item(NetClient * client, size_t id);
 ObjectData foo();
 
 extern NetClient * client;
+extern NetworkObject * el_from_data(const ObjectData * data);
+extern size_t my_id;
 
 #endif

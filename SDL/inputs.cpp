@@ -14,7 +14,7 @@
 #include "dialog/d_craft.h"
 #include "dialog/d_hotbar.h"
 #include "menu.h"
-#include "networking.h"
+#include "../core/networking.h"
 #include "player_actions.h"
 #include "window.h"
 

@@ -15,7 +15,7 @@ set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_definitions(${enet_CFLAGS} ${SDL_CFLAGS} ${SDL2_IMAGE_CFLAGS} 
+add_definitions(-DDISABLE_NPC ${enet_CFLAGS} ${SDL_CFLAGS} ${SDL2_IMAGE_CFLAGS} 
     ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${SDL2_GFX_CFLAGS} )
 
 set(CORE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../core)
@@ -23,24 +23,16 @@ set(CORE_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/core)
 
 add_subdirectory(${CORE_SOURCE_DIR} ${CORE_BINARY_DIR})
 
-set(MULTI_USER 1)
-
-if(NOT MULTI_USER)
-    set(NETWORK_STUB network_stub.cpp)
-endif()
-
 set(SHARED_SOURCES
     window.cpp music.cpp text.cpp
     texture.cpp main.cpp render.cpp menu.cpp
-    networking.cpp dialog/dialog.cpp dialog/d_hotbar.cpp
+    dialog/dialog.cpp dialog/d_hotbar.cpp
     dialog/d_craft.cpp
     inputs.cpp player_actions.cpp npc.cpp
     implementations/alchemistSDL.cpp
     implementations/BeingSDL.cpp
     implementations/playerSDL.cpp
     palette.cpp
-
-    ${NETWORK_STUB}
 )
 
 set(SHARED_LIBRARIES

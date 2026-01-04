@@ -19,7 +19,7 @@
 #include "dialog/d_hotbar.h"
 #include "inputs.h"
 #include "menu.h"
-#include "networking.h"
+#include "../core/networking.h"
 #include "../core/player.h"
 #include <sys/stat.h>
 #include <sys/types.h>

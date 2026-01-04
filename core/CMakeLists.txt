@@ -22,6 +22,8 @@ add_library(pime STATIC
     alchemist/skills.cpp
     alchemist/serialization.cpp
     alchemist/object.cpp
+    
+    networking.cpp 
 	)
 
 add_definitions(${enet_CFLAGS} )
