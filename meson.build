@@ -28,3 +28,9 @@ lines = custom_target(
   command : ['sh', '-c', 'cd @SOURCE_ROOT@ && echo find . -name "*.cpp" -o -name "*.h" -exec "wc -l {} \;" | awk "{s+=$$1} END { print s }" | tee lines'],
   build_by_default : false
 )
+
+clean_generated = custom_target(
+  'clean_generated',
+  output : 'clean_generated',
+  command : ['sh', '-c', 'cd @SOURCE_ROOT@ && ./clean.sh']
+)
