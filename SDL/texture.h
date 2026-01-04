@@ -1,10 +1,10 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include <SDL2/SDL_surface.h>
+#include <SDL_surface.h>
 #include <stdlib.h>
 
-#include <SDL2/SDL_image.h>
+#include <SDL_image.h>
 
 #include "../core/alchemist/elements.h"
 #include "../core/tiles.h"

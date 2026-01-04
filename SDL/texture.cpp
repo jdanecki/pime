@@ -2,8 +2,8 @@
 #include "../core/alchemist/elements.h"
 #include "../core/tiles.h"
 #include "window.h"
-#include <SDL2/SDL_blendmode.h>
-#include <SDL2/SDL_image.h>
+#include <SDL_blendmode.h>
+#include <SDL_image.h>
 #include <dirent.h>
 #include <stdio.h>
 #include <assert.h>

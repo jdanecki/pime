@@ -1,7 +1,11 @@
 include config.txt
 
-all: serv client client-tui godot-client
+all: 2d 3d
 #   	tui-core
+
+2d: serv client client-tui
+
+3d: serv godot-client
 
 serv:
 	+$(BUILD_TOOL) -C server/build
@@ -15,7 +19,11 @@ client-tui:
 tui-core:
 	+$(BUILD_TOOL) -C core/alchemist-tui
 
-clean: serv-clean client-clean tui-clean 
+clean: 2d-clean 3d-clean
+	
+2d-clean: serv-clean client-clean tui-clean 
+
+3d-clean: serv-clean godot-clean
 
 godot-client:
 	+scons -C godot platform=linux

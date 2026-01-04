@@ -6,7 +6,7 @@
 #include "../networking.h"
 #include "../texture.h"
 #include "../window.h"
-#include <SDL2/SDL_render.h>
+#include <SDL_render.h>
 
 class Renderable
 {    
