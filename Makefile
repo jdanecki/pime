@@ -18,7 +18,7 @@ tui-core:
 clean: serv-clean client-clean tui-clean 
 
 godot-client:
-	cd godot/; scons platform=linux
+	+scons -C godot platform=linux
 
 serv-clean:
 	+$(BUILD_TOOL) -C server/build clean
