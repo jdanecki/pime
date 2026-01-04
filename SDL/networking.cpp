@@ -235,7 +235,7 @@ void update_object(const ObjectData * data)
     Class_id c_id = data->inv_element.data.c_id;
 
     InventoryElement * el = find_by_uid(data->inv_element.data.uid, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
-    //FIXME why we get el=NULL?
+    //FIXME why we get el=NULL? -> change this to get_object_by_uid
     //  CONSOLE_LOG("update_object: el=%p chunk[%d,%d]\n", el, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
     if (el)
     {
