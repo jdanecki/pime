@@ -51,3 +51,8 @@ distclean:
 lines:
 	find . -name *.cpp -o -name *.h  -exec wc -l {} \; | awk '{s+=$$1} END { print s} '
 
+tests:
+	make -C SDL/dialog
+	make -C server/tests
+	make -C core/alchemist/tests
+

@@ -16,8 +16,6 @@ class Packet
 {
   protected:
     PacketType t;
-
-  protected:
     int send_data(ENetPeer * peer, void * data, size_t size)
     {
         show_packet_type_name('S', *(unsigned char *)data);

@@ -9,7 +9,7 @@
 Dialog * dialog;
 DAction * actions;
 
-int tile_size;
+extern int tile_size;
 DCraft *craft;
 PlayerSDL * player;
 bool show_craft;
@@ -117,7 +117,7 @@ void button_right(DialogButton * button)
 
 int main()
 {
-    if (init_window("test dialog"))
+    if (init_window("test dialog", 1200, 600))
         return 1;
     if (load_font())
         return 1;

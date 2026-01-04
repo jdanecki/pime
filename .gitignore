@@ -10,3 +10,12 @@ core/alchemist/skills_type.h
 *.os
 compile_commands.json
 .cache
+.qtcreator
+pime.cflags
+pime.config
+pime.creator
+pime.creator.user
+pime.cxxflags
+pime.files
+pime.includes
+

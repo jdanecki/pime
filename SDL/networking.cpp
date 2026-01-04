@@ -160,35 +160,6 @@ void checked_update(size_t pl_id, size_t el)
         return;
     p->set_checked(el);
 }
-void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y, int thirst, int hunger)
-{
-    // DEPRECATED
-    // if (id >= 0 && id < PLAYER_NUM)
-    // {
-    //     if (!players[id])
-    //     {
-    //         players[id] = new Player(id);
-    //     }
-    //     /*for (int i = 0; i < 25; i++)
-    //     {
-    //        CONSOLE_LOG("%d, ", data[i]);
-    //     }*/
-    //     Player * p = players[id];
-    //     p->map_x = map_x;
-    //     p->map_y = map_y;
-
-    //     // FIXME when more chunks added
-    //     if (x != p->x)
-    //         p->going_right = p->x > x ? 0 : 1;
-    //     p->x = x;
-    //     p->y = y;
-    //     p->thirst = thirst;
-    //     p->hunger = hunger;
-
-    //     // CONSOLE_LOG("updated player %ld: %d %d %d %d\n", id, map_x, map_y, x, y);
-    // }
-}
-
 void update_chunk(int32_t x, int32_t y, const chunk_table * data)
 {
     data = (chunk_table *)((char *)(data) + 3);

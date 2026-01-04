@@ -167,8 +167,6 @@ BaseAnimal * get_base_animal(size_t id);
 
 Base * get_base(uint32_t c_id, int32_t id);
 
-extern void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y, int32_t thirst, int32_t hunger);
-
 extern void update_chunk(int32_t x, int32_t y, const chunk_table * data);
 
 extern void got_id(size_t id, int64_t seed);

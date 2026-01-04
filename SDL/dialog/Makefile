@@ -1,6 +1,8 @@
 CXX := g++
-CXXFLAGS := -g
-LDFLAGS := -lSDL2 -lSDL2_image -lSDL2_ttf -L../build/core -lpime \
+PKG=sdl2 SDL2_image SDL2_ttf SDL2_gfx
+CXXFLAGS := `pkg-config --cflags $(PKG)` -g
+LIBS=`pkg-config --libs $(PKG)`
+LDFLAGS := $(LIBS) -L../build/core -lpime \
            -Wl,-rpath,'$$ORIGIN/../build/core'
 
 SDL_FILES := ../window.cpp ../text.cpp ../texture.cpp ../implementations/alchemistSDL.cpp \
