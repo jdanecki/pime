@@ -47,7 +47,7 @@ void add_base_elements(PacketElementsList * list, int i)
     }
 }
 
-extern void update_hotbar();
+// extern void update_hotbar();
 void add_elements(PacketElementsList * list, int i)
 {
     size_t uid= ((size_t*) list->get_data())[i];
@@ -57,7 +57,7 @@ void add_elements(PacketElementsList * list, int i)
             if (el) p->pickup(el);
     }
     printf("player=%s [%d]=%lx inv.elements=%d\n", p->get_name(), i, uid, p->inventory.nr_elements);
-    update_hotbar();
+    // update_hotbar();
 }
 
 bool handle_packet(ENetPacket * packet)
