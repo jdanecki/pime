@@ -1,0 +1,6 @@
+
+#BUILD_TOOL=make
+BUILD_TOOL=ninja
+
+#CXX=clang++ 
+CXX=g++ 
