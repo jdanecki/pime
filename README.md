@@ -11,6 +11,12 @@ Set variables in config.txt
 make -j `nproc`
 ```
 
+## Run all together
+
+```
+./start.sh
+```
+
 ## Run
 
 * run server
@@ -28,3 +34,4 @@ In SDL directory run:
 ```
 ./build/pime_SDL
 ```
+
