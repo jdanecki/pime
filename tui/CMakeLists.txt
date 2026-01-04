@@ -17,7 +17,7 @@ set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 #FIXME SDL
-add_definitions(-DDISABLE_NPC ${SDL_CFLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_TTF_CFLAGS} 
+add_definitions(-DDISABLE_NPC ${enet_CFLAGS} ${SDL_CFLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_TTF_CFLAGS} 
     ${SDL2_GFX_CFLAGS})
 
 add_subdirectory(../core core)
