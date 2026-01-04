@@ -146,7 +146,7 @@ class ElementSDL : public Element, public Renderable
         return 1.0 * width.value / start_width;
     }
     void show(bool details = true) override;
-    bool check_rect(unsigned int px, unsigned int py, int t_size)
+    bool check_rect(unsigned int px, unsigned int py, int t_size) override
     {
         return Renderable::check_rect(px, py, location.get_world_x(), location.get_world_y(), t_size);
     }

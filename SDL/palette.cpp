@@ -32,7 +32,7 @@ float c4[3] = {0.0f, 0.33f, 0.66f};
 
 void rgb2hsv(int r, int g, int b, int* h, int* s, int* v)
 {
-    float r1, g1, b1, h1, s1, v1;
+    float r1, g1, b1, h1=0, s1, v1;
     float cmax, cmin;
     float t, delta;
 

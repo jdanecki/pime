@@ -1,31 +1,24 @@
 # The Game aka pime aka alchemist
 
+## Compilation configuration
+
+Set variables in config.txt
+
 ## Build
 
-### All versions
-To build server and client run:
-
 ```
-make
-```
-
-### Enet version
-
-```
-make configure enet
-make enet
+./configure
+make -j `nproc`
 ```
 
 ## Run
 
-### Enet version
-
 * run server
 
-In server/enet/build run: 
+In server/build run: 
 
 ```
-./server_enet
+./server_pime
 ```
 
 * SDL client
@@ -33,5 +26,5 @@ In server/enet/build run:
 In SDL directory run:
 
 ```
-./build/pime_SDL_enet
+./build/pime_SDL
 ```

@@ -18,6 +18,7 @@ extern "C"
     };
     struct SDL_Renderer
     {
+        void * foo;
     };
 
     SDL_Renderer * renderer;

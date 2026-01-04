@@ -11,7 +11,6 @@ set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-
 add_definitions(-DSERVER_CODE -DUSE_NCURSES ${enet_CFLAGS} ${ncurses_CFLAGS} )
 
 add_subdirectory(../core core)

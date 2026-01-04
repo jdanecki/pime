@@ -13,8 +13,7 @@ class BeingSDL : public InventoryElement, public Renderable
 };
 */
 class PlantSDL : public Plant, public Renderable
-{
-    int * padding1; // FIXME
+{    
   public:
     SDL_Texture * get_texture() override;
     PlantSDL(Plant data);
@@ -22,7 +21,7 @@ class PlantSDL : public Plant, public Renderable
     {
         return size;
     }
-    bool check_rect(unsigned int px, unsigned int py, int t_size)
+    bool check_rect(unsigned int px, unsigned int py, int t_size) override
     {
         return Renderable::check_rect(px, py, location.get_world_x(), location.get_world_y(), t_size);
     }
@@ -36,12 +35,12 @@ class AnimalSDL : public Animal, public Renderable
     bool going_right;
     AnimalSDL(Animal data);
     void render(int x, int y) override;
-    void update_item_location(ItemLocation & old_loc, ItemLocation & new_loc);
+    void update_item_location(ItemLocation & old_loc, ItemLocation & new_loc) override;
     float get_scale() override
     {
         return size;
     }
-    bool check_rect(unsigned int px, unsigned int py, int t_size)
+    bool check_rect(unsigned int px, unsigned int py, int t_size) override
     {
         return Renderable::check_rect(px, py, location.get_world_x(), location.get_world_y(), t_size);
     }

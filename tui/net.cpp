@@ -52,10 +52,11 @@ void add_elements(PacketElementsList * list, int i)
 {
     size_t uid= ((size_t*) list->get_data())[i];
     Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, list->get_pl_id()));
-    if (p)
-        p->pickup(get_object_by_id(NetworkObject(Class_Element, uid)));
-
-    printf("player=%p [%d]=%lx elems=%d\n", p, i, uid, p->inventory.nr_elements);
+    if (p) {
+            InventoryElement * el = get_object_by_id(NetworkObject(Class_Element, uid));
+            if (el) p->pickup(el);
+    }
+    printf("player=%s [%d]=%lx inv.elements=%d\n", p->get_name(), i, uid, p->inventory.nr_elements);
     update_hotbar();
 }
 

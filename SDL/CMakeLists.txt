@@ -10,9 +10,10 @@ pkg_check_modules(SDL2_GFX REQUIRED SDL2_gfx)
 pkg_check_modules(enet REQUIRED libenet)
 
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch -Wno-reorder")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch -Wno-reorder -Wno-unused-but-set-variable")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_definitions(${enet_CFLAGS} )
 

@@ -384,9 +384,7 @@ extern const char * product_name[];
 
 class Ingredient : public InventoryElement
 {
-    size_t padding; // FIXME
-
-  public:
+     public:
     // properties only needed to create product
     Property quality;    //[0..100] slaby..najlepszy
     Property resilience; // [0..100] wytrzymały..słaby
@@ -431,8 +429,7 @@ class Ingredient : public InventoryElement
 };
 
 class Product : public InventoryElement
-{
-    size_t padding; // FIXME
+{    
   public:
     Property quality;    //[0..100] slaby..najlepszy
     Property resilience; // [0..100] wytrzymały..słaby
@@ -621,7 +618,7 @@ class Plant : public InventoryElement
     {
         return base.get();
     }
-    const char * get_name()
+    const char * get_name() override
     {
         return get_base()->get_name();
     }
@@ -633,7 +630,7 @@ class Plant : public InventoryElement
     {
         return get_base()->c_id;
     }
-    bool action(Product_action action, Player * pl)
+    bool action(Product_action action, Player * pl) override
     {
         CONSOLE_LOG("PLANT: %s %s\n", product_action_name[action], get_name());
         return false;
@@ -645,7 +642,7 @@ class Plant : public InventoryElement
         sprintf(buf, "%s: (%s) %s", get_class_name(), get_name(), plant_phase_name[phase]);
         return buf;
     }
-    Property ** get_properties(int * count)
+    Property ** get_properties(int * count) override
     {
         Property ** props = new Property *[1];
         props[0] = new Property(plant_phase_name[phase], phase);

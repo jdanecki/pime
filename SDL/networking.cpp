@@ -281,9 +281,9 @@ void update_object(const ObjectData * data)
             case Class_Player:
             {
                 Player * player = dynamic_cast<Player *>(el);
-                CONSOLE_LOG("update_object: player=%p inv_elems=%d\n", player, player->inventory.nr_elements);
+                CONSOLE_LOG("update_object: player=%s inv.elements=%d\n", player->get_name(), player->inventory.nr_elements);
                 *player = data->player.data;
-                CONSOLE_LOG("update_object: -> update: inv_elems=%d\n", player->inventory.nr_elements);
+                CONSOLE_LOG("update_object: -> update: inv.elements=%d\n", player->inventory.nr_elements);
                 break;
             }
             default:

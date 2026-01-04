@@ -13,7 +13,7 @@
 #include <sys/ioctl.h>
 #include "generator/generator.h"
 
-//#define DEBUG 1
+//#define DEBUG_TIMEOUT 1
 
 #define RED "$COLOR_PAIR_1_"
 #define GREEN "$COLOR_PAIR_2_"
@@ -321,17 +321,22 @@ class PlayerClient : public ListElement
     }
 };
 
+//#define SEND_LOG=1
 void send_to_all(Packet * p)
 {
     ListElement * pl_el = players->head;
+#ifdef SEND_LOG
     int i = 0;
+#endif
     while (pl_el)
     {
         PlayerClient * pl = (PlayerClient *)pl_el;
-//        add_to_output("[%d/%d] sending to player: %d\n", i, players->nr_elements, pl->player->get_id());
+#ifdef SEND_LOG
+        add_to_output("[%d/%d] sending to player: %d\n", i++, players->nr_elements, pl->player->get_id());
+#endif
         p->send(pl->peer);
         pl_el = pl_el->next;
-        i++;
+
     }
 }
 
@@ -993,7 +998,7 @@ int main()
                 unsigned short * port = new unsigned short;
                 *port = event.peer->address.port;
                 event.peer->data = (void *)port;
-#if DEBUG
+#if DEBUG_TIMEOUT
                 enet_peer_timeout(event.peer, 5 * 60 * 1000, 5 * 60 * 1000, 5 * 60 * 1000); // 5 minutes
 #endif
                 break;

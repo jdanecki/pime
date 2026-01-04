@@ -8,6 +8,7 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_definitions(-DDISABLE_NPC)
 

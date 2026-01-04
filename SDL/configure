@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 MULTI_USER=ON
 if [ ! -d build ] 
 then
@@ -11,6 +9,7 @@ pushd ../core/alchemist
 ./generate_files.sh
 popd
 
-cd build
-cmake -DMULTI_USER=${MULTI_USER} -GNinja ..
+pushd build
+cmake -DMULTI_USER=${MULTI_USER} "${GENERATOR}" ..
+popd
 

@@ -18,7 +18,7 @@ int random_range(int min, int max)
 
 float random_float_range(float min, float max)
 {
-    return ((float)rand() / RAND_MAX) * (max - min) + min;
+    return (float) rand() / (1.0 * RAND_MAX) * (max - min) + min;
 }
 
 void choose_multiple(int total, int n, int * out_indices)

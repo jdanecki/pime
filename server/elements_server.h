@@ -97,8 +97,7 @@ class AnimalServer : public Animal, public BeingServer
 {
     int delay_for_move;
     int delay_for_grow;
-    int dst_loc_x, dst_loc_y;
-    int padding1;
+    int dst_loc_x, dst_loc_y;    
 
   public:
     void move();
@@ -115,8 +114,7 @@ class AnimalServer : public Animal, public BeingServer
 };
 
 class PlantServer : public Plant, public BeingServer
-{
-    int * padding; // FIXME
+{    
     int delay_for_grow;
 
   public:
@@ -140,7 +138,7 @@ class PlantServer : public Plant, public BeingServer
     {
         return true;
     }
-    bool player_action(Player_action action, Player * pl);
+    bool player_action(Player_action action, Player * pl) override;
 };
 
 class IngredientServer : public Ingredient
