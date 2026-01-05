@@ -1,5 +1,5 @@
 #include "../core/networking.h"
-#include "playerTUI.h"
+#include "playerUI.h"
 
 NetworkObject * el_from_data(const ObjectData * data)
 {
@@ -37,10 +37,10 @@ NetworkObject * el_from_data(const ObjectData * data)
             el = new Animal(data->animal.data);
             break;
         case ObjectData::Tag::Player:
-            el = new PlayerTUI(data->player.data);
+            el = new PlayerUI(data->player.data);
             if (my_id == el->uid)
             {
-                player = (PlayerTUI *)el;
+                player = (PlayerUI *)el;
                 CONSOLE_LOG("new player uid=%ld name=%s\n", player->uid, player->get_name());
             }
             break;

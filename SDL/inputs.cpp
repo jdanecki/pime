@@ -8,7 +8,7 @@
 #include <SDL2/SDL_timer.h>
 #include <stdio.h>
 
-#include "implementations/playerSDL.h"
+#include "playerUI.h"
 #include "../core/tiles.h"
 #include "../core/packet_types.h"
 #include "dialog/d_craft.h"
@@ -215,7 +215,7 @@ Uint64 handle_keyboard_state(const Uint8 * keys)
     return 0;
 }
 
-bool handle_SDL_events()
+bool handle_events()
 {
     int ww = 0, wh = 0;
     SDL_Event event;

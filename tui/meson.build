@@ -1,18 +1,11 @@
 enet_dep = dependency('libenet', method: 'pkg-config', required: true)
 
-run_target('link implementations from SDL',
-  command: ['bash', '-lc', 'cd @SOURCE_DIR@ && ln -sf @SOURCE_ROOT@/SDL/implementations @SOURCE_DIR@/implementations']
-)
-
 tui_src = [
   'main.cpp',
+  'playerUI.cpp',
   'net.cpp',
-  '../SDL/networking.cpp',
-  '../SDL/player_actions.cpp',
-  'sdl_stub.cpp',
-  'implementations/alchemistSDL.cpp',
-  'implementations/BeingSDL.cpp',
-  'implementations/playerSDL.cpp'
+  '../client-common/net.cpp',
+  '../client-common/game.cpp'
 ]
 
 executable('pime_tui', tui_src,

@@ -8,6 +8,7 @@ src = [
   'npc.cpp',
   'packet_types.cpp',
   'clan.cpp',
+  'time.cpp',
   'alchemist/elements.cpp',
   'alchemist/names.cpp',
   'alchemist/el_list.cpp',

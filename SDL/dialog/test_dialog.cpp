@@ -4,14 +4,14 @@
 #include "d_craft.h"
 #include "d_action.h"
 #include "../main.h"
-#include "../implementations/alchemistSDL.h"
+#include "../alchemistSDL.h"
 
 Dialog * dialog;
 DAction * actions;
 
 extern int tile_size;
 DCraft *craft;
-PlayerSDL * player;
+PlayerUI * player;
 bool show_craft;
 
 int active_hotbar = 0;
@@ -69,7 +69,7 @@ void mouse_pressed(SDL_MouseButtonEvent & event)
     actions->press(event.x, event.y, event.button);
 }
 
-bool handle_SDL_events()
+bool handle_events()
 {
     SDL_Event event;
 
@@ -124,7 +124,7 @@ int main()
 
     load_textures();
 
-    player = (PlayerSDL *)calloc(sizeof(PlayerSDL), 1);
+    player = (PlayerUI *)calloc(sizeof(PlayerUI), 1);
     Element * el1 = new Element(new BaseElement(Form_solid, 0));
     Element * el2 = new Element(new BaseElement(Form_solid, 1));
     player->hotbar[0]=new ElementSDL(*el1);
@@ -151,7 +151,7 @@ int main()
     {
         clear_window();
 
-        if (handle_SDL_events())
+        if (handle_events())
             break;
 
         dialog->draw(renderer);

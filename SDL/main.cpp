@@ -2,7 +2,7 @@
 #include "main.h"
 #include "npc.h"
 #include "window.h"
-#include "../client-common/net.h"
+#include "../client-common/game.h"
 
 // Normal speed
 #define UPDATE_DELAY 1000
@@ -11,14 +11,12 @@
 // #define UPDATE_DELAY 0
 
 SDL_Texture * map;
-int auto_explore;
 
 
 bool finish;
 
-NetClient * client;
 
-extern bool draw();
+extern void draw();
 
 void (*callback_daily)();
 void daily_call()
@@ -110,100 +108,19 @@ int init_SDL()
     return 0;
 }
 
-int setup(const char * ip, const char * port)
+bool setup(const char * ip, const char * port)
 {
     setbuf(stdout, nullptr); // fix for qtcreator console
 
     if (init_SDL() != 0)
-        return 1;
+        return false;
 
     client = init(ip, port);
-
-    return 0;
-}
-
-int dst_map_x;
-int dst_map_y;
-
-void do_auto_explore()
-{
-    if ((dst_map_x == player->location.chunk.map_x) && (dst_map_y == player->location.chunk.map_y))
-    {
-        int dx = 5 - (rand() % 11);
-        int dy = 5 - (rand() % 11);
-
-        if (player->location.chunk.map_y + dy >= 0 && player->location.chunk.map_y + dy < WORLD_SIZE && player->location.chunk.map_x + dx >= 0 && player->location.chunk.map_x + dx < WORLD_SIZE)
-        {
-            if (!world_table[player->location.chunk.map_y + dy][player->location.chunk.map_x + dx])
-            {
-                dst_map_x = player->location.chunk.map_x + dx;
-                dst_map_y = player->location.chunk.map_y + dy;
-            }
-        }
-    }
-    if (dst_map_x > player->location.chunk.map_x)
-        send_packet_move(client, 1, 0);
-    if (dst_map_x < player->location.chunk.map_x)
-        send_packet_move(client, -1, 0);
-    if (dst_map_y > player->location.chunk.map_y)
-        send_packet_move(client, 0, 1);
-    if (dst_map_y < player->location.chunk.map_y)
-        send_packet_move(client, 0, -1);
-}
-
-void loop()
-{
-    dst_map_x = player->location.chunk.map_x;
-    dst_map_y = player->location.chunk.map_y;
-
-    print_status(0, "Welcome in game!");
-
-    for (;;)
-    {
-        clear_window();
-
-        if (handle_SDL_events())
-            return;
-
-        // TODO disconnect
-        network_tick(client);
-
-        if (auto_explore)
-        {
-            do_auto_explore();
-        }
-        if (draw())
-        {
-            SDL_RenderPresent(renderer);
-            if (!auto_explore)
-                SDL_Delay(20);
-        }
-    }
+    if (client) return true;
+    else return false;
 }
 
 int main(int argc, char * argv[])
 {
-    const char * ip;
-    if (argc < 2)
-    {
-        CONSOLE_LOG("usage: ./pime_SDL <ip> [port]\n");
-        CONSOLE_LOG("using localhost 127.0.0.1\n");
-        ip = "127.0.0.1";
-    }
-    else
-    {
-        ip = argv[1];
-    }
-    const char * port;
-    if (argc < 3)
-    {
-        port = "1234";
-    }
-    else
-    {
-        port = argv[2];
-    }
-    if (setup(ip, port))
-        return 1;
-    loop();
+    init_game("pime_SDL", argc, argv);
 }

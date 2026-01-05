@@ -1,12 +1,6 @@
-#include "playerSDL.h"
-#include "../texture.h"
+#include "playerUI.h"
 
-SDL_Texture * PlayerSDL::get_texture()
-{
-    return Player_textures.player;
-}
-
-PlayerSDL::PlayerSDL(Player data) : Player(data)
+PlayerUI::PlayerUI(Player data) : Player(data)
 {
     for (int i = 0; i < 10; i++)
     {

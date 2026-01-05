@@ -187,7 +187,6 @@ extern void knowledge_update(size_t pl_id, Class_id cid, int32_t id);
 
 extern void checked_update(size_t pl_id, uintptr_t el);
 
-extern NetClient * client;
 extern NetworkObject * el_from_data(const ObjectData * data);
 extern size_t my_id;
 

@@ -9,11 +9,12 @@
 #include "dialog/d_craft.h"
 #include <assert.h>
 #include "dialog/d_hotbar.h"
-#include "implementations/playerSDL.h"
+#include "playerUI.h"
 
 extern SDL_Texture * map;
 
 extern int active_hotbar;
+extern int auto_explore;
 
 unsigned int left_chunk_x;
 unsigned int right_chunk_x;
@@ -180,32 +181,7 @@ void draw_maps()
     SDL_RenderCopy(renderer, map, NULL, &window_rec);
 }
 
-chunk * check_chunk(int cx, int cy)
-{
-    if (cx < 0 || cy < 0 || cx >= WORLD_SIZE || cy >= WORLD_SIZE)
-        return nullptr;
 
-    chunk * ch = world_table[cy][cx];
-    if (!ch)
-    {
-        if (loaded_chunks[cy][cx] == CHUNK_NOT_LOADED)
-        {
-            send_packet_request_chunk(client, cx, cy);
-            loaded_chunks[cy][cx] = CHUNK_LOADING;
-            return nullptr;
-        }
-        else
-        {
-            CONSOLE_LOG("waiting for chunk %d %d\n", cx, cy);
-            return nullptr;
-        }
-    }
-    else
-    {
-        loaded_chunks[cy][cx] = CHUNK_LOADED;
-    }
-    return ch;
-}
 
 void render_element(InventoryElement *o, unsigned int ltx, unsigned int lty)
 {
@@ -376,7 +352,7 @@ void draw_dialogs()
     hotbar.draw(renderer);
 }
 
-bool draw()
+void draw()
 {
     hotbar.update();
     d_craft.update();
@@ -402,5 +378,9 @@ bool draw()
     if (current_menu)
         current_menu->show();
     draw_dialogs();
-    return ret;
+    if (ret) {
+        SDL_RenderPresent(renderer);
+            if (!auto_explore)
+                SDL_Delay(20);
+    }
 }

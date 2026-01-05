@@ -10,17 +10,17 @@ set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_definitions(-DDISABLE_NPC -DPlayerTYPE=PlayerTUI
-   -DPLAYER_HEADER=\"playerTUI.h\" ${enet_CFLAGS}
+add_definitions(-DDISABLE_NPC ${enet_CFLAGS}
 )
 
 add_subdirectory(../core core)
 
 add_executable(pime_tui
     main.cpp 
-    playerTUI.cpp
+    playerUI.cpp
     net.cpp
     ../client-common/net.cpp
+    ../client-common/game.cpp
 )
 
 target_link_libraries(pime_tui

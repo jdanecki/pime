@@ -5,7 +5,7 @@ LIBS=`pkg-config --libs $(PKG)`
 LDFLAGS := $(LIBS) -L../build/core -lpime \
            -Wl,-rpath,'$$ORIGIN/../build/core'
 
-SDL_FILES := ../window.cpp ../text.cpp ../texture.cpp ../implementations/alchemistSDL.cpp \
+SDL_FILES := ../window.cpp ../text.cpp ../texture.cpp ../alchemistSDL.cpp \
              ../palette.cpp
 
 SRC := test_dialog.cpp dialog.cpp d_craft.cpp d_action.cpp $(SDL_FILES)

@@ -25,6 +25,14 @@ make -j `nproc`
 ./start.sh
 ```
 
+## Build with meson
+
+```
+meson setup build .
+meson compile -C build
+
+```
+
 ## Run
 
 * run server

@@ -2,14 +2,15 @@
 #include <cstring>
 //#include "../core/tiles.h"
 #include "../core/packets.h"
-#include PLAYER_HEADER
+#include "playerUI.h"
 #include "net.h"
 
 ElementsList objects("objects");
 
 int active_hotbar = 0;
 Player * players[PLAYER_NUM];
-PlayerTYPE * player;
+PlayerUI * player;
+NetClient * client;
 
 extern void print_status(int i, const char * format, ...);
 
@@ -77,12 +78,12 @@ void got_id(size_t id, int64_t seed)
 {
     my_id = id;
 
-    player = (PlayerTYPE *)calloc(sizeof(PlayerTYPE), 1);
+    player = (PlayerUI *)calloc(sizeof(PlayerUI), 1);
     player->location.chunk.map_x = 128;
     player->location.chunk.map_y = 128;
     player->location.chunk.x = 8;
     player->location.chunk.y = 8;
-
+    player->name=SerializableCString("player");
     CONSOLE_LOG("seed: %ld\n", seed);
     srand(seed);
     init_sentences();
@@ -560,3 +561,29 @@ void put_element()
     }
 }
 
+chunk * check_chunk(int cx, int cy)
+{
+    if (cx < 0 || cy < 0 || cx >= WORLD_SIZE || cy >= WORLD_SIZE)
+        return nullptr;
+
+    chunk * ch = world_table[cy][cx];
+    if (!ch)
+    {
+        if (loaded_chunks[cy][cx] == CHUNK_NOT_LOADED)
+        {
+            send_packet_request_chunk(client, cx, cy);
+            loaded_chunks[cy][cx] = CHUNK_LOADING;
+            return nullptr;
+        }
+        else
+        {
+            CONSOLE_LOG("waiting for chunk %d %d\n", cx, cy);
+            return nullptr;
+        }
+    }
+    else
+    {
+        loaded_chunks[cy][cx] = CHUNK_LOADED;
+    }
+    return ch;
+}

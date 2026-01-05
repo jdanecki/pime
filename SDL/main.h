@@ -16,9 +16,9 @@
 #include "../core/tiles.h"
 
 #include "npc.h"
-#include "implementations/alchemistSDL.h"
-#include "implementations/playerSDL.h"
-#include "implementations/BeingSDL.h"
+#include "alchemistSDL.h"
+#include "playerUI.h"
+#include "BeingSDL.h"
 #include "text.h"
 #include "window.h"
 // #include <SDL2/SDL_render.h>

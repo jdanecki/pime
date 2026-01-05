@@ -16,7 +16,7 @@ set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
-add_definitions(-DDISABLE_NPC -DPlayerTYPE=PlayerSDL  -DPLAYER_HEADER=\"implementations/playerSDL.h\" ${enet_CFLAGS} ${SDL_CFLAGS} ${SDL2_IMAGE_CFLAGS}
+add_definitions(-DDISABLE_NPC ${enet_CFLAGS} ${SDL_CFLAGS} ${SDL2_IMAGE_CFLAGS}
     ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${SDL2_GFX_CFLAGS} )
 
 set(CORE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../core)
@@ -31,11 +31,12 @@ add_executable(pime_SDL
     dialog/dialog.cpp dialog/d_hotbar.cpp
     dialog/d_craft.cpp
     inputs.cpp player_actions.cpp npc.cpp
-    implementations/alchemistSDL.cpp
-    implementations/BeingSDL.cpp
-    implementations/playerSDL.cpp
+    alchemistSDL.cpp
+    BeingSDL.cpp
+    playerUI.cpp
     palette.cpp
     ../client-common/net.cpp
+    ../client-common/game.cpp
 )
 
 set(SHARED_LIBRARIES

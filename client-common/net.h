@@ -6,6 +6,8 @@
 extern Player * players[PLAYER_NUM];
 extern ElementsList objects;
 extern int active_hotbar;
+extern chunk * check_chunk(int cx, int cy);
+extern NetClient * client;
 
 void send_packet_move(NetClient * client, int32_t x, int32_t y);
 void send_packet_pickup(NetClient * client, uintptr_t id);

@@ -12,18 +12,12 @@
 #include "../core/tiles.h"
 #include "../core/player.h"
 #include "../core/time.h"
-#include "playerTUI.h"
-#include "../client-common/net.h"
+#include "playerUI.h"
+#include "../client-common/game.h"
 
 extern int trace_network;
-bool use_network = true;
-bool show_received;
-unsigned int max_recv;
-unsigned long max_time;
 
 bool finish;
-
-NetClient * client;
 
 struct termios old_stdin, stdin_tty;
 void set_terminal()
@@ -40,12 +34,13 @@ void set_terminal()
     ioctl(0, TCXONC, 1);
 }
 
-NetClient * setup(const char * ip, const char * port)
+bool setup(const char * ip, const char * port)
 {
     set_terminal();
 
     client = init(ip, port);
-    return client;
+    if (client) return true;
+    else return false;
 }
 
 void print_status(int l, const char * format, ...)
@@ -87,19 +82,7 @@ char wait_key(char prompt)
         return 0;
 }
 
-char check_key()
-{
-    if (!kbhit())
-        return 0;
-    char c;
-    if (read(0, &c, 1) == 1)
-    {
-        printf("%c\n", c);
-        return c;
-    }
-    else
-        return 0;
-}
+
 
 void help()
 {
@@ -282,111 +265,38 @@ bool do_key(char k)
     return false;
 }
 
-bool check_chunk(int cx, int cy)
+bool handle_events()
 {
-    if (cx < 0 || cy < 0 || cx >= WORLD_SIZE || cy >= WORLD_SIZE)
-        return false;
-
-    chunk * ch = world_table[cy][cx];
-    if (!ch)
+    if (!kbhit()) return false;
+    char c;
+    if (read(0, &c, 1) == 1)
     {
-        if (loaded_chunks[cy][cx] == CHUNK_NOT_LOADED)
-        {
-            send_packet_request_chunk(client, cx, cy);
-            loaded_chunks[cy][cx] = CHUNK_LOADING;
-            return false;
-        }
-        else
-        {
-            printf("waiting for chunk %d %d\n", cx, cy);
-            return false;
-        }
-    }
-    else
-    {
-        loaded_chunks[cy][cx] = CHUNK_LOADED;
-    }
-    return true;
-}
-
-void loop()
-{
-    print_status(0, "Welcome in PIME - TUI version for debug!");
-    unsigned int total_recv = 0;
-
-    while(!player->name.str[0])
-    {
-        printf("waiting for data\n");
-        network_tick(client);
-        sleep(1);
-    }
-    for (;;)
-    {
-        printf("\r%s%ld@[%d,%d][%d,%d] %c: ", player->get_name(), player->get_id(),
-            player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y, submenu ? submenu : '#');
-
-        char c = check_key();
         if (c)
         {
-            if (do_key(c))
-                break;
+            printf("%c\n", c);
+            return do_key(c);
         }
-        unsigned long start = get_time_usec();
-        unsigned int recv = 0;
-
-        if (use_network)
-        {
-            recv = network_tick(client);
-        }
-        total_recv += recv;
-
-        unsigned long stop = get_time_usec();
-        if (recv > max_recv)
-            max_recv = recv;
-        if (stop - start > max_time)
-            max_time = stop - start;
-        if (recv && show_received)
-            printf("recv: %u/%u max=%u time=%lu us/%lu ms\n", recv, total_recv, max_recv, stop - start, max_time / 1000);
-
-        for (int y=-1; y < 2; y++)
-        {
-            for (int x=-1; x < 2; x++)
-            {
-                check_chunk(player->location.chunk.map_x + x, player->location.chunk.map_y + y);
-            }
-        }
-        long w = 20000 - (stop - start);
-        if (w > 0 && !c)
-            usleep(w);
     }
+    return false;
+}
+
+void clear_window() {}
+void draw()
+{
+    printf("\r%s%ld@[%d,%d][%d,%d] %c: ", player->get_name(), player->get_id(),
+        player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y, submenu ? submenu : '#');
+    for (int y=-1; y < 2; y++)
+    {
+        for (int x=-1; x < 2; x++)
+        {
+            check_chunk(player->location.chunk.map_x + x, player->location.chunk.map_y + y);
+        }
+    }
+    if (!auto_explore) usleep(20000);
 }
 
 int main(int argc, char * argv[])
 {
-    const char * ip;
-
-    if (argc < 2)
-    {
-        printf("usage: ./pime_tui <ip> [port]\n");
-        printf("using localhost 127.0.0.1\n");
-        ip = "127.0.0.1";
-    }
-    else
-    {
-        ip = argv[1];
-    }
-    const char * port;
-    if (argc < 3)
-    {
-        port = "1234";
-    }
-    else
-    {
-        port = argv[2];
-    }
-    if (setup(ip, port))
-    {
-        loop();
-    }
+    init_game("pime_tui", argc, argv);
     tcsetattr(0, TCSANOW, &old_stdin);
 }

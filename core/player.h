@@ -49,7 +49,6 @@ class Player : public InventoryElement
 
     // FIXME
     // add list know players, npc's
-  public:
     char running;
     char sneaking;
     char going_right;

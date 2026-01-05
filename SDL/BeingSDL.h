@@ -1,8 +1,8 @@
 #ifndef BEING_SDL_H
 #define BEING_SDL_H
 
-#include "../../core/alchemist/elements.h"
-#include "../texture.h"
+#include "../core/alchemist/elements.h"
+#include "texture.h"
 #include "alchemistSDL.h"
 /*
 class BeingSDL : public InventoryElement, public Renderable

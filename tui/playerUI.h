@@ -3,14 +3,14 @@
 
 #include "../core/player.h"
 
-class PlayerTUI : public Player
+class PlayerUI : public Player
 {
   public:
     InventoryElement * hotbar[10];
     int craftbar[10];
-    PlayerTUI(Player data);
+    PlayerUI(Player data);
 };
 
-extern PlayerTUI* player;
+extern PlayerUI* player;
 
 #endif

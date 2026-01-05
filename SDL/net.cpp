@@ -36,10 +36,10 @@ NetworkObject * el_from_data(const ObjectData * data)
             el = new AnimalSDL(data->animal.data);
             break;
         case ObjectData::Tag::Player:
-            el = new PlayerSDL(data->player.data);
+            el = new PlayerUI(data->player.data);
             if (my_id == el->uid)
             {
-                player = (PlayerSDL *)el;
+                player = (PlayerUI *)el;
                 CONSOLE_LOG("new player uid=%ld name=%s\n", player->uid, player->get_name());
             }
             break;

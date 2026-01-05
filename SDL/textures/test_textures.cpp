@@ -47,7 +47,7 @@ void mouse_pressed(SDL_MouseButtonEvent & event)
 }
 
 
-bool handle_SDL_events()
+bool handle_events()
 {
     SDL_Event event;
 
@@ -288,7 +288,7 @@ int main()
         SDL_Rect img_rect = {600, 0, tile_size*CHUNK_SIZE, tile_size*CHUNK_SIZE};
         clear_window();
 
-        if (handle_SDL_events())
+        if (handle_events())
             break;
         if (redraw) {
             memset(objects, 0, sizeof(objects));

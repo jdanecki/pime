@@ -1,11 +1,11 @@
 #ifndef ALCHEMIST_SDL_H
 #define ALCHEMIST_SDL_H
 
-#include "../../core/alchemist/elements.h"
-#include "../../core/player.h"
-#include "../../core/networking.h"
-#include "../texture.h"
-#include "../window.h"
+#include "../core/alchemist/elements.h"
+#include "../core/player.h"
+#include "../core/networking.h"
+#include "texture.h"
+#include "window.h"
 #include <SDL_render.h>
 
 class Renderable

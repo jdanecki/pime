@@ -2,7 +2,7 @@
 #define SDL_NPC_H
 #include "../core/alchemist/npc_talk.h"
 #include "../core/npc.h"
-#include "implementations/alchemistSDL.h"
+#include "alchemistSDL.h"
 #include "menu.h"
 
 extern int npc(menu_actions a);

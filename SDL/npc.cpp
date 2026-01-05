@@ -6,7 +6,7 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
 #include <stdio.h>
-#include "implementations/playerSDL.h"
+#include "playerUI.h"
 
 NpcSDL * current_npc;
 extern int active_hotbar;

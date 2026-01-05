@@ -1,10 +1,10 @@
 #include "player_actions.h"
 
 #include "../core/world.h"
-#include "implementations/playerSDL.h"
+#include "playerUI.h"
 #include "../client-common/net.h"
 
-extern PlayerSDL * player;
+extern PlayerUI * player;
 extern int active_hotbar;
 
 void use_tile()
