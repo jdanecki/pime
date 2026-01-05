@@ -248,9 +248,6 @@ last_line:
 
 Region ** regions;
 
-ElementsList base_elements("base elements");
-ElementsList base_plants("base plants");
-ElementsList base_animals("base animals");
 
 BaseElement * get_base_element(size_t id)
 {

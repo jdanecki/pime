@@ -1,25 +1,33 @@
-#include "main.h"
 #include <sys/ioctl.h>
 #include <termios.h>
+#include <cstdlib>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <termios.h>
+#include <unistd.h>
+#include "../core/world.h"
+#include "../core/tiles.h"
+#include "../core/networking.h"
 #include "../core/player.h"
-#include "../SDL/player_actions.h"
+#include "../core/time.h"
+#include "playerTUI.h"
 
-PlayerSDL * players[PLAYER_NUM];
-PlayerSDL * player;
+
+#define PlayerTYPE PlayerTUI
+#include "../client-common/net.inl"
+
 extern int trace_network;
 bool use_network = true;
 bool show_received;
-int active_hotbar = 0;
 unsigned int max_recv;
 unsigned long max_time;
 
 bool finish;
 
 NetClient * client;
-extern ElementsList objects;
-extern ElementsList base_elements;
-extern ElementsList base_plants;
-extern ElementsList base_animals;
 
 struct termios old_stdin, stdin_tty;
 void set_terminal()
@@ -305,14 +313,6 @@ bool check_chunk(int cx, int cy)
     return true;
 }
 
-unsigned long get_time_usec()
-{
-    struct timespec t;
-
-    clock_gettime(CLOCK_MONOTONIC_RAW, &t);
-    return (t.tv_sec * 1000000 + t.tv_nsec / 1000);
-}
-
 void loop()
 {
     print_status(0, "Welcome in PIME - TUI version for debug!");
@@ -371,7 +371,7 @@ int main(int argc, char * argv[])
 
     if (argc < 2)
     {
-        printf("usage: ./pime_SDL <ip> [port]\n");
+        printf("usage: ./pime_tui <ip> [port]\n");
         printf("using localhost 127.0.0.1\n");
         ip = "127.0.0.1";
     }

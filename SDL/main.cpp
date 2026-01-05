@@ -11,8 +11,8 @@
 SDL_Texture * map;
 int auto_explore;
 
-Player * players[PLAYER_NUM];
-PlayerSDL * player;
+#define PlayerTYPE PlayerSDL
+#include "../client-common/net.inl"
 
 bool finish;
 

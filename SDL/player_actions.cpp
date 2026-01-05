@@ -7,21 +7,6 @@
 extern PlayerSDL * player;
 extern int active_hotbar;
 
-void put_element()
-{
-    InventoryElement * el = player->hotbar[active_hotbar];
-    if (el)
-    {
-        send_packet_drop(client, el->uid);
-        // player->hotbar[active_hotbar] = NULL;
-        /*el->set_posittion(player.x, player.y);
-        set_item_at_ppos(el, &player);
-        player.inventory->remove(el);
-        player.hotbar[active_hotbar]=NULL;
-       CONSOLE_LOG("item %s placed\n", el->get_name());*/
-    }
-}
-
 void use_tile()
 {
     InventoryElement * object = get_item_at(player->location);
@@ -65,26 +50,4 @@ void action_tile(Player_action a, ItemLocation loc)
     send_packet_action_on_object(client, a, object->uid);
 }
 
-void server_action_tile(Server_action a, ItemLocation loc)
-{
-    InventoryElement * object = get_item_at(loc);
-    if (object)
-    {
-        CONSOLE_LOG("SDL: server action %s on %s\n", server_action_name[a], object->get_name());
-        send_packet_server_action_on_object(client, a, object->uid);
-    }
-    else
-    {
-        switch (a)
-        {
-            case SERVER_SHOW_CHUNK:
-            case SERVER_TRACE_NETWORK:
-                CONSOLE_LOG("SDL: server action %s\n", server_action_name[a]);
-                send_packet_server_action_on_object(client, a, 0);
-                break;
-            default:
-                CONSOLE_LOG("SDL: nothing to show\n");
-                break;
-        }
-    }
-}
+

@@ -652,4 +652,5 @@ class Plant : public InventoryElement
     }
 };
 
+
 #endif

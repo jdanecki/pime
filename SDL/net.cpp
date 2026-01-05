@@ -1,5 +1,4 @@
-#include "../core/networking.h"
-#include "playerTUI.h"
+#include "main.h"
 
 NetworkObject * el_from_data(const ObjectData * data)
 {
@@ -11,36 +10,36 @@ NetworkObject * el_from_data(const ObjectData * data)
             break;
         case ObjectData::Tag::Element:
         {
-            el = new Element(data->element.data);
+            el = new ElementSDL(data->element.data);
             break;
         }
         case ObjectData::Tag::Place:
         {
-            el = new Place(data->place.data);
+            el = new PlaceSDL(data->place.data);
             break;
         }
         case ObjectData::Tag::Scroll:
-            el = new Scroll(data->scroll.data);
+            el = new ScrollSDL(data->scroll.data);
             break;
         case ObjectData::Tag::Ingredient:
-            el = new Ingredient(data->ingredient.data);
+            el = new IngredientSDL(data->ingredient.data);
             break;
         case ObjectData::Tag::Product:
-            el = new Product(data->product.data);
+            el = new ProductSDL(data->product.data);
             break;
         case ObjectData::Tag::Plant:
         {
-            el = new Plant(data->plant.data);
+            el = new PlantSDL(data->plant.data);
             break;
         }
         case ObjectData::Tag::Animal:
-            el = new Animal(data->animal.data);
+            el = new AnimalSDL(data->animal.data);
             break;
         case ObjectData::Tag::Player:
-            el = new PlayerTUI(data->player.data);
+            el = new PlayerSDL(data->player.data);
             if (my_id == el->uid)
             {
-                player = (PlayerTUI *)el;
+                player = (PlayerSDL *)el;
                 CONSOLE_LOG("new player uid=%ld name=%s\n", player->uid, player->get_name());
             }
             break;
@@ -50,7 +49,7 @@ NetworkObject * el_from_data(const ObjectData * data)
 
         case ObjectData::Tag::Npc:
 #if !defined(DISABLE_NPC)
-            el = new Npc(data->npc.data);
+            el = new NpcSDL(data->npc.data);
             el->c_id = Class_Npc;
             CONSOLE_LOG("creating NPC");
 #endif

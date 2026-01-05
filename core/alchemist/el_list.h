@@ -236,4 +236,8 @@ class InvList : public ElementsList
     void remove(InventoryElement * el);
 };
 
+extern ElementsList base_elements;
+extern ElementsList base_plants;
+extern ElementsList base_animals;
+
 #endif // EL_LIST_H

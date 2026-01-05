@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <time.h>
 #include "../core/alchemist/ncurses-output.h"
+#include "../core/time.h"
 
 SDL_Renderer * renderer;
 SDL_Window * main_window;
@@ -40,14 +41,6 @@ void draw_rectangle(int x, int y, int w, int h, SDL_Color c0, SDL_Color c1, SDL_
     v[3].tex_coord.y = 0;
 
     SDL_RenderGeometry(renderer, NULL, v, 6, i, 6);
-}
-
-unsigned long get_time_usec()
-{
-    struct timespec t;
-
-    clock_gettime(CLOCK_MONOTONIC_RAW, &t);
-    return (t.tv_sec * 1000000 + t.tv_nsec / 1000);
 }
 
 int init_window(const char *title, int wx, int wy)

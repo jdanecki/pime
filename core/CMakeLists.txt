@@ -13,10 +13,10 @@ add_library(pime STATIC
     npc.cpp
     packet_types.cpp
     clan.cpp
-
+    time.cpp
     alchemist/elements.cpp
-	alchemist/names.cpp
-	alchemist/el_list.cpp
+    alchemist/names.cpp
+    alchemist/el_list.cpp
     alchemist/npc_talk.cpp
     alchemist/properties.cpp
     alchemist/skills.cpp

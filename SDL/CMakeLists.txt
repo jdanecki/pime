@@ -23,7 +23,8 @@ set(CORE_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/core)
 
 add_subdirectory(${CORE_SOURCE_DIR} ${CORE_BINARY_DIR})
 
-set(SHARED_SOURCES
+add_executable(pime_SDL 
+    net.cpp
     window.cpp music.cpp text.cpp
     texture.cpp main.cpp render.cpp menu.cpp
     dialog/dialog.cpp dialog/d_hotbar.cpp
@@ -41,7 +42,6 @@ set(SHARED_LIBRARIES
     m
 )
 
-add_executable(pime_SDL ${SHARED_SOURCES} ../tui/net.cpp)
 target_link_libraries(pime_SDL
     pime ${SHARED_LIBRARIES} enet
 )

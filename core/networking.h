@@ -207,8 +207,6 @@ void send_packet_request_chunk(NetClient * client, int32_t x, int32_t y);
 
 void send_packet_request_item(NetClient * client, size_t id);
 
-ObjectData foo();
-
 extern NetClient * client;
 extern NetworkObject * el_from_data(const ObjectData * data);
 extern size_t my_id;

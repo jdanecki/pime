@@ -7,6 +7,10 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+ElementsList base_elements("base elements");
+ElementsList base_plants("base plants");
+ElementsList base_animals("base animals");
+
 ListElement::ListElement(InventoryElement * entry) : el(entry), c_id(Class_ListElement)
 {
     next = nullptr;

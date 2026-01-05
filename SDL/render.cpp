@@ -13,8 +13,7 @@
 
 extern SDL_Texture * map;
 
-// TODO move it
-int active_hotbar = 0;
+extern int active_hotbar;
 
 unsigned int left_chunk_x;
 unsigned int right_chunk_x;
