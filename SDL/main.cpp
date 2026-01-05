@@ -4,17 +4,7 @@
 #include "window.h"
 #include "../client-common/game.h"
 
-// Normal speed
-#define UPDATE_DELAY 1000
-
-// TURBO
-// #define UPDATE_DELAY 0
-
 SDL_Texture * map;
-
-
-bool finish;
-
 
 extern void draw();
 
@@ -23,30 +13,11 @@ void daily_call()
 {
 }
 
-const char * direction_names[4] = {
-    "up",
-    "right",
-    "down",
-    "left",
-};
-
 void save(char with_player)
 {
 }
 void load(char with_player)
 {
-}
-
-int next_to(int x1, int y1, int x2, int y2)
-{
-    if (x1 == x2 && y1 == y2)
-        return 2;
-
-    if ((x1 == x2 + 1 || x1 == x2 - 1) && y1 == y2)
-        return 1;
-    if ((y1 == y2 + 1 || y1 == y2 - 1) && x1 == x2)
-        return 1;
-    return 0;
 }
 
 void intro()

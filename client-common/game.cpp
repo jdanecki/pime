@@ -25,6 +25,22 @@ unsigned long max_time;
 bool show_received;
 int auto_explore;
 
+void put_element()
+{
+    InventoryElement * el = player->hotbar[active_hotbar];
+    if (el)
+    {
+        send_packet_drop(client, el->uid);
+        // player->hotbar[active_hotbar] = NULL;
+        /*el->set_posittion(player.x, player.y);
+        set_item_at_ppos(el, &player);
+        player.inventory->remove(el);
+        player.hotbar[active_hotbar]=NULL;
+       CONSOLE_LOG("item %s placed\n", el->get_name());*/
+    }
+}
+
+
 void handle_network()
 {
         unsigned long start = get_time_usec();

@@ -1,5 +1,5 @@
-#include "../core/networking.h"
-#include "playerUI.h"
+#include "../client-common/net.h"
+#include "../client-common/players.h"
 
 NetworkObject * el_from_data(const ObjectData * data)
 {

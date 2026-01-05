@@ -20,10 +20,6 @@ class NetClient
     NetClient(ENetHost *host, ENetPeer *peer):host(host), peer(peer) {}
 };
 
-template <typename K = void, typename V = void, typename Hasher = void> struct HashMap;
-
-template <typename T = void> struct Vec;
-
 struct ObjectData
 {
     enum class Tag
@@ -148,46 +144,5 @@ struct LocationUpdateData
     ItemLocation old;
     ItemLocation new_;
 };
-
-NetClient * init(const char * server_ip, const char * port);
-
-uint32_t network_tick(NetClient * client);
-
-InventoryElement *get_object_by_id(NetworkObject uid);
-
-void register_object(NetworkObject * o);
-
-void deregister_object(NetworkObject * o);
-
-BaseElement * get_base_element(size_t id);
-
-BasePlant * get_base_plant(size_t id);
-
-BaseAnimal * get_base_animal(size_t id);
-
-Base * get_base(uint32_t c_id, int32_t id);
-
-extern void update_chunk(int32_t x, int32_t y, const chunk_table * data);
-
-extern void got_id(size_t id, int64_t seed);
-
-extern void update_object(const ObjectData * data);
-
-extern void update_item_location(LocationUpdateData data);
-
-extern void create_object(const ObjectData * data);
-
-extern void destroy_object(NetworkObject id, ItemLocation location);
-
-extern void failed_craft();
-
-extern void action_failed();
-
-extern void knowledge_update(size_t pl_id, Class_id cid, int32_t id);
-
-extern void checked_update(size_t pl_id, uintptr_t el);
-
-extern NetworkObject * el_from_data(const ObjectData * data);
-extern size_t my_id;
 
 #endif

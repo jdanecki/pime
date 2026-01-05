@@ -17,7 +17,6 @@
 
 extern int trace_network;
 
-bool finish;
 
 struct termios old_stdin, stdin_tty;
 void set_terminal()
@@ -81,8 +80,6 @@ char wait_key(char prompt)
     else
         return 0;
 }
-
-
 
 void help()
 {

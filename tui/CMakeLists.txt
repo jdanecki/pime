@@ -21,6 +21,8 @@ add_executable(pime_tui
     net.cpp
     ../client-common/net.cpp
     ../client-common/game.cpp
+    ../client-common/players.cpp
+
 )
 
 target_link_libraries(pime_tui

@@ -3,7 +3,7 @@
 
 #include "../core/alchemist/elements.h"
 #include "../core/player.h"
-#include "../core/networking.h"
+#include "../client-common/net.h"
 #include "texture.h"
 #include "window.h"
 #include <SDL_render.h>

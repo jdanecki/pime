@@ -37,6 +37,7 @@ add_executable(pime_SDL
     palette.cpp
     ../client-common/net.cpp
     ../client-common/game.cpp
+    ../client-common/players.cpp
 )
 
 set(SHARED_LIBRARIES
