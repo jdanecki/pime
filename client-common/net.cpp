@@ -2,11 +2,12 @@
 #include <cstring>
 //#include "../core/tiles.h"
 #include "../core/packets.h"
+#include PLAYER_HEADER
+#include "net.h"
 
 ElementsList objects("objects");
 
 int active_hotbar = 0;
-#define PLAYER_NUM 16
 Player * players[PLAYER_NUM];
 PlayerTYPE * player;
 
@@ -147,6 +148,12 @@ void destroy_object(NetworkObject id, ItemLocation location)
     // else
     //  item on not loaded chunk
     //    CONSOLE_LOG("Client: deleting inexisting item %ld\n", id);
+}
+
+void send_packet_request_item(NetClient * client, size_t id)
+{
+    Packet * p = new PacketRequestItem(id);
+    p->send(client->peer);
 }
 
 
@@ -511,12 +518,6 @@ void send_packet_craft(NetClient * client, uintptr_t prod_id, uintptr_t ingredie
 void send_packet_request_chunk(NetClient * client, int32_t cx, int32_t cy)
 {
     Packet * p = new PacketRequestChunk(cx, cy);
-    p->send(client->peer);
-}
-
-void send_packet_request_item(NetClient * client, size_t id)
-{
-    Packet * p = new PacketRequestItem(id);
     p->send(client->peer);
 }
 

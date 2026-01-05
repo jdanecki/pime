@@ -12,7 +12,6 @@
 #include <unistd.h>
 
 #include "../core/world.h"
-#include "../core/networking.h"
 #include "../core/player.h"
 #include "../core/tiles.h"
 
@@ -28,6 +27,7 @@
 #include "dialog/d_hotbar.h"
 #include "inputs.h"
 #include "menu.h"
+#include "../client-common/net.h"
 
 extern SDL_Texture * map;
 #endif // MAIN_H

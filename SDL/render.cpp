@@ -1,4 +1,4 @@
-#include "../core/networking.h"
+#include "../client-common/net.h"
 #include "npc.h"
 #include "text.h"
 #include "texture.h"

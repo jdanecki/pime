@@ -2,6 +2,8 @@
 #include "main.h"
 #include "npc.h"
 #include "window.h"
+#include "../client-common/net.h"
+
 // Normal speed
 #define UPDATE_DELAY 1000
 
@@ -11,8 +13,6 @@
 SDL_Texture * map;
 int auto_explore;
 
-#define PlayerTYPE PlayerSDL
-#include "../client-common/net.inl"
 
 bool finish;
 

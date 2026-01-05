@@ -5,11 +5,6 @@ then
     mkdir build
 fi
 
-if [ ! -L implementations ]
-then
-    ln -sf ../SDL/implementations implementations
-fi
-
 pushd build
 cmake "${GENERATOR}" ..
 popd 

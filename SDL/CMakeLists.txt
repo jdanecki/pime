@@ -15,7 +15,8 @@ set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_definitions(-DDISABLE_NPC ${enet_CFLAGS} ${SDL_CFLAGS} ${SDL2_IMAGE_CFLAGS} 
+
+add_definitions(-DDISABLE_NPC -DPlayerTYPE=PlayerSDL  -DPLAYER_HEADER=\"implementations/playerSDL.h\" ${enet_CFLAGS} ${SDL_CFLAGS} ${SDL2_IMAGE_CFLAGS}
     ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${SDL2_GFX_CFLAGS} )
 
 set(CORE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../core)
@@ -34,6 +35,7 @@ add_executable(pime_SDL
     implementations/BeingSDL.cpp
     implementations/playerSDL.cpp
     palette.cpp
+    ../client-common/net.cpp
 )
 
 set(SHARED_LIBRARIES
@@ -45,4 +47,6 @@ set(SHARED_LIBRARIES
 target_link_libraries(pime_SDL
     pime ${SHARED_LIBRARIES} enet
 )
+
+target_include_directories(pime_SDL    PRIVATE  ${CMAKE_SOURCE_DIR} )
 

@@ -2,7 +2,7 @@
 
 #include "../core/world.h"
 #include "implementations/playerSDL.h"
-#include "../core/networking.h"
+#include "../client-common/net.h"
 
 extern PlayerSDL * player;
 extern int active_hotbar;

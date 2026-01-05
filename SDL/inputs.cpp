@@ -14,9 +14,9 @@
 #include "dialog/d_craft.h"
 #include "dialog/d_hotbar.h"
 #include "menu.h"
-#include "../core/networking.h"
 #include "player_actions.h"
 #include "window.h"
+#include "../client-common/net.h"
 
 extern int active_hotbar;
 extern int auto_explore;

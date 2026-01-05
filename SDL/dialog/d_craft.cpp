@@ -2,6 +2,8 @@
 #include "../main.h"
 #include "dialog.h"
 #include <stdio.h>
+#include "../../client-common/net.h"
+
 
 extern int active_hotbar;
 extern NetClient * client;

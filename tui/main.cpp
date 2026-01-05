@@ -10,14 +10,10 @@
 #include <unistd.h>
 #include "../core/world.h"
 #include "../core/tiles.h"
-#include "../core/networking.h"
 #include "../core/player.h"
 #include "../core/time.h"
 #include "playerTUI.h"
-
-
-#define PlayerTYPE PlayerTUI
-#include "../client-common/net.inl"
+#include "../client-common/net.h"
 
 extern int trace_network;
 bool use_network = true;

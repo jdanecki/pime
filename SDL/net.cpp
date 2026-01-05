@@ -64,5 +64,3 @@ NetworkObject * el_from_data(const ObjectData * data)
     }
     return el;
 }
-
-
