@@ -1,12 +1,9 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "alchemist/el_list.h"
-#include "alchemist/elements.h"
 #include "alchemist/npc_talk.h"
 
 #include "clan.h"
-#include "alchemist/skills.h"
 
 /*enum class direction
 {

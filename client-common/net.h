@@ -2,9 +2,17 @@
 #define NET_H
 #include "../core/networking.h"
 
+class NetClient
+{
+  public:
+    ENetHost * host;
+    ENetPeer * peer;
+    NetClient(ENetHost *host, ENetPeer *peer):host(host), peer(peer) {}
+};
+extern NetClient * client;
+
 extern ElementsList objects;
 extern chunk * check_chunk(int cx, int cy);
-extern NetClient * client;
 
 void send_packet_move(NetClient * client, int32_t x, int32_t y);
 void send_packet_pickup(NetClient * client, uintptr_t id);

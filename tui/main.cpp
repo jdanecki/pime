@@ -1,18 +1,11 @@
 #include <sys/ioctl.h>
 #include <termios.h>
-#include <cstdlib>
 #include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
-#include "../core/world.h"
-#include "../core/tiles.h"
-#include "../core/player.h"
 #include "../core/time.h"
-#include "playerUI.h"
 #include "../client-common/game.h"
 
 extern int trace_network;

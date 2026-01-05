@@ -570,18 +570,6 @@ chunk * check_chunk(int cx, int cy)
     return ch;
 }
 
-InventoryElement * find_by_uid(size_t uid, int chunk_x, int chunk_y)
-{
-    if (!world_table[chunk_y][chunk_x])
-        return nullptr;
-    for (InventoryElement * el : world_table[chunk_y][chunk_x]->objects)
-    {
-        if (el->uid == uid)
-            return el;
-    }
-    return nullptr;
-}
-
 void update_chunk(int32_t x, int32_t y, const chunk_table * data)
 {
     data = (chunk_table *)((char *)(data));
@@ -606,7 +594,7 @@ void update_object(const ObjectData * data)
     //        size_t uid = data.inv_element.data.uid;
     Class_id c_id = data->inv_element.data.c_id;
 
-    InventoryElement * el = find_by_uid(data->inv_element.data.uid, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
+    InventoryElement * el = get_object_by_id(data->inv_element.data);
     //FIXME why we get el=NULL? -> change this to get_object_by_uid
     //  CONSOLE_LOG("update_object: el=%p chunk[%d,%d]\n", el, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
     if (el)

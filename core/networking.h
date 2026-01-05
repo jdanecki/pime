@@ -2,23 +2,13 @@
 #define NETWORKING_H
 
 #include "world.h"
-#include "player.h"
 #include "npc.h"
 
 #include <cstdarg>
 #include <cstdint>
-#include <cstdlib>
 #include <ostream>
 #include <new>
 #include <enet/enet.h>
-
-class NetClient
-{
-  public:
-    ENetHost * host;
-    ENetPeer * peer;
-    NetClient(ENetHost *host, ENetPeer *peer):host(host), peer(peer) {}
-};
 
 struct ObjectData
 {

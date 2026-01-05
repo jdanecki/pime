@@ -3,12 +3,10 @@
 
 #include "object.h"
 #include "names.h"
-#include <cstddef>
 #include <cstdlib>
 #include <stdint.h>
 #include "properties.h"
 #include "item_location.h"
-#include "serialization.h"
 
 extern const char * class_name[];
 

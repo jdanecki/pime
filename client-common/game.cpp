@@ -3,11 +3,9 @@
 
 #include "game.h"
 #include "../core/alchemist/ncurses-output.h"
-#include "../core/world_params.h"
 #include "../core/world.h"
 
 #include "../core/time.h"
-#include "playerUI.h"
 
 extern NetClient * client;
 
