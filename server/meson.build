@@ -2,6 +2,7 @@ enet_dep = dependency('libenet', method: 'pkg-config', required: true)
 ncurses_dep = dependency('ncurses', method: 'pkg-config', required: true)
 
 server_sources = [
+  'console.cpp',
   'server.cpp', 'generator/generator.cpp',
   'world_server.cpp', 'player_server.cpp',
   'networking.cpp', 'elements_server.cpp',

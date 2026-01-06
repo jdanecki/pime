@@ -47,6 +47,7 @@ distclean:
 	rm -rf SDL/build
 	rm -rf server/build
 	rm -rf tui/build
+	rm -rf build
 
 lines:
 	find . -name *.cpp -o -name *.h  -exec wc -l {} \; | awk '{s+=$$1} END { print s} '
@@ -59,4 +60,8 @@ tests:
 rebuild: distclean
 	./configure
 	+$(BUILD_TOOL) 2d
+
+meson:
+	meson setup build .
+	meson compile -C build
 

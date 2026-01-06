@@ -106,7 +106,7 @@ void hsv2rgb(int h, int s, int v, int* r, int* g, int* b)
     300° – magenta
     360° = 0° – znowu czerwony
 */    
-    float r1, g1, b1, i, f, p, q, t, h1, s1, v1;
+    float r1=0, g1=0, b1=0, i, f, p, q, t, h1, s1, v1;
     s1 = s / 100.0;
     v1 = v / 100.0;
 
