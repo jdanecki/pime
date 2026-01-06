@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdarg.h>
 #include "../core/packets.h"
 #include "../core/alchemist/el_list.h"
@@ -9,82 +8,11 @@
 #include "places/places.h"
 #include "networking.h"
 #include <math.h>
-#include <ncurses.h>
-#include <sys/ioctl.h>
+//#include <sys/ioctl.h>
+#include "console.h"
 #include "generator/generator.h"
 
 //#define DEBUG_TIMEOUT 1
-
-#define RED "$COLOR_PAIR_1_"
-#define GREEN "$COLOR_PAIR_2_"
-#define ORANGE "$COLOR_PAIR_3_"
-#define BLUE "$COLOR_PAIR_4_"
-#define RESET "$COLOR_PAIR_0_"
-#define INPUT_SIZE 64
-#define MAX_OUTPUT_SIZE 1024
-int history_size = 1024;
-
-WINDOW * in_w;
-WINDOW * out_w;
-WINDOW * status;
-
-char in_buf[INPUT_SIZE + 1];
-char ** out_buf;
-int show_key=0;
-
-int history_up;
-int buf_pos;
-bool scrolling=true;
-
-void shift_output()
-{
-    for (int i = 1; i < history_size; i++)
-    {
-        strncpy(out_buf[i - 1], out_buf[i], MAX_OUTPUT_SIZE);
-        out_buf[i][0]=0;
-    }
-}
-
-int print_color(WINDOW * w, const char * string)
-{
-    int current_color = 0;
-    const char * c = string;
-    if (!(*c)) return 2;
-    int ret = OK;
-    while (*c)
-    {        
-        if (*c == '$' && strncmp(c, "$COLOR_PAIR_", 12) == 0)
-        {
-            c += 12;
-            current_color = atoi(c);
-            while (*c != '_')
-                c++;
-            c++;
-            if (!*c)
-                break;
-        }
-        wattron(w, COLOR_PAIR(current_color));
-        if (waddch(w, *c) == ERR) ret = 1;
-        wattroff(w, COLOR_PAIR(current_color));
-        if (ret == 1) break;
-        c++;
-    }
-    return ret;
-}
-
-int add_to_output(const char * fmt, ...)
-{
-    va_list args;
-    va_start(args, fmt);
-
-    vsnprintf(out_buf[buf_pos], MAX_OUTPUT_SIZE, fmt, args);
-
-    if (buf_pos < history_size-1) buf_pos++;
-    else shift_output();
-    va_end(args);
-
-    return 0;
-}
 
 void print_help()
 {
@@ -102,37 +30,12 @@ void print_help()
     add_to_output("# - show keys\n");
 }
 
-void clear_history()
-{
-    for (int i = 0; i < history_size; i++)
-    {
-        memset(out_buf[i], 0, MAX_OUTPUT_SIZE);
-    }
-    history_up=0;
-    buf_pos=0;
-    add_to_output("%scleared%s\n", RED, RESET);
-}
-
-void handle_resize()
-{
-    int w, h;
-    getmaxyx(stdscr, h, w);
-    wresize(out_w, h - 4, w);
-    wresize(in_w, 3, w);
-    mvwin(in_w, h - 4, 0);
-}
-
 char handle_command();
 char handle_pressed(int pressed)
 {
     if (pressed == 0)
         return 0;
 
-    if (pressed < 127 && (isalpha((unsigned char)pressed) || isdigit((unsigned char)pressed)))
-    {
-        char append[2] = {(char)pressed, 0};
-        strcat(in_buf, append);
-    }
     switch (pressed)
     {
         case KEY_BACKSPACE:
@@ -153,6 +56,8 @@ char handle_pressed(int pressed)
             handle_resize(); // FALLTHROUGH
         case KEY_END:
             scrolling=true;
+            history_up=buf_pos-win_h+1;
+            if (history_up < 0) history_up=0;
             break;
         case KEY_HOME:
             scrolling=false;
@@ -160,7 +65,7 @@ char handle_pressed(int pressed)
             break;
         case KEY_DOWN:
             scrolling=false;
-            history_up += 5;
+            if (history_up < (buf_pos-5)) history_up += 5;
             break;
         case KEY_UP:
             scrolling=false;
@@ -171,83 +76,15 @@ char handle_pressed(int pressed)
         case '#':
              show_key^=1;
             break;
+        default:
+            char append[2] = {(char)pressed, 0};
+            strcat(in_buf, append);
+            break;
     }
     return 0;
-}
-
-char ncurses_init()
-{
-    initscr();
-    start_color();
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-    curs_set(1);
-
-    int w, h;
-    getmaxyx(stdscr, h, w);
-    out_w = newwin(h - 4, w, 0, 0);
-    in_w = newwin(3, w, h - 4, 0);
-    status = newwin(1, w, h - 1, 0);
-    wbkgd(status, COLOR_PAIR(5));
-    wbkgd(in_w, COLOR_PAIR(6));
- //   keypad(out_w, TRUE);
-    keypad(in_w, TRUE);
-  //  nodelay(out_w, TRUE);
-    nodelay(in_w, TRUE);
-
-    out_buf = (char **)calloc(history_size, sizeof(char *));
-    for (int i = 0; i < history_size; i++)
-    {
-        out_buf[i] = (char *)calloc(MAX_OUTPUT_SIZE, sizeof(char *));
-    }
-
-    memset(in_buf, 0, sizeof(char) * INPUT_SIZE);
-
-    init_pair(0, COLOR_WHITE, COLOR_BLACK);
-    init_pair(1, COLOR_RED, COLOR_BLACK);
-    init_pair(2, COLOR_GREEN, COLOR_BLACK);
-    init_pair(3, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(4, COLOR_BLUE, COLOR_BLACK);
-    init_pair(5,COLOR_BLACK,COLOR_BLUE);
-    init_pair(6,COLOR_BLACK,COLOR_GREEN);
-    scrollok(out_w, FALSE);
-
-    return 0;
-}
-
-
-void ncurses_tick()
-{
-    werase(in_w);
-    werase(out_w);
-    box(in_w, 0, 0);
-    wmove(in_w, 1, 2);
-    char buf[128];
-    snprintf(buf, 128, "> %s", in_buf);
-    print_color(in_w, buf);    
-
-    for (int i = 0; i + history_up < history_size; i++)
-    {
-        int ret = print_color(out_w, out_buf[i+history_up]);
-        switch(ret)
-        {
-            case 1:
-                if (scrolling) {
-                    history_up++;
-                }
-            case 2:
-                goto last_line;
-        }
-    }
-last_line:
-    wrefresh(out_w);
-    wmove(in_w, 4 + strlen(in_buf), 1);
-    wrefresh(in_w);    
 }
 
 Region ** regions;
-
 
 BaseElement * get_base_element(size_t id)
 {
@@ -360,18 +197,6 @@ class PacketToSend : public ListElement
         send_to_all(p);
     }
 };
-
-void print_status(int l, const char * format, ...)
-{
-    va_list args;
-    char buf[128];
-    va_start(args, format);
-    vsnprintf(buf, 127, format, args);
-    va_end(args);
-
-    wprintw(status, "\r %s ", buf);
-    wrefresh(status);
-}
 
 bool handle_packet(ENetPacket * packet, ENetPeer * peer)
 {
@@ -908,7 +733,7 @@ char handle_command()
             show_players();
             break;
         default:
-            add_to_output("%sinvalid command: %s%s\n", RED, RESET, in_buf);
+            add_to_output("invalid command: %s\n", in_buf);
             add_to_output("use \"help\" to show help\n");
             break;
         case '1':

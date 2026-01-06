@@ -2,105 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <unistd.h>
 
-#define MAX_OUTPUT_SIZE 189
-int history_size = 1024;
-char ** out_buf;
-int history_up;
-int buf_pos;
-bool scrolling=true;
-#define RED "$COLOR_PAIR_1_"
-#define GREEN "$COLOR_PAIR_2_"
-#define ORANGE "$COLOR_PAIR_3_"
-#define BLUE "$COLOR_PAIR_4_"
-#define RESET "$COLOR_PAIR_0_"
-WINDOW * win;
-WINDOW * status;
-int win_w, win_h;
-
-void shift_output()
-{
-    for (int i = 1; i < history_size; i++)
-    {
-        strncpy(out_buf[i - 1], out_buf[i], MAX_OUTPUT_SIZE);
-        out_buf[i][0]=0;
-    }
-}
-
-int col=0;
-int add_to_output(const char * fmt, ...)
-{
-    va_list args;
-    va_start(args, fmt);
-    char buf[MAX_OUTPUT_SIZE+1];
-    memset(buf, 0, MAX_OUTPUT_SIZE+1);
-    vsnprintf(buf, MAX_OUTPUT_SIZE, fmt, args);
-    va_end(args);
-
-    int len=strlen(buf);
-    if (col+strlen(buf) > MAX_OUTPUT_SIZE) {
-       if (buf_pos < history_size-1) buf_pos++;
-            else shift_output();
-       col=0;
-    }
-    for (int ch=0; ch < len; ch++)
-    {
-        switch(buf[ch])
-        {
-            case 13: // \r
-                col=0;
-            break;
-            case 10: // \n
-                if (buf_pos < history_size-1) buf_pos++;
-                else shift_output();
-                col=0;
-            break;
-            default:
-                out_buf[buf_pos][col]=buf[ch];
-                if (col < MAX_OUTPUT_SIZE-1) col++;
-            break;
-        }
-    }
-    return 0;
-}
-
-void clear_history()
-{
-    for (int i = 0; i < history_size; i++)
-    {
-        memset(out_buf[i], 0, MAX_OUTPUT_SIZE);
-    }
-    history_up=0;
-    buf_pos=0;
-    add_to_output("cleared\n");
-}
-
-void ncurses_tick()
-{
-    werase(win);
-    int lines=0;
-    for (int i = 0; i < win_h; i++)
-    {
-        if (out_buf[i + history_up][0])
-        {
-            mvwaddnstr(win, i, 0, out_buf[i + history_up ], MAX_OUTPUT_SIZE);
-            lines++;
-        }
-    }
-    wrefresh(win);
-}
-
-void print_status(const char * format, ...)
-{
-    va_list args;
-    char buf[128];
-    va_start(args, format);
-    vsnprintf(buf, 127, format, args);
-    va_end(args);
-
-    wprintw(status, "\r %s ", buf);
-    wrefresh(status);
-}
+#include "functions.cpp"
 
 int main()
 {
@@ -114,10 +18,11 @@ int main()
 	start_color();
     getmaxyx(stdscr, h, w);
 //  lines, columns, y, x
-    win = newwin(h - 4, w, 0, 0);
+    out_w = newwin(h - 1, w, 0, 0);
     win_w=w;
-    win_h=h-4;
-    keypad(win,TRUE);
+    win_h=h-1;
+    keypad(out_w,TRUE);
+    nodelay(out_w, TRUE);
 
     init_pair(0, COLOR_WHITE, COLOR_BLACK);
     init_pair(1, COLOR_RED, COLOR_BLACK);
@@ -128,10 +33,10 @@ int main()
     init_pair(6,COLOR_BLACK,COLOR_GREEN);
 
     status = newwin(1, w, h - 1, 0);
-    wbkgd(status, COLOR_PAIR(5));
+    wbkgd(status, COLOR_PAIR(6));
 
-    wcolor_set(win, 0, NULL);
-    scrollok(win, FALSE);
+    wcolor_set(out_w, 0, NULL);
+    scrollok(out_w, FALSE);
 
     out_buf = (char **)calloc(history_size, sizeof(char *));
     for (int i = 0; i < history_size; i++)
@@ -143,7 +48,7 @@ int main()
     while(key!= 'q')
     {
         ncurses_tick();
-        key = wgetch(win);
+        key = wgetch(out_w);
         if (key!=ERR) {
             if (key < 127 )
             {
@@ -179,27 +84,31 @@ int main()
                     break;
                 case KEY_DOWN:
                     scrolling=false;
-                    history_up += 5;
+                    if (history_up < (buf_pos-5)) history_up += 5;
                     break;
                 case KEY_UP:
                     scrolling=false;
                     history_up -= 5;
-                    if (history_up < 0)
-                    history_up = 0;
+                    if (history_up < 0) history_up = 0;
                     break;
                 case KEY_END:
                     scrolling=true;
+                    history_up=buf_pos-win_h+1;
+                    if (history_up < 0) history_up=0;
                     break;
                 }
             }
         }
         int x, y;
-        getyx(win, y, x);
-        print_status("key=%d buf_pos=%d col=%d history_up=%d history_size=%d w=%d h=%d x=%d y=%d",
-                     key, buf_pos, col, history_up, history_size, win_w, win_h, x, y);
+        getyx(out_w, y, x);
+        if (key != ERR) {
+            print_status("key=%d buf_pos=%d col=%d history_up=%d history_size=%d w=%d h=%d x=%d y=%d scrolling=%d",
+                     key, buf_pos, col, history_up, history_size, win_w, win_h, x, y, scrolling);
+        }
+        usleep(20000);
     }
 
-    delwin(win);
+    delwin(out_w);
     endwin();
     curs_set(1);
 }

@@ -16,6 +16,7 @@ add_definitions(-DSERVER_CODE -DUSE_NCURSES ${enet_CFLAGS} ${ncurses_CFLAGS} )
 add_subdirectory(../core core)
 
 add_executable(server_pime
+    console.cpp
     server.cpp generator/generator.cpp
     world_server.cpp player_server.cpp
     networking.cpp elements_server.cpp
