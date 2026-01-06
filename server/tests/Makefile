@@ -1,4 +1,4 @@
-ncurses: ncurses.c
-	gcc -o $@  $< `pkg-config --cflags ncurses` `pkg-config --libs ncurses`
+all: ncurses.c
+	gcc -g -o ncurses $< `pkg-config --cflags ncurses` `pkg-config --libs ncurses`
 
 
