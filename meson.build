@@ -3,7 +3,7 @@ project('alchemist-project', 'cpp',
 
 
 subdir('core')
-# subdir('tui')
+subdir('tui')
 subdir('SDL')
 subdir('server')
 

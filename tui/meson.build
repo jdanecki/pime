@@ -5,11 +5,12 @@ tui_src = [
   'playerUI.cpp',
   'net.cpp',
   '../client-common/net.cpp',
-  '../client-common/game.cpp'
+  '../client-common/game.cpp',
+  '../client-common/players.cpp'
 ]
 
 executable('pime_tui', tui_src,
-  dependencies: [enet_dep],
+  dependencies: [pime_dep, enet_dep],
   link_args: ['-lm'],
   install: false,
   cpp_args: ['-Wall', '-Wno-switch', '-DDISABLE_NPC']

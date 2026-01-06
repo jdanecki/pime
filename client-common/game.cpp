@@ -5,7 +5,7 @@
 #include "../core/alchemist/ncurses-output.h"
 #include "../core/world.h"
 
-#include "../core/time.h"
+#include "../core/time_core.h"
 
 extern NetClient * client;
 
@@ -38,23 +38,22 @@ void put_element()
     }
 }
 
-
 void handle_network()
 {
-        unsigned long start = get_time_usec();
-        unsigned int recv = 0;
-        if (use_network)
-        {
-            recv = network_tick(client);
-            total_recv += recv;
-            unsigned long stop = get_time_usec();
-            if (recv > max_recv)
-                max_recv = recv;
-            if (stop - start > max_time)
-                max_time = stop - start;
-            if (recv && show_received)
-                printf("recv: %u/%u max=%u time=%lu us/%lu ms\n", recv, total_recv, max_recv, stop - start, max_time / 1000);
-        }
+    unsigned long start = get_time_usec();
+    unsigned int recv = 0;
+    if (use_network)
+    {
+        recv = network_tick(client);
+        total_recv += recv;
+        unsigned long stop = get_time_usec();
+        if (recv > max_recv)
+            max_recv = recv;
+        if (stop - start > max_time)
+            max_time = stop - start;
+        if (recv && show_received)
+            printf("recv: %u/%u max=%u time=%lu us/%lu ms\n", recv, total_recv, max_recv, stop - start, max_time / 1000);
+    }
 }
 
 int dst_map_x;

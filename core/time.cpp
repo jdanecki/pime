@@ -1,4 +1,4 @@
-#include "time.h"
+#include "time_core.h"
 #include <time.h>
 
 unsigned long get_time_usec()
@@ -8,4 +8,3 @@ unsigned long get_time_usec()
     clock_gettime(CLOCK_MONOTONIC_RAW, &t);
     return (t.tv_sec * 1000000 + t.tv_nsec / 1000);
 }
-

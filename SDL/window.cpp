@@ -2,7 +2,7 @@
 #include <SDL2/SDL.h>
 #include <time.h>
 #include "../core/alchemist/ncurses-output.h"
-#include "../core/time.h"
+#include "../core/time_core.h"
 
 SDL_Renderer * renderer;
 SDL_Window * main_window;
@@ -43,7 +43,7 @@ void draw_rectangle(int x, int y, int w, int h, SDL_Color c0, SDL_Color c1, SDL_
     SDL_RenderGeometry(renderer, NULL, v, 6, i, 6);
 }
 
-int init_window(const char *title, int wx, int wy)
+int init_window(const char * title, int wx, int wy)
 {
     Uint32 flags;
     // flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;

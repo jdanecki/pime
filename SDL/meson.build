@@ -14,7 +14,8 @@ shared_sources = [
   'alchemistSDL.cpp', 'BeingSDL.cpp',
   'playerUI.cpp', 'palette.cpp' , 'net.cpp',
   '../client-common/net.cpp',
-  '../client-common/game.cpp'
+  '../client-common/game.cpp',
+  '../client-common/players.cpp'
 ]
 
 sdl_deps = [sdl_dep, sdl_image_dep, sdl_ttf_dep, sdl_mixer_dep, sdl_gfx_dep, enet_dep]

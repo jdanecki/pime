@@ -5,11 +5,10 @@
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
-#include "../core/time.h"
+#include "../core/time_core.h"
 #include "../client-common/game.h"
 
 extern int trace_network;
-
 
 struct termios old_stdin, stdin_tty;
 void set_terminal()
@@ -31,8 +30,10 @@ bool setup(const char * ip, const char * port)
     set_terminal();
 
     client = init(ip, port);
-    if (client) return true;
-    else return false;
+    if (client)
+        return true;
+    else
+        return false;
 }
 
 void print_status(int l, const char * format, ...)
@@ -257,7 +258,8 @@ bool do_key(char k)
 
 bool handle_events()
 {
-    if (!kbhit()) return false;
+    if (!kbhit())
+        return false;
     char c;
     if (read(0, &c, 1) == 1)
     {
@@ -270,19 +272,22 @@ bool handle_events()
     return false;
 }
 
-void clear_window() {}
+void clear_window()
+{
+}
 void draw()
 {
-    printf("\r%s%ld@[%d,%d][%d,%d] %c: ", player->get_name(), player->get_id(),
-        player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y, submenu ? submenu : '#');
-    for (int y=-1; y < 2; y++)
+    printf("\r%s%ld@[%d,%d][%d,%d] %c: ", player->get_name(), player->get_id(), player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y,
+        submenu ? submenu : '#');
+    for (int y = -1; y < 2; y++)
     {
-        for (int x=-1; x < 2; x++)
+        for (int x = -1; x < 2; x++)
         {
             check_chunk(player->location.chunk.map_x + x, player->location.chunk.map_y + y);
         }
     }
-    if (!auto_explore) usleep(20000);
+    if (!auto_explore)
+        usleep(20000);
 }
 
 int main(int argc, char * argv[])
