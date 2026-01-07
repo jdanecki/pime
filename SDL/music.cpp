@@ -1,4 +1,14 @@
-#include "music.h"
+#include <SDL.h>
+#include <SDL_mixer.h>
+#include <stdlib.h>
+
+#include "../client-common/music.h"
+
+struct Musics
+{
+    Mix_Chunk * music_one;
+    Mix_Chunk * music_two;
+};
 
 struct Musics music;
 
@@ -11,6 +21,7 @@ int init_music()
     }
     return 0;
 }
+
 void load_music()
 {
     music.music_two = Mix_LoadWAV("music2.wav");

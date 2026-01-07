@@ -4,9 +4,10 @@
 #include <SDL_ttf.h>
 #include <SDL2_gfxPrimitives.h>
 
-#include "window.h"
 #include "../core/alchemist/ncurses-output.h"
 #include "../core/time_core.h"
+
+#include "../client-common/window.h"
 
 SDL_Renderer * renderer;
 SDL_Window * main_window;

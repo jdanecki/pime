@@ -1,4 +1,3 @@
-#include "inputs.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_keyboard.h>
@@ -8,14 +7,18 @@
 #include <SDL2/SDL_timer.h>
 #include <stdio.h>
 
-#include "playerUI.h"
 #include "../core/tiles.h"
 #include "../core/packet_types.h"
+
+#include "playerUI.h"
 #include "dialog/d_craft.h"
 #include "dialog/d_hotbar.h"
-#include "menu.h"
-#include "player_actions.h"
-#include "window.h"
+
+#include "../client-common/inputs.h"
+
+#include "../client-common/menu.h"
+#include "../client-common/player_actions.h"
+#include "../client-common/window.h"
 #include "../client-common/net.h"
 
 extern int active_hotbar;

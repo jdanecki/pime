@@ -4,9 +4,10 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include "text.h"
-#include "window.h"
 #include "../core/alchemist/ncurses-output.h"
+
+#include "../client-common/text.h"
+#include "../client-common/window.h"
 
 TTF_Font * font;
 
@@ -18,8 +19,6 @@ SDL_Color Red = {255, 0, 0};
 SDL_Color Cyan = {255, 0, 255};
 SDL_Color Yellow = {255, 255, 0};
 
-char status_line[256];
-char status_line2[256];
 
 int load_font()
 {
@@ -69,13 +68,4 @@ void write_text(int x, int y, const char * text, SDL_Color color, int scale_x, i
     SDL_DestroyTexture(text_sdl);
 }
 
-void print_status(int l, const char * format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    if (!l)
-        vsprintf(status_line, format, args);
-    else
-        vsprintf(status_line2, format, args);
-    va_end(args);
-}
+

@@ -3,9 +3,10 @@
 
 #include "../core/alchemist/elements.h"
 #include "../core/player.h"
+
 #include "../client-common/net.h"
-#include "texture.h"
-#include "window.h"
+#include "../client-common/texture.h"
+#include "../client-common/window.h"
 
 class Renderable
 {    

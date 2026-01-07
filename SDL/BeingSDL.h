@@ -2,7 +2,7 @@
 #define BEING_SDL_H
 
 #include "../core/alchemist/elements.h"
-#include "texture.h"
+#include "../client-common/texture.h"
 #include "alchemistSDL.h"
 /*
 class BeingSDL : public InventoryElement, public Renderable

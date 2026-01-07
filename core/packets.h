@@ -452,7 +452,7 @@ class PacketObjectCreate : public Packet
         /*      for (int i=0; i<100; i++)
                    CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
         */
-        CONSOLE_LOG("PacketObjectCreate for objectData::Tag=%d size=%ld\n", (int)obj->tag, obj->size);
+    //    CONSOLE_LOG("PacketObjectCreate for objectData::Tag=%d size=%ld\n", (int)obj->tag, obj->size);
         switch (obj->tag)
         {
             case ObjectData::Tag::Element:
@@ -463,7 +463,7 @@ class PacketObjectCreate : public Packet
             case ObjectData::Tag::Place:
             {
                 size_t * pdata=(size_t*) &obj->data[0];
-                CONSOLE_LOG("pdata=%lx\n", *pdata);
+            //    CONSOLE_LOG("pdata=%lx\n", *pdata);
                 new (&obj->place.data) Place((Place_id)obj->id, *pdata);
                 break;
             }

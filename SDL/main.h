@@ -4,16 +4,16 @@
 #include "../core/world.h"
 #include "../core/tiles.h"
 
-#include "npc.h"
-#include "alchemistSDL.h"
-#include "BeingSDL.h"
-#include "text.h"
-#include "window.h"
+#include "../client-common/npc.h"
+#include "../client-common/text.h"
+#include "../client-common/window.h"
+#include "../client-common/inputs.h"
+#include "../client-common/menu.h"
+#include "../client-common/game.h"
 #include "dialog/d_craft.h"
 #include "dialog/d_hotbar.h"
-#include "inputs.h"
-#include "menu.h"
-#include "../client-common/game.h"
+#include "alchemistSDL.h"
+#include "BeingSDL.h"
 
 extern SDL_Texture * map;
 #endif // MAIN_H

@@ -1,12 +1,15 @@
-#include "npc.h"
-#include "menu.h"
-#include "../core/networking.h"
-#include "texture.h"
-#include "window.h"
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
 #include <stdio.h>
+
+#include "../core/networking.h"
+
 #include "playerUI.h"
+
+#include "../client-common/npc.h"
+#include "../client-common/menu.h"
+#include "../client-common/texture.h"
+#include "../client-common/window.h"
 
 NpcSDL * current_npc;
 extern int active_hotbar;

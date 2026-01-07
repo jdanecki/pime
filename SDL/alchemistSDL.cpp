@@ -1,6 +1,8 @@
 #include "alchemistSDL.h"
 #include <SDL_render.h>
 
+extern SDL_Texture * add_texture_color(SDL_Surface * s, ColorRGB c);
+
 void hsv2rgb(int h, int s, int v, int* r, int* g, int* b);
 
 SDL_Texture * PlaceSDL::get_texture()

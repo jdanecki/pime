@@ -17,12 +17,22 @@ add_definitions(-DDISABLE_NPC ${enet_CFLAGS} ${raylib_CFLAGS}
 add_subdirectory(../core core)
 
 add_executable(pime_raylib
-    main.cpp 
-    playerUI.cpp
     net.cpp
+    main.cpp 
+    window.cpp music.cpp text.cpp
+    texture.cpp main.cpp render.cpp menu.cpp
+    backend.cpp
+
+    inputs.cpp 
+    #    npc.cpp
+   
+    playerUI.cpp
     ../client-common/net.cpp
     ../client-common/game.cpp
     ../client-common/players.cpp
+    ../client-common/player_actions.cpp 
+    ../client-common/text.cpp
+    ../client-common/texture.cpp
 
 )
 

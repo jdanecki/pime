@@ -1,20 +1,23 @@
-#include "menu.h"
-#include "../core/alchemist/elements.h"
-#include "playerUI.h"
-#include "../core/tiles.h"
-#include "../core/world.h"
-#include "music.h"
-#include "../core/networking.h"
-#include "npc.h"
-#include "text.h"
-#include "texture.h"
-#include "window.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "dialog/d_craft.h"
-#include "player_actions.h"
 #include <assert.h>
+#include <SDL_mixer.h>
+
+#include "playerUI.h"
+
+#include "../client-common/menu.h"
+#include "../core/alchemist/elements.h"
+#include "../core/tiles.h"
+#include "../core/world.h"
+#include "../client-common/music.h"
+#include "../core/networking.h"
+#include "../client-common/npc.h"
+#include "../client-common/text.h"
+#include "../client-common/texture.h"
+#include "../client-common/window.h"
+#include "dialog/d_craft.h"
+#include "../client-common/player_actions.h"
 
 extern int active_hotbar;
 extern NetClient * client;

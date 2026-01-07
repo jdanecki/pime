@@ -6,7 +6,6 @@
 #include "game.h"
 #include "../core/alchemist/ncurses-output.h"
 #include "../core/world.h"
-
 #include "../core/time_core.h"
 
 extern NetClient * client;

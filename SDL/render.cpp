@@ -1,15 +1,17 @@
-#include "../client-common/net.h"
-#include "npc.h"
-#include "text.h"
-#include "texture.h"
-#include "window.h"
 #include <SDL2/SDL_render.h>
 #include <stddef.h>
 #include <stdio.h>
-#include "dialog/d_craft.h"
 #include <assert.h>
-#include "dialog/d_hotbar.h"
+
 #include "playerUI.h"
+
+#include "../client-common/net.h"
+#include "../client-common/npc.h"
+#include "../client-common/text.h"
+#include "../client-common/texture.h"
+#include "../client-common/window.h"
+#include "dialog/d_craft.h"
+#include "dialog/d_hotbar.h"
 
 extern SDL_Texture * map;
 

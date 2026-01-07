@@ -1,21 +1,6 @@
-#include <SDL2/SDL.h>
-#include <cstdlib>
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <termios.h>
-#include <unistd.h>
-
-#include "main.h"
-#include "npc.h"
-#include "window.h"
 #include "../client-common/game.h"
 
 SDL_Texture * map;
-
-extern void draw();
 
 void (*callback_daily)();
 void daily_call()

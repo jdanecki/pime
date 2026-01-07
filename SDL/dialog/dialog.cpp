@@ -1,7 +1,8 @@
-#include "dialog.h"
-#include "../text.h"
-#include "../texture.h"
 #include <SDL2/SDL_render.h>
+
+#include "dialog.h"
+#include "../client-common/text.h"
+#include "../client-common/texture.h"
 
 DialogElement::DialogElement(int id, SDL_Rect rect, enum DialogElementType c_id) : rect(rect), id(id), c_id(c_id)
 {

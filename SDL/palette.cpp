@@ -17,7 +17,7 @@
 
 #include <math.h>
 #include <stdlib.h>
-#include "window.h"
+#include "../client-common/window.h"
 
 extern int window_width;
 extern int window_height;

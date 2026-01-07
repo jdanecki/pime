@@ -30,14 +30,19 @@ add_executable(pime_SDL
     texture.cpp main.cpp render.cpp menu.cpp
     dialog/dialog.cpp dialog/d_hotbar.cpp
     dialog/d_craft.cpp
-    inputs.cpp player_actions.cpp npc.cpp
+    inputs.cpp 
+    npc.cpp
     alchemistSDL.cpp
     BeingSDL.cpp
     playerUI.cpp
     palette.cpp
+    backend.cpp
     ../client-common/net.cpp
     ../client-common/game.cpp
     ../client-common/players.cpp
+    ../client-common/player_actions.cpp 
+    ../client-common/text.cpp 
+    ../client-common/texture.cpp
 )
 
 target_link_libraries(pime_SDL

@@ -1,5 +1,5 @@
 #include "playerUI.h"
-#include "texture.h"
+#include "../client-common/texture.h"
 
 SDL_Texture * PlayerUI::get_texture()
 {
