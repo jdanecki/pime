@@ -1,10 +1,6 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <SDL2_gfxPrimitives.h>
 #include "../core/world_params.h"
 
 extern SDL_Renderer * renderer;
@@ -14,6 +10,7 @@ extern int window_width;
 extern int window_height;
 
 int init_window(const char *title, int wx, int wy);
+void close_graphics();
 void clear_window();
 unsigned int color(int r, int g, int b, int a);
 void draw_rectangle(int x, int y, int w, int h, SDL_Color c0, SDL_Color c1, SDL_Color c2, SDL_Color c3);

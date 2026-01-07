@@ -1,6 +1,10 @@
-#include "window.h"
-#include <SDL2/SDL.h>
 #include <time.h>
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
+#include <SDL2_gfxPrimitives.h>
+
+#include "window.h"
 #include "../core/alchemist/ncurses-output.h"
 #include "../core/time_core.h"
 
@@ -92,6 +96,11 @@ int init_window(const char * title, int wx, int wy)
     CONSOLE_LOG("Time it took to initialize SDL2 modules (img, window, renderer): %ldms\n ", (t3 - t1) / 1000);
 
     return 0;
+}
+
+void close_graphics()
+{
+    SDL_Quit();
 }
 
 void clear_window()

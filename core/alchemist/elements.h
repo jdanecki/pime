@@ -61,7 +61,7 @@ class Base: public NetworkObject
     }
 };
 
-struct Color
+struct ColorRGB
 {
     int r;
     int g;
@@ -72,7 +72,7 @@ class BaseElement : public Base
 {
   public:
     Form form; // solid, liquid, gas
-    Color color; //color for tile
+    ColorRGB color; //color for tile
     Property density;
     Solid solid;
 

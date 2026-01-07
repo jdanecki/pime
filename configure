@@ -30,6 +30,10 @@ pushd SDL
 . ./configure
 popd
 
+pushd raylib
+. ./configure
+popd
+
 pushd server
 . ./configure
 popd

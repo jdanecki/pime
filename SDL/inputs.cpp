@@ -225,7 +225,6 @@ bool handle_events()
     {
         if (event.type == SDL_QUIT)
         {
-            SDL_Quit();
             return true;
         };
         if (event.type == SDL_KEYDOWN)

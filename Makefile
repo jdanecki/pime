@@ -3,7 +3,7 @@ include config.txt
 all: 2d 3d
 #   	tui-core
 
-2d: serv client client-tui
+2d: serv client client-tui client-raylib
 
 3d: serv godot-client
 
@@ -13,6 +13,9 @@ serv:
 client: 
 	+$(BUILD_TOOL) -C SDL/build
 
+client-raylib: 
+	+$(BUILD_TOOL) -C raylib/build
+
 client-tui:
 	+$(BUILD_TOOL) -C tui/build
 
@@ -21,7 +24,7 @@ tui-core:
 
 clean: 2d-clean 3d-clean
 	
-2d-clean: serv-clean client-clean tui-clean 
+2d-clean: serv-clean client-clean tui-clean raylib-clean
 
 3d-clean: serv-clean godot-clean
 
@@ -33,6 +36,9 @@ serv-clean:
 
 client-clean:
 	+$(BUILD_TOOL) -C SDL/build clean
+
+raylib-clean:
+	+$(BUILD_TOOL) -C raylib/build clean
 
 tui-clean:
 	+$(BUILD_TOOL) -C tui/build clean

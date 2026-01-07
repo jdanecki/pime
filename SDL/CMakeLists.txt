@@ -40,14 +40,11 @@ add_executable(pime_SDL
     ../client-common/players.cpp
 )
 
-set(SHARED_LIBRARIES
-     SDL2 SDL2_image SDL2_ttf SDL2_mixer SDL2_gfx
-    ${SDL_LDFLAGS} ${SDL2_MIXER_LDFLAGS}
-    m
-)
-
 target_link_libraries(pime_SDL
-    pime ${SHARED_LIBRARIES} enet
+    pime 
+    ${enet_LDFLAGS}
+    ${SDL2_IMAGE_LDFLAGS} ${SDL2_TTF_LDFLAGS} ${SDL2_MIXER_LDFLAGS} ${SDL2_GFX_LDFLAGS} ${SDL_LDFLAGS}
+    m
 )
 
 target_include_directories(pime_SDL    PRIVATE  ${CMAKE_SOURCE_DIR} )

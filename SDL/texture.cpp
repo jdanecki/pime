@@ -1,12 +1,14 @@
-#include "texture.h"
-#include "../core/alchemist/elements.h"
-#include "../core/tiles.h"
 #include "window.h"
+#include <SDL_surface.h>
+#include <SDL_image.h>
 #include <SDL_blendmode.h>
 #include <SDL_image.h>
 #include <dirent.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
+
+#include "texture.h"
 
 struct player_textures Player_textures;
 
@@ -163,7 +165,7 @@ Field:     A          B          G        R
     places_textures[PLACE_FIELD] = load_texture("textures/objects/field.png");
 }
 
-SDL_Texture * add_texture_color(SDL_Surface * s, Color c)
+SDL_Texture * add_texture_color(SDL_Surface * s, ColorRGB c)
 {
     unsigned char mask_r = c.r;
     unsigned char mask_g = c.g;

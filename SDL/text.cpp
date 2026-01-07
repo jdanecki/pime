@@ -1,8 +1,11 @@
-#include "text.h"
-#include "window.h"
-#include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <SDL_ttf.h>
+#include <errno.h>
+#include <stdio.h>
+
+#include "text.h"
+#include "window.h"
 #include "../core/alchemist/ncurses-output.h"
 
 TTF_Font * font;

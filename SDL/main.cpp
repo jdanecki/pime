@@ -1,3 +1,12 @@
+#include <SDL2/SDL.h>
+#include <cstdlib>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <termios.h>
+#include <unistd.h>
 
 #include "main.h"
 #include "npc.h"
@@ -49,49 +58,7 @@ void intro()
     // tcsetattr(0, TCSANOW, &state);
 }
 
-int init_SDL()
-{
-    int texture_size=32;
-    if (init_window("pime", texture_size*CHUNK_SIZE + PANEL_WINDOW, texture_size*CHUNK_SIZE + STATUS_LINES))
-    {
-        return 1;
-    }
-    if (load_font())
-        return 1;
-
-    struct stat statbuf;
-    int ret = stat("textures", &statbuf);
-    if (ret)
-    {
-        chdir("..");
-        ret = stat("textures", &statbuf);
-        if (ret)
-        {
-            CONSOLE_LOG("missing directory with textures\n");
-            return 2;
-        }
-    }
-
-    load_textures();
-    create_menus();
-    map = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, WORLD_SIZE, WORLD_SIZE);
-
-    return 0;
-}
-
-bool setup(const char * ip, const char * port)
-{
-    setbuf(stdout, nullptr); // fix for qtcreator console
-
-    if (init_SDL() != 0)
-        return false;
-
-    client = init(ip, port);
-    if (client) return true;
-    else return false;
-}
-
 int main(int argc, char * argv[])
 {
-    init_game("pime_SDL", argc, argv);
+    start_game("pime_SDL", argc, argv);
 }

@@ -4,7 +4,7 @@
 #include "net.h"
 #include "players.h"
 
-void init_game(const char *name, int argc, char *argv[]);
+void start_game(const char *name, int argc, char *argv[]);
 void handle_network();
 void put_element();
 

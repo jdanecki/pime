@@ -1,4 +1,5 @@
 #include "alchemistSDL.h"
+#include <SDL_render.h>
 
 void hsv2rgb(int h, int s, int v, int* r, int* g, int* b);
 
@@ -131,7 +132,7 @@ ScrollSDL::ScrollSDL(Scroll data) : Scroll(data)
     w = 32;
     h = 32;
     Base * b = get_base();
-    Color c;
+    ColorRGB c;
 
     switch (b->c_id)
     {

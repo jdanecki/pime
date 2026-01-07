@@ -11,7 +11,19 @@
 extern int trace_network;
 
 struct termios old_stdin, stdin_tty;
-void set_terminal()
+
+void load_textures()
+{}
+
+int load_font()
+{
+    return 0;
+}
+
+void create_menus()
+{}
+
+int init_window(const char * title, int wx, int wy)
 {
     setbuf(stdout, nullptr);
     tcgetattr(0, &old_stdin);
@@ -23,17 +35,11 @@ void set_terminal()
 
     tcflush(0, TCIFLUSH);
     ioctl(0, TCXONC, 1);
+    return 0;
 }
 
-bool setup(const char * ip, const char * port)
-{
-    set_terminal();
-
-    client = init(ip, port);
-    if (client)
-        return true;
-    else
-        return false;
+void close_graphics() {
+    tcsetattr(0, TCSANOW, &old_stdin);
 }
 
 void print_status(int l, const char * format, ...)
@@ -292,6 +298,5 @@ void draw()
 
 int main(int argc, char * argv[])
 {
-    init_game("pime_tui", argc, argv);
-    tcsetattr(0, TCSANOW, &old_stdin);
+    start_game("pime_tui", argc, argv);
 }

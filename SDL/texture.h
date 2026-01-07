@@ -1,10 +1,6 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include <SDL_surface.h>
-#include <stdlib.h>
-
-#include <SDL_image.h>
 
 #include "../core/alchemist/elements.h"
 #include "../core/tiles.h"
@@ -33,6 +29,6 @@ extern struct player_textures Player_textures;
 
 void load_textures();
 SDL_Texture * load_texture(const char * texture_name);
-SDL_Texture * add_texture_color(SDL_Surface * s, Color c);
+SDL_Texture * add_texture_color(SDL_Surface * s, ColorRGB c);
 
 #endif
