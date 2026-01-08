@@ -11,7 +11,7 @@
 #include "../client-common/texture.h"
 #include "../client-common/window.h"
 
-NpcSDL * current_npc;
+Npc2d * current_npc;
 extern int active_hotbar;
 
 
@@ -67,7 +67,7 @@ SDL_Texture * create_npc_texture()
     return retval;
 }
 
-NpcSDL::NpcSDL(Npc data) : Npc(data)
+Npc2d::Npc2d(Npc data) : Npc(data)
 {
     w = 32;
     h = 32;

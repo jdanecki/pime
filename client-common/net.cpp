@@ -161,7 +161,7 @@ void update_item_location(LocationUpdateData data)
     ItemLocation & old_loc = data.old;
     ItemLocation & new_loc = data.new_;
 
-    /*CONSOLE_LOG("update item location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
+/*    CONSOLE_LOG("update item location uid=%lx old_tag=%d new_tag=%d\n", id.uid, (int)old_loc.tag, (int)new_loc.tag);
     old_loc.show();
     new_loc.show();
 */
@@ -191,7 +191,14 @@ void update_item_location(LocationUpdateData data)
                 old_loc.chunk.x, old_loc.chunk.y,
                 new_loc.chunk.map_x, new_loc.chunk.map_y,
                 new_loc.chunk.x, new_loc.chunk.y);
-*/
+            */
+
+            if (el->get_cid() == Class_Player)
+            {
+//                printf("my_id=%lx id=%lx\n", my_id, el->get_id());
+                if (my_id == el->get_id()) print_status(1, "player moved");
+            }
+
             /*ItemLocation old_l;
             ItemLocation new_l;
             old_l.chunk.x = old_loc.chunk.x;

@@ -63,9 +63,9 @@ class Base: public NetworkObject
 
 struct ColorRGB
 {
-    int r;
-    int g;
-    int b;
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
 };
 
 class BaseElement : public Base

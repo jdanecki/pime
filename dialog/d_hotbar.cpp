@@ -1,6 +1,5 @@
 #include "d_hotbar.h"
-#include "../main.h"
-#include "dialog.h"
+#include "playerUI.h"
 
 extern int active_hotbar;
 
@@ -33,11 +32,12 @@ void DHotbar::update()
     {
         // IMAGES
         DialogImage * img = dynamic_cast<DialogImage *>(get_element_from_id(i, DialogElementType::Image));
-        img->texture = NULL;
+        img->texture_loaded=false;
         if (player->hotbar[i])
         {
             Renderable * r = dynamic_cast<Renderable *>(player->hotbar[i]);
             img->texture = r->get_texture();
+            img->texture_loaded=true;
         }
         // SELECTION
         DialogBox * b = dynamic_cast<DialogBox *>(get_element_from_id(i, DialogElementType::Box));

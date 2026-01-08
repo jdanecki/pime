@@ -10,10 +10,6 @@
 #include "../client-common/inputs.h"
 #include "../client-common/menu.h"
 #include "../client-common/game.h"
-#include "dialog/d_craft.h"
-#include "dialog/d_hotbar.h"
-#include "alchemistSDL.h"
-#include "BeingSDL.h"
 
-extern SDL_Texture * map;
+//extern SDL_Texture * map;
 #endif // MAIN_H

@@ -1,5 +1,11 @@
 #include "playerUI.h"
 
+Texture PlayerUI::get_texture()
+{
+    texture_created=true;
+    return Player_textures.player;
+}
+
 PlayerUI::PlayerUI(Player data) : Player(data)
 {
     for (int i = 0; i < 10; i++)

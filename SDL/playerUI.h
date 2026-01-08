@@ -2,7 +2,7 @@
 #define PLAYER_SDL
 
 #include "../core/player.h"
-#include "alchemistSDL.h"
+#include "../client-common/alchemist2d.h"
 
 class PlayerUI : public Player, public Renderable
 {

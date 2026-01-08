@@ -247,5 +247,6 @@ PlayerServer * create_player(size_t id)
 
 Npc * create_npc()
 {
-    return new Npc(ItemLocation::center());
+    //return new Npc(ItemLocation::center());
+    return nullptr;
 }

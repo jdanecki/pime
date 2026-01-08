@@ -3,7 +3,8 @@ include config.txt
 all: 2d 3d
 #   	tui-core
 
-2d: serv client client-tui client-raylib
+2d: serv client client-raylib
+#	client-tui 
 
 3d: serv godot-client
 

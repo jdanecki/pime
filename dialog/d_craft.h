@@ -2,7 +2,6 @@
 #define D_CRAFT_H
 
 #include "dialog.h"
-#include <SDL2/SDL_render.h>
 class DCraft : public Dialog
 {
   public:    
@@ -12,7 +11,7 @@ class DCraft : public Dialog
     bool show;
     DCraft();
     void update();
-    void draw(SDL_Renderer * renderer);
+    void draw();
     bool press(int x, int y, int button);
 
 };

@@ -1,9 +1,8 @@
-#include "d_craft.h"
-#include "../main.h"
-#include "dialog.h"
 #include <stdio.h>
-#include "../../client-common/net.h"
-
+#include "d_craft.h"
+#include "dialog.h"
+#include "../client-common/net.h"
+#include "playerUI.h"
 
 extern int active_hotbar;
 extern NetClient * client;
@@ -69,41 +68,43 @@ void button_switch(DialogButton * button)
     if (cr) cr->in_products = button->id;
 }
 
-DCraft::DCraft() : Dialog({50, 50, 500, 500}, {125, 125, 125, 255}), ingredients({190, 170, 500 - 140, 500 - 120}, {125, 125, 125, 10}), products({190, 170, 500 - 140, 500 - 120}, {125, 125, 125, 10})
+DCraft::DCraft() : Dialog(Backend_Rect(50, 50, 500, 500), {125, 125, 125, 255}), 
+    ingredients(Backend_Rect(190, 170, 500 - 140, 500 - 120), {125, 125, 125, 10}), 
+    products(Backend_Rect(190, 170, 500 - 140, 500 - 120), {125, 125, 125, 10})
 {
     show = false;
     in_products = false;
-    add(new DialogButton(0, {0, 0, 250, 100}, 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Ingredients", button_switch));
-    add(new DialogButton(1, {250, 0, 250, 100}, 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Products", button_switch));
-    add(new DialogBox(0, {20, 120, 100, 100}, {0, 0, 0, 125}, true));
-    add(new DialogBox(1, {20, 240, 100, 100}, {0, 0, 0, 125}, true));
-    add(new DialogImage(0, {20, 120, 100, 100}));
-    add(new DialogImage(1, {20, 240, 100, 100}));
+    add(new DialogButton(0, Backend_Rect(0, 0, 250, 100), 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Ingredients", button_switch));
+    add(new DialogButton(1, Backend_Rect(250, 0, 250, 100), 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Products", button_switch));
+    add(new DialogBox(0, Backend_Rect(20, 120, 100, 100), {0, 0, 0, 125}, true));
+    add(new DialogBox(1, Backend_Rect(20, 240, 100, 100), {0, 0, 0, 125}, true));
+    add(new DialogImage(0, Backend_Rect(20, 120, 100, 100)));
+    add(new DialogImage(1, Backend_Rect(20, 240, 100, 100)));
 
     for (int i = 0; i < ING_COUNT; i++)
     {
         int x = i % 6 * 54;
         int y = i / 6 * 54;
-        ingredients.add(new DialogButton(i, {x, y, 50, 50}, 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", button_craft_ing));
-        ingredients.add(new DialogImage(i, {x + 2, y + 2, 46, 46}));
+        ingredients.add(new DialogButton(i, Backend_Rect(x, y, 50, 50), 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", button_craft_ing));
+        ingredients.add(new DialogImage(i, Backend_Rect(x + 2, y + 2, 46, 46)));
     }
 
     for (int i = 0; i < PROD_COUNT; i++)
     {
         int x = i % 6 * 54;
         int y = i / 6 * 54;
-        products.add(new DialogButton(i, {x, y, 50, 50}, 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", button_craft_prod));
-        products.add(new DialogImage(i, {x + 2, y + 2, 46, 46}));
+        products.add(new DialogButton(i, Backend_Rect(x, y, 50, 50), 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", button_craft_prod));
+        products.add(new DialogImage(i, Backend_Rect(x + 2, y + 2, 46, 46)));
     }
 }
 
-void DCraft::draw(SDL_Renderer * renderer)
+void DCraft::draw()
 {
-    Dialog::draw(renderer);
+    Dialog::draw();
     if (in_products)
-        products.draw(renderer);
+        products.draw();
     else
-        ingredients.draw(renderer);
+        ingredients.draw();
 }
 
 bool DCraft::press(int x, int y, int button)
@@ -136,31 +137,34 @@ void DCraft::update()
             }
         }
         DialogImage * img = dynamic_cast<DialogImage *>(get_element_from_id(0, DialogElementType::Image));
-        img->texture = NULL;
+        img->texture_loaded = false;
         if (el1)
         {
             Renderable * r = dynamic_cast<Renderable *>(el1);
             img->texture = r->get_texture();
+            img->texture_loaded = true;
         }
         img = dynamic_cast<DialogImage *>(get_element_from_id(1, DialogElementType::Image));
-        img->texture = NULL;
+        img->texture_loaded = false;
         if (el2)
         {
             Renderable * r = dynamic_cast<Renderable *>(el2);
             img->texture = r->get_texture();
+            img->texture_loaded = true;
         }
     }
     else
     {
         DialogImage * img = dynamic_cast<DialogImage *>(get_element_from_id(0, DialogElementType::Image));
-        img->texture = NULL;
+        img->texture_loaded = false;
         if (player->hotbar[active_hotbar])
         {
             Renderable * r = dynamic_cast<Renderable *>(player->hotbar[active_hotbar]);
             img->texture = r->get_texture();
+            img->texture_loaded = true;
         }
         img = dynamic_cast<DialogImage *>(get_element_from_id(1, DialogElementType::Image));
-        img->texture = NULL;
+        img->texture_loaded = false;
     }
 
     DialogButton * ing_button = dynamic_cast<DialogButton *>(get_element_from_id(0, DialogElementType::Button));
@@ -180,17 +184,19 @@ void DCraft::update()
     }
 
     DialogImage * img = dynamic_cast<DialogImage *>(ingredients.get_element_from_id(0, DialogElementType::Image));
-    if (img && img->texture) return;
+    if (img && img->texture_loaded) return;
 
     for (int i = 0; i < ING_COUNT; i++)
     {
         DialogImage * img = dynamic_cast<DialogImage *>(ingredients.get_element_from_id(i, DialogElementType::Image));
         img->texture = ing_textures[i];
+        img->texture_loaded=true;
     }
 
     for (int i = 0; i < PROD_COUNT; i++)
     {
         DialogImage * img = dynamic_cast<DialogImage *>(products.get_element_from_id(i, DialogElementType::Image));
         img->texture = prod_textures[i];
+        img->texture_loaded=true;
     }
 }

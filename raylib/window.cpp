@@ -11,6 +11,8 @@ int init_window(const char * title, int wx, int wy)
     window_width=GetScreenWidth();
     window_height=GetScreenHeight();
     SetTargetFPS(60);
+    tile_size = 32;
+    SetExitKey(KEY_NULL);
     return 0;
 }
 

@@ -4,13 +4,13 @@ project(pime)
 set(CMAKE_BUILD_TYPE Debug)
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-switch -Wno-reorder")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -Wall -Wno-switch -Wno-reorder")
 
 add_library(pime STATIC
     world.cpp 
     player.cpp 
     tiles.cpp 
-    npc.cpp
+#    npc.cpp
     packet_types.cpp
     clan.cpp
     time.cpp

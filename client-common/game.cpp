@@ -3,6 +3,8 @@
 #include <sys/stat.h>
 #include <string.h>
 
+#include "backend.inl"
+
 #include "game.h"
 #include "../core/alchemist/ncurses-output.h"
 #include "../core/world.h"
@@ -105,7 +107,6 @@ void loop()
     for (;;)
     {
         handle_network();
-        clear_window();
 
         if (handle_events())
             return;
@@ -115,6 +116,7 @@ void loop()
             do_auto_explore();
         }
         draw();
+        if (!auto_explore) Backend_Wait();
     }
 }
 

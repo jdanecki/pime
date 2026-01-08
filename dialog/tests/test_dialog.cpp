@@ -1,10 +1,11 @@
-#include "dialog.h"
-#include "../window.h"
-#include "../text.h"
-#include "d_craft.h"
-#include "d_action.h"
-#include "../main.h"
-#include "../alchemistSDL.h"
+#include "../dialog.h"
+#include "../d_craft.h"
+#include "../d_action.h"
+
+#include "../../client-common/window.h"
+#include "../../client-common/text.h"
+#include "../../client-common/alchemist2d.h"
+#include "playerUI.h"
 
 Dialog * dialog;
 DAction * actions;
@@ -16,6 +17,7 @@ bool show_craft;
 
 int active_hotbar = 0;
 
+bool handle_events();
 NetClient * client;
 
 BasePlant * get_base_plant(size_t id)
@@ -45,57 +47,6 @@ bool Player::set_known(Class_id cid, int el_id)
     return true;
 }
 
-bool key_pressed(int key)
-{
-    switch (key)
-    {
-        case SDLK_ESCAPE:
-            if (show_craft) {
-                show_craft=0;
-            }
-            else
-                return true;
-    }
-    return false;
-}
-
-void mouse_pressed(SDL_MouseButtonEvent & event)
-{
-    printf("mouse x: %d y: %d button=%d\n", event.x, event.y, event.button);
-    if (show_craft)
-        craft->press(event.x, event.y, event.button);
-    else
-        dialog->press(event.x, event.y, event.button);
-    actions->press(event.x, event.y, event.button);
-}
-
-bool handle_events()
-{
-    SDL_Event event;
-
-    while (SDL_PollEvent(&event))
-    {
-        if (event.type == SDL_QUIT)
-        {
-            SDL_Quit();
-            return true;
-        };
-        if (event.type == SDL_KEYDOWN)
-        {
-            int key = event.key.keysym.sym;
-
-            if (key_pressed(key))
-                return true;
-        }
-
-        if (event.type == SDL_MOUSEBUTTONDOWN)
-        {
-            mouse_pressed(event.button);
-        }
-    }
-
-    return 0;
-}
 
 void button_left(DialogButton * button)
 {
@@ -115,6 +66,15 @@ void button_right(DialogButton * button)
     printf("button right: id=%d\n", button->id);
 }
 
+void handle_mouse(int x, int y, int button)
+{
+    if (show_craft)
+        craft->press(x, y, button);
+    else
+        dialog->press(x, y, button);
+    actions->press(x, y, button);
+}
+
 int main()
 {
     if (init_window("test dialog", 1200, 600))
@@ -127,8 +87,8 @@ int main()
     player = (PlayerUI *)calloc(sizeof(PlayerUI), 1);
     Element * el1 = new Element(new BaseElement(Form_solid, 0));
     Element * el2 = new Element(new BaseElement(Form_solid, 1));
-    player->hotbar[0]=new ElementSDL(*el1);
-    player->hotbar[1]=new ElementSDL(*el2);
+    player->hotbar[0]=new Element2d(*el1);
+    player->hotbar[1]=new Element2d(*el2);
 
     dialog = new Dialog({50, 200, 550, 350}, {125, 125, 125, 125});
     dialog->add(new DialogButton(0, {0, 0, 150, 100}, 15, {125, 0, 0, 125}, // bg
@@ -149,20 +109,24 @@ int main()
 
     for (;;)
     {
-        clear_window();
 
         if (handle_events())
             break;
+        
+        Backend_Begin_Drawing();
+        clear_window();
 
-        dialog->draw(renderer);
+        dialog->draw();
         if (show_craft) {
             craft->update();
-            craft->draw(renderer);
+            craft->draw();
         }        
-        actions->draw(renderer);
+        actions->draw();
 
-        SDL_RenderPresent(renderer);
-        SDL_Delay(20);
+        Backend_Update_Screen();
+        Backend_End_Drawing();
+
+        Backend_Wait();
     }
     return 0;
 }

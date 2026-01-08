@@ -1,4 +1,5 @@
-#include "../client-common/net.h"
+#include "playerUI.h"
+#include "../client-common/being2d.h"
 #include "../client-common/players.h"
 
 NetworkObject * el_from_data(const ObjectData * data)
@@ -11,30 +12,30 @@ NetworkObject * el_from_data(const ObjectData * data)
             break;
         case ObjectData::Tag::Element:
         {
-            el = new Element(data->element.data);
+            el = new Element2d(data->element.data);
             break;
         }
         case ObjectData::Tag::Place:
         {
-            el = new Place(data->place.data);
+            el = new Place2d(data->place.data);
             break;
         }
         case ObjectData::Tag::Scroll:
-            el = new Scroll(data->scroll.data);
+            el = new Scroll2d(data->scroll.data);
             break;
         case ObjectData::Tag::Ingredient:
-            el = new Ingredient(data->ingredient.data);
+            el = new Ingredient2d(data->ingredient.data);
             break;
         case ObjectData::Tag::Product:
-            el = new Product(data->product.data);
+            el = new Product2d(data->product.data);
             break;
         case ObjectData::Tag::Plant:
         {
-            el = new Plant(data->plant.data);
+            el = new Plant2d(data->plant.data);
             break;
         }
         case ObjectData::Tag::Animal:
-            el = new Animal(data->animal.data);
+            el = new Animal2d(data->animal.data);
             break;
         case ObjectData::Tag::Player:
             el = new PlayerUI(data->player.data);
@@ -50,7 +51,7 @@ NetworkObject * el_from_data(const ObjectData * data)
 
         case ObjectData::Tag::Npc:
 #if !defined(DISABLE_NPC)
-            el = new Npc(data->npc.data);
+            el = new Npc2d(data->npc.data);
             el->c_id = Class_Npc;
             CONSOLE_LOG("creating NPC");
 #endif
@@ -65,5 +66,3 @@ NetworkObject * el_from_data(const ObjectData * data)
     }
     return el;
 }
-
-

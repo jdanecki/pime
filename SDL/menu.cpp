@@ -16,7 +16,7 @@
 #include "../client-common/text.h"
 #include "../client-common/texture.h"
 #include "../client-common/window.h"
-#include "dialog/d_craft.h"
+#include "../dialog/d_craft.h"
 #include "../client-common/player_actions.h"
 
 extern int active_hotbar;

@@ -10,11 +10,10 @@ pkg_check_modules(SDL2_GFX REQUIRED SDL2_gfx)
 pkg_check_modules(enet REQUIRED libenet)
 
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og -Wall -Wno-switch -Wno-reorder -Wno-unused-but-set-variable")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -Wall -Wno-switch -Wno-reorder -Wno-unused-but-set-variable")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "ccache")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "ccache")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 
 add_definitions(-DDISABLE_NPC ${enet_CFLAGS} ${SDL_CFLAGS} ${SDL2_IMAGE_CFLAGS}
     ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${SDL2_GFX_CFLAGS} )
@@ -27,13 +26,12 @@ add_subdirectory(${CORE_SOURCE_DIR} ${CORE_BINARY_DIR})
 add_executable(pime_SDL 
     net.cpp
     window.cpp music.cpp text.cpp
-    texture.cpp main.cpp render.cpp menu.cpp
-    dialog/dialog.cpp dialog/d_hotbar.cpp
-    dialog/d_craft.cpp
+    texture.cpp main.cpp menu.cpp
+    ../dialog/dialog.cpp 
+    ../dialog/d_hotbar.cpp
+    ../dialog/d_craft.cpp
     inputs.cpp 
     npc.cpp
-    alchemistSDL.cpp
-    BeingSDL.cpp
     playerUI.cpp
     palette.cpp
     backend.cpp
@@ -43,6 +41,9 @@ add_executable(pime_SDL
     ../client-common/player_actions.cpp 
     ../client-common/text.cpp 
     ../client-common/texture.cpp
+    ../client-common/render.cpp
+    ../client-common/alchemist2d.cpp
+    ../client-common/being2d.cpp
 )
 
 target_link_libraries(pime_SDL

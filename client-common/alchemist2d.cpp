@@ -1,39 +1,34 @@
-#include "alchemistSDL.h"
-#include <SDL_render.h>
+#include <math.h>
 
-extern SDL_Texture * add_texture_color(SDL_Surface * s, ColorRGB c);
+#include "alchemist2d.h"
+
+extern Backend_Texture* add_texture_color(Backend_Surface* s, ColorRGB c);
 
 void hsv2rgb(int h, int s, int v, int* r, int* g, int* b);
 
-SDL_Texture * PlaceSDL::get_texture()
+Backend_Texture Place2d::get_texture()
 {
+    texture_created=true;
     return places_textures[id];
 }
 
-PlaceSDL::PlaceSDL(Place data) : Place(data)
+Place2d::Place2d(Place data) : Place(data)
 {
 
 }
 
-ElementSDL::ElementSDL(Element data) : Element(data)
+Element2d::Element2d(Element data) : Element(data)
 {
     w = width.value;
     h = height.value;
-
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, w, h);
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-
     start_width = width.value;
-    /* value=0xff000000; //a
-     value = 0xffff0000; //b
-     value = 0xff00ff00; //g
-     value = 0xff0000ff; //r
+    /* value=0xff000000; //r
+     value = 0xffff0000; //g
+     value = 0xff00ff00; //b
+     value = 0xff0000ff; //a
     */
-    unsigned int * pixels;
-    int pitch;
-
-    SDL_LockTexture(texture, NULL, (void **)&pixels, &pitch);
-
+    Backend_Pixels b_pixels = Backend_Allocate_Pixels(w, h);
+    unsigned int * pixels=(unsigned int *) b_pixels.pixels;
     Form f = get_form();
 
     /* float vx = 1.0 + 1.0 * (rand() % 4);
@@ -65,7 +60,7 @@ ElementSDL::ElementSDL(Element data) : Element(data)
             unsigned char r = (unsigned char)(get_base()->color.r * inter + base * (1.0 - inter));
             unsigned char g = (unsigned char)(get_base()->color.g * inter + base * (1.0 - inter));
             unsigned char b = (unsigned char)(get_base()->color.b * inter + base * (1.0 - inter));
-            c |= (b << 16) | (g << 8) | r;
+            c |= (r << 24) | (g << 16) | (b <<8);
 
             switch (f)
             {
@@ -80,7 +75,7 @@ ElementSDL::ElementSDL(Element data) : Element(data)
                     //hsv2rgb(200 + (offset * 4), 100, 50 + val/2, &r, &g, &b);
                     b+= offset*4;
                     g+=val/2;
-                    c = (255<<24) | (b << 16) | (g << 8) | r;
+                    c = (r<<24) | (g << 16) | (b << 8) | 255;
                     pixels[y * width.value + x] = (distance <= offset) ? c : 0;
                     break;
                 case Form_gas:
@@ -93,7 +88,7 @@ ElementSDL::ElementSDL(Element data) : Element(data)
                         r+=10.0*edgeFade2;
                         g+=10.0*edgeFade2;
                         b+=10.0*edgeFade2;
-                        c = (((int)(255.0*edgeFade1)) <<24) | (b << 16) | (g << 8) | r;
+                        c = (((int)(255.0*edgeFade1))) | (b << 8) | (g << 16) | (r<<24);
                     } else c =0;
 
                     pixels[y * width.value + x] = c;
@@ -102,34 +97,37 @@ ElementSDL::ElementSDL(Element data) : Element(data)
             }
         }
     }
-    SDL_UnlockTexture(texture);
+    Backend_Update_Texture_Pixels(b_pixels);
+    texture = b_pixels.texture;
 }
 
-void ElementSDL::show(bool details)
+void Element2d::show(bool details)
 {
     Element::show(details);
     // CONSOLE_LOG("scale=%0.2f %d %d\n", get_scale(), width.value, start_width);
 }
 
-IngredientSDL::IngredientSDL(Ingredient data) : Ingredient(data)
+Ingredient2d::Ingredient2d(Ingredient data) : Ingredient(data)
 {
 }
 
-SDL_Texture * IngredientSDL::get_texture()
+Backend_Texture Ingredient2d::get_texture()
 {
+    texture_created=true;
     return ing_textures[get_id()];
 }
 
-ProductSDL::ProductSDL(Product data) : Product(data)
+Product2d::Product2d(Product data) : Product(data)
 {
 }
 
-SDL_Texture * ProductSDL::get_texture()
+Backend_Texture Product2d::get_texture()
 {
+    texture_created=true;
     return prod_textures[get_id()];
 }
 
-ScrollSDL::ScrollSDL(Scroll data) : Scroll(data)
+Scroll2d::Scroll2d(Scroll data) : Scroll(data)
 {
     w = 32;
     h = 32;
@@ -156,5 +154,6 @@ ScrollSDL::ScrollSDL(Scroll data) : Scroll(data)
             break;
     }
 
-    texture = add_texture_color(scroll_surface, c);
+//    texture = add_texture_color(scroll_surface, c);
+    texture_created = false;
 }

@@ -2,21 +2,21 @@
 #define BEING_SDL_H
 
 #include "../core/alchemist/elements.h"
-#include "../client-common/texture.h"
-#include "alchemistSDL.h"
+#include "texture.h"
+#include "alchemist2d.h"
 /*
 class BeingSDL : public InventoryElement, public Renderable
 {
   public:
-    SDL_Texture * get_texture() override;
+    Backend_Texture get_texture() override;
 
 };
 */
-class PlantSDL : public Plant, public Renderable
+class Plant2d : public Plant, public Renderable
 {    
   public:
-    SDL_Texture * get_texture() override;
-    PlantSDL(Plant data);
+    Backend_Texture get_texture() override;
+    Plant2d(Plant data);
     float get_scale() override
     {
         return size;
@@ -25,15 +25,14 @@ class PlantSDL : public Plant, public Renderable
     {
         return Renderable::check_rect(px, py, location.get_world_x(), location.get_world_y(), t_size);
     }
-
 };
 
-class AnimalSDL : public Animal, public Renderable
+class Animal2d : public Animal, public Renderable
 {
   public:
-    SDL_Texture * get_texture() override;
+    Backend_Texture get_texture() override;
     bool going_right;
-    AnimalSDL(Animal data);
+    Animal2d(Animal data);
     void render(int x, int y) override;
     void update_item_location(ItemLocation & old_loc, ItemLocation & new_loc) override;
     float get_scale() override

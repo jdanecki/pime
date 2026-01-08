@@ -43,19 +43,18 @@ void write_text(int x, int y, const char * text, SDL_Color color, int scale_x, i
     surface = TTF_RenderText_Solid(font, text, color);
     SDL_Texture * text_sdl = SDL_CreateTextureFromSurface(renderer, surface);
 
-    int window_width;
-    int window_height;
-    SDL_GetWindowSize(main_window, &window_width, &window_height);
+    int window_w, window_h;
+    SDL_GetWindowSize(main_window, &window_w, &window_h);
 
     int game_size;
 
-    if (window_width < window_height)
+    if (window_w < window_h)
     {
-        game_size = window_width;
+        game_size = window_w;
     }
     else
     {
-        game_size = window_height;
+        game_size = window_h;
     }
 
     int x_size, y_size;

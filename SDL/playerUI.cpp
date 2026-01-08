@@ -3,6 +3,7 @@
 
 SDL_Texture * PlayerUI::get_texture()
 {
+    texture_created=true;
     return Player_textures.player;
 }
 

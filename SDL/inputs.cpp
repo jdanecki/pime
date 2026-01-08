@@ -11,8 +11,8 @@
 #include "../core/packet_types.h"
 
 #include "playerUI.h"
-#include "dialog/d_craft.h"
-#include "dialog/d_hotbar.h"
+#include "../dialog/d_craft.h"
+#include "../dialog/d_hotbar.h"
 
 #include "../client-common/inputs.h"
 
@@ -31,6 +31,10 @@ Uint64 last_time = 0;
 
 void key_pressed(int key)
 {
+    if (key == SDLK_ESCAPE) {
+        SDL_Quit();
+        exit(0);
+    }
     if (d_craft.show == false && menu_interact(key))
         return;
 
@@ -145,11 +149,13 @@ void key_pressed(int key)
 
 void mouse_pressed(SDL_MouseButtonEvent * event)
 {
+#if 0
     hotbar.press(event->x, event->y, event->button);
     if (d_craft.show)
     {
         d_craft.press(event->x, event->y, event->button);        
     }
+#endif
     CONSOLE_LOG("mouse %d,%d %d \n", event->x, event->y, event->button);
 }
 
