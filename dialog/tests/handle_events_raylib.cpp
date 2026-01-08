@@ -11,17 +11,25 @@ bool handle_events()
                 show_craft=0;
                 return false;
             } 
-         else
+        }
+    if (IsKeyDown(KEY_Q)) {             
              return true;
+    }
+    
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        Vector2 pos = GetMousePosition();
+        handle_mouse((int)pos.x, (int)pos.y, 1);
+    }
+    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+        Vector2 pos = GetMousePosition();
+        handle_mouse((int)pos.x, (int)pos.y, 3);
+    }
+    if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
+        Vector2 pos = GetMousePosition();
+        handle_mouse((int)pos.x, (int)pos.y, 2);
     }
 
     return WindowShouldClose();
 
-
-//        if (event.type == SDL_MOUSEBUTTONDOWN)
-  //      {
-    //      
-//            handle_mouse(event.x, event.y, event.button);
-      //  }
 }
 

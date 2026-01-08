@@ -1,33 +1,43 @@
 #include <raylib.h>
-#include <stdio.h>
 
-#include "../core/tiles.h"
-#include "../core/packet_types.h"
-
-#include "playerUI.h"
-
-#include "../dialog/d_craft.h"
-#include "../dialog/d_hotbar.h"
-
-#include "../client-common/net.h"
-#include "../client-common/player_actions.h"
-#include "../client-common/text.h"
-
-extern int auto_explore;
-extern int active_hotbar;
+#include "../client-common/inputs.h"
 
 float last_key;
+
+void mouse_pressed(int x, int y, int button)
+{
+        CONSOLE_LOG("mouse %d,%d %d \n", x, y, button);
+        hotbar.press(x, y, button);
+        if (d_craft.show)
+        {
+                d_craft.press(x, y, button);        
+        }
+}
 
 bool handle_events()
 {
     //FIXME call update_window_size
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        Vector2 pos = GetMousePosition();
+        mouse_pressed((int)pos.x, (int)pos.y, 1);
+    }
+    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+        Vector2 pos = GetMousePosition();
+        mouse_pressed((int)pos.x, (int)pos.y, 3);
+    }
+    if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
+        Vector2 pos = GetMousePosition();
+        mouse_pressed((int)pos.x, (int)pos.y, 2);
+    }
 
     float dt = GetFrameTime();
     last_key+=dt;
 
-    if (IsKeyDown(KEY_ESCAPE)) return 1;
+    
     if (last_key < 0.1) return 0;
     last_key=0;
+
+    if (IsKeyDown(KEY_ESCAPE)) return 1;
     bool player_moved=false;
 
     if (IsKeyDown(KEY_LEFT))  {
@@ -117,6 +127,7 @@ bool handle_events()
         print_status(1, " ");
     }
 
+  
     return WindowShouldClose();
 }
 

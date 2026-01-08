@@ -12,7 +12,8 @@ bool key_pressed(int key)
             if (show_craft) {
                 show_craft=0;
             }
-            else
+            break;
+        case SDLK_q:
                 return true;
     }
     return false;

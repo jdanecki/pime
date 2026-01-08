@@ -5,25 +5,9 @@
 #include <SDL2/SDL_mouse.h>
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_timer.h>
-#include <stdio.h>
-
-#include "../core/tiles.h"
-#include "../core/packet_types.h"
-
-#include "playerUI.h"
-#include "../dialog/d_craft.h"
-#include "../dialog/d_hotbar.h"
 
 #include "../client-common/inputs.h"
 
-#include "../client-common/menu.h"
-#include "../client-common/player_actions.h"
-#include "../client-common/window.h"
-#include "../client-common/net.h"
-
-extern int active_hotbar;
-extern int auto_explore;
-extern DHotbar hotbar;
 
 int last_frame_press = 0;
 Uint64 last_time = 0;
@@ -149,14 +133,12 @@ void key_pressed(int key)
 
 void mouse_pressed(SDL_MouseButtonEvent * event)
 {
-#if 0
+    CONSOLE_LOG("mouse %d,%d %d \n", event->x, event->y, event->button);
     hotbar.press(event->x, event->y, event->button);
     if (d_craft.show)
     {
         d_craft.press(event->x, event->y, event->button);        
-    }
-#endif
-    CONSOLE_LOG("mouse %d,%d %d \n", event->x, event->y, event->button);
+    }   
 }
 
 Uint64 handle_keyboard_state(const Uint8 * keys)
