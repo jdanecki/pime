@@ -54,12 +54,14 @@ add_custom_target(link_assets ALL
 add_executable(test_dialog_sdl ${SOURCES} ${SDL_FILES})
 target_include_directories(test_dialog_sdl PRIVATE ${SDL2_INCLUDE_DIRS} ../../SDL)
 target_link_libraries(test_dialog_sdl ${SDL2_LIBRARIES} pime)
+target_link_directories(test_dialog_sdl PRIVATE ${SDL2_LIBRARY_DIRS})
 
 pkg_check_modules(RAYLIB REQUIRED raylib)
 
 add_executable(test_dialog_raylib ${SOURCES} ${RAYLIB_FILES})
 target_include_directories(test_dialog_raylib PRIVATE ${RAYLIB_INCLUDE_DIRS} ../../raylib)
 target_link_libraries(test_dialog_raylib ${RAYLIB_LIBRARIES} pime)
+target_link_directories(test_dialog_raylib PRIVATE ${RAYLIB_LIBRARY_DIRS})
 
 set(CORE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../core)
 set(CORE_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/core)
