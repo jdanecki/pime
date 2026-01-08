@@ -44,6 +44,7 @@ add_executable(pime_SDL
     ../client-common/render.cpp
     ../client-common/alchemist2d.cpp
     ../client-common/being2d.cpp
+    ../client-common/inputs.cpp
 )
 
 target_link_libraries(pime_SDL

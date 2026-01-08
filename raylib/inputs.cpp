@@ -14,9 +14,45 @@ void mouse_pressed(int x, int y, int button)
         }
 }
 
-bool handle_events()
+
+KeyHandler key_handlers[] = {
+    { KEY_F1, handle_f1 },
+    { KEY_F2, handle_f2 },
+    { KEY_F3, handle_f3 },
+    { KEY_F4, handle_f4 },
+    { KEY_F5, handle_f5 },
+    { KEY_F6, handle_f6 },
+    { KEY_F7, handle_f7 },
+    { KEY_ENTER, handle_enter },
+    { KEY_C, handle_c },
+    { KEY_ONE, handle_hotbar_0 },
+    { KEY_TWO, handle_hotbar_1 },
+    { KEY_THREE, handle_hotbar_2 },
+    { KEY_FOUR, handle_hotbar_3 },
+    { KEY_FIVE, handle_hotbar_4 },
+    { KEY_SIX, handle_hotbar_5 },
+    { KEY_SEVEN, handle_hotbar_6 },
+    { KEY_EIGHT, handle_hotbar_7 },
+    { KEY_NINE, handle_hotbar_8 },
+    { KEY_ZERO, handle_hotbar_9 },
+    { KEY_LEFT, handle_left },
+    { KEY_RIGHT, handle_right },
+    { KEY_UP, handle_up },
+    { KEY_DOWN, handle_down },    
+    { KEY_Q, put_element },
+    { KEY_GRAVE, handle_prev_hotbar  },
+    { KEY_TAB, handle_next_hotbar },
+    { KEY_MINUS, handle_minus },
+    { KEY_EQUAL, handle_equal }      
+};
+
+int get_num_handlers()
 {
-    //FIXME call update_window_size
+    return sizeof(key_handlers)/sizeof(KeyHandler);
+}
+
+void handle_mouse()
+{
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         Vector2 pos = GetMousePosition();
         mouse_pressed((int)pos.x, (int)pos.y, 1);
@@ -29,6 +65,13 @@ bool handle_events()
         Vector2 pos = GetMousePosition();
         mouse_pressed((int)pos.x, (int)pos.y, 2);
     }
+}
+
+bool handle_events()
+{
+    //FIXME call update_window_size
+ 
+    handle_mouse();
 
     float dt = GetFrameTime();
     last_key+=dt;
@@ -36,98 +79,35 @@ bool handle_events()
     
     if (last_key < 0.1) return 0;
     last_key=0;
+    player_moved = false;
 
-    if (IsKeyDown(KEY_ESCAPE)) return 1;
-    bool player_moved=false;
+    if (IsKeyDown(KEY_ESCAPE)) {
+        if (d_craft.show) {
+            d_craft.show = false;
+            return 0;
+        } 
+        else return 1;
+     }
 
-    if (IsKeyDown(KEY_LEFT))  {
-            player->going_right = 0;
-            send_packet_move(client, -1, 0);
-            player_moved = true;
-    }
-    if (IsKeyDown(KEY_RIGHT)) {
-            player->going_right = 1;
-            send_packet_move(client, 1, 0);
-            player_moved = true;
-    }
-    if (IsKeyDown(KEY_UP)) {
-            send_packet_move(client, 0, -1);
-            player_moved = true;
-    }
-    if (IsKeyDown(KEY_DOWN)) {
-        send_packet_move(client, 0, 1);
-            player_moved = true;
-    }
+//    if (d_craft.show == false && menu_interact(key))
+  //      return;
 
-    if (IsKeyDown(KEY_F1)) {
-       InventoryElement * item = get_item_at_ppos(player);
-       if (item)
-           item->show();
-       else
-       CONSOLE_LOG("nothing to show\n");
-    }
-    if (IsKeyDown(KEY_F2)) {
-            server_action_tile(SERVER_SHOW_ITEM, player->location);
-    }
-    if (IsKeyDown(KEY_F3)) {
-            show_chunk(player->location);
-    }
-    if (IsKeyDown(KEY_F4)) {
-            server_action_tile(SERVER_SHOW_CHUNK, player->location);
-    }
-    if (IsKeyDown(KEY_F5)) {
-            trace_network += 1;
-    }
-    if (IsKeyDown(KEY_F6)) {
-            server_action_tile(SERVER_TRACE_NETWORK, player->location);
-    }
-    if (IsKeyDown(KEY_F7)) {
-            auto_explore ^= 1;
-    }
-    if (IsKeyDown(KEY_ENTER)) {
-            use_tile();
-    }
-    if (IsKeyDown(KEY_C)) {
-        d_craft.show ^= 1;
+    player_moved = false;
+    int num_handlers = sizeof(key_handlers)/sizeof(KeyHandler);
+
+    for (int i = 0; i < num_handlers; ++i) {
+        if (IsKeyDown(key_handlers[i].key)) {
+            key_handlers[i].func();
+        }
     }
 
-    if (IsKeyDown(KEY_ONE)) {
-            active_hotbar = 0;
-    }
-    if (IsKeyDown(KEY_TWO)) {
-            active_hotbar = 1;
-    }
-    if (IsKeyDown(KEY_THREE)) {
-            active_hotbar = 2;
-    }
-    if (IsKeyDown(KEY_FOUR)) {
-            active_hotbar = 3;
-    }
-    if (IsKeyDown(KEY_FIVE)) {
-            active_hotbar = 4;
-    }
-    if (IsKeyDown(KEY_SIX)) {
-            active_hotbar = 5;
-    }
-    if (IsKeyDown(KEY_SEVEN)) {
-            active_hotbar = 6;
-    }
-    if (IsKeyDown(KEY_EIGHT)) {
-            active_hotbar = 7;
-    }
-    if (IsKeyDown(KEY_NINE)) {
-            active_hotbar = 8;
-    }
-    if (IsKeyDown(KEY_ZERO)) {
-            active_hotbar = 9;
-    }
     if (player_moved)
     {
         print_status(0, " ");
         print_status(1, " ");
     }
 
-  
+
     return WindowShouldClose();
 }
 

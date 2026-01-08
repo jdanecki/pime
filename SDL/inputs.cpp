@@ -1,4 +1,3 @@
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_keyboard.h>
 #include <SDL2/SDL_keycode.h>
@@ -12,122 +11,52 @@
 int last_frame_press = 0;
 Uint64 last_time = 0;
 
+KeyHandler key_handlers[] = {
+    { SDLK_F1, handle_f1 },
+    { SDLK_F2, handle_f2 },
+    { SDLK_F3, handle_f3 },
+    { SDLK_F4, handle_f4 },
+    { SDLK_F5, handle_f5 },
+    { SDLK_F6, handle_f6 },
+    { SDLK_F7, handle_f7 },
+    { SDLK_RETURN, handle_enter },
+    { SDLK_c, handle_c },
+    { SDLK_1, handle_hotbar_0 },
+    { SDLK_2, handle_hotbar_1 },
+    { SDLK_3, handle_hotbar_2 },
+    { SDLK_4, handle_hotbar_3 },
+    { SDLK_5, handle_hotbar_4 },
+    { SDLK_6, handle_hotbar_5 },
+    { SDLK_7, handle_hotbar_6 },
+    { SDLK_8, handle_hotbar_7 },
+    { SDLK_9, handle_hotbar_8 },
+    { SDLK_0, handle_hotbar_9 },
+    { SDLK_q, put_element },
+    { SDLK_BACKQUOTE, handle_prev_hotbar },
+    { SDLK_TAB, handle_next_hotbar },
+    { SDLK_MINUS, handle_minus },
+    { SDLK_EQUALS, handle_equal }      
+};
+
 
 void key_pressed(int key)
 {
     if (key == SDLK_ESCAPE) {
+        if (d_craft.show) {
+            d_craft.show = false;
+            return;
+        }
         SDL_Quit();
         exit(0);
     }
     if (d_craft.show == false && menu_interact(key))
         return;
 
-    switch (key)
-    {
-        case SDLK_v:
-            sprintf(status_line, " ");
-            break;
-
-        case SDLK_F11:
-            update_window_size();
-            break;
-        case SDLK_1:
-            active_hotbar = 0;
-            break;
-        case SDLK_2:
-            active_hotbar = 1;
-            break;
-        case SDLK_3:
-            active_hotbar = 2;
-            break;
-        case SDLK_4:
-            active_hotbar = 3;
-            break;
-        case SDLK_5:
-            active_hotbar = 4;
-            break;
-        case SDLK_6:
-            active_hotbar = 5;
-            break;
-        case SDLK_7:
-            active_hotbar = 6;
-            break;
-        case SDLK_8:
-            active_hotbar = 7;
-            break;
-        case SDLK_9:
-            active_hotbar = 8;
-            break;
-        case SDLK_0:
-            active_hotbar = 9;
-            break;
-
-        case SDLK_q:
-            put_element();
-            break;
-
-        case SDLK_BACKQUOTE:
-            active_hotbar--;
-            if (active_hotbar == -1)
-                active_hotbar = 9;
-            break;
-        case SDLK_TAB:
-            active_hotbar++;
-            if (active_hotbar == 10)
-                active_hotbar = 0;
-            break;
-
-        case SDLK_MINUS:
-            player->craftbar[active_hotbar] = 0;
-            break;
-        case SDLK_EQUALS:
-            if (player->hotbar[active_hotbar])
-                player->craftbar[active_hotbar] = 1;
-            break;
-
-            /* case SDLK_F5:
-             {
-                 auto_explore ^= 1;
-                 break;
-             }*/
-        case SDLK_F1:
-        {
-            InventoryElement * item = get_item_at_ppos(player);
-            if (item)
-                item->show();
-            else
-                CONSOLE_LOG("nothing to show\n");
-            break;
+    int num_handlers = sizeof(key_handlers)/sizeof(KeyHandler);
+    for (int i = 0; i < num_handlers; ++i) {
+        if (key == key_handlers[i].key) {
+            key_handlers[i].func();
         }
-        case SDLK_F2:
-            server_action_tile(SERVER_SHOW_ITEM, player->location);
-            break;
-
-        case SDLK_F3:
-            show_chunk(player->location);
-            break;
-        case SDLK_F4:
-            server_action_tile(SERVER_SHOW_CHUNK, player->location);
-            break;
-
-        case SDLK_F5:
-            trace_network += 1;
-            break;
-        case SDLK_F6:
-            server_action_tile(SERVER_TRACE_NETWORK, player->location);
-            break;
-        case SDLK_F7:
-            auto_explore ^= 1;
-
-        case SDLK_RETURN:
-            use_tile();
-            break;
-        case SDLK_c:
-            d_craft.show ^= 1;
-            break;
-        case SDLK_ESCAPE:
-            d_craft.show = 0;
-            break;
     }
 }
 
@@ -205,6 +134,7 @@ Uint64 handle_keyboard_state(const Uint8 * keys)
     last_frame_press = 0;
     return 0;
 }
+
 
 bool handle_events()
 {
