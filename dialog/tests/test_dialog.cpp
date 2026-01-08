@@ -22,18 +22,18 @@ NetClient * client;
 
 BasePlant * get_base_plant(size_t id)
 {
-    printf("get_base_plant id=%d\n", id);
+    printf("get_base_plant id=%ld\n", id);
     return nullptr;
 }
 BaseAnimal * get_base_animal(size_t id)
 {
-    printf("get_base_animal id=%d\n", id);
+    printf("get_base_animal id=%ld\n", id);
     return nullptr;
 }
 
 BaseElement * get_base_element(size_t id)
 {
-    printf("get_base_element id=%d\n", id);
+    printf("get_base_element id=%ld\n", id);
     return nullptr;
 }
 
