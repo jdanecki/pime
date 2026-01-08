@@ -3,7 +3,7 @@
 #include "../core/alchemist/npc_talk.h"
 #include "../core/npc.h"
 #include "alchemist2d.h"
-#include "menu.h"
+#include "../menu/menu.h"
 
 extern int npc(menu_actions a);
 extern int npc_say(Sentence * s, InventoryElement * el);

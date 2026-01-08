@@ -200,3 +200,12 @@ void DCraft::update()
         img->texture_loaded=true;
     }
 }
+
+
+void hide_craft_window()
+{
+    if (d_craft.show) {
+        d_craft.show = false;
+        return;
+    }
+}

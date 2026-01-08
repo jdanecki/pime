@@ -2,17 +2,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <SDL_mixer.h>
 
+#include "backend.inl"
 #include "playerUI.h"
 
-#include "../client-common/menu.h"
+#include "menu.h"
 #include "../core/alchemist/elements.h"
 #include "../core/tiles.h"
 #include "../core/world.h"
 #include "../client-common/music.h"
 #include "../core/networking.h"
+
+#ifndef DISABLE_NPC
 #include "../client-common/npc.h"
+#endif
+
 #include "../client-common/text.h"
 #include "../client-common/texture.h"
 #include "../client-common/window.h"
@@ -21,6 +25,7 @@
 
 extern int active_hotbar;
 extern NetClient * client;
+extern bool finish_program;
 
 // Menu * menu_music;
 Menu * menu_main;
@@ -32,7 +37,11 @@ Menu * menu_inventory_elements;
 Menu * menu_inventory;
 Menu * menu_inventory_elements_form;
 Menu * menu_inventory_class;
+
+#ifndef DISABLE_NPC
 Menu * menu_npc;
+#endif
+
 Menu * menu_dialog;
 Menu * menu_action;
 Menu * menu_knowledge;
@@ -117,7 +126,7 @@ void Menu::show()
     int i;
     int game_size;
 
-    SDL_GetWindowSize(main_window, &window_width, &window_height);
+    Backend_Window_Size(&window_width, &window_height);
 
     if (window_width < window_height)
         game_size = window_width;
@@ -144,9 +153,8 @@ void Menu::show()
     int modx = int((game_size / 2)) - (0.4 * game_size);
     int modx2 = int((game_size / 2)) + (0.6 * game_size);
 
-    SDL_Rect rect = {modx, mody, modx2 - modx, mody2 - mody};
-    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 100);
-    SDL_RenderFillRect(renderer, &rect);
+    Backend_Rect rect(modx, mody, modx2 - modx, mody2 - mody);
+    Backend_Draw_Fill_Rectangle(rect, Backend_Color{0,0,255,100});
 
     int mody3 = mody + (((index + 1) * menu_opt_size) - (menu_opt_size));
     int mody4 = mody + ((index + 1) * menu_opt_size);
@@ -154,42 +162,40 @@ void Menu::show()
     // THIS IS THE SELECT
     // if (added < 10)
     {
-        draw_rectangle(modx, mody3, modx2 - modx, mody4 - mody3, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255}, SDL_Color{}, SDL_Color{});
-        draw_rectangle(modx, mody3, modx2 - modx, mody4 - mody3, SDL_Color{}, SDL_Color{}, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255});
+        Backend_Draw_Gradient_Rectangle(modx, mody3, modx2 - modx, mody4 - mody3, Backend_Color{0, 255, 255, 255}, Backend_Color{});
+        Backend_Draw_Gradient_Rectangle(modx, mody3, modx2 - modx, mody4 - mody3, Backend_Color{}, Backend_Color{0, 255, 255, 255});
     }
     /* else
      {
          if (added % 2)
          {
-             draw_rectangle(modx, game_size / 2 - menu_opt_size / 2, modx2 - modx, menu_opt_size, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255}, SDL_Color{}, SDL_Color{});
-             draw_rectangle(modx, game_size / 2 - menu_opt_size / 2, modx2 - modx, menu_opt_size, SDL_Color{}, SDL_Color{}, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255});
+             draw_rectangle(modx, game_size / 2 - menu_opt_size / 2, modx2 - modx, menu_opt_size, Backend_Color{0, 255, 255, 255}, Backend_Color{0, 255, 255, 255}, Backend_Color{}, Backend_Color{});
+             draw_rectangle(modx, game_size / 2 - menu_opt_size / 2, modx2 - modx, menu_opt_size, Backend_Color{}, Backend_Color{}, Backend_Color{0, 255, 255, 255}, Backend_Color{0, 255, 255, 255});
          }
          else
          {
-             draw_rectangle(modx, game_size / 2, modx2 - modx, menu_opt_size, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255}, SDL_Color{}, SDL_Color{});
-             draw_rectangle(modx, game_size / 2, modx2 - modx, menu_opt_size, SDL_Color{}, SDL_Color{}, SDL_Color{0, 255, 255, 255}, SDL_Color{0, 255, 255, 255});
+             draw_rectangle(modx, game_size / 2, modx2 - modx, menu_opt_size, Backend_Color{0, 255, 255, 255}, Backend_Color{0, 255, 255, 255}, Backend_Color{}, Backend_Color{});
+             draw_rectangle(modx, game_size / 2, modx2 - modx, menu_opt_size, Backend_Color{}, Backend_Color{}, Backend_Color{0, 255, 255, 255}, Backend_Color{0, 255, 255, 255});
          }
      }
  */
     //  if (added < 10)
     {
-        SDL_Rect rect3 = {modx, mody - menu_opt_size, modx2 - modx, mody4 - mody3};
-        SDL_SetRenderDrawColor(renderer, 150, 0, 150, 100);
-        SDL_RenderFillRect(renderer, &rect3);
+        Backend_Rect rect3(modx, mody - menu_opt_size, modx2 - modx, mody4 - mody3);
+        Backend_Draw_Fill_Rectangle(rect3, Backend_Color{150, 0, 150, 100});
         write_text(modx, mody - menu_opt_size, name, Yellow, game_size / 27, menu_opt_size);
     }
     /*else
     {
-        SDL_Rect rect3 = {modx, mody + (-menu_pos + added / 2) * menu_opt_size - menu_opt_size, modx2 - modx, menu_opt_size};
-        SDL_SetRenderDrawColor(renderer, 150, 0, 150, 100);
-        SDL_RenderFillRect(renderer, &rect3);
+        Backend_Rect rect3(modx, mody + (-menu_pos + added / 2) * menu_opt_size - menu_opt_size, modx2 - modx, menu_opt_size);
+        Backend_Draw_Fill_Rectangle(rect3, 150, 0, 150, 100);
         write_text(modx, mody + (-menu_pos + added / 2) * menu_opt_size - menu_opt_size, name, Yellow, game_size / 27, menu_opt_size);
     }*/
     Menu_entry * menu_entry = (Menu_entry *)(entries->head);
 
     for (i = 0; i < menu_entries; i++)
     {
-        //  SDL_Rect rect;
+        //  Backend_Rect rect;
         int text_y = mody + i * menu_opt_size;
         int text_x = modx;
 #if 0
@@ -210,14 +216,14 @@ void Menu::show()
         //FIXME
         /*if (entries[i]->texture)
         {
-            SDL_RenderCopy(renderer, entries[i]->texture, NULL, &rect);
+            Backend_Texture_Copy(entries[i]->texture, NULL, &rect);
             text_x += menu_opt_size;
         }
         if (show_texture)
         {
             // TODO fix that
-            // SDL_Texture *_texture = el[i]->get_texture();
-            // SDL_RenderCopy(renderer, _texture, NULL, &rect);
+            // Backend_Texture _texture = el[i]->get_texture();
+            // Backend_Texture_Copy(_texture, NULL, &rect);
             // text_x+=menu_opt_size;
         }*/
         //  if (added >= 10)
@@ -322,12 +328,12 @@ void create_menus()
     menu_inventory_elements->add("Liquid form", MENU_INV_LIGQUID, Form_liquid);
     menu_inventory_elements->add("Gas form", MENU_INV_GAS, Form_gas);
     menu_inventory_elements->add("Cancel", MENU_CANCEL);
-
+#ifndef DISABLE_NPC
     menu_npc = new Menu("NPC");
     menu_npc->add("Talk to NPC", MENU_NPC_SAY);
     menu_npc->add("Ask NPC", MENU_NPC_ASK);
     menu_npc->add("Cancel", MENU_CANCEL);
-
+#endif
     menu_action = new Menu("Action");
     menu_action->add("Drink", MENU_DRINK);
     menu_action->add("Eat", MENU_EAT);
@@ -422,6 +428,12 @@ Menu * create_knowledge_classes(enum Class_id c)
         return nullptr;
 }
 
+void save(char with_player)                                                                                                                                                                   
+{                 
+}                 
+void load(char with_player)
+{                 
+} 
 // create menu for elements with the same base id
 void create_inv_menu(int id)
 {
@@ -451,6 +463,7 @@ void create_inv_menu(int id)
 
 void Menu::go_down()
 {
+    printf("go_down: index=%d -> ", index);
     menu_pos = (Menu_entry *)(menu_pos->next);
     index++;
     if (!menu_pos)
@@ -458,94 +471,43 @@ void Menu::go_down()
         menu_pos = (Menu_entry *)(entries->head);
         index = 0;
     }
+    printf("%d\n", index);
 }
 
 void Menu::go_up()
 {
+    printf("go_up: index=%d -> ", index);
     menu_pos = (Menu_entry *)(menu_pos->prev);
     index--;
     if (!menu_pos)
     {
-        menu_pos = (Menu_entry *)(entries->head);
-        index = 0;
+        menu_pos = (Menu_entry *)(entries->tail);
+        index = entries->nr_elements - 1;
+    }
+    printf("%d\n", index);
+}
+
+void menu_handle_escape()
+{
+    current_menu= nullptr;
+}
+
+void menu_handle_enter()
+{
+    if (current_menu->interact())
+    {
+        current_menu = NULL;
     }
 }
 
-int menu_interact(int key)
+void menu_go_down()
 {
-    switch (key)
-    {
-        case SDLK_ESCAPE:
-        {
-            if (current_menu)
-                current_menu = NULL;
-            else
-                current_menu = menu_main;
-            return 1;
-        }
+    current_menu->go_down();
+}
 
-        case SDLK_RETURN:
-        {
-            if (current_menu)
-            {
-                if (current_menu->interact())
-                {
-                    current_menu = NULL;
-                    return 1;
-                }
-            }
-            break;
-        }
-        case SDLK_i:
-        {
-            player->inventory.show();
-            if (!current_menu)
-                current_menu = menu_inventory_categories;
-            else if (current_menu == menu_inventory_categories)
-                current_menu = NULL;
-            return 1;
-        }
-
-        case SDLK_n:
-        {
-            if (!current_menu)
-                current_menu = menu_npc;
-            else if (current_menu == menu_npc)
-                current_menu = NULL;
-
-            return 1;
-        }
-
-        case SDLK_DOWN:
-        {
-            if (current_menu)
-                current_menu->go_down();
-            break;
-        }
-        case SDLK_UP:
-        {
-            if (current_menu)
-                current_menu->go_up();
-            break;
-        }
-        case SDLK_a:
-        {
-            if (!current_menu)
-                current_menu = menu_action;
-            else if (current_menu == menu_action)
-                current_menu = NULL;
-            return 1;
-        }
-        case SDLK_k:
-        {
-            if (!current_menu)
-                current_menu = menu_knowledge;
-            else if (current_menu == menu_knowledge)
-                current_menu = NULL;
-            return 1;
-        }
-    }
-    return current_menu ? 1 : 0;
+void menu_go_up()
+{
+    current_menu->go_up();
 }
 
 // add item from menu to hotbar
@@ -582,11 +544,12 @@ int Menu::interact()
 
     if (a & MENU_ITEM)
         return menu_inventory->handle_item(a & ~MENU_ITEM);
+#ifndef DISABLE_NPC
     if (a & MENU_NPC_CONV)
     {
         return player->conversation(current_npc, menu_dialog->get_sentence(), menu_dialog->get_el());
     }
-
+#endif
     switch (a)
     {
         case MENU_ITEMS_GROUP:
@@ -609,8 +572,8 @@ int Menu::interact()
         case MENU_SAVE_EXIT:
             save(1);
         case MENU_EXIT:
-            SDL_Quit();
-            Mix_Quit();
+            finish_program = true;
+//            Mix_Quit();
             exit(0);
         case MENU_LOAD:
             load(1);
@@ -638,14 +601,17 @@ int Menu::interact()
             current_menu = create_knowledge_classes((Class_id)menu_knowledge->get_val());
             return 0;
 
+#if 0
         case MENU_CRAFT:
             d_craft.show ^= 1;
             return 1; // hide menu
+#endif
 
+#ifndef DISABLE_NPC
         case MENU_NPC:
             current_menu = menu_npc;
             return 0;
-
+#endif
         case MENU_INV_ELEMENTS:
             current_menu = menu_inventory_elements;
             return 0;
@@ -664,7 +630,8 @@ int Menu::interact()
             current_menu = create_inv_category_classes((Class_id)menu_inventory_categories->get_val());
             return 0;
 
-        case MENU_LOUDER:
+#if 0
+    case MENU_LOUDER:
             Mix_Volume(0, Mix_Volume(0, -1) + 5);
             Mix_Volume(1, Mix_Volume(1, -1) + 5);
             CONSOLE_LOG("%d\n%d\n", Mix_Volume(1, -1), Mix_Volume(0, -1));
@@ -675,10 +642,12 @@ int Menu::interact()
             Mix_Volume(1, Mix_Volume(1, -1) - 5);
             CONSOLE_LOG("%d\n%d\n", Mix_Volume(1, -1), Mix_Volume(0, -1));
             return 0;
-
+#endif
+#ifndef DISABLE_NPC
         case MENU_NPC_SAY:
         case MENU_NPC_ASK:
             return npc(a);
+#endif
 
         case MENU_ACTION:
             current_menu = menu_action;
@@ -701,4 +670,32 @@ int Menu::interact()
             return 1; // hide menu
     }
     return 1; // hide menu
+}
+
+void show_menu()
+{
+    current_menu = menu_main;
+}
+
+void show_menu_inventory_categories()
+{
+    player->inventory.show();
+    current_menu = menu_inventory_categories;
+}
+
+#ifndef DISABLE_NPC
+void show_menu_npc()
+{
+    current_menu = menu_npc;
+}
+#endif
+
+void show_menu_knowledge()
+{
+    current_menu=menu_knowledge;
+}
+
+void show_menu_action()
+{
+    current_menu=menu_action;
 }

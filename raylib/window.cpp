@@ -25,9 +25,9 @@ void close_graphics()
 void clear_window()
 {
    Color c;
-   c.r=0;
-   c.g=0;
-   c.b=200;
+   c.r=10;
+   c.g=10;
+   c.b=50;
    c.a=255;
 
    ClearBackground(c);

@@ -6,6 +6,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_render.h>
+#include <SDL_mixer.h>
 
 typedef SDL_Texture * Backend_Texture;
 typedef SDL_TimerID timer_id;
@@ -64,4 +65,7 @@ extern void Backend_Update_Texture_Pixels(Backend_Pixels pixels);
 
 extern void Backend_Draw_Fill_Rectangle(Backend_Rect r, SDL_Color color);
 extern void Backend_Draw_Rectangle(Backend_Rect r, SDL_Color color);
+extern void Backend_Draw_Gradient_Rectangle(int x, int y, int w, int h, SDL_Color top, SDL_Color bottom);
+
+extern void Backend_Window_Size(int *w, int *h);
 #endif

@@ -79,3 +79,41 @@ void Backend_Draw_Rectangle(Backend_Rect r, SDL_Color color)
    SDL_RenderDrawRect(renderer, &r.r);
 }
 
+void Backend_Window_Size(int *w, int *h)
+{
+    SDL_GetWindowSize(main_window, w, h);
+}
+
+void Backend_Draw_Gradient_Rectangle(int x, int y, int w, int h, SDL_Color top, SDL_Color bottom)
+{
+    SDL_Vertex v[4];
+    int i[6] = {0, 1, 2, 0, 3, 2};
+    v[0].position.x = x;
+    v[0].position.y = y;
+
+    v[1].position.x = x + w;
+    v[1].position.y = y;
+
+    v[2].position.x = x + w;
+    v[2].position.y = y + h;
+
+    v[3].position.x = x;
+    v[3].position.y = y + h;
+
+    v[0].color = top;
+    v[1].color = top;
+    v[2].color = bottom;
+    v[3].color = bottom;
+
+    v[0].tex_coord.x = 0;
+    v[1].tex_coord.x = 0;
+    v[2].tex_coord.x = 0;
+    v[3].tex_coord.x = 0;
+
+    v[0].tex_coord.y = 0;
+    v[1].tex_coord.y = 0;
+    v[2].tex_coord.y = 0;
+    v[3].tex_coord.y = 0;
+
+    SDL_RenderGeometry(renderer, NULL, v, 6, i, 6);
+}

@@ -61,6 +61,8 @@ extern Backend_Pixels Backend_Allocate_Pixels(int w, int h);
 extern void Backend_Update_Texture_Pixels(Backend_Pixels pixels);
 extern void Backend_Draw_Fill_Rectangle(Backend_Rect r, Color color);
 extern void Backend_Draw_Rectangle(Backend_Rect r, Color color);
+extern void Backend_Draw_Gradient_Rectangle(int x, int y, int w, int h, Color top, Color bottom);
 
+extern void Backend_Window_Size(int *w, int *h);
 #endif
 

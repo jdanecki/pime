@@ -15,3 +15,15 @@ sudo dnf install cmake pkg-config SDL2-devel SDL2_mixer-devel SDL2_image-devel S
 ```
 sudo pacman -S cmake sdl2_mixer sdl2_image sdl2 sdl2_ttf sdl2_gfx enet
 ```
+
+## Raylib installation
+
+```
+git clone https://github.com/raysan5/raylib.git
+cd raylib
+mkdir build; cd build
+cmake ..
+make -j `nproc`
+sudo make install
+
+```

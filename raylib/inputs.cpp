@@ -2,7 +2,6 @@
 
 #include "../client-common/inputs.h"
 
-float last_key;
 
 void mouse_pressed(int x, int y, int button)
 {
@@ -46,27 +45,23 @@ KeyHandler key_handlers[] = {
     { KEY_EQUAL, handle_equal }      
 };
 
-int get_num_handlers()
-{
-    return sizeof(key_handlers)/sizeof(KeyHandler);
-}
-
 void handle_mouse()
 {
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         Vector2 pos = GetMousePosition();
         mouse_pressed((int)pos.x, (int)pos.y, 1);
     }
-    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-        Vector2 pos = GetMousePosition();
-        mouse_pressed((int)pos.x, (int)pos.y, 3);
-    }
     if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
         Vector2 pos = GetMousePosition();
         mouse_pressed((int)pos.x, (int)pos.y, 2);
     }
+    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+        Vector2 pos = GetMousePosition();
+        mouse_pressed((int)pos.x, (int)pos.y, 3);
+    }
 }
 
+float last_key;
 bool handle_events()
 {
     //FIXME call update_window_size
@@ -75,11 +70,9 @@ bool handle_events()
 
     float dt = GetFrameTime();
     last_key+=dt;
-
     
     if (last_key < 0.1) return 0;
     last_key=0;
-    player_moved = false;
 
     if (IsKeyDown(KEY_ESCAPE)) {
         if (d_craft.show) {
@@ -106,7 +99,6 @@ bool handle_events()
         print_status(0, " ");
         print_status(1, " ");
     }
-
 
     return WindowShouldClose();
 }

@@ -3,7 +3,7 @@
 
 #include "../core/alchemist/npc_talk.h"
 #include "../core/alchemist/el_list.h"
-#include "text.h"
+#include "../client-common/text.h"
 
 enum menu_actions
 {
@@ -106,7 +106,17 @@ extern Menu * menu_action;
 
 int interact(enum menu_actions a);
 void show_menu();
+void show_menu_inventory_categories();
+void show_menu_action();
+void show_menu_knowledge();
+
+#ifndef DISABLE_NPC
+void show_menu_npc();
+#endif
 void create_menus();
-int menu_interact(int key);
+void menu_handle_escape();
+void menu_handle_enter();
+void menu_go_down();
+void menu_go_up();
 
 #endif

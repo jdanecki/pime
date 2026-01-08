@@ -18,4 +18,5 @@ class DCraft : public Dialog
 
 extern DCraft d_craft;
 
+void hide_craft_window();
 #endif

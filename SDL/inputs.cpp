@@ -35,29 +35,30 @@ KeyHandler key_handlers[] = {
     { SDLK_BACKQUOTE, handle_prev_hotbar },
     { SDLK_TAB, handle_next_hotbar },
     { SDLK_MINUS, handle_minus },
-    { SDLK_EQUALS, handle_equal }      
+    { SDLK_EQUALS, handle_equal },
+    { SDLK_ESCAPE, handle_escape },
 };
 
 
 void key_pressed(int key)
 {
-    if (key == SDLK_ESCAPE) {
-        if (d_craft.show) {
-            d_craft.show = false;
-            return;
-        }
-        SDL_Quit();
-        exit(0);
-    }
-    if (d_craft.show == false && menu_interact(key))
-        return;
+    int num_handlers;
+    KeyHandler * handlers;
 
-    int num_handlers = sizeof(key_handlers)/sizeof(KeyHandler);
+    if (current_menu) {
+        num_handlers = sizeof(menu_key_handlers)/sizeof(KeyHandler);
+        handlers= menu_key_handlers;
+    }
+    else {
+        num_handlers = sizeof(key_handlers)/sizeof(KeyHandler);
+        handlers= key_handlers;
+    }
     for (int i = 0; i < num_handlers; ++i) {
-        if (key == key_handlers[i].key) {
-            key_handlers[i].func();
+        if (key == handlers[i].key) {
+            handlers[i].func();
         }
     }
+    return finish_program;
 }
 
 void mouse_pressed(SDL_MouseButtonEvent * event)

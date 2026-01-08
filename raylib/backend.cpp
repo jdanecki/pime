@@ -84,7 +84,17 @@ void Backend_Draw_Fill_Rectangle(Backend_Rect r, Color color)
     DrawRectangleRec(r.r, color);
 }
 
+void Backend_Draw_Gradient_Rectangle(int x, int y, int w, int h, Color top, Color bottom)
+{
+    DrawRectangleGradientV(x, y, w, h, top, bottom);
+}
 void Backend_Draw_Rectangle(Backend_Rect r, Color color)
 {
     DrawRectangleLinesEx(r.r, 1.0f, color);
+}
+
+void Backend_Window_Size(int *w, int *h)
+{
+    *w=GetScreenWidth();
+    *h=GetScreenHeight();
 }
