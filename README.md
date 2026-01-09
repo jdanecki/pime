@@ -1,8 +1,13 @@
 # The Game aka pime aka alchemist
 
-This is a game made with sdl2 and C++. Port to Godot was restored.
+This game is currently under development using
+* C++
+* [SDL2](https://www.libsdl.org)
+* [Raylib](https://github.com/raysan5/raylib.git)
+* [Godot](https://github.com/godotengine/godot.git)
 
-![SDL version](game-gui-sdl.png)
+![SDL version](pime-sdl.png)
+![Raylib version](pime-raylib.png)
 
 ## Dependencies installation
 
@@ -19,7 +24,7 @@ This is a game made with sdl2 and C++. Port to Godot was restored.
 make -j `nproc`
 ```
 
-## Run all together
+## Run server and SDL client together
 
 ```
 ./start.sh
@@ -35,9 +40,9 @@ meson compile -C build
 
 ## Run
 
-* run server
+* Server
 
-In server/build run: 
+In server/build directory run: 
 
 ```
 ./server_pime
@@ -48,7 +53,15 @@ In server/build run:
 In SDL directory run:
 
 ```
-./build/pime_SDL
+./run_local.sh
+```
+
+* Raylib client
+
+In raylib directory run:
+
+```
+./run_local.sh
 ```
 
 ## This project uses nerd-font: https://github.com/ryanoasis/nerd-fonts

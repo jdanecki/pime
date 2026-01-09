@@ -52,6 +52,11 @@ format:
 
 distclean:
 	rm -rf SDL/build
+	rm -rf SDL/tests/build
+	rm -rf dialog/tests/build
+	rm -rf menu/tests/build
+	rm -rf raylib/build
+	rm -rf raylib/tests/build
 	rm -rf server/build
 	rm -rf tui/build
 	rm -rf build
