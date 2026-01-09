@@ -51,11 +51,12 @@ void add_elements(PacketElementsList * list, int i)
 {
     size_t uid= ((size_t*) list->get_data())[i];
     Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, list->get_pl_id()));
-    if (p) {
-            InventoryElement * el = get_object_by_id(NetworkObject(Class_Element, uid));
-            if (el) p->pickup(el);
+    if (p)
+    {
+       InventoryElement * el = get_object_by_id(NetworkObject(Class_Element, uid));
+       if (el) p->pickup(el);
+        printf("player=%s [%d]=%lx inv.elements=%d\n", p->get_name(), i, uid, p->inventory.nr_elements);
     }
-    printf("player=%s [%d]=%lx inv.elements=%d\n", p->get_name(), i, uid, p->inventory.nr_elements);
     update_hotbar();
 }
 
@@ -196,7 +197,10 @@ void update_item_location(LocationUpdateData data)
             if (el->get_cid() == Class_Player)
             {
 //                printf("my_id=%lx id=%lx\n", my_id, el->get_id());
-                if (my_id == el->get_id()) print_status(1, "player moved");
+                if (my_id == el->get_id()) {
+                    print_status(0, " ");
+                    print_status(1, " ");
+                }
             }
 
             /*ItemLocation old_l;

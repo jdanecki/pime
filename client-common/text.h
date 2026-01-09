@@ -3,6 +3,9 @@
 
 #include "backend.inl"
 
+#define FONT_NAME "nerdfont.otf"
+#define INITIAL_FONT_SIZE 128
+
 extern Backend_Font font;
 extern Backend_Color White;
 extern Backend_Color Red;
@@ -12,10 +15,10 @@ extern Backend_Color Yellow;
 
 extern char status_line[256];
 extern char status_line2[256];
-extern void print_status(int i, const char * format, ...);
-extern void write_text(int x, int y, const char * text, Backend_Color color, int scale_x, int scale_y);
+void print_status(int i, const char * format, ...);
+void write_text(int x, int y, const char * text, Backend_Color color, int scale_x, int scale_y, bool clear_bg=false);
 
-extern int load_font();
-extern void unload_font();
+int load_font();
+void unload_font();
 
 #endif

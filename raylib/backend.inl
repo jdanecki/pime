@@ -16,13 +16,14 @@ class Backend_Rect
 {
 public:
     Rectangle r;
-    Backend_Rect(Backend_Rect_Field x,Backend_Rect_Field y,Backend_Rect_Field w, Backend_Rect_Field h)
+    Backend_Rect(Backend_Rect_Field x, Backend_Rect_Field y, Backend_Rect_Field w, Backend_Rect_Field h)
     {
         r.x=x;
         r.y=y;
         r.width=w;
         r.height=h;
     }
+
     float get_w() { return r.width; }
     float get_h() { return r.height; }
     void set_w(float w) { r.width = w; }

@@ -88,7 +88,7 @@ Uint64 handle_keyboard_state(const Uint8 * keys)
     Uint64 time_period = 0;
     if (keys[SDL_SCANCODE_LSHIFT])
     {
-        player->sneaking = 1;
+        handle_left_shift();
         time_period = 200;
     }
     else
@@ -96,7 +96,7 @@ Uint64 handle_keyboard_state(const Uint8 * keys)
         player->sneaking = 0;
         if (keys[SDL_SCANCODE_LCTRL] && player->hunger && player->thirst)
         {
-            player->running = 1;
+            handle_left_control();
             time_period = 50;
         }
         else
@@ -106,7 +106,7 @@ Uint64 handle_keyboard_state(const Uint8 * keys)
         }
     }
 
-    if (current_menu == NULL && ((current_time - last_time > time_period) || !(last_frame_press)))
+    if ((!current_menu) && ((current_time - last_time > time_period) || !(last_frame_press)))
     {
         if (keys[SDL_SCANCODE_DOWN])
         {
@@ -137,8 +137,6 @@ Uint64 handle_keyboard_state(const Uint8 * keys)
     }
     if (keys[SDL_SCANCODE_DOWN] || keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_LEFT])
     {
-        print_status(0, " ");
-        print_status(1, " ");
         last_frame_press = 1;
         return 0;
     }

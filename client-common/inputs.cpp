@@ -1,6 +1,6 @@
 #include "inputs.h"
 
-bool player_moved;
+bool finish_program;
 
 void handle_f1() {
     InventoryElement * item = get_item_at_ppos(player);
@@ -64,6 +64,45 @@ void handle_up() {
 }
 void handle_down() {
     send_packet_move(client, 0, 1);
-
 }
 
+void handle_left_shift() {
+    player->sneaking = 1;
+}
+
+void handle_left_control() {
+    player->running = 1;
+}
+
+void quit_program()
+{
+    finish_program= true;
+}
+
+void handle_i()
+{
+    show_menu_inventory_categories();
+}
+
+void handle_a()
+{
+    show_menu_action();
+}
+
+void handle_k()
+{
+    show_menu_knowledge();
+}
+
+void handle_escape()
+{
+    hide_craft_window();
+    show_menu();
+}
+
+#ifndef DISABLE_NPC
+void handle_n()
+{
+    show_menu_npc();
+}
+#endif

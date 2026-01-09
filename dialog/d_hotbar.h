@@ -9,4 +9,5 @@ class DHotbar : public Dialog
     void update();
 };
 
+extern int hotbar_x, hotbar_y;
 #endif

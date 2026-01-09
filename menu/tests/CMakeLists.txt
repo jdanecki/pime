@@ -8,7 +8,7 @@ set(CLIENT_FILES
     ../../client-common/text.cpp
     ../../client-common/players.cpp
     ../../client-common/player_actions.cpp
-    ../../client-common/key_handlers.cpp
+    ../../client-common/input.cpp
 )
 set(MENU_FILES
         ../menu.cpp

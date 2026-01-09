@@ -21,7 +21,7 @@ bool DialogElement::in_rect(int x, int y)
     return rect.r.x < x && rect.r.y < y && rect.r.x + rect.get_w() > x && rect.r.y + rect.get_h() > y;
 }
 
-DialogBox::DialogBox(int id, Backend_Rect rect, Backend_Color color, bool fill) : DialogElement(id, rect, DialogElementType::Box), fill(fill), color(color)
+DialogBox::DialogBox(int id, Backend_Rect rect, Backend_Color color, bool fill) : DialogElement(id, rect, DialogElementType::Box), color(color), fill(fill)
 {
 }
 

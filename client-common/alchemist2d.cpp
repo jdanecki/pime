@@ -23,9 +23,9 @@ Element2d::Element2d(Element data) : Element(data)
     h = height.value;
     start_width = width.value;
     /* value=0xff000000; //a
-     value = 0xffff0000; //b
-     value = 0xff00ff00; //g
-     value = 0xff0000ff; //r
+     value = 0x00ff0000; //b
+     value = 0x0000ff00; //g
+     value = 0x000000ff; //r
     */
     Backend_Pixels b_pixels = Backend_Allocate_Pixels(w, h);
     unsigned int * pixels=(unsigned int *) b_pixels.pixels;

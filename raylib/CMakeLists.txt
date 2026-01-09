@@ -42,7 +42,6 @@ add_executable(pime_raylib
     ../client-common/alchemist2d.cpp
     ../client-common/being2d.cpp
     ../client-common/inputs.cpp
-    ../client-common/key_handlers.cpp
 )
 
 target_link_libraries(pime_raylib

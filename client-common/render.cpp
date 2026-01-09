@@ -36,8 +36,10 @@ char text[300];
 extern NetClient * client;
 void draw_texts()
 {
-    int ty = 10;
     int tx = window_width - PANEL_WINDOW + 10;
+    int ty = 10;
+    Backend_Rect r(tx-10, 0, PANEL_WINDOW, window_height - 64 );
+    Backend_Draw_Fill_Rectangle(r, Backend_Color{10, 10, 200, 255});
 
     sprintf(text, "Hunger=%d Thirst=%d", player->hunger, player->thirst);
     write_text(tx, ty, text, (player->hunger < 100 || player->thirst < 100) ? Red : White, 15, 30);
@@ -290,7 +292,8 @@ bool draw_terrain()
             }
         }
     }
-    render_element(player, left_top_world_x, left_top_world_y);
+    if (player && player->c_id == Class_Player)
+        render_element(player, left_top_world_x, left_top_world_y);
 
     return true;
 }
@@ -353,7 +356,7 @@ void draw()
 
     Backend_Begin_Drawing();
     
-    clear_window();
+  //  clear_window();
 
     bool ret = draw_terrain();
     if (ret)
@@ -367,17 +370,22 @@ void draw()
     }
     if (status_line[0] != ' ')
     {
-        write_text(5, window_height - 64, status_line, White, 15, 30);
+        Backend_Rect r(0, window_height - 64, window_width, 32 );
+        Backend_Draw_Fill_Rectangle(r, Backend_Color{10, 100, 10, 255});
+        write_text(5, window_height - 64, status_line, White, 15, 30, false);
     }
 
     if (status_line2[0] != ' ') {
-        write_text(5, window_height - 32, status_line2, White, 15, 30);
+        Backend_Rect r(0, window_height - 32, window_width, 32 );
+        Backend_Draw_Fill_Rectangle(r, Backend_Color{10, 100, 10, 255});
+        write_text(5, window_height - 32, status_line2, White, 15, 30, false);
     }
+
+    draw_dialogs();
 
     if (current_menu)
         current_menu->show();
 
-    draw_dialogs();
 
     if (ret) {
         Backend_Update_Screen();

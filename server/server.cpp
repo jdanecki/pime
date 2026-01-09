@@ -12,7 +12,7 @@
 #include "console.h"
 #include "generator/generator.h"
 
-//#define DEBUG_TIMEOUT 1
+#define DEBUG_TIMEOUT 1
 
 void print_help()
 {

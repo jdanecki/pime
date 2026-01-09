@@ -46,7 +46,7 @@ class Renderable
         if (scale < 0.01)
             return;
 
-        Backend_Rect img_rect(x, y, w * scale, h * scale);
+        Backend_Rect img_rect((Backend_Rect_Field)x, (Backend_Rect_Field)y, (Backend_Rect_Field)(w * scale), (Backend_Rect_Field)(h * scale));
         Backend_Rect_Field ww = window_width - PANEL_WINDOW;
         Backend_Rect_Field wh = window_height - STATUS_LINES;
         Backend_Rect src_rect(0, 0 , w, h);

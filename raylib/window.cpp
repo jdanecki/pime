@@ -13,6 +13,8 @@ int init_window(const char * title, int wx, int wy)
     SetTargetFPS(60);
     tile_size = 32;
     SetExitKey(KEY_NULL);
+    SetTraceLogLevel(LOG_WARNING);
+//    SetTraceLogLevel(LOG_NONE);
     return 0;
 }
 

@@ -2,7 +2,6 @@
 
 #include "../client-common/inputs.h"
 
-
 KeyHandler menu_key_handlers[] = {
     { KEY_ESCAPE, menu_handle_escape },
     { KEY_ENTER, menu_handle_enter},
@@ -44,6 +43,8 @@ KeyHandler key_handlers[] = {
     { KEY_MINUS, handle_minus },
     { KEY_EQUAL, handle_equal },
     { KEY_ESCAPE, handle_escape },
+    { KEY_LEFT_CONTROL, handle_left_control},
+    { KEY_LEFT_SHIFT, handle_left_shift},
 };
 
 void mouse_pressed(int x, int y, int button)
@@ -82,11 +83,17 @@ bool handle_events()
 
     float dt = GetFrameTime();
     last_key+=dt;
-    
-    if (last_key < 0.1) return 0;
-    last_key=0;
 
-    player_moved = false;
+    float time_period = 0.1;
+    if (player->sneaking) {
+       time_period = 0.2;
+    }
+    if (player->running) {
+       time_period = 0.05;
+    }
+
+    if (last_key < time_period) return 0;
+    last_key=0;
 
     int num_handlers;
     KeyHandler * handlers;
@@ -99,16 +106,12 @@ bool handle_events()
         num_handlers = sizeof(key_handlers)/sizeof(KeyHandler);
         handlers= key_handlers;
     }
+    player->running = 0;
+    player->sneaking = 0;
     for (int i = 0; i < num_handlers; ++i) {
         if (IsKeyDown(handlers[i].key)) {
             handlers[i].func();
         }
-    }
-
-    if (player_moved)
-    {
-        print_status(0, " ");
-        print_status(1, " ");
     }
 
     return finish_program || WindowShouldClose();
