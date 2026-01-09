@@ -7,7 +7,7 @@
 #include "playerUI.h"
 
 #include "../client-common/npc.h"
-#include "../client-common/menu.h"
+#include "../menu/menu.h"
 #include "../client-common/texture.h"
 #include "../client-common/window.h"
 

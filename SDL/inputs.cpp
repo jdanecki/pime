@@ -7,9 +7,13 @@
 
 #include "../client-common/inputs.h"
 
+KeyHandler menu_key_handlers[] = {
+    { SDLK_ESCAPE, menu_handle_escape },
+    { SDLK_RETURN, menu_handle_enter},
+    { SDLK_DOWN, menu_go_down},
+    { SDLK_UP, menu_go_up},
+};
 
-int last_frame_press = 0;
-Uint64 last_time = 0;
 
 KeyHandler key_handlers[] = {
     { SDLK_F1, handle_f1 },
@@ -20,7 +24,6 @@ KeyHandler key_handlers[] = {
     { SDLK_F6, handle_f6 },
     { SDLK_F7, handle_f7 },
     { SDLK_RETURN, handle_enter },
-    { SDLK_c, handle_c },
     { SDLK_1, handle_hotbar_0 },
     { SDLK_2, handle_hotbar_1 },
     { SDLK_3, handle_hotbar_2 },
@@ -31,7 +34,13 @@ KeyHandler key_handlers[] = {
     { SDLK_8, handle_hotbar_7 },
     { SDLK_9, handle_hotbar_8 },
     { SDLK_0, handle_hotbar_9 },
+    { SDLK_c, handle_c },
+    { SDLK_i, handle_i},
+#ifndef DISABLE_NPC
+    { SDLK_n, handle_n},
+#endif
     { SDLK_q, put_element },
+
     { SDLK_BACKQUOTE, handle_prev_hotbar },
     { SDLK_TAB, handle_next_hotbar },
     { SDLK_MINUS, handle_minus },
@@ -40,7 +49,7 @@ KeyHandler key_handlers[] = {
 };
 
 
-void key_pressed(int key)
+bool key_pressed(int key)
 {
     int num_handlers;
     KeyHandler * handlers;
@@ -71,6 +80,8 @@ void mouse_pressed(SDL_MouseButtonEvent * event)
     }   
 }
 
+int last_frame_press = 0;
+Uint64 last_time = 0;
 Uint64 handle_keyboard_state(const Uint8 * keys)
 {
     Uint64 current_time = SDL_GetTicks64();
@@ -153,7 +164,7 @@ bool handle_events()
         {
             int key = event.key.keysym.sym;
 
-            key_pressed(key);
+            return key_pressed(key);
         }
         if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
         {

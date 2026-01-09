@@ -68,6 +68,7 @@ Backend_Pixels Backend_Allocate_Pixels(int w, int h)
     Backend_Pixels pixels;
     Image img = GenImageColor(w, h, BLANK); // CPU, RGBA8888
     pixels.texture = LoadTextureFromImage(img);
+//    printf("Image.format=%d Texture.format=%d Texture.id=%d\n", img.format, pixels.texture.format, pixels.texture.id);
     UnloadImage(img);
     pixels.pixels = (unsigned char*) calloc(1, w * h * 4);
     pixels.pitch = w * 4;

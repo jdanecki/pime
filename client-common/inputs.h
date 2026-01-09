@@ -12,6 +12,7 @@
 #include "window.h"
 #include "net.h"
 #include "key_handler.h"
+#include "key_handlers.h"
 
 extern int active_hotbar;
 extern int auto_explore;

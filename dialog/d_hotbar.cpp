@@ -17,12 +17,14 @@ DHotbar::DHotbar() : Dialog({550, 490, 500, 50}, {0, 0, 0, 0})
 {
     for (int i = 0; i < 10; i++)
     {
+        Backend_Rect_Field r1=(Backend_Rect_Field)(i*50);
+        Backend_Rect_Field r2=(Backend_Rect_Field)(i*50+2);
         if (i == active_hotbar)
-            add(new DialogBox(i, {i * 50, 0, 50, 50}, {255, 255, 255, 255}, false));
+            add(new DialogBox(i, {r1, 0, 50, 50}, {255, 255, 255, 255}, false));
         else
-            add(new DialogBox(i, {i * 50, 0, 50, 50}, {125, 125, 125, 255}, false));
-        add(new DialogImage(i, {i * 50 + 2, 2, 50 - 4, 50 - 4}));
-        add(new DialogButton(i, {i * 50 + 2, 2, 50 - 4, 50 - 4}, 0, {0, 0, 0, 0}, {0, 0, 0, 0}, "", change_active_hotbar, change_craftbar));
+            add(new DialogBox(i, {r1, 0, 50, 50}, {125, 125, 125, 255}, false));
+        add(new DialogImage(i, {r2, 2, 50 - 4, 50 - 4}));
+        add(new DialogButton(i, {r2, 2, 50 - 4, 50 - 4}, 0, {0, 0, 0, 0}, {0, 0, 0, 0}, "", change_active_hotbar, change_craftbar));
     }
 }
 

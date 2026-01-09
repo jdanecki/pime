@@ -260,7 +260,8 @@ class Element : public InventoryElement
 {
     SerializablePointer<BaseElement> base;
     // void init(BaseElement * b);
-  protected:
+//  protected:
+public:
     Property length;
     Property width;
     Property height;

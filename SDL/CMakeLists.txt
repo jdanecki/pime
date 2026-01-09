@@ -25,16 +25,21 @@ add_subdirectory(${CORE_SOURCE_DIR} ${CORE_BINARY_DIR})
 
 add_executable(pime_SDL 
     net.cpp
+    main.cpp
     window.cpp music.cpp text.cpp
-    texture.cpp main.cpp menu.cpp
-    ../dialog/dialog.cpp 
-    ../dialog/d_hotbar.cpp
-    ../dialog/d_craft.cpp
-    inputs.cpp 
+    texture.cpp
+    backend.cpp
+    inputs.cpp
     npc.cpp
     playerUI.cpp
     palette.cpp
-    backend.cpp
+
+    ../menu/menu.cpp
+
+    ../dialog/dialog.cpp 
+    ../dialog/d_hotbar.cpp
+    ../dialog/d_craft.cpp
+
     ../client-common/net.cpp
     ../client-common/game.cpp
     ../client-common/players.cpp
@@ -45,6 +50,7 @@ add_executable(pime_SDL
     ../client-common/alchemist2d.cpp
     ../client-common/being2d.cpp
     ../client-common/inputs.cpp
+    ../client-common/key_handlers.cpp
 )
 
 target_link_libraries(pime_SDL

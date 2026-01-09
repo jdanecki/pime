@@ -38,6 +38,7 @@ class TerrainType
     TerrainType(int id) : id(id)
     {
         form = random_range(1, 4);
+        //form = 1;
     }
     bool eq(TerrainType * other)
     {

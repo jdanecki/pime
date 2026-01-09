@@ -16,6 +16,7 @@
 #include "window.h"
 #include "alchemist2d.h"
 #include "being2d.h"
+#include "../menu/menu.h"
 
 extern Backend_Texture map;
 
@@ -373,8 +374,8 @@ void draw()
         write_text(5, window_height - 32, status_line2, White, 15, 30);
     }
 
-  //  if (current_menu)
-    //    current_menu->show();
+    if (current_menu)
+        current_menu->show();
 
     draw_dialogs();
 

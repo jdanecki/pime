@@ -22,10 +22,10 @@ Element2d::Element2d(Element data) : Element(data)
     w = width.value;
     h = height.value;
     start_width = width.value;
-    /* value=0xff000000; //r
-     value = 0xffff0000; //g
-     value = 0xff00ff00; //b
-     value = 0xff0000ff; //a
+    /* value=0xff000000; //a
+     value = 0xffff0000; //b
+     value = 0xff00ff00; //g
+     value = 0xff0000ff; //r
     */
     Backend_Pixels b_pixels = Backend_Allocate_Pixels(w, h);
     unsigned int * pixels=(unsigned int *) b_pixels.pixels;
@@ -53,14 +53,13 @@ Element2d::Element2d(Element data) : Element(data)
             float distance = dx * dx + dy * dy;
             float angle = atan2f(dy, dx);
             float offset;
-            unsigned int c = 255 << 24;
             unsigned char base = 100 + rand() % 40;
             float inter = 0.1 * (rand() % 9);
 
             unsigned char r = (unsigned char)(get_base()->color.r * inter + base * (1.0 - inter));
             unsigned char g = (unsigned char)(get_base()->color.g * inter + base * (1.0 - inter));
             unsigned char b = (unsigned char)(get_base()->color.b * inter + base * (1.0 - inter));
-            c |= (r << 24) | (g << 16) | (b <<8);
+            unsigned int c = (255 << 24) | (b << 16) | (g <<8) | r;
 
             switch (f)
             {
@@ -75,7 +74,7 @@ Element2d::Element2d(Element data) : Element(data)
                     //hsv2rgb(200 + (offset * 4), 100, 50 + val/2, &r, &g, &b);
                     b+= offset*4;
                     g+=val/2;
-                    c = (r<<24) | (g << 16) | (b << 8) | 255;
+                    c = (255<<24) | (b << 16) | (g << 8) | r;
                     pixels[y * width.value + x] = (distance <= offset) ? c : 0;
                     break;
                 case Form_gas:
@@ -88,7 +87,7 @@ Element2d::Element2d(Element data) : Element(data)
                         r+=10.0*edgeFade2;
                         g+=10.0*edgeFade2;
                         b+=10.0*edgeFade2;
-                        c = (((int)(255.0*edgeFade1))) | (b << 8) | (g << 16) | (r<<24);
+                        c = ( ((unsigned char)(255.0*edgeFade1)) << 24) | (b << 16) | (g << 8) | r;
                     } else c =0;
 
                     pixels[y * width.value + x] = c;

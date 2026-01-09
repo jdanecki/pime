@@ -3,16 +3,12 @@
 #include "../client-common/inputs.h"
 
 
-void mouse_pressed(int x, int y, int button)
-{
-        CONSOLE_LOG("mouse %d,%d %d \n", x, y, button);
-        hotbar.press(x, y, button);
-        if (d_craft.show)
-        {
-                d_craft.press(x, y, button);        
-        }
-}
-
+KeyHandler menu_key_handlers[] = {
+    { KEY_ESCAPE, menu_handle_escape },
+    { KEY_ENTER, menu_handle_enter},
+    { KEY_DOWN, menu_go_down},
+    { KEY_UP, menu_go_up},
+};
 
 KeyHandler key_handlers[] = {
     { KEY_F1, handle_f1 },
@@ -23,7 +19,6 @@ KeyHandler key_handlers[] = {
     { KEY_F6, handle_f6 },
     { KEY_F7, handle_f7 },
     { KEY_ENTER, handle_enter },
-    { KEY_C, handle_c },
     { KEY_ONE, handle_hotbar_0 },
     { KEY_TWO, handle_hotbar_1 },
     { KEY_THREE, handle_hotbar_2 },
@@ -38,12 +33,29 @@ KeyHandler key_handlers[] = {
     { KEY_RIGHT, handle_right },
     { KEY_UP, handle_up },
     { KEY_DOWN, handle_down },    
+    { KEY_C, handle_c },
+    { KEY_I, handle_i},
+#ifndef DISABLE_NPC
+    { KEY_N, handle_n},
+#endif
     { KEY_Q, put_element },
     { KEY_GRAVE, handle_prev_hotbar  },
     { KEY_TAB, handle_next_hotbar },
     { KEY_MINUS, handle_minus },
-    { KEY_EQUAL, handle_equal }      
+    { KEY_EQUAL, handle_equal },
+    { KEY_ESCAPE, handle_escape },
 };
+
+void mouse_pressed(int x, int y, int button)
+{
+        CONSOLE_LOG("mouse %d,%d %d \n", x, y, button);
+        hotbar.press(x, y, button);
+        if (d_craft.show)
+        {
+                d_craft.press(x, y, button);
+        }
+}
+
 
 void handle_mouse()
 {
@@ -74,23 +86,22 @@ bool handle_events()
     if (last_key < 0.1) return 0;
     last_key=0;
 
-    if (IsKeyDown(KEY_ESCAPE)) {
-        if (d_craft.show) {
-            d_craft.show = false;
-            return 0;
-        } 
-        else return 1;
-     }
-
-//    if (d_craft.show == false && menu_interact(key))
-  //      return;
-
     player_moved = false;
-    int num_handlers = sizeof(key_handlers)/sizeof(KeyHandler);
 
+    int num_handlers;
+    KeyHandler * handlers;
+
+    if (current_menu) {
+        num_handlers = sizeof(menu_key_handlers)/sizeof(KeyHandler);
+        handlers= menu_key_handlers;
+    }
+    else {
+        num_handlers = sizeof(key_handlers)/sizeof(KeyHandler);
+        handlers= key_handlers;
+    }
     for (int i = 0; i < num_handlers; ++i) {
-        if (IsKeyDown(key_handlers[i].key)) {
-            key_handlers[i].func();
+        if (IsKeyDown(handlers[i].key)) {
+            handlers[i].func();
         }
     }
 
@@ -100,6 +111,6 @@ bool handle_events()
         print_status(1, " ");
     }
 
-    return WindowShouldClose();
+    return finish_program || WindowShouldClose();
 }
 

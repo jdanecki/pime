@@ -45,17 +45,20 @@ void Backend_Texture_Copy_Flip(SDL_Texture *texture, Backend_Rect *srcrect, Back
 
 int Backend_Get_Texture_Size(SDL_Texture *texture, int *w, int *h)
 {
+//    unsigned int format;
+  //  int ret=SDL_QueryTexture(texture, &format, NULL, w, h);
     int ret=SDL_QueryTexture(texture, NULL, NULL, w, h);
     if (ret)
         CONSOLE_LOG("SDL_QueryTexture failed: %s", SDL_GetError());
-
+ //   printf("format=%x %s\n", format, SDL_GetPixelFormatName(format));
+ //   format=16462004
     return ret;
 }
 
 Backend_Pixels Backend_Allocate_Pixels(int w, int h)
 {
     Backend_Pixels pixels;
-    pixels.texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, w, h);
+    pixels.texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, w, h);
     SDL_SetTextureBlendMode(pixels.texture, SDL_BLENDMODE_BLEND);
 
     SDL_LockTexture(pixels.texture, NULL, (void **)&pixels.pixels, &pixels.pitch);

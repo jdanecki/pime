@@ -17,17 +17,20 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_definitions(${SDL_CFLAGS} ${SDL2_IMAGE_CFLAGS}
     ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${SDL2_GFX_CFLAGS} )
 
+add_subdirectory(../../core core)
 
 add_executable(test_SDL 
     test_sdl.cpp
     ../window.cpp
     ../backend.cpp
-    ../../core/time.cpp
+    ../../client-common/alchemist2d.cpp
+    ../../client-common/texture.cpp
     )
 
 target_link_libraries(test_SDL
     ${SDL2_IMAGE_LDFLAGS} ${SDL2_TTF_LDFLAGS} ${SDL2_MIXER_LDFLAGS} ${SDL2_GFX_LDFLAGS} ${SDL_LDFLAGS}
     m
+    pime
 )
 
 target_include_directories(test_SDL    PRIVATE  ${CMAKE_SOURCE_DIR}/.. )

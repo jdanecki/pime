@@ -1,6 +1,7 @@
+#include <stdio.h>
+
 #include "../../client-common/window.h"
 #include "../../client-common/alchemist2d.h"
-
 
 bool handle_events();
 
@@ -25,8 +26,15 @@ Element2d *el;
 
 void draw()
 {
-    SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
-    SDL_RenderClear(renderer);
+   Color c;
+   c.r=100;
+   c.g=100;
+   c.b=100;
+   c.a=255;
+
+    Backend_Begin_Drawing();
+    ClearBackground(c);
+
     Backend_Draw_Gradient_Rectangle(50, 100, 200, 150, Backend_Color{255, 0, 0, 255},  Backend_Color{});
     Backend_Draw_Gradient_Rectangle(300, 100, 200, 150, Backend_Color{0, 255, 0, 255}, Backend_Color{});
     Backend_Draw_Gradient_Rectangle(550, 100, 200, 150, Backend_Color{0, 0, 255, 255}, Backend_Color{});
@@ -38,57 +46,55 @@ void draw()
     Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{}, Backend_Color{0,255,0,255});
 
     el->render(10, 500);
+
+    Backend_Update_Screen();
+    Backend_End_Drawing();
 }
 
 bool finish_program = false;
 
-void key_pressed(int key)
+void mouse_pressed(int x, int y, int button)
 {
-    switch (key)
-    {
-        case SDLK_ESCAPE: finish_program = true; break;
-        default:
-            printf("key=%d\n", key);
-        break;
-    }
+    printf("mouse %d,%d %d \n", x, y, button);
 }
-void mouse_pressed(SDL_MouseButtonEvent * event)
+
+void handle_mouse()
 {
-    printf("mouse %d,%d %d \n", event->x, event->y, event->button);
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        Vector2 pos = GetMousePosition();
+        mouse_pressed((int)pos.x, (int)pos.y, 1);
+    }
+    if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
+        Vector2 pos = GetMousePosition();
+        mouse_pressed((int)pos.x, (int)pos.y, 2);
+    }
+    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+        Vector2 pos = GetMousePosition();
+        mouse_pressed((int)pos.x, (int)pos.y, 3);
+    }
 }
 
 bool handle_events()
 {
-    SDL_Event event;
+    handle_mouse();
 
-    while (SDL_PollEvent(&event))
-    {
-        if (event.type == SDL_QUIT)
-        {
-            return true;
-        };
-        if (event.type == SDL_KEYDOWN)
-        {
-            int key = event.key.keysym.sym;
-            key_pressed(key);
-        }
-        if (event.type == SDL_MOUSEBUTTONDOWN)
-        {
-            mouse_pressed(&event.button);
-        }
-    }
+    if (IsKeyDown(KEY_ESCAPE)) return true;
+
     return false;
 }
 
+void unload_font() {}
+
+
 int main()
 {
-   init_window("test_sdl", 1000, 800);
+   init_window("test_raylib", 1000, 800);
 
    Element e(new BaseElement(Form_solid, 0));
     e.width.value=100;
     e.height.value=100;
 
-    el = new Element2d(e); ;
+    el = new Element2d(e);
 
    while(!finish_program)
    {
@@ -96,7 +102,6 @@ int main()
             return 0;
 
         draw();
-        Backend_Update_Screen();
     }
 
   close_graphics();

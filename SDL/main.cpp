@@ -7,13 +7,6 @@ void daily_call()
 {
 }
 
-void save(char with_player)
-{
-}
-void load(char with_player)
-{
-}
-
 void intro()
 {
     // int a;

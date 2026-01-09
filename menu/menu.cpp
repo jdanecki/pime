@@ -463,7 +463,7 @@ void create_inv_menu(int id)
 
 void Menu::go_down()
 {
-    printf("go_down: index=%d -> ", index);
+//    printf("go_down: index=%d -> ", index);
     menu_pos = (Menu_entry *)(menu_pos->next);
     index++;
     if (!menu_pos)
@@ -471,12 +471,12 @@ void Menu::go_down()
         menu_pos = (Menu_entry *)(entries->head);
         index = 0;
     }
-    printf("%d\n", index);
+//    printf("%d\n", index);
 }
 
 void Menu::go_up()
 {
-    printf("go_up: index=%d -> ", index);
+//    printf("go_up: index=%d -> ", index);
     menu_pos = (Menu_entry *)(menu_pos->prev);
     index--;
     if (!menu_pos)
@@ -484,7 +484,7 @@ void Menu::go_up()
         menu_pos = (Menu_entry *)(entries->tail);
         index = entries->nr_elements - 1;
     }
-    printf("%d\n", index);
+//    printf("%d\n", index);
 }
 
 void menu_handle_escape()
