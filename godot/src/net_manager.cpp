@@ -1,15 +1,12 @@
 #include "net_manager.h"
 
-#include "../../SDL/networking.h"
+#include "../../client-common/net.h"
 #include "chunk_renderer.h"
 #include "godot_cpp/classes/engine.hpp"
-#include "godot_cpp/classes/mesh_instance3d.hpp"
 #include "godot_cpp/core/memory.hpp"
 #include "godot_cpp/variant/string.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
-
-NetClient * client;
 
 using namespace godot;
 
@@ -71,6 +68,15 @@ void print_status(int l, const char * format, ...)
     va_start(args, format);
     UtilityFunctions::print(format, args);
     va_end(args);
+}
+
+int CONSOLE_LOG(const char * fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    UtilityFunctions::print(fmt, args);
+    va_end(args);
+    return 0;
 }
 
 // FIXME remove when cleaned in core

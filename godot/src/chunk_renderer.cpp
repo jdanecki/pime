@@ -4,7 +4,7 @@
 #include "godot_cpp/classes/plane_mesh.hpp"
 #include "godot_cpp/classes/standard_material3d.hpp"
 #include "godot_cpp/core/memory.hpp"
-#include "../../SDL/networking.h"
+#include "../../client-common/net.h"
 
 using namespace godot;
 

@@ -1,5 +1,6 @@
 client_common_sources=[
     'net.cpp',
+    'net2d.cpp',
     'game.cpp',
     'players.cpp',
     'text.cpp'
