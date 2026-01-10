@@ -2,6 +2,7 @@
 
 #include "element_godot.h"
 #include "net_manager.h"
+#include "chunk_renderer.h"
 // includes go here
 
 #include <gdextension_interface.h>
@@ -20,6 +21,7 @@ void initialize_example_module(ModuleInitializationLevel p_level)
 
     ClassDB::register_class<ElementGodot>();
     ClassDB::register_class<NetManager>();
+    ClassDB::register_class<ChunkRenderer>();
     //     ClassDB::register_class<class_name>();
 }
 
