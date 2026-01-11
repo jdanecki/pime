@@ -37,7 +37,7 @@ void shift_output()
 }
 
 int col=0;
-int add_to_output(const char * fmt, ...)
+int CONSOLE_LOG(const char * fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -81,7 +81,7 @@ void clear_history()
     }
     history_up=0;
     buf_pos=0;
-    add_to_output("cleared\n");
+    CONSOLE_LOG("cleared\n");
 }
 
 void ncurses_tick()

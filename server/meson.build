@@ -1,4 +1,3 @@
-enet_dep = dependency('libenet', method: 'pkg-config', required: true)
 ncurses_dep = dependency('ncurses', method: 'pkg-config', required: true)
 
 server_sources = [
@@ -23,7 +22,8 @@ server_sources = [
 ]
 
 executable('server_pime', server_sources,
-  dependencies: [pime_dep, enet_dep, ncurses_dep],
+  dependencies: [enet_dep, ncurses_dep],
   install: false,
-  cpp_args: ['-Wall', '-Wno-switch', '-DSERVER_CODE', '-DUSE_NCURSES']
+  link_with: [core],
+  
 )

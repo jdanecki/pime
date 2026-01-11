@@ -4,8 +4,6 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include "../core/alchemist/ncurses-output.h"
-
 #include "../client-common/text.h"
 #include "../client-common/window.h"
 

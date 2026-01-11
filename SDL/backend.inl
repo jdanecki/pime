@@ -68,4 +68,6 @@ extern void Backend_Draw_Rectangle(Backend_Rect r, SDL_Color color);
 extern void Backend_Draw_Gradient_Rectangle(int x, int y, int w, int h, SDL_Color top, SDL_Color bottom);
 
 extern void Backend_Window_Size(int *w, int *h);
+
+int CONSOLE_LOG(const char * fmt, ...);
 #endif

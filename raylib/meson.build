@@ -1,18 +1,49 @@
-enet_dep = dependency('libenet', method: 'pkg-config', required: true)
 raylib_dep = dependency('raylib', method: 'pkg-config', required: true)
 
-tui_src = [
-  'main.cpp',
-  'playerUI.cpp',
-  'net.cpp',
-  '../client-common/net.cpp',
-  '../client-common/game.cpp',
-  '../client-common/players.cpp'
+raylib_deps = [raylib_dep, enet_dep]
+
+raylib_sources = [
+    'net.cpp',
+    'main.cpp',
+    'window.cpp',
+    'music.cpp',
+    'text.cpp',
+    'texture.cpp',
+    'backend.cpp',
+    'inputs.cpp',
+#    'npc.cpp',
+    'playerUI.cpp',
 ]
 
-executable('pime_tui', tui_src,
-  dependencies: [pime_dep, enet_dep, raylib_dep],
-  link_args: ['-lm'],
-  install: false,
-  cpp_args: ['-Wall', '-Wno-switch', '-DDISABLE_NPC', '-Wno-unused-but-set-variable']
+inc = include_directories('.')
+
+client_common_raylib = static_library('client_common_raylib', 
+  client_common,
+  #  cpp_args : ['-DDISABLE_NPC'],
+  include_directories : inc,
+  dependencies: [raylib_deps], 
 )
+
+executable('pime_raylib', 
+  sources: raylib_sources,
+  #  cpp_args : ['-DDISABLE_NPC'],
+  dependencies: [raylib_deps],
+  link_args: shared_link_args,
+  link_with: [core, client_common_raylib ],
+  install: false,
+)
+
+custom_target(
+  'textures_link',
+  output: 'textures',
+  command: ['ln', '-sf', meson.project_source_root() + '/assets/textures', '@OUTPUT@'],
+  build_by_default: true
+)
+
+custom_target(
+  'font_link',
+  output: 'nerdfont.otf',
+  command: ['ln', '-sf', meson.project_source_root() + '/assets/nerdfont.otf', '@OUTPUT@'],
+  build_by_default: true,
+)
+

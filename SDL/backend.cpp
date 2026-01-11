@@ -1,5 +1,4 @@
 #include "backend.inl"
-#include "../core/alchemist/ncurses-output.h"
 
 SDL_Texture * Backend_Create_Texture_From_Surface(SDL_Surface * image)
 {

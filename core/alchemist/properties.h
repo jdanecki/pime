@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "serialization.h"
-#include "ncurses-output.h"
 
 class Property
 {

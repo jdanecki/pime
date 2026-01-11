@@ -16,18 +16,18 @@
 
 void print_help()
 {
-    add_to_output("e - exit\n");
-    add_to_output("h - help\n");
-    add_to_output("c - clear\n");
-    add_to_output("p - players\n");
-    add_to_output("1 - show terrains types\n");
-    add_to_output("2 - show plants types\n");
-    add_to_output("3 - show animals types\n");
-    add_to_output("4 - show chunk\n");
-    add_to_output("5 - show base elements\n");
-    add_to_output("6 - show base plants\n");
-    add_to_output("7 - show base animals\n");
-    add_to_output("# - show keys\n");
+    CONSOLE_LOG("e - exit\n");
+    CONSOLE_LOG("h - help\n");
+    CONSOLE_LOG("c - clear\n");
+    CONSOLE_LOG("p - players\n");
+    CONSOLE_LOG("1 - show terrains types\n");
+    CONSOLE_LOG("2 - show plants types\n");
+    CONSOLE_LOG("3 - show animals types\n");
+    CONSOLE_LOG("4 - show chunk\n");
+    CONSOLE_LOG("5 - show base elements\n");
+    CONSOLE_LOG("6 - show base plants\n");
+    CONSOLE_LOG("7 - show base animals\n");
+    CONSOLE_LOG("# - show keys\n");
 }
 
 char handle_command();
@@ -47,7 +47,7 @@ char handle_pressed(int pressed)
             break;
         case '\n':
         {
-            add_to_output("> %s\n", in_buf);
+            CONSOLE_LOG("> %s\n", in_buf);
             char retval = handle_command();
             in_buf[0] = '\0';
             return retval;
@@ -156,7 +156,7 @@ class PlayerClient : public ListElement
     {
         char hostname[64];
         enet_address_get_host_ip(&peer->address, hostname, 64);
-        add_to_output("player uid=%ld host=%s port=%u\n", player->uid, hostname, peer->address.port);
+        CONSOLE_LOG("player uid=%ld host=%s port=%u\n", player->uid, hostname, peer->address.port);
         player->location.show();
     }
 };
@@ -172,7 +172,7 @@ void send_to_all(Packet * p)
     {
         PlayerClient * pl = (PlayerClient *)pl_el;
 #ifdef SEND_LOG
-        add_to_output("[%d/%d] sending to player: %d\n", i++, players->nr_elements, pl->player->get_id());
+        CONSOLE_LOG("[%d/%d] sending to player: %d\n", i++, players->nr_elements, pl->player->get_id());
 #endif
         p->send(pl->peer);
         pl_el = pl_el->next;
@@ -201,7 +201,7 @@ class PacketToSend : public ListElement
 bool handle_packet(ENetPacket * packet, ENetPeer * peer)
 {
     unsigned char * data = packet->data;
-   // add_to_output("Received length=%lu: %d\n", packet->dataLength, *data);
+   // CONSOLE_LOG("Received length=%lu: %d\n", packet->dataLength, *data);
 
     Packet * p = check_packet('R', data, packet->dataLength);
     if (!p)
@@ -360,7 +360,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             {
                 if (Product * prod = dynamic_cast<Product *>(item))
                 {
-                    add_to_output("use product: %s on tile [%d,%d]:[%d,%d]\n", prod->get_name(), map_x, map_y, x, y);
+                    CONSOLE_LOG("use product: %s on tile [%d,%d]:[%d,%d]\n", prod->get_name(), map_x, map_y, x, y);
                     if (!pl->player->use_product_on_tile(prod,  map_x, map_y, x, y))
                     {
                         p = new PacketActionFailed();
@@ -370,7 +370,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
                 }
                 else
                 {
-                    add_to_output("use item: %s on tile [%d,%d]:[%d,%d]\n", item->get_name(), map_x, map_y, x, y);
+                    CONSOLE_LOG("use item: %s on tile [%d,%d]:[%d,%d]\n", item->get_name(), map_x, map_y, x, y);
                     /*if (!pl->player->plant_with_seed(item, map_x, map_y, x, y))
                     {
                         p = new PacketActionFailed();
@@ -390,7 +390,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             delete p;
             if (craft_entry(prod_id, ing_num, iid_table, pl->player))
             {
-                add_to_output("crafted id=%ld\n", prod_id);
+                CONSOLE_LOG("crafted id=%ld\n", prod_id);
                 InventoryElement * el1 = pl->player->get_item_by_uid(iid_table[0]);
                 if (el1)
                 {
@@ -431,27 +431,27 @@ void send_updates()
     if (packets_to_send->nr_elements)
     {
         ListElement * el = packets_to_send->head;
-//        add_to_output("sending updates elems=%d\n", packets_to_send->nr_elements);
+//        CONSOLE_LOG("sending updates elems=%d\n", packets_to_send->nr_elements);
         while (el)
         {
             PacketToSend * p = (PacketToSend *)el;
             p->to_all();
             el = el->next;
         }
-//        add_to_output("sent updates\n");
+//        CONSOLE_LOG("sent updates\n");
     }
 
     if (packets_to_send1->nr_elements)
     {
         ListElement * el = packets_to_send1->head;
-       // add_to_output("sending updates1 elems=%d\n", packets_to_send1->nr_elements);
+       // CONSOLE_LOG("sending updates1 elems=%d\n", packets_to_send1->nr_elements);
         while (el)
         {
             PacketToSend * p = (PacketToSend *)el;
             p->to_all();
             el = el->next;
         }
-      //  add_to_output("sent updates1\n");
+      //  CONSOLE_LOG("sent updates1\n");
     }
 
     if (objects_to_create.nr_elements)
@@ -459,7 +459,7 @@ void send_updates()
         ListElement * el = objects_to_create.head;
         while (el)
         {
-//            add_to_output("sending objects to create: %s id=%lx\n", static_cast<InventoryElement*> (el->el.get())->get_name(), el->el.get()->uid);
+//            CONSOLE_LOG("sending objects to create: %s id=%lx\n", static_cast<InventoryElement*> (el->el.get())->get_name(), el->el.get()->uid);
             Packet * p = new PacketObjectCreate(el->el.get());
             send_to_all(p);
             el = el->next;
@@ -515,7 +515,7 @@ void add_animal(chunk * ch, size_t id)
 
 void load_chunk(int cx, int cy)
 {
-    add_to_output("load_chunk(%d, %d)\n", cx, cy);
+    CONSOLE_LOG("load_chunk(%d, %d)\n", cx, cy);
     chunk * ch = new chunk(cx, cy);
     Region * r = find_region(cx, cy);
 
@@ -530,7 +530,7 @@ try_again:
     }
 
     if (!ch->objects.nr_elements) {
-        add_to_output("empty chunk, trying again %d\n", r->rocks_count);
+        CONSOLE_LOG("empty chunk, trying again %d\n", r->rocks_count);
         goto try_again;
     }
 
@@ -733,8 +733,8 @@ char handle_command()
             show_players();
             break;
         default:
-            add_to_output("invalid command: %s\n", in_buf);
-            add_to_output("use \"help\" to show help\n");
+            CONSOLE_LOG("invalid command: %s\n", in_buf);
+            CONSOLE_LOG("use \"help\" to show help\n");
             break;
         case '1':
             show_terrains();
@@ -767,11 +767,11 @@ int main()
 {
     ncurses_init();
     print_status(0, "pime_enet\n");
-    add_to_output("Copyright (C) 2025 Piotr Danecki <i3riced@mailfence.com>\n");
-    add_to_output("Copyright (C) 2025 Jacek Danecki\n");
-    add_to_output("This program comes with ABSOLUTELY NO WARRANTY.\n");
-    add_to_output("This is free software, and you are welcome to redistribute it under certain conditions.\n");
-    add_to_output("See LICENSE file\n");
+    CONSOLE_LOG("Copyright (C) 2025 Piotr Danecki <i3riced@mailfence.com>\n");
+    CONSOLE_LOG("Copyright (C) 2025 Jacek Danecki\n");
+    CONSOLE_LOG("This program comes with ABSOLUTELY NO WARRANTY.\n");
+    CONSOLE_LOG("This is free software, and you are welcome to redistribute it under certain conditions.\n");
+    CONSOLE_LOG("See LICENSE file\n");
  //   trace_network = 1;
 
     srand(0);
@@ -795,7 +795,7 @@ int main()
         fprintf(stderr, "Can't create host\n");
         return 1;
     }
-    add_to_output("Server Pime started on port %u\n", address.port);
+    CONSOLE_LOG("Server Pime started on port %u\n", address.port);
 
     generate();
 
@@ -816,7 +816,7 @@ int main()
         ncurses_tick();
         int ch = wgetch(in_w);
         if (show_key) {
-            if (ch!=ERR) add_to_output("key=%d ", ch);
+            if (ch!=ERR) CONSOLE_LOG("key=%d ", ch);
         }
         if (ch != ERR && handle_pressed(ch))
             break;
@@ -825,7 +825,7 @@ int main()
             case ENET_EVENT_TYPE_CONNECT:
             {
                 enet_address_get_host_ip(&event.peer->address, hostname, 512);
-                add_to_output("Client connected %s:%d\n", hostname, event.peer->address.port);
+                CONSOLE_LOG("Client connected %s:%d\n", hostname, event.peer->address.port);
                 unsigned short * port = new unsigned short;
                 *port = event.peer->address.port;
                 event.peer->data = (void *)port;
@@ -849,7 +849,7 @@ int main()
                 PlayerClient * pl = (PlayerClient *)players->find(&peer_id);
                 enet_address_get_host_ip(&event.peer->address, hostname, 512);
 
-                add_to_output("player: %s from %s:%d disconnected\n", pl->player->get_name(), hostname, event.peer->address.port);
+                CONSOLE_LOG("player: %s from %s:%d disconnected\n", pl->player->get_name(), hostname, event.peer->address.port);
                 destroy(pl->player);
                 players->remove(pl);
                 send_updates();

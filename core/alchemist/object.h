@@ -2,6 +2,7 @@
 #define OBJECT_H
 
 #include <cstddef>
+int CONSOLE_LOG(const char * fmt, ...);
 
 enum Class_id
 {

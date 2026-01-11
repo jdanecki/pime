@@ -154,9 +154,7 @@ class PacketObjectDestroy : public Packet
     }
 };
 
-#ifdef SERVER_CODE
 extern void add_packet_to_send1(Packet * p);
-#endif
 class PacketElementsList : public Packet
 {
     struct serial_data
@@ -300,7 +298,6 @@ class PacketElementsList : public Packet
     }
 };
 
-#ifdef SERVER_CODE
 ObjectData * convert_to_data(NetworkObject * el)
 {
     ObjectData * obj = nullptr;
@@ -393,7 +390,6 @@ ObjectData * convert_to_data(NetworkObject * el)
     }
     return obj;
 }
-#endif
 
 class PacketObjectCreate : public Packet
 {
@@ -421,9 +417,7 @@ class PacketObjectCreate : public Packet
     ObjectData * obj;
     PacketObjectCreate(NetworkObject * el) : Packet(PACKET_OBJECT_CREATE)
     {
-#ifdef SERVER_CODE
         obj = convert_to_data(el);
-#endif
     }
     PacketObjectCreate() : Packet(PACKET_OBJECT_CREATE)
     { // called by client
@@ -517,9 +511,7 @@ class PacketObjectUpdate : public Packet
     ObjectData * obj;
     PacketObjectUpdate(InventoryElement * el) : Packet(PACKET_OBJECT_UPDATE)
     {
-#ifdef SERVER_CODE
         obj = convert_to_data(el);
-#endif
     }
     PacketObjectUpdate() : Packet(PACKET_OBJECT_UPDATE)
     { // called by client

@@ -701,3 +701,6 @@ void action_failed()
     print_status(1, "action failed");
 }
 
+void add_packet_to_send1(Packet * p) {}
+
+

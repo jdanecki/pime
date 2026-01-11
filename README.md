@@ -20,49 +20,30 @@ This game is currently under development using
 ## Build
 
 ```
-./configure
-make -j `nproc`
-```
-
-## Run server and SDL client together
-
-```
-./start.sh
-```
-
-## Build with meson
-
-```
-meson setup build .
-meson compile -C build
-
+./build.sh
 ```
 
 ## Run
 
 * Server
 
-In server/build directory run: 
-
 ```
-./server_pime
+./run_server.sh
 ```
 
 * SDL client
 
-In SDL directory run:
-
 ```
-./run_local.sh
+./run_local_sdl.sh
 ```
 
 * Raylib client
 
-In raylib directory run:
-
 ```
-./run_local.sh
+./run_local_raylib.sh
 ```
 
-## This project uses nerd-font: https://github.com/ryanoasis/nerd-fonts
+## This project uses
+
+* https://github.com/ryanoasis/nerd-fonts
 

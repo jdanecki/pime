@@ -14,3 +14,12 @@ void print_status(int l, const char * format, ...)
         vsprintf(status_line2, format, args);
     va_end(args);
 }
+
+int CONSOLE_LOG(const char * fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+    return 0;
+}

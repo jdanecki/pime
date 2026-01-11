@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <climits>
-#include "../../core/alchemist/ncurses-output.h"
 #include "../../core/world_params.h"
+int CONSOLE_LOG(const char * fmt, ...);
 
 #define REGIONS_NUM 16
 

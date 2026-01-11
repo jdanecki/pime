@@ -1,7 +1,7 @@
 run_command(['bash', meson.global_source_root() + '/core/generate_packet_types.sh'], check: true)
 subdir('alchemist')
 
-src = [
+core_sources = [
   'world.cpp',
   'player.cpp',
   'tiles.cpp',
@@ -9,27 +9,15 @@ src = [
   'packet_types.cpp',
   'clan.cpp',
   'time.cpp',
-  'alchemist/elements.cpp',
-  'alchemist/names.cpp',
-  'alchemist/el_list.cpp',
-  'alchemist/npc_talk.cpp',
-  'alchemist/properties.cpp',
-  'alchemist/skills.cpp',
-  'alchemist/serialization.cpp',
-  'alchemist/object.cpp'
 ]
 
-# FIXME:
-# enet_cflags = get_option('enet_cflags')
-# if enet_cflags != ''
-#   add_project_arguments(enet_cflags.split(), language: 'cpp')
-# endif
+core_alchemist_sources = []
+foreach s : alchemist_sources
+  core_alchemist_sources += ['alchemist/' + s]
+endforeach
 
-pime = static_library('pime', src,
-  install: false,
-  cpp_args: ['-Wall', '-Wno-switch', '-Wno-reorder']
-)
+core = static_library('core_client', 
+  [core_sources, core_alchemist_sources]
+  )
 
-pime_dep = declare_dependency(
-  link_with: pime
-)
+

@@ -2,7 +2,7 @@
 #include <cstring>
 #include "skills_names.h"
 #include "skills.h"
-#include "ncurses-output.h"
+int CONSOLE_LOG(const char * fmt, ...);
 
 const char * gsn(Skill_type t)
 {

@@ -1,6 +1,8 @@
 #ifndef SERIALIZATION_H
 #define SERIALIZATION_H
 
+int CONSOLE_LOG(const char * fmt, ...);
+
 template <typename T> class SerializablePointer
 {
     T * ptr;
