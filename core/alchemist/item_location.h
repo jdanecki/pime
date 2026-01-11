@@ -1,10 +1,8 @@
-/// <div rustbindgen hide></div>
 #ifndef ITEM_LOCATION_H
 #define ITEM_LOCATION_H
 
 extern unsigned int get_world_pos(unsigned int chunk, unsigned int pos);
 
-/// <div rustbindgen hide></div>
 struct ItemLocation
 {
     enum class Tag
