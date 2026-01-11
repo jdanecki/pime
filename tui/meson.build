@@ -1,17 +1,29 @@
-enet_dep = dependency('libenet', method: 'pkg-config', required: true)
-
-tui_src = [
+tui_sources = [
   'main.cpp',
   'playerUI.cpp',
   'net.cpp',
-  '../client-common/net.cpp',
-  '../client-common/game.cpp',
-  '../client-common/players.cpp'
+  'backend.cpp'
 ]
+inc = include_directories('.')
 
-executable('pime_tui', tui_src,
-  dependencies: [pime_dep, enet_dep],
-  link_args: ['-lm'],
-  install: false,
-  cpp_args: ['-Wall', '-Wno-switch', '-DDISABLE_NPC', '-Wno-unused-but-set-variable']
+client_common_tui_sources= []
+foreach s : client_common_sources
+  client_common_tui_sources += ['../client-common/' + s]
+endforeach
+
+client_common_tui = static_library('client_common_tui', 
+  client_common_tui_sources,
+  include_directories : inc,
+  dependencies: [enet_dep], 
 )
+
+executable('pime_tui', 
+  sources: [tui_sources],
+  #  cpp_args : ['-DDISABLE_NPC'],
+  dependencies: [enet_dep],
+  #  link_args: shared_link_args,
+  link_with: [core, client_common_tui ],
+  install: false,
+)
+
+

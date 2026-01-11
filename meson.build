@@ -23,24 +23,28 @@ subdir('client-common')
 subdir('dialog')
 subdir('menu')
 
-client_common= []
+client_common_2d= []
 foreach s : client_common_sources
-  client_common += ['../client-common/' + s]
+  client_common_2d += ['../client-common/' + s]
+endforeach
+
+foreach s : client_common_2d_sources
+  client_common_2d += ['../client-common/' + s]
 endforeach
 
 foreach s : menu_sources
-  client_common += ['../menu/' + s]
+  client_common_2d += ['../menu/' + s]
 endforeach
 
 foreach s : dialog_sources
-  client_common += ['../dialog/' + s]
+  client_common_2d += ['../dialog/' + s]
 endforeach
 
 subdir('SDL')
 subdir('raylib')
 
 subdir('server')
-#subdir('tui')
+subdir('tui')
 
 custom_target(
   'godot-client',

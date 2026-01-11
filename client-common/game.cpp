@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
 #include <string.h>
 
 #include "backend.inl"
@@ -126,23 +125,7 @@ int init_graphics()
     {
         return 1;
     }
-    if (load_font())
-        return 1;
 
-    struct stat statbuf;
-    int ret = stat("textures", &statbuf);
-    if (ret)
-    {
-        chdir("..");
-        ret = stat("textures", &statbuf);
-        if (ret)
-        {
-            CONSOLE_LOG("missing directory with textures\n");
-            return 2;
-        }
-    }
-
-    load_textures();
     create_menus();
     //map = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, WORLD_SIZE, WORLD_SIZE);
 

@@ -24,7 +24,7 @@ sdl_sources = [
 inc = include_directories('.')
 
 client_common_sdl = static_library('client_common_sdl', 
-  client_common,
+  client_common_2d,
   #  cpp_args : ['-DDISABLE_NPC'],
   include_directories : inc,
   dependencies: [sdl_deps], 

@@ -3,10 +3,14 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL2_gfxPrimitives.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "../core/time_core.h"
 
+#include "../client-common/text.h"
 #include "../client-common/window.h"
+#include "../client-common/texture.h"
 
 SDL_Renderer * renderer;
 SDL_Window * main_window;
@@ -58,6 +62,23 @@ int init_window(const char * title, int wx, int wy)
     SDL_FreeSurface(icon);
 
     TTF_Init();
+
+    if (load_font()) return 1;
+
+    struct stat statbuf;
+    int ret = stat("textures", &statbuf);
+    if (ret)
+    {
+        chdir("..");
+        ret = stat("textures", &statbuf);
+        if (ret)
+        {
+            CONSOLE_LOG("missing directory with textures\n");
+            return 2;
+        }
+    }
+
+    load_textures();
 
     unsigned long t3 = get_time_usec();
     CONSOLE_LOG("Time it took to initialize SDL2 modules (img, window, renderer): %ldms\n ", (t3 - t1) / 1000);

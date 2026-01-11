@@ -12,14 +12,6 @@ extern int trace_network;
 
 struct termios old_stdin, stdin_tty;
 
-void load_textures()
-{}
-
-int load_font()
-{
-    return 0;
-}
-
 void create_menus()
 {}
 
@@ -40,18 +32,6 @@ int init_window(const char * title, int wx, int wy)
 
 void close_graphics() {
     tcsetattr(0, TCSANOW, &old_stdin);
-}
-
-void print_status(int l, const char * format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    if (!l)
-        vprintf(format, args);
-    else
-        vprintf(format, args);
-    va_end(args);
-    puts("");
 }
 
 int kbhit()
