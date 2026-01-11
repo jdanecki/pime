@@ -3,7 +3,7 @@
 
 #include "object.h"
 #include "names.h"
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdint.h>
 #include "properties.h"
 #include "item_location.h"

@@ -1,7 +1,7 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include <cstddef>
+#include <stddef.h>
 int CONSOLE_LOG(const char * fmt, ...);
 
 enum Class_id

@@ -16,7 +16,7 @@ foreach s : alchemist_sources
   core_alchemist_sources += ['alchemist/' + s]
 endforeach
 
-core = static_library('core_client', 
+core = static_library('core', 
   [core_sources, core_alchemist_sources]
   )
 

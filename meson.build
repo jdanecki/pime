@@ -5,6 +5,8 @@ project('pime-project', 'cpp',
     'optimization=g', 
     'warning_level=0',
     #'warning_level=3',
+    'b_pie=true',
+    'b_lto=false'
   ],
   #  version : '0.1'
 )

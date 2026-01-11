@@ -63,7 +63,7 @@ Base * get_base(uint32_t c_id, int32_t id)
 
 void handle_mouse(int x, int y, int button)
 {
-    printf("mouse: x=%d y=%y, button=%d\n", x, y, button);
+    printf("mouse: x=%d y=%d, button=%d\n", x, y, button);
 }
 
 int main()
