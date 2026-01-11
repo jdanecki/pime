@@ -1,6 +1,6 @@
-#include "../dialog.h"
-#include "../d_craft.h"
-#include "../d_action.h"
+#include "../../dialog/dialog.h"
+#include "../../dialog/d_craft.h"
+#include "../../dialog/d_action.h"
 
 #include "../../client-common/window.h"
 #include "../../client-common/text.h"

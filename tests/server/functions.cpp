@@ -1,4 +1,6 @@
-#define MAX_OUTPUT_SIZE 189
+#include "ncurses.h"
+#include "functions.h"
+
 int history_size = 1024;
 char ** out_buf;
 int history_up;

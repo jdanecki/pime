@@ -17,6 +17,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <SDL2_gfxPrimitives.h>
 #include "../client-common/window.h"
 
 extern int window_width;

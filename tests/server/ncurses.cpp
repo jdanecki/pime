@@ -1,10 +1,7 @@
-#include <ncurses.h>
-#include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <unistd.h>
-
-#include "functions.cpp"
+#include "functions.h"
 
 int main()
 {

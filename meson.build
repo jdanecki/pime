@@ -45,6 +45,9 @@ subdir('raylib')
 
 subdir('server')
 subdir('tui')
+if get_option('tests')
+  subdir('tests')
+endif
 
 custom_target(
   'godot-client',

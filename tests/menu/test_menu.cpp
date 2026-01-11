@@ -5,13 +5,12 @@
 #include "../../client-common/window.h"
 #include "../../client-common/text.h"
 
-#include "../menu.h"
+#include "../../menu/menu.h"
 
-class NetClient
-{
-};
-
+bool finish_program;
 bool handle_events();
+class NetClient {};
+
 NetClient * client;
 
 void send_packet_item_used_on_object(NetClient * client, uintptr_t iid, uintptr_t oid) {}
@@ -20,6 +19,24 @@ void send_packet_pickup(NetClient * client, uintptr_t id) {}
 void send_packet_item_used_on_tile(NetClient * client, uintptr_t iid, ItemLocation location) {}
 
 void hide_craft_window() {}
+
+void handle_escape()
+{
+    hide_craft_window();
+    show_menu();
+}
+
+void handle_i()
+{
+    show_menu_inventory_categories();
+}
+
+void quit_program()
+{
+    finish_program= true;
+}
+
+
 
 BasePlant * get_base_plant(size_t id)
 {

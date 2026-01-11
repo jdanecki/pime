@@ -1,4 +1,4 @@
-#include "el_list.h"
+#include "../core/alchemist/el_list.h"
 
 BasePlant * get_base_plant(size_t id)
 {

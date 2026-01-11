@@ -679,7 +679,7 @@ void show_menu()
 
 void show_menu_inventory_categories()
 {
-    player->inventory.show();
+//    player->inventory.show();
     current_menu = menu_inventory_categories;
 }
 

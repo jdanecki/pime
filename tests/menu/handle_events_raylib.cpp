@@ -1,11 +1,14 @@
 #include <raylib.h>
-#include "../menu.h"
-#include "../../client-common/key_handlers.h"
+#include "../../menu/menu.h"
 #include "../../client-common/key_handler.h"
 
 extern bool show_craft;
+extern bool finish_program;
 
 void handle_mouse(int x, int y, int button);
+void handle_escape();
+void handle_i();
+void quit_program();
 
 KeyHandler menu_key_handlers[] = {
     { KEY_ESCAPE, menu_handle_escape },

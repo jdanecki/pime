@@ -1,8 +1,12 @@
 #include <limits.h>
 #include <dirent.h>
 #include <stdio.h>
-#include "../window.h"
-#include "../text.h"
+
+#include  "../core/tiles.h"
+
+#include "../client-common/window.h"
+#include "../client-common/text.h"
+#include "../client-common/texture.h"
 
 int tile_size=32;
 bool redraw=true;
@@ -15,18 +19,11 @@ struct tilexy
 };
 
 struct tilexy objects[TILE_TEXTURES];
-struct tile
-{
-    int tile;
-};
 
-struct tile chunk_table[CHUNK_SIZE][CHUNK_SIZE];
+chunk_table table;
 
-SDL_Texture ** tiles_textures;
 SDL_Surface ** tiles_surfaces;
 SDL_Texture * field;
-
-int tiles_textures_count;
 
 bool key_pressed(int key)
 {
@@ -100,13 +97,14 @@ void blend_pixels(unsigned int *pxA, unsigned int * pxB, SDL_PixelFormat * forma
     //  *pxA= SDL_MapRGBA(format, 255, 255, 255, 255);
     *pxB= *pxA;
 }
+
 void prepare_texture()
 {
     int s=tile_size*CHUNK_SIZE;
 
     SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat( 0, s, s, 32,SDL_PIXELFORMAT_RGBA8888);    
 
-    memset(chunk_table, 0, sizeof(chunk_table));
+    memset(table, 0, sizeof(table));
 
     for (int ty = 0; ty < CHUNK_SIZE; ++ty)
     {
@@ -126,7 +124,7 @@ void prepare_texture()
                     closest_tile=t;
                 }
             }
-            chunk_table[ty][tx].tile=closest_tile;
+            table[ty][tx].tile=closest_tile;
 
             SDL_Surface * tile = tiles_surfaces[closest_tile];
             SDL_Rect img_rect = {tx * tile_size, ty * tile_size, tile_size, tile_size};
@@ -139,7 +137,7 @@ void prepare_texture()
     {
         for (int tx = 0; tx < CHUNK_SIZE-1; ++tx)
         {
-            if (chunk_table[ty][tx].tile!=chunk_table[ty][tx+1].tile)
+            if (table[ty][tx].tile!=table[ty][tx+1].tile)
             {
                 for (int i = 0; i < tile_size; i++) {
                     for (int bw = 0; bw < 2; bw++)
@@ -151,7 +149,7 @@ void prepare_texture()
                     }
                 }
             }
-            if (chunk_table[tx][ty].tile!=chunk_table[tx+1][ty].tile)
+            if (table[tx][ty].tile!=table[tx+1][ty].tile)
             {
                 for (int i = 0; i < tile_size; i++) {
                     for (int bw = 0; bw < 2; bw++)
