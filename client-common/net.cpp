@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <cstring>
-//#include "../core/tiles.h"
+// #include "../core/tiles.h"
 #include "../core/packets.h"
 #include "net.h"
 #include "players.h"
@@ -14,47 +14,51 @@ extern void print_status(int i, const char * format, ...);
 class ObjectElement : public ListElement
 {
   public:
-    ObjectElement(InventoryElement *el): ListElement(el) {}
-    bool check(void *what)
+    ObjectElement(InventoryElement * el) : ListElement(el)
     {
-        uintptr_t * uid=(uintptr_t*)what;
+    }
+    bool check(void * what)
+    {
+        uintptr_t * uid = (uintptr_t *)what;
         return *uid == el.get()->uid;
     }
 };
 
 void add_base_elements(PacketElementsList * list, int i)
 {
-    switch (list->get_c_id()) {
+    switch (list->get_c_id())
+    {
         case Class_BaseElement:
         {
-            BaseElement * base_el = &((BaseElement*) list->get_data())[i];
+            BaseElement * base_el = &((BaseElement *)list->get_data())[i];
             base_elements.add(new BaseListElement(new BaseElement(*base_el)));
             break;
         }
         case Class_BasePlant:
         {
-            BasePlant * base_el = &((BasePlant*) list->get_data())[i];
+            BasePlant * base_el = &((BasePlant *)list->get_data())[i];
             base_plants.add(new BaseListElement(new BasePlant(*base_el)));
             break;
         }
         case Class_BaseAnimal:
         {
-            BaseAnimal * base_el = &((BaseAnimal*) list->get_data())[i];
+            BaseAnimal * base_el = &((BaseAnimal *)list->get_data())[i];
             base_animals.add(new BaseListElement(new BaseAnimal(*base_el)));
             break;
         }
     }
 }
 
- extern void update_hotbar();
+extern void update_hotbar();
 void add_elements(PacketElementsList * list, int i)
 {
-    size_t uid= ((size_t*) list->get_data())[i];
+    size_t uid = ((size_t *)list->get_data())[i];
     Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, list->get_pl_id()));
     if (p)
     {
-       InventoryElement * el = get_object_by_id(NetworkObject(Class_Element, uid));
-       if (el) p->pickup(el);
+        InventoryElement * el = get_object_by_id(NetworkObject(Class_Element, uid));
+        if (el)
+            p->pickup(el);
         printf("player=%s [%d]=%lx inv.elements=%d\n", p->get_name(), i, uid, p->inventory.nr_elements);
     }
     update_hotbar();
@@ -81,7 +85,7 @@ void got_id(size_t id, int64_t seed)
     player->location.chunk.map_y = 128;
     player->location.chunk.x = 8;
     player->location.chunk.y = 8;
-    player->name=SerializableCString("player");
+    player->name = SerializableCString("player");
     CONSOLE_LOG("seed: %ld\n", seed);
     srand(seed);
     init_sentences();
@@ -103,10 +107,9 @@ void checked_update(size_t pl_id, size_t el)
     p->set_checked(el);
 }
 
-
 InventoryElement * remove_from_location(ItemLocation location, NetworkObject id)
 {
-    InventoryElement * el = (InventoryElement*)get_object_by_id(id);
+    InventoryElement * el = (InventoryElement *)get_object_by_id(id);
     if (!el)
         return nullptr;
     switch (location.tag)
@@ -132,7 +135,7 @@ InventoryElement * remove_from_location(ItemLocation location, NetworkObject id)
 
 void destroy_object(NetworkObject id, ItemLocation location)
 {
-    InventoryElement * el = (InventoryElement*)get_object_by_id(id);
+    InventoryElement * el = (InventoryElement *)get_object_by_id(id);
     if (el)
     {
         InventoryElement * removed = remove_from_location(location, id);
@@ -140,7 +143,7 @@ void destroy_object(NetworkObject id, ItemLocation location)
         {
             abort();
         }
-       CONSOLE_LOG("Client: destroy_object %ld", id.uid);
+        CONSOLE_LOG("Client: destroy_object %ld", id.uid);
         deregister_object(el);
         delete el;
     }
@@ -155,17 +158,16 @@ void send_packet_request_item(NetClient * client, size_t id)
     p->send(client->peer);
 }
 
-
 void update_item_location(LocationUpdateData data)
 {
     NetworkObject id = data.id;
     ItemLocation & old_loc = data.old;
     ItemLocation & new_loc = data.new_;
 
-/*    CONSOLE_LOG("update item location uid=%lx old_tag=%d new_tag=%d\n", id.uid, (int)old_loc.tag, (int)new_loc.tag);
-    old_loc.show();
-    new_loc.show();
-*/
+    /*    CONSOLE_LOG("update item location uid=%lx old_tag=%d new_tag=%d\n", id.uid, (int)old_loc.tag, (int)new_loc.tag);
+        old_loc.show();
+        new_loc.show();
+    */
     InventoryElement * el = remove_from_location(old_loc, id);
     if (!el)
     { // FIXME
@@ -175,9 +177,7 @@ void update_item_location(LocationUpdateData data)
         //      old_loc.chunk.x, old_loc.chunk.y,
         //      new_loc.chunk.map_x, new_loc.chunk.map_y,
         //      new_loc.chunk.x, new_loc.chunk.y);
-        if (new_loc.tag == ItemLocation::Tag::Chunk
-            && new_loc.chunk.map_x == player->location.chunk.map_x
-            && new_loc.chunk.map_y == player->location.chunk.map_y)
+        if (new_loc.tag == ItemLocation::Tag::Chunk && new_loc.chunk.map_x == player->location.chunk.map_x && new_loc.chunk.map_y == player->location.chunk.map_y)
             send_packet_request_item(client, id.uid);
 
         return;
@@ -196,8 +196,9 @@ void update_item_location(LocationUpdateData data)
 
             if (el->get_cid() == Class_Player)
             {
-//                printf("my_id=%lx id=%lx\n", my_id, el->get_id());
-                if (my_id == el->get_id()) {
+                //                printf("my_id=%lx id=%lx\n", my_id, el->get_id());
+                if (my_id == el->get_id())
+                {
                     print_status(0, " ");
                     print_status(1, " ");
                 }
@@ -209,7 +210,7 @@ void update_item_location(LocationUpdateData data)
             old_l.chunk.y = old_loc.chunk.y;
             new_l.chunk.x = new_loc.chunk.x;
             new_l.chunk.y = new_loc.chunk.y;*/
-            //el->update_item_location(old_l, new_l);
+            // el->update_item_location(old_l, new_l);
             el->update_item_location(old_loc, new_loc);
             add_object_to_world(el, new_loc);
             break;
@@ -227,12 +228,11 @@ void update_item_location(LocationUpdateData data)
     }
 }
 
-
 bool handle_packet(ENetPacket * packet)
 {
     bool ret = false;
     unsigned char * data = packet->data;
-  //  printf("Received length=%lu: %d\n", packet->dataLength, *data);
+    //  printf("Received length=%lu: %d\n", packet->dataLength, *data);
 
     Packet * p = check_packet('R', data, packet->dataLength);
     if (!p)
@@ -252,7 +252,7 @@ bool handle_packet(ENetPacket * packet)
             got_id(id->get_id(), 0);
             ret = true;
             break;
-        }            
+        }
         case PACKET_CHUNK_UPDATE:
         {
             PacketChunkUpdate * up = dynamic_cast<PacketChunkUpdate *>(p);
@@ -308,9 +308,9 @@ bool handle_packet(ENetPacket * packet)
         case PACKET_ELEMENTS_LIST:
         {
             PacketElementsList * list = dynamic_cast<PacketElementsList *>(p);
-            for (int i=0; i < list->get_nr_elements(); i++)
+            for (int i = 0; i < list->get_nr_elements(); i++)
             {
-                switch(list->get_list_c_id())
+                switch (list->get_list_c_id())
                 {
                     case Class_BaseListElement:
                         add_base_elements(list, i);
@@ -319,13 +319,10 @@ bool handle_packet(ENetPacket * packet)
                         add_elements(list, i);
                         break;
                 }
-
-
             }
             ret = true;
             break;
         }
-
     }
     delete p;
     return ret;
@@ -333,7 +330,7 @@ bool handle_packet(ENetPacket * packet)
 
 NetClient * init(const char * server_ip, const char * port)
 {
-    //trace_network = 1;
+    // trace_network = 1;
 
     if (enet_initialize() != 0)
     {
@@ -378,7 +375,7 @@ NetClient * init(const char * server_ip, const char * port)
     }
 
     Packet * p = new PacketJoinRequest();
-    p->send(peer);    
+    p->send(peer);
 
     if (enet_host_service(host, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_RECEIVE)
     {
@@ -429,27 +426,27 @@ unsigned int network_tick(NetClient * client)
 
 InventoryElement * get_object_by_id(NetworkObject uid)
 {
-    ListElement *el = objects.find(&uid.uid);
-    return el ? static_cast<InventoryElement*>(el->el.get()) : nullptr;
+    ListElement * el = objects.find(&uid.uid);
+    return el ? static_cast<InventoryElement *>(el->el.get()) : nullptr;
 }
 
 void register_object(NetworkObject * o)
 {
-    ObjectElement *obj = new ObjectElement((InventoryElement*)o);
-   // printf("register_object: uid=%lx\n", o->uid);
+    ObjectElement * obj = new ObjectElement((InventoryElement *)o);
+    // printf("register_object: uid=%lx\n", o->uid);
     objects.add(obj);
 }
 
 void deregister_object(NetworkObject * o)
 {
-    ListElement * obj= objects.find(&o->uid);
+    ListElement * obj = objects.find(&o->uid);
     objects.remove(obj);
 }
 
 Base * get_base(uint32_t c_id, int32_t id)
 {
     return nullptr;
-   // return base.find(&id);
+    // return base.find(&id);
 }
 
 void send_packet_move(NetClient * client, int32_t x, int32_t y)
@@ -585,11 +582,11 @@ void update_object(const ObjectData * data)
     Class_id c_id = data->inv_element.data.c_id;
 
     InventoryElement * el = get_object_by_id(data->inv_element.data);
-    //FIXME why we get el=NULL? -> change this to get_object_by_uid
-    //  CONSOLE_LOG("update_object: el=%p chunk[%d,%d]\n", el, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
+    // FIXME why we get el=NULL? -> change this to get_object_by_uid
+    //   CONSOLE_LOG("update_object: el=%p chunk[%d,%d]\n", el, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
     if (el)
     {
-       // CONSOLE_LOG("update_object: el->cid=%x c_id=%x\n", el->c_id, c_id);
+        // CONSOLE_LOG("update_object: el->cid=%x c_id=%x\n", el->c_id, c_id);
     }
     if (el && el->c_id == c_id)
     {
@@ -658,7 +655,7 @@ void create_object(const ObjectData * data)
         register_object(object);
         if (object->c_id != Class_Clan)
         {
-            InventoryElement* el = (InventoryElement*)object;
+            InventoryElement * el = (InventoryElement *)object;
             add_object_to_world(el, el->location);
         }
     }
@@ -680,6 +677,6 @@ void action_failed()
     print_status(1, "action failed");
 }
 
-void add_packet_to_send1(Packet * p) {}
-
-
+void add_packet_to_send1(Packet * p)
+{
+}

@@ -7,8 +7,7 @@ AxeHandle::AxeHandle(InventoryElement * from) : IngredientServer(from, ING_AXE_H
 
 IngredientServer * AxeHandle::createAxeHandle(InventoryElement * from)
 {
-    if ((from->get_cid() == Class_Element && from->get_form() == Form_solid) ||
-        from->get_cid() == Class_Plant)
+    if ((from->get_cid() == Class_Element && from->get_form() == Form_solid) || from->get_cid() == Class_Plant)
         return new AxeHandle(from);
     else
         return nullptr;

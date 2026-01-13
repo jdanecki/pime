@@ -38,7 +38,7 @@ class TerrainType
     TerrainType(int id) : id(id)
     {
         form = random_range(1, 4);
-        //form = 1;
+        // form = 1;
     }
     bool eq(TerrainType * other)
     {
@@ -60,7 +60,7 @@ class PlantType
     void show()
     {
         CONSOLE_LOG(" PlanType: id=%d grounds=%d: ", id, grounds_count);
-        for (int i=0; i< grounds_count; i++)
+        for (int i = 0; i < grounds_count; i++)
         {
             CONSOLE_LOG("%d ", possible_ground[i]->id);
         }
@@ -87,7 +87,7 @@ class AnimalType
     void show()
     {
         CONSOLE_LOG(" AnimalType: id=%d grounds=%d: ", id, grounds_count);
-        for (int i=0; i< grounds_count; i++)
+        for (int i = 0; i < grounds_count; i++)
         {
             CONSOLE_LOG("%d ", possible_ground[i]->id);
         }
@@ -103,7 +103,6 @@ class AnimalType
         return false;
     }
 };
-
 
 extern int terrains_count;
 extern TerrainType ** terrains;
@@ -143,7 +142,6 @@ class PlantEntry
     }
 };
 
-
 class AnimalEntry
 {
   public:
@@ -164,7 +162,7 @@ class Region
   public:
     TerrainType * terrain_type;
     RockEntry ** rocks_types; // elements in this region
-    int rocks_count; //number of elements in this region
+    int rocks_count;          // number of elements in this region
     PlantEntry ** plants_types;
     int plants_count;
     AnimalEntry ** animals_types;
@@ -212,4 +210,3 @@ Region * find_region(int x, int y);
 void show_terrains();
 void show_plants();
 void show_animals();
-

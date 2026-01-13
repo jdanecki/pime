@@ -9,15 +9,24 @@
 
 bool finish_program;
 bool handle_events();
-class NetClient {};
+class NetClient
+{
+};
 
 NetClient * client;
 
-void send_packet_item_used_on_object(NetClient * client, uintptr_t iid, uintptr_t oid) {}
-void send_packet_action_on_object(NetClient * client, int32_t a, uintptr_t oid) {}
-void send_packet_pickup(NetClient * client, uintptr_t id) {} 
-void send_packet_item_used_on_tile(NetClient * client, uintptr_t iid, ItemLocation location) {}
-
+void send_packet_item_used_on_object(NetClient * client, uintptr_t iid, uintptr_t oid)
+{
+}
+void send_packet_action_on_object(NetClient * client, int32_t a, uintptr_t oid)
+{
+}
+void send_packet_pickup(NetClient * client, uintptr_t id)
+{
+}
+void send_packet_item_used_on_tile(NetClient * client, uintptr_t iid, ItemLocation location)
+{
+}
 
 void handle_escape()
 {
@@ -31,13 +40,13 @@ void handle_i()
 
 void quit_program()
 {
-    finish_program= true;
+    finish_program = true;
 }
 
-Base * get_base(uint32_t c_id, int32_t id)                                                                                                                                                    
+Base * get_base(uint32_t c_id, int32_t id)
 {
     return nullptr;
-   // return base.find(&id);
+    // return base.find(&id);
 }
 
 void handle_mouse(int x, int y, int button)
@@ -56,12 +65,12 @@ int main()
     {
         if (handle_events())
             break;
-        
+
         Backend_Begin_Drawing();
         clear_window();
 
-      if (current_menu)
-          current_menu->show();
+        if (current_menu)
+            current_menu->show();
 
         Backend_Update_Screen();
         Backend_End_Drawing();
@@ -69,5 +78,4 @@ int main()
         Backend_Wait();
     }
     return 0;
-
 }

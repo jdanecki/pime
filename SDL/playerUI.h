@@ -13,6 +13,6 @@ class PlayerUI : public Player, public Renderable
     PlayerUI(Player data);
 };
 
-extern PlayerUI* player;
+extern PlayerUI * player;
 
 #endif

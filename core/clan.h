@@ -1,7 +1,6 @@
 #ifndef CLAN_H
 #define CLAN_H
 
-
 #include "alchemist/object.h"
 #include "alchemist/skills.h"
 
@@ -18,34 +17,34 @@ extern const char * clan_names[];
 
 class Clan : public NetworkObject
 {
-public:
+  public:
     ClanId id;
     Clan(ClanId id);
     // TODO use those as default for a player
     Skill skills[SK_NUM];
 };
 
-class Human_clan: public Clan
+class Human_clan : public Clan
 {
-public:
+  public:
     Human_clan();
 };
 
-class Dwarf_clan: public Clan
+class Dwarf_clan : public Clan
 {
-public:
+  public:
     Dwarf_clan();
 };
 
-class Elf_clan: public Clan
+class Elf_clan : public Clan
 {
-public:
+  public:
     Elf_clan();
 };
 
-class Niziolek_clan: public Clan
+class Niziolek_clan : public Clan
 {
-public:
+  public:
     Niziolek_clan();
 };
 

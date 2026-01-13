@@ -2,7 +2,7 @@
 #include "playerUI.h"
 
 extern int active_hotbar;
-int hotbar_x=550, hotbar_y=420;
+int hotbar_x = 550, hotbar_y = 420;
 
 void change_active_hotbar(DialogButton * button)
 {
@@ -18,8 +18,8 @@ DHotbar::DHotbar() : Dialog({(Backend_Rect_Field)hotbar_x, (Backend_Rect_Field)h
 {
     for (int i = 0; i < 10; i++)
     {
-        Backend_Rect_Field r1=(Backend_Rect_Field)(i*50);
-        Backend_Rect_Field r2=(Backend_Rect_Field)(i*50+2);
+        Backend_Rect_Field r1 = (Backend_Rect_Field)(i * 50);
+        Backend_Rect_Field r2 = (Backend_Rect_Field)(i * 50 + 2);
         if (i == active_hotbar)
             add(new DialogBox(i, {r1, 0, 50, 50}, {255, 255, 255, 255}, false));
         else
@@ -35,12 +35,12 @@ void DHotbar::update()
     {
         // IMAGES
         DialogImage * img = dynamic_cast<DialogImage *>(get_element_from_id(i, DialogElementType::Image));
-        img->texture_loaded=false;
+        img->texture_loaded = false;
         if (player->hotbar[i])
         {
             Renderable * r = dynamic_cast<Renderable *>(player->hotbar[i]);
             img->texture = r->get_texture();
-            img->texture_loaded=true;
+            img->texture_loaded = true;
         }
         // SELECTION
         DialogBox * b = dynamic_cast<DialogBox *>(get_element_from_id(i, DialogElementType::Box));
@@ -49,16 +49,18 @@ void DHotbar::update()
             b->color = {150, 150, 80, 255};
             b->fill = true;
         }
-        else {
+        else
+        {
             b->fill = false;
             b->color = {125, 125, 125, 255};
         }
-        if (player->craftbar[i] == 1) {
+        if (player->craftbar[i] == 1)
+        {
             if (b->fill)
                 b->color = {000, 240, 40, 255};
             else
             {
-                b->fill=true;
+                b->fill = true;
                 b->color = {000, 150, 40, 255};
             }
         }

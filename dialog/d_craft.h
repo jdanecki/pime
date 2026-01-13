@@ -4,7 +4,7 @@
 #include "dialog.h"
 class DCraft : public Dialog
 {
-  public:    
+  public:
     Dialog ingredients;
     Dialog products;
     bool in_products;
@@ -13,7 +13,6 @@ class DCraft : public Dialog
     void update();
     void draw();
     bool press(int x, int y, int button);
-
 };
 
 extern DCraft d_craft;

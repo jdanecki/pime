@@ -5,28 +5,28 @@
 
 bool handle_events();
 
-Element2d *el;
+Element2d * el;
 
 void draw()
 {
-   Color c;
-   c.r=100;
-   c.g=100;
-   c.b=100;
-   c.a=255;
+    Color c;
+    c.r = 100;
+    c.g = 100;
+    c.b = 100;
+    c.a = 255;
 
     Backend_Begin_Drawing();
     ClearBackground(c);
 
-    Backend_Draw_Gradient_Rectangle(50, 100, 200, 150, Backend_Color{255, 0, 0, 255},  Backend_Color{});
+    Backend_Draw_Gradient_Rectangle(50, 100, 200, 150, Backend_Color{255, 0, 0, 255}, Backend_Color{});
     Backend_Draw_Gradient_Rectangle(300, 100, 200, 150, Backend_Color{0, 255, 0, 255}, Backend_Color{});
     Backend_Draw_Gradient_Rectangle(550, 100, 200, 150, Backend_Color{0, 0, 255, 255}, Backend_Color{});
 
-    Backend_Draw_Gradient_Rectangle(50, 300, 200, 150, Backend_Color{},  Backend_Color{255,0,0,255});
+    Backend_Draw_Gradient_Rectangle(50, 300, 200, 150, Backend_Color{}, Backend_Color{255, 0, 0, 255});
     Backend_Draw_Gradient_Rectangle(50, 300, 200, 150, Backend_Color{255, 0, 0, 255}, Backend_Color{});
 
-    Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{0,255,0,255}, Backend_Color{});
-    Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{}, Backend_Color{0,255,0,255});
+    Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{0, 255, 0, 255}, Backend_Color{});
+    Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{}, Backend_Color{0, 255, 0, 255});
 
     el->render(10, 500);
 
@@ -43,15 +43,18 @@ void mouse_pressed(int x, int y, int button)
 
 void handle_mouse()
 {
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+    {
         Vector2 pos = GetMousePosition();
         mouse_pressed((int)pos.x, (int)pos.y, 1);
     }
-    if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
+    if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON))
+    {
         Vector2 pos = GetMousePosition();
         mouse_pressed((int)pos.x, (int)pos.y, 2);
     }
-    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
+    {
         Vector2 pos = GetMousePosition();
         mouse_pressed((int)pos.x, (int)pos.y, 3);
     }
@@ -61,35 +64,39 @@ bool handle_events()
 {
     handle_mouse();
     printf("events:\n");
-    if (IsKeyDown(KEY_ESCAPE)) return true;
-    if (IsKeyDown(KEY_LEFT)) printf("left\n");
-    if (IsKeyDown(KEY_RIGHT)) printf("right\n");
-    if (IsKeyDown(KEY_UP)) printf("up\n");
-    if (IsKeyDown(KEY_DOWN)) printf("down\n");
+    if (IsKeyDown(KEY_ESCAPE))
+        return true;
+    if (IsKeyDown(KEY_LEFT))
+        printf("left\n");
+    if (IsKeyDown(KEY_RIGHT))
+        printf("right\n");
+    if (IsKeyDown(KEY_UP))
+        printf("up\n");
+    if (IsKeyDown(KEY_DOWN))
+        printf("down\n");
     printf("--------\n");
 
     return false;
 }
 
-
 int main()
 {
-   init_window("test_raylib", 1000, 800);
+    init_window("test_raylib", 1000, 800);
 
-   Element e(new BaseElement(Form_solid, 0));
-    e.width.value=100;
-    e.height.value=100;
+    Element e(new BaseElement(Form_solid, 0));
+    e.width.value = 100;
+    e.height.value = 100;
 
     el = new Element2d(e);
 
-   while(!finish_program)
-   {
+    while (!finish_program)
+    {
         if (handle_events())
             return 0;
 
         draw();
     }
 
-  close_graphics();
-  return 0;
+    close_graphics();
+    return 0;
 }

@@ -30,10 +30,10 @@ class ListElement
     virtual void show(bool details = true);
     virtual bool tick()
     {
-        return ((InventoryElement*)(el.get()))->tick();
+        return ((InventoryElement *)(el.get()))->tick();
     }
     ListElement(InventoryElement * entry);
-    ListElement(NetworkObject* entry);
+    ListElement(NetworkObject * entry);
     ListElement() : c_id(Class_ListElement), el(nullptr), next(nullptr), prev(nullptr)
     {
         enable();
@@ -129,34 +129,38 @@ class ElementsListIterator
     ListElement * le;
 
   public:
-    ElementsListIterator(ListElement *le);
-    bool operator!=(const ElementsListIterator& other);
+    ElementsListIterator(ListElement * le);
+    bool operator!=(const ElementsListIterator & other);
     ElementsListIterator operator++();
-    InventoryElement* operator*();
+    InventoryElement * operator*();
 
     ElementsListIterator next();
-    bool equal(const ElementsListIterator& other);
-    InventoryElement* get();
+    bool equal(const ElementsListIterator & other);
+    InventoryElement * get();
 };
 
 class ElementsListReverseIterator
 {
-    ListElement* le;
+    ListElement * le;
 
   public:
-    ElementsListReverseIterator(ListElement* le) : le(le) {}
+    ElementsListReverseIterator(ListElement * le) : le(le)
+    {
+    }
     bool operator!=(const ElementsListReverseIterator & other) const
     {
         return le != other.le;
     }
 
-    ElementsListReverseIterator& operator++() {
+    ElementsListReverseIterator & operator++()
+    {
         le = le->prev;
         return *this;
     }
 
-    InventoryElement* operator*() const {
-        return (InventoryElement*)le->el.get();
+    InventoryElement * operator*() const
+    {
+        return (InventoryElement *)le->el.get();
     }
 };
 
@@ -195,23 +199,41 @@ class ElementsList
     void tick();
     void copy_elements(ElementsList * dst);
     ListElement * get_random();
-    
+
     ElementsListIterator begin() const;
     ElementsListIterator end() const;
 
-    ElementsListReverseIterator rbegin() { return tail; }
-    ElementsListReverseIterator rend()   { return nullptr; }
+    ElementsListReverseIterator rbegin()
+    {
+        return tail;
+    }
+    ElementsListReverseIterator rend()
+    {
+        return nullptr;
+    }
 
     ReversedView reversed();
 };
 
-class ReversedView {    
+class ReversedView
+{
   public:
-    ElementsList* list;
-    ReversedView(ElementsList *list) : list(list) {}
-    void show() { list->show(false); }
-    ElementsListReverseIterator begin() { return list->rbegin(); }
-    ElementsListReverseIterator end()   { return list->rend(); }
+    ElementsList * list;
+    ReversedView(ElementsList * list) : list(list)
+    {
+    }
+    void show()
+    {
+        list->show(false);
+    }
+    ElementsListReverseIterator begin()
+    {
+        return list->rbegin();
+    }
+    ElementsListReverseIterator end()
+    {
+        return list->rend();
+    }
 };
 
 typedef bool (*FindFunc)(InventoryElement * el, void * arg);

@@ -7,7 +7,7 @@ int random_range(int min, int max)
 
 float random_float_range(float min, float max)
 {
-    return (float) rand() / (1.0 * RAND_MAX) * (max - min) + min;
+    return (float)rand() / (1.0 * RAND_MAX) * (max - min) + min;
 }
 
 int random_bool(double probability)
@@ -26,4 +26,3 @@ void do_times(float prob, callback_fn f, chunk * ch, int id)
         }
     }
 }
-

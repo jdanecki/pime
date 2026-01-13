@@ -16,7 +16,7 @@ extern Backend_Color Yellow;
 extern char status_line[256];
 extern char status_line2[256];
 void print_status(int i, const char * format, ...);
-void write_text(int x, int y, const char * text, Backend_Color color, int scale_x, int scale_y, bool clear_bg=false);
+void write_text(int x, int y, const char * text, Backend_Color color, int scale_x, int scale_y, bool clear_bg = false);
 
 int load_font();
 void unload_font();

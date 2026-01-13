@@ -6,9 +6,9 @@ Seed::Seed(InventoryElement * from) : IngredientServer(from, ING_SEED, Form_soli
 
 IngredientServer * Seed::createSeed(InventoryElement * from)
 {
-    IngredientServer * ret=nullptr;
+    IngredientServer * ret = nullptr;
 
-    switch(from->get_cid())
+    switch (from->get_cid())
     {
         case Class_Plant:
             if (dynamic_cast<Plant *>(from)->phase == Plant_fruits)

@@ -32,7 +32,7 @@ int auto_explore;
 extern int load_font();
 extern void create_menus();
 extern void close_graphics();
-extern int init_window(const char *title, int wx, int wy);
+extern int init_window(const char * title, int wx, int wy);
 extern void load_textures();
 
 void put_element()
@@ -114,24 +114,24 @@ void loop()
             do_auto_explore();
         }
         draw();
-        if (!auto_explore) Backend_Wait();
+        if (!auto_explore)
+            Backend_Wait();
     }
 }
 
 int init_graphics()
 {
-    int texture_size=32;
-    if (init_window(game_name, texture_size*CHUNK_SIZE + PANEL_WINDOW, texture_size*CHUNK_SIZE + STATUS_LINES))
+    int texture_size = 32;
+    if (init_window(game_name, texture_size * CHUNK_SIZE + PANEL_WINDOW, texture_size * CHUNK_SIZE + STATUS_LINES))
     {
         return 1;
     }
 
     create_menus();
-    //map = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, WORLD_SIZE, WORLD_SIZE);
+    // map = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, WORLD_SIZE, WORLD_SIZE);
 
     return 0;
 }
-
 
 bool setup(const char * ip, const char * port)
 {
@@ -141,10 +141,11 @@ bool setup(const char * ip, const char * port)
         return false;
 
     client = init(ip, port);
-    if (client) return true;
-    else return false;
+    if (client)
+        return true;
+    else
+        return false;
 }
-
 
 void start_game(const char * name, int argc, char * argv[])
 {

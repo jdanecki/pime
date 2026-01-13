@@ -9,5 +9,6 @@ IngredientServer * HoeBlade::createHoeBlade(InventoryElement * from)
 {
     if (from->get_cid() == Class_Element && from->get_form() == Form_solid)
         return new HoeBlade(from);
-    else return nullptr;
+    else
+        return nullptr;
 }

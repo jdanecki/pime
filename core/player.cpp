@@ -117,10 +117,8 @@ void Player::stop_conversation()
 
 void Player::show(bool details)
 {
-    CONSOLE_LOG(
-        "%s %s clan=%s id=%ld @ [%d,%d]:[%d,%d] <%c %c>\n", class_name[c_id], get_name(), clan_names[clan.get()->id], get_id(),
-                location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y,
-                running ? 'R' : ' ', sneaking ? 'S': ' ');
+    CONSOLE_LOG("%s %s clan=%s id=%ld @ [%d,%d]:[%d,%d] <%c %c>\n", class_name[c_id], get_name(), clan_names[clan.get()->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x,
+        location.chunk.y, running ? 'R' : ' ', sneaking ? 'S' : ' ');
     if (details)
     {
         // FIXME

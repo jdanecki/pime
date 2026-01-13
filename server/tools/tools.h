@@ -42,7 +42,7 @@ GENERATE_INGREDIENT(Stick, )
 GENERATE_INGREDIENT(Tinder, )
 
 GENERATE_INGREDIENT(Seed, )
-GENERATE_PRODUCT(Seedling, bool use(InventoryElement * object, Player * pl); )
+GENERATE_PRODUCT(Seedling, bool use(InventoryElement * object, Player * pl);)
 
 GENERATE_PRODUCT(RoastedMeat, bool player_action(Player_action, Player *);)
 GENERATE_INGREDIENT(Meat, bool action(Product_action, Player *);)

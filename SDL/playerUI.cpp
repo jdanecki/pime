@@ -3,7 +3,7 @@
 
 SDL_Texture * PlayerUI::get_texture()
 {
-    texture_created=true;
+    texture_created = true;
     return Player_textures.player;
 }
 
@@ -28,9 +28,8 @@ void update_hotbar()
         if (i >= 10)
             break;
         if (le->el.get())
-            player->hotbar[i] = (InventoryElement*)le->el.get();
+            player->hotbar[i] = (InventoryElement *)le->el.get();
         le = le->next;
         i++;
     }
 }
-

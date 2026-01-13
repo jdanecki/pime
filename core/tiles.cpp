@@ -2,13 +2,13 @@
 
 void chunk::add_object(InventoryElement * object, int x, int y)
 {
-    //if (object->c_id == Class_Player)
-      //  objects.add(object);
-    //else
+    // if (object->c_id == Class_Player)
+    //   objects.add(object);
+    // else
     objects.add_front(object);
 
     Class_id cid = object->c_id;
-    if (cid == Class_Animal || cid == Class_Plant || cid == Class_Player )
+    if (cid == Class_Animal || cid == Class_Plant || cid == Class_Player)
     {
         beings.add(object);
     }
@@ -24,7 +24,7 @@ void chunk::add_object(InventoryElement * object)
 {
     int x = rand() % CHUNK_SIZE;
     int y = rand() % CHUNK_SIZE;
-//    CONSOLE_LOG("class %d, %d %d, %ld\n", object->get_cid(), x, y, object->get_uid());
+    //    CONSOLE_LOG("class %d, %d %d, %ld\n", object->get_cid(), x, y, object->get_uid());
     add_object(object, x, y);
 }
 

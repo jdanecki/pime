@@ -172,7 +172,7 @@ class PacketElementsList : public Packet
         unsigned char data[0];
         static void * operator new(size_t size_base, size_t extra)
         {
-       //     CONSOLE_LOG("PacketElementsList: serial_data: allocating %ld + %ld\n", size_base, extra);
+            //     CONSOLE_LOG("PacketElementsList: serial_data: allocating %ld + %ld\n", size_base, extra);
             return ::operator new(size_base + extra);
         }
         serial_data(size_t s) : size(s)
@@ -237,7 +237,7 @@ class PacketElementsList : public Packet
         size_t uid = obj->get_uid();
         size_t * dst = &((size_t *)(&pdata->data))[i];
         *dst = uid;
-    //    CONSOLE_LOG("copy_list_element: [%d/%d]=%lx\n", i, pdata->nr_elements, uid);
+        //    CONSOLE_LOG("copy_list_element: [%d/%d]=%lx\n", i, pdata->nr_elements, uid);
     }
     void init(ElementsList * list)
     {
@@ -296,7 +296,7 @@ class PacketElementsList : public Packet
         /*      for (int i=0; i<100; i++)
                    CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
         */
-     //   CONSOLE_LOG("PacketElementList: list=%s elems=%d %s\n", pdata->name, pdata->nr_elements, class_name[get_list_c_id()]);
+        //   CONSOLE_LOG("PacketElementList: list=%s elems=%d %s\n", pdata->name, pdata->nr_elements, class_name[get_list_c_id()]);
         return true;
     }
 };
@@ -312,12 +312,12 @@ class PacketObjectCreate : public Packet
         unsigned char data[0];
         static void * operator new(size_t size_base, size_t extra)
         {
-    //        CONSOLE_LOG("PacketObjectCreate: serial_data: allocating %ld + %ld\n", size_base, extra);
+            //        CONSOLE_LOG("PacketObjectCreate: serial_data: allocating %ld + %ld\n", size_base, extra);
             return ::operator new(size_base + extra);
         }
         serial_data(size_t s) : size(s)
         {
-    //        CONSOLE_LOG("PacketObjectCreate: serial_data: set size to %ld\n", size);
+            //        CONSOLE_LOG("PacketObjectCreate: serial_data: set size to %ld\n", size);
         }
         static void operator delete(void * ptr)
         {
@@ -358,7 +358,7 @@ class PacketObjectCreate : public Packet
         /*      for (int i=0; i<100; i++)
                    CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
         */
-    //    CONSOLE_LOG("PacketObjectCreate for objectData::Tag=%d size=%ld\n", (int)obj->tag, obj->size);
+        //    CONSOLE_LOG("PacketObjectCreate for objectData::Tag=%d size=%ld\n", (int)obj->tag, obj->size);
         switch (obj->tag)
         {
             case ObjectData::Tag::Element:
@@ -368,8 +368,8 @@ class PacketObjectCreate : public Packet
             }
             case ObjectData::Tag::Place:
             {
-                size_t * pdata=(size_t*) &obj->data[0];
-            //    CONSOLE_LOG("pdata=%lx\n", *pdata);
+                size_t * pdata = (size_t *)&obj->data[0];
+                //    CONSOLE_LOG("pdata=%lx\n", *pdata);
                 new (&obj->place.data) Place((Place_id)obj->id, *pdata);
                 break;
             }
@@ -386,7 +386,7 @@ class PacketObjectCreate : public Packet
             case ObjectData::Tag::Player:
                 new (&obj->player.data.inventory) InvList("inventory");
                 new (&obj->player.data.known_elements) ElementsList("known elements");
-                //new (obj->player.data.player_skills) Skills();
+                // new (obj->player.data.player_skills) Skills();
                 new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
                 // talking_to
                 // relations
@@ -407,7 +407,7 @@ class PacketObjectUpdate : public Packet
         unsigned char data[0];
         static void * operator new(size_t size_base, size_t extra)
         {
-         //   CONSOLE_LOG("PacketObjectUpdate: serial_data: allocating %ld + %ld\n", size_base, extra);
+            //   CONSOLE_LOG("PacketObjectUpdate: serial_data: allocating %ld + %ld\n", size_base, extra);
             return ::operator new(size_base + extra);
         }
         serial_data(size_t s) : size(s)
@@ -452,7 +452,7 @@ class PacketObjectUpdate : public Packet
         /*      for (int i=0; i<100; i++)
                    CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
         */
-     //   CONSOLE_LOG("PacketObjectUpdate for objectData::Tag=%d\n", (int)obj->tag);
+        //   CONSOLE_LOG("PacketObjectUpdate for objectData::Tag=%d\n", (int)obj->tag);
         switch (obj->tag)
         {
             case ObjectData::Tag::Element:
@@ -471,11 +471,11 @@ class PacketObjectUpdate : public Packet
                 break;
             }
             case ObjectData::Tag::Player:
-            //    CONSOLE_LOG("ObjectUpdate for player inv_elems=%d\n", obj->player.data.inventory.nr_elements);
+                //    CONSOLE_LOG("ObjectUpdate for player inv_elems=%d\n", obj->player.data.inventory.nr_elements);
                 new (&obj->player.data.inventory) InvList("inventory");
-            //    CONSOLE_LOG("ObjectUpdate for player initialized: inv_elems=%d\n", obj->player.data.inventory.nr_elements);
+                //    CONSOLE_LOG("ObjectUpdate for player initialized: inv_elems=%d\n", obj->player.data.inventory.nr_elements);
                 new (&obj->player.data.known_elements) ElementsList("known elements");
-                //new (&obj->player.data.player_skills) Skills();
+                // new (&obj->player.data.player_skills) Skills();
                 new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
                 // talking_to
                 // relations
@@ -1028,7 +1028,7 @@ class PacketPlayerActionCraft : public Packet
         uintptr_t iid[0];
         static void * operator new(size_t size_base, size_t extra)
         {
-    //        CONSOLE_LOG("serial_data: allocating %ld + %ld\n", size_base, extra);
+            //        CONSOLE_LOG("serial_data: allocating %ld + %ld\n", size_base, extra);
             return ::operator new(size_base + extra);
         }
         serial_data(uintptr_t prod_id, uintptr_t ing_num, const uintptr_t * iid_tab, PacketType t) : t(t), prod_id(prod_id), ing_num(ing_num)

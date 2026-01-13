@@ -11,7 +11,7 @@ Dialog * dialog;
 DAction * actions;
 
 extern int tile_size;
-DCraft *craft;
+DCraft * craft;
 PlayerUI * player;
 bool show_craft;
 
@@ -30,16 +30,16 @@ bool Player::set_known(Class_id cid, int el_id)
     return true;
 }
 
-
 void button_left(DialogButton * button)
 {
     printf("button left: id=%d\n", button->id);
-    if (button->id==1){
-        show_craft^=1;
+    if (button->id == 1)
+    {
+        show_craft ^= 1;
         if (show_craft)
         {
-            player->craftbar[0]=1;
-            player->craftbar[1]=1;
+            player->craftbar[0] = 1;
+            player->craftbar[1] = 1;
         }
     }
 }
@@ -70,8 +70,8 @@ int main()
     player = (PlayerUI *)calloc(sizeof(PlayerUI), 1);
     Element * el1 = new Element(new BaseElement(Form_solid, 0));
     Element * el2 = new Element(new BaseElement(Form_solid, 1));
-    player->hotbar[0]=new Element2d(*el1);
-    player->hotbar[1]=new Element2d(*el2);
+    player->hotbar[0] = new Element2d(*el1);
+    player->hotbar[1] = new Element2d(*el2);
 
     dialog = new Dialog({50, 200, 550, 350}, {125, 125, 125, 125});
     dialog->add(new DialogButton(0, {0, 0, 150, 100}, 15, {125, 0, 0, 125}, // bg
@@ -95,15 +95,16 @@ int main()
 
         if (handle_events())
             break;
-        
+
         Backend_Begin_Drawing();
         clear_window();
 
         dialog->draw();
-        if (show_craft) {
+        if (show_craft)
+        {
             craft->update();
             craft->draw();
-        }        
+        }
         actions->draw();
 
         Backend_Update_Screen();

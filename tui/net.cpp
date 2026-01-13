@@ -3,7 +3,7 @@
 
 NetworkObject * el_from_data(const ObjectData * data)
 {
-   // CONSOLE_LOG("CREATING OBJECT for tag: %d\n", (int)data->tag);
+    // CONSOLE_LOG("CREATING OBJECT for tag: %d\n", (int)data->tag);
     NetworkObject * el = nullptr;
     switch (data->tag)
     {
@@ -65,5 +65,3 @@ NetworkObject * el_from_data(const ObjectData * data)
     }
     return el;
 }
-
-

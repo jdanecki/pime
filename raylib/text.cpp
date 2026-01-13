@@ -3,7 +3,6 @@
 
 #include "../client-common/text.h"
 
-
 Color White = {255, 255, 255, 255};
 Color Gray = {200, 200, 200, 255};
 Color Red = {255, 0, 0, 255};
@@ -14,11 +13,11 @@ Font font;
 
 int load_font()
 {
-//    font = LoadFont(FONT_NAME);
+    //    font = LoadFont(FONT_NAME);
     font = LoadFontEx(FONT_NAME, INITIAL_FONT_SIZE, NULL, 0);
     SetTextureFilter(font.texture, TEXTURE_FILTER_POINT);
-//    SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
-//    SetTextureFilter(font.texture, TEXTURE_FILTER_TRILINEAR);
+    //    SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
+    //    SetTextureFilter(font.texture, TEXTURE_FILTER_TRILINEAR);
     return 0;
 }
 
@@ -29,10 +28,10 @@ void unload_font()
 
 void write_text(int x, int y, const char * text, Color c, int scale_x, int scale_y, bool clear_bg)
 {
-    Vector2 position = { (float)x, (float)y };
+    Vector2 position = {(float)x, (float)y};
     int window_w, window_h;
-    window_w=GetScreenWidth();
-    window_h=GetScreenHeight();
+    window_w = GetScreenWidth();
+    window_h = GetScreenHeight();
 
     int game_size;
 
@@ -53,10 +52,10 @@ void write_text(int x, int y, const char * text, Color c, int scale_x, int scale
     if (clear_bg)
     {
         Color bc;
-        bc.r=10;
-        bc.g=10;
-        bc.b=50;
-        bc.a=255;
+        bc.r = 10;
+        bc.g = 10;
+        bc.b = 50;
+        bc.a = 255;
         Rectangle r{(float)x, (float)y, (float)x_size, (float)y_size};
         DrawRectangleRec(r, bc);
     }

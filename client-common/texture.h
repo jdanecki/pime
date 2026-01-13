@@ -1,7 +1,6 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-
 #include "../core/alchemist/elements.h"
 #include "../core/tiles.h"
 #include "backend.inl"

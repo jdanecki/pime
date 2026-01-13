@@ -16,7 +16,8 @@ void use_tile()
         if (object->get_cid() == Class_Player)
         {
             CONSOLE_LOG("player=%p object=%p\n", player, object);
-            if (player == object) goto player_object;
+            if (player == object)
+                goto player_object;
         }
         if (Product * item = dynamic_cast<Product *>(player->hotbar[active_hotbar]))
         {
@@ -29,7 +30,7 @@ void use_tile()
     }
     else
     {
-player_object:
+    player_object:
         if (InventoryElement * item = player->hotbar[active_hotbar])
         {
             send_packet_item_used_on_tile(client, item->uid, player->location);
@@ -49,5 +50,3 @@ void action_tile(Player_action a, ItemLocation loc)
     CONSOLE_LOG("SDL: action %s on %s\n", player_action_name[a], object->get_name());
     send_packet_action_on_object(client, a, object->uid);
 }
-
-

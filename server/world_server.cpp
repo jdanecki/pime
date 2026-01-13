@@ -26,7 +26,7 @@ void update()
             chunk * c = world_table[y][x];
             if (!c)
                 continue;
-            for (InventoryElement* el : world_table[y][x]->beings)
+            for (InventoryElement * el : world_table[y][x]->beings)
             {
                 BeingServer * b = dynamic_cast<BeingServer *>(el);
                 b->tick();
@@ -49,4 +49,3 @@ void update()
     }
 #endif
 }
-

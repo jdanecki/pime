@@ -5,7 +5,7 @@
 #include "../core/packet_types.h"
 #include <stdio.h>
 
-ElementsList *players;
+ElementsList * players;
 
 void create_players()
 {
@@ -38,7 +38,7 @@ void PlayerServer::move(int dx, int dy)
     int new_map_x = location.chunk.map_x;
     int new_map_y = location.chunk.map_y;
 
- //   CONSOLE_LOG("SERV: player move dx=%d dy=%d\n", dx, dy);
+    //   CONSOLE_LOG("SERV: player move dx=%d dy=%d\n", dx, dy);
 
     if (!((new_x >= 0 && new_x < CHUNK_SIZE) && (new_y >= 0 && new_y < CHUNK_SIZE)))
     {
@@ -85,7 +85,7 @@ bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement 
         {
             return true;
         }
-    }   
+    }
     return false;
 }
 
@@ -230,7 +230,7 @@ bool PlayerServer::pickup(InventoryElement * item)
 
 bool PlayerServer::tick()
 {
-    if (hunger_delay-- <= 0) 
+    if (hunger_delay-- <= 0)
     {
         hunger -= 1;
         thirst -= 1;
@@ -240,7 +240,8 @@ bool PlayerServer::tick()
     return true;
 }
 
-PlayerServer::PlayerServer(size_t uid) : Player(uid, SerializableCString("player"), ItemLocation::center(), 50 + rand() % 100, 50 + rand() % 100, 50 + rand() % 100), hunger_delay(60), hunger_delay_max(600)
+PlayerServer::PlayerServer(size_t uid)
+    : Player(uid, SerializableCString("player"), ItemLocation::center(), 50 + rand() % 100, 50 + rand() % 100, 50 + rand() % 100), hunger_delay(60), hunger_delay_max(600)
 {
     CONSOLE_LOG("PlayerServer: uid=%ld\n", uid);
     notify_create(this);
@@ -254,7 +255,7 @@ PlayerServer * create_player(size_t id)
 
 Npc * create_npc()
 {
-    //return new Npc(ItemLocation::center());
+    // return new Npc(ItemLocation::center());
     return nullptr;
 }
 
@@ -268,4 +269,3 @@ void show_players()
         pl_el = pl_el->next;
     }
 }
-

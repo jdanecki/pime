@@ -10,6 +10,7 @@ class PlayerServer : public Player, public BeingServer
   private:
     int hunger_delay;
     int hunger_delay_max;
+
   public:
     void move(int dx, int dy);
     bool use_item_on_object(InventoryElement * item, InventoryElement * object);
@@ -19,12 +20,12 @@ class PlayerServer : public Player, public BeingServer
     bool pickup(InventoryElement * item);
 
     PlayerServer(size_t uid);
-    bool use_product_on_tile(Product *prod, int map_x, int map_y, int x, int y);
+    bool use_product_on_tile(Product * prod, int map_x, int map_y, int x, int y);
     virtual bool tick() override;
 };
 
 PlayerServer * create_player(size_t id);
-extern ElementsList *players;
+extern ElementsList * players;
 void create_players();
 
 Npc * create_npc();

@@ -85,9 +85,9 @@ struct ObjectData
         CONSOLE_LOG("ObjectData: set size to %ld\n", size);
     }
     ObjectData(Tag tag) : tag(tag)
-    {        
+    {
         size = sizeof(struct ObjectData);
-    //    CONSOLE_LOG("ObjectData: size=%ld\n", size);
+        //    CONSOLE_LOG("ObjectData: size=%ld\n", size);
     }
 
     ~ObjectData()

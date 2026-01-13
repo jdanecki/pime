@@ -55,18 +55,27 @@ class Player : public InventoryElement
     int nutrition;
     InvList inventory;
     ElementsList known_elements;
-    ElementsList* get_known_elements() {return &known_elements;}
+    ElementsList * get_known_elements()
+    {
+        return &known_elements;
+    }
     size_t checked_element;
 
     SerializablePointer<Clan> clan;
-    Clan* get_clan() {return clan.get();}
+    Clan * get_clan()
+    {
+        return clan.get();
+    }
     Skill player_skills[SK_NUM];
 
     bool in_conversation;
     bool welcomed;
     // Player * talking_to;
     SerializablePointer<Player> talking_to;
-    Player* get_talking_to() {return talking_to.get();}
+    Player * get_talking_to()
+    {
+        return talking_to.get();
+    }
     // FIXME change that to list
     // PlayerRelation * relations;
 
@@ -75,7 +84,7 @@ class Player : public InventoryElement
     InventoryElement * get_item_by_uid(size_t id);
     size_t get_id();
     // Player(int uid);
-    Player(size_t uid, SerializableCString&& name, ItemLocation location, int thirst, int hunger, int nutrition);
+    Player(size_t uid, SerializableCString && name, ItemLocation location, int thirst, int hunger, int nutrition);
     int conversation(Player * who, Sentence * s, InventoryElement * el);
     void stop_conversation();
 

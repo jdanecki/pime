@@ -25,7 +25,6 @@ ListElement::ListElement(NetworkObject * entry) : el(entry)
     enabled = true;
 }
 
-
 void ListElement::add(ListElement * entry)
 {
     next = entry;
@@ -35,23 +34,23 @@ void ListElement::add(ListElement * entry)
 
 void ListElement::show(bool details)
 {
-  //  CONSOLE_LOG("ListElement: %p next=%p prev=%p\n", this, next, prev);
-    (static_cast<InventoryElement*>(el.get()))->show(details);
+    //  CONSOLE_LOG("ListElement: %p next=%p prev=%p\n", this, next, prev);
+    (static_cast<InventoryElement *>(el.get()))->show(details);
 }
 
 void ElementsList::remove_all()
 {
     while (head)
     {
-//        CONSOLE_LOG("removing %p elements=%d\n", head, nr_elements);
+        //        CONSOLE_LOG("removing %p elements=%d\n", head, nr_elements);
         remove(head);
-  //      CONSOLE_LOG("removed: head=%p tail=%p elements=%d\n", head, tail, nr_elements);
+        //      CONSOLE_LOG("removed: head=%p tail=%p elements=%d\n", head, tail, nr_elements);
     }
 }
 
-ElementsListIterator::ElementsListIterator(ListElement* le): le(le) {};
+ElementsListIterator::ElementsListIterator(ListElement * le) : le(le){};
 
-bool ElementsListIterator::operator!=(const ElementsListIterator& other)
+bool ElementsListIterator::operator!=(const ElementsListIterator & other)
 {
     return le != other.le;
 }
@@ -62,12 +61,12 @@ ElementsListIterator ElementsListIterator::operator++()
     return *this;
 }
 
-InventoryElement* ElementsListIterator::operator*()
+InventoryElement * ElementsListIterator::operator*()
 {
-    return (InventoryElement*)le->el.get();
+    return (InventoryElement *)le->el.get();
 }
 
-bool ElementsListIterator::equal(const ElementsListIterator& other)
+bool ElementsListIterator::equal(const ElementsListIterator & other)
 {
     return (*this != other);
 }
@@ -77,13 +76,19 @@ ElementsListIterator ElementsListIterator::next()
     return ++*this;
 }
 
-InventoryElement* ElementsListIterator::get()
+InventoryElement * ElementsListIterator::get()
 {
     return **this;
 }
 
-ElementsListIterator ElementsList::begin() const {return head;}
-ElementsListIterator ElementsList::end() const {return nullptr;}
+ElementsListIterator ElementsList::begin() const
+{
+    return head;
+}
+ElementsListIterator ElementsList::end() const
+{
+    return nullptr;
+}
 
 ElementsList::ElementsList(const char * n)
 {
@@ -116,7 +121,7 @@ ListElement * ElementsList::find(void * what)
 void ElementsList::show(bool details)
 {
     ListElement * cur = head;
-    int i=1;
+    int i = 1;
     while (cur)
     {
         CONSOLE_LOG("--- %s (%d/%d) ---\n", name, i, nr_elements);
@@ -177,8 +182,8 @@ ListElement * ElementsList::add(ListElement * entry)
     {
         head = entry;
         tail = entry;
-        entry->next=nullptr;
-        entry->prev=nullptr;
+        entry->next = nullptr;
+        entry->prev = nullptr;
     }
     nr_elements++;
     return entry;
@@ -191,7 +196,7 @@ ListElement * ElementsList::add_front(ListElement * entry)
     if (head)
     {
         entry->next = head;
-        entry->prev=nullptr;
+        entry->prev = nullptr;
         head->prev = entry;
         head = entry;
     }
@@ -343,7 +348,7 @@ InventoryElement * InvList::add(InventoryElement * el)
 {
     ListElement * entry = new ListElement(el);
     ElementsList::add(entry);
-   // CONSOLE_LOG("InvList: added to list(%s) elements=%d el_class_name:%s\n", name, nr_elements, el->get_class_name());
+    // CONSOLE_LOG("InvList: added to list(%s) elements=%d el_class_name:%s\n", name, nr_elements, el->get_class_name());
     return el;
 }
 
@@ -369,10 +374,10 @@ void InvList::remove(InventoryElement * el)
         assert(tail);
 
         if (tail->el.get() == el) // only 1 element on the list
-        {           
+        {
             tail = nullptr;
         }
-     //   CONSOLE_LOG("Inv: delete %p from %p %s\n", head, this, name);
+        //   CONSOLE_LOG("Inv: delete %p from %p %s\n", head, this, name);
         delete head;
         nr_elements--;
         head = tmp;
@@ -392,7 +397,7 @@ void InvList::remove(InventoryElement * el)
             {
                 tail = cur;
             }
-        //    CONSOLE_LOG("Inv: delete %p from %p %s\n", tmp, this, name);
+            //    CONSOLE_LOG("Inv: delete %p from %p %s\n", tmp, this, name);
             delete tmp;
             nr_elements--;
             return;

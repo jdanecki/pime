@@ -16,14 +16,14 @@ ObjectData * convert_to_data(NetworkObject * el)
         case Class_Place:
         {
             Place * place = static_cast<Place *>(el);
-            //obj = new ObjectData(ObjectData::Tag::Place);
-            size_t new_size=sizeof(struct ObjectData)+sizeof(size_t);
+            // obj = new ObjectData(ObjectData::Tag::Place);
+            size_t new_size = sizeof(struct ObjectData) + sizeof(size_t);
             obj = new (new_size) ObjectData(ObjectData::Tag::Place, new_size);
             obj->place.data = *place;
             obj->id = place->get_id();
-            size_t * pdata=(size_t*) &obj->data[0];
+            size_t * pdata = (size_t *)&obj->data[0];
             *pdata = place->get_uid();
-       //     CONSOLE_LOG("pdata=%lx size=%d\n", *pdata, obj->size);
+            //     CONSOLE_LOG("pdata=%lx size=%d\n", *pdata, obj->size);
             break;
         }
         case Class_Player:
@@ -86,7 +86,7 @@ ObjectData * convert_to_data(NetworkObject * el)
             break;
         }
         default:
-        //    CONSOLE_LOG("Unknown class ID=%d in convert_to_data\n", el->c_id);
+            //    CONSOLE_LOG("Unknown class ID=%d in convert_to_data\n", el->c_id);
             assert(0);
             break;
     }
@@ -171,4 +171,3 @@ Packet * check_packet(char dir, unsigned char * data, size_t s)
         return nullptr;
     }
 }
-

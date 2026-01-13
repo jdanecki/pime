@@ -8,7 +8,7 @@
 */
 Backend_Texture Animal2d::get_texture()
 {
-    texture_created=true;
+    texture_created = true;
     return animal_textures[get_id() % BASE_ANIMALS];
 }
 
@@ -29,7 +29,7 @@ void Animal2d::update_item_location(ItemLocation & old_loc, ItemLocation & new_l
 
 Backend_Texture Plant2d::get_texture()
 {
-    texture_created=true;
+    texture_created = true;
     // FIXME combine plant textures in one file for each phase
     // if (grown)
     return plant_textures[get_id() % BASE_PLANTS];

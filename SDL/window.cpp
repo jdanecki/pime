@@ -23,7 +23,7 @@ int init_window(const char * title, int wx, int wy)
     // flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
     flags = SDL_WINDOW_HIDDEN;
     unsigned long t1 = get_time_usec();
-//    if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) < 0)
+    //    if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) < 0)
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         fprintf(stderr, "\nUnable to initialize SDL:  %s\n", SDL_GetError());
@@ -63,7 +63,8 @@ int init_window(const char * title, int wx, int wy)
 
     TTF_Init();
 
-    if (load_font()) return 1;
+    if (load_font())
+        return 1;
 
     struct stat statbuf;
     int ret = stat("textures", &statbuf);

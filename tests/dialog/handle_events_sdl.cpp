@@ -9,12 +9,13 @@ bool key_pressed(int key)
     switch (key)
     {
         case SDLK_ESCAPE:
-            if (show_craft) {
-                show_craft=0;
+            if (show_craft)
+            {
+                show_craft = 0;
             }
             break;
         case SDLK_q:
-                return true;
+            return true;
     }
     return false;
 }
@@ -24,7 +25,6 @@ void mouse_pressed(SDL_MouseButtonEvent & event)
     printf("mouse x: %d y: %d button=%d\n", event.x, event.y, event.button);
     handle_mouse(event.x, event.y, event.button);
 }
-
 
 bool handle_events()
 {
@@ -53,4 +53,3 @@ bool handle_events()
 
     return 0;
 }
-

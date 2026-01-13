@@ -42,7 +42,8 @@ try_again:
         do_times(r->plants_types[i]->value, add_plant, ch, r->plants_types[i]->plant->id);
     }
 
-    if (!ch->objects.nr_elements) {
+    if (!ch->objects.nr_elements)
+    {
         CONSOLE_LOG("empty chunk, trying again %d\n", r->rocks_count);
         goto try_again;
     }
@@ -50,28 +51,27 @@ try_again:
     for (int y = 0; y < CHUNK_SIZE; y++)
         for (int x = 0; x < CHUNK_SIZE; x++)
         {
-            InventoryElement * closest_el=nullptr;
+            InventoryElement * closest_el = nullptr;
             int min_dist = INT_MAX;
-            ListElement * cur=ch->objects.head;
-            while(cur)
+            ListElement * cur = ch->objects.head;
+            while (cur)
             {
-                InventoryElement * el=static_cast<InventoryElement *>(cur->el.get());
+                InventoryElement * el = static_cast<InventoryElement *>(cur->el.get());
                 int dx = x - el->location.get_x();
                 int dy = y - el->location.get_y();
-                int dist=dx * dx + dy * dy;
+                int dist = dx * dx + dy * dy;
                 if (dist < min_dist)
                 {
                     min_dist = dist;
-                    closest_el=el;
+                    closest_el = el;
                 }
-                cur=cur->next;
+                cur = cur->next;
             }
-            if (closest_el) {
+            if (closest_el)
+            {
                 ch->table[y][x].tile = closest_el->get_id();
             }
         }
-
-
 
     for (int i = 0; i < r->animals_count; i++)
     {
@@ -79,21 +79,21 @@ try_again:
     }
 
     // ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
-#if 0
-    int id;
 
+    size_t id;
+#if 0
     for (id=0; id < all_base_elements_count; id++)
     {
         BaseListElement * el = (BaseListElement *)base_elements.find(&id);
         ch->add_object(create_element((BaseElement *)(el->base)), id % 17, 14 + (id / 17));
     }
-
-    for (id=0; id < BASE_PLANTS; id++)
+#endif
+    for (id = 0; id < BASE_PLANTS; id++)
     {
         BaseListElement * pl = (BaseListElement *)base_plants.find(&id);
-        ch->add_object(create_plant((BasePlant *)(pl->base)), id % CHUNK_SIZE, 3*(id / CHUNK_SIZE));
+        ch->add_object(create_plant((BasePlant *)(pl->base)), id % CHUNK_SIZE, 3 * (id / CHUNK_SIZE));
     }
-
+#if 0
     for (id=0; id < BASE_ANIMALS; id++)
     {
         BaseListElement * an = (BaseListElement *)base_animals.find(&id);
@@ -106,7 +106,8 @@ try_again:
 void show_chunk()
 {
     ListElement * pl_el = players->head;
-    if (!pl_el) return;
+    if (!pl_el)
+        return;
     PlayerClient * pl = (PlayerClient *)pl_el;
     int x = pl->player->location.chunk.map_x;
     int y = pl->player->location.chunk.map_y;
@@ -116,7 +117,6 @@ void show_chunk()
     Region * reg = find_region(x, y);
     reg->show();
 }
-
 
 void load_chunks()
 {

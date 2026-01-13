@@ -4,12 +4,12 @@
 
 const char * clan_names[] = {"Animal", "Human", "Dwarf", "Elf", "Niziolek"};
 
-Clan::Clan(ClanId id):  NetworkObject(Class_Clan), id(id)
-{    
+Clan::Clan(ClanId id) : NetworkObject(Class_Clan), id(id)
+{
 }
 
 Human_clan::Human_clan() : Clan(Clan_Human)
-{    
+{
     skills[SK_KAMIENIARSTWO].experience = 3;
     skills[SK_MAGIA].experience = 3;
     skills[SK_RZEMIOSLO].experience = 3;
@@ -48,7 +48,7 @@ Elf_clan::Elf_clan() : Clan(Clan_Elf)
 }
 
 Niziolek_clan::Niziolek_clan() : Clan(Clan_Niziolek)
-{    
+{
     skills[SK_KAMIENIARSTWO].experience = 1;
     skills[SK_MAGIA].experience = 1;
     skills[SK_RZEMIOSLO].experience = 1;
@@ -62,18 +62,21 @@ Niziolek_clan::Niziolek_clan() : Clan(Clan_Niziolek)
 
 Clan * get_clan_by_id(ClanId id)
 {
-    switch ((int) id)
+    switch ((int)id)
     {
-        case 1: return new Human_clan();
-        case 2: return new Dwarf_clan();
-        case 3: return new Elf_clan();
-        case 4: return new Niziolek_clan();
+        case 1:
+            return new Human_clan();
+        case 2:
+            return new Dwarf_clan();
+        case 3:
+            return new Elf_clan();
+        case 4:
+            return new Niziolek_clan();
     }
     return nullptr;
 }
-Clan *get_random_clan()
+Clan * get_random_clan()
 {
     int c = rand() % 4;
-    return get_clan_by_id((ClanId) c);
+    return get_clan_by_id((ClanId)c);
 }
-

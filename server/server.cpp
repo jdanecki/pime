@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdarg.h>
-#include <math.h>
 
 #include "../core/alchemist/el_list.h"
 #include "player_server.h"
@@ -8,11 +7,10 @@
 #include "places/places.h"
 #include "networking.h"
 #include "chunk.h"
-//#include <sys/ioctl.h>
 #include "console.h"
 #include "generator/generator.h"
 
-//#define DEBUG_TIMEOUT 1
+// #define DEBUG_TIMEOUT 1
 
 void print_help()
 {
@@ -55,26 +53,28 @@ char handle_pressed(int pressed)
         case KEY_RESIZE:
             handle_resize(); // FALLTHROUGH
         case KEY_END:
-            scrolling=true;
-            history_up=buf_pos-win_h+1;
-            if (history_up < 0) history_up=0;
+            scrolling = true;
+            history_up = buf_pos - win_h + 1;
+            if (history_up < 0)
+                history_up = 0;
             break;
         case KEY_HOME:
-            scrolling=false;
+            scrolling = false;
             history_up = 0;
             break;
         case KEY_DOWN:
-            scrolling=false;
-            if (history_up < (buf_pos-5)) history_up += 5;
+            scrolling = false;
+            if (history_up < (buf_pos - 5))
+                history_up += 5;
             break;
         case KEY_UP:
-            scrolling=false;
+            scrolling = false;
             history_up -= 5;
             if (history_up < 0)
                 history_up = 0;
             break;
         case '#':
-             show_key^=1;
+            show_key ^= 1;
             break;
         default:
             char append[2] = {(char)pressed, 0};
@@ -84,11 +84,10 @@ char handle_pressed(int pressed)
     return 0;
 }
 
-
-
 char handle_command()
-{    
-    if (!in_buf[0]) return 0;
+{
+    if (!in_buf[0])
+        return 0;
     switch (in_buf[0])
     {
         case 'e':
@@ -122,10 +121,10 @@ char handle_command()
             base_elements.show();
             break;
         case '6':
-             base_plants.show();
+            base_plants.show();
             break;
         case '7':
-             base_animals.show();
+            base_animals.show();
             break;
     }
 
@@ -143,12 +142,12 @@ void generate()
 
         if (i < terrains_count)
         {
-            f= (Form)terrains[i]->form;
+            f = (Form)terrains[i]->form;
             id = terrains[i]->id;
         }
         else
         {
-            f= (Form) (1 + rand() % 3);
+            f = (Form)(1 + rand() % 3);
             id = i;
         }
         ListElement * entry = new BaseListElement(new BaseElement(f, id));
@@ -176,10 +175,11 @@ int main()
     CONSOLE_LOG("This program comes with ABSOLUTELY NO WARRANTY.\n");
     CONSOLE_LOG("This is free software, and you are welcome to redistribute it under certain conditions.\n");
     CONSOLE_LOG("See LICENSE file\n");
- //   trace_network = 1;
+    //   trace_network = 1;
 
     srand(0);
-    if (!init_networking()) return 1;
+    if (!init_networking())
+        return 1;
 
     generate();
     create_players();
@@ -193,8 +193,10 @@ int main()
     {
         ncurses_tick();
         int ch = wgetch(in_w);
-        if (show_key) {
-            if (ch!=ERR) CONSOLE_LOG("key=%d ", ch);
+        if (show_key)
+        {
+            if (ch != ERR)
+                CONSOLE_LOG("key=%d ", ch);
         }
         if (ch != ERR && handle_pressed(ch))
             break;

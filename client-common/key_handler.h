@@ -3,7 +3,8 @@
 
 typedef void (*KeyHandlerFunc)();
 
-struct KeyHandler {
+struct KeyHandler
+{
     int key;
     KeyHandlerFunc func;
     bool press_key;

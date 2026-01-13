@@ -3,21 +3,21 @@
 
 bool handle_events();
 
-Element2d *el;
+Element2d * el;
 
 void draw()
 {
     SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
     SDL_RenderClear(renderer);
-    Backend_Draw_Gradient_Rectangle(50, 100, 200, 150, Backend_Color{255, 0, 0, 255},  Backend_Color{});
+    Backend_Draw_Gradient_Rectangle(50, 100, 200, 150, Backend_Color{255, 0, 0, 255}, Backend_Color{});
     Backend_Draw_Gradient_Rectangle(300, 100, 200, 150, Backend_Color{0, 255, 0, 255}, Backend_Color{});
     Backend_Draw_Gradient_Rectangle(550, 100, 200, 150, Backend_Color{0, 0, 255, 255}, Backend_Color{});
 
-    Backend_Draw_Gradient_Rectangle(50, 300, 200, 150, Backend_Color{},  Backend_Color{255,0,0,255});
+    Backend_Draw_Gradient_Rectangle(50, 300, 200, 150, Backend_Color{}, Backend_Color{255, 0, 0, 255});
     Backend_Draw_Gradient_Rectangle(50, 300, 200, 150, Backend_Color{255, 0, 0, 255}, Backend_Color{});
 
-    Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{0,255,0,255}, Backend_Color{});
-    Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{}, Backend_Color{0,255,0,255});
+    Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{0, 255, 0, 255}, Backend_Color{});
+    Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{}, Backend_Color{0, 255, 0, 255});
 
     el->render(10, 500);
 }
@@ -28,10 +28,12 @@ void key_pressed(int key)
 {
     switch (key)
     {
-        case SDLK_ESCAPE: finish_program = true; break;
+        case SDLK_ESCAPE:
+            finish_program = true;
+            break;
         default:
             printf("key=%d\n", key);
-        break;
+            break;
     }
 }
 void mouse_pressed(SDL_MouseButtonEvent * event)
@@ -64,16 +66,17 @@ bool handle_events()
 
 int main()
 {
-   init_window("test_sdl", 1000, 800);
+    init_window("test_sdl", 1000, 800);
 
-   Element e(new BaseElement(Form_solid, 0));
-    e.width.value=100;
-    e.height.value=100;
+    Element e(new BaseElement(Form_solid, 0));
+    e.width.value = 100;
+    e.height.value = 100;
 
-    el = new Element2d(e); ;
+    el = new Element2d(e);
+    ;
 
-   while(!finish_program)
-   {
+    while (!finish_program)
+    {
         if (handle_events())
             return 0;
 
@@ -81,6 +84,6 @@ int main()
         Backend_Update_Screen();
     }
 
-  close_graphics();
-  return 0;
+    close_graphics();
+    return 0;
 }

@@ -17,7 +17,7 @@ enum Product_action
     ACT_HIT,
     ACT_STAB, // dźgnij
     ACT_FIRE,
-    ACT_PLOW, //oraj
+    ACT_PLOW, // oraj
     ACT_PLANT,
     ACT_INVITE,
 };
@@ -43,7 +43,7 @@ enum Server_action
 
 extern const char * server_action_name[];
 
-class Base: public NetworkObject
+class Base : public NetworkObject
 {
   public:
     Edible edible;
@@ -71,8 +71,8 @@ struct ColorRGB
 class BaseElement : public Base
 {
   public:
-    Form form; // solid, liquid, gas
-    ColorRGB color; //color for tile
+    Form form;      // solid, liquid, gas
+    ColorRGB color; // color for tile
     Property density;
     Solid solid;
 
@@ -138,7 +138,7 @@ class InventoryElement : public NetworkObject
         return c_id;
     }
 
-    virtual bool check_rect(unsigned int px, unsigned int py, int )
+    virtual bool check_rect(unsigned int px, unsigned int py, int)
     {
         return (px == location.get_world_x() && py == location.get_world_y());
     }
@@ -183,7 +183,7 @@ enum Place_id
 extern const char * places_names[];
 
 enum Place_states
-{    
+{
     FIELD_PLOWED,
     FIELD_PLANTED,
 };
@@ -213,10 +213,12 @@ class Place : public InventoryElement
         sprintf(buf, "%s: (%s)", get_name(), place_states_names[state]);
         return buf;
     }
-    virtual void show_state() {}
+    virtual void show_state()
+    {
+    }
     size_t get_id() override
     {
-        return (size_t) id;
+        return (size_t)id;
     }
 };
 
@@ -260,8 +262,8 @@ class Element : public InventoryElement
 {
     SerializablePointer<BaseElement> base;
     // void init(BaseElement * b);
-//  protected:
-public:
+    //  protected:
+  public:
     Property length;
     Property width;
     Property height;
@@ -331,7 +333,6 @@ public:
         sprintf(buf, "%s %s: (%s) base=%ld", get_form_name(), get_class_name(), get_name(), get_id());
         return buf;
     }
-
 };
 
 enum Ingredient_id
@@ -383,7 +384,7 @@ extern const char * product_name[];
 
 class Ingredient : public InventoryElement
 {
-     public:
+  public:
     // properties only needed to create product
     Property quality;    //[0..100] slaby..najlepszy
     Property resilience; // [0..100] wytrzymały..słaby
@@ -428,7 +429,7 @@ class Ingredient : public InventoryElement
 };
 
 class Product : public InventoryElement
-{    
+{
   public:
     Property quality;    //[0..100] slaby..najlepszy
     Property resilience; // [0..100] wytrzymały..słaby
@@ -552,7 +553,7 @@ class Animal : public InventoryElement
 };
 
 enum Plant_phase
-{    
+{
     Plant_seedling,
     Plant_growing,
     Plant_flowers,
@@ -593,7 +594,7 @@ class Plant : public InventoryElement
     unsigned int flowers_time;
 
   public:
-    float size;    
+    float size;
     int water;
 
     // shared with client
@@ -610,7 +611,7 @@ class Plant : public InventoryElement
         if (details)
         {
             get_base()->show(details);
-            CONSOLE_LOG("phase=%s grown=%d times=%d/%d/%d/ water=%d \n", plant_phase_name[phase], grown,  seedling_time, growing_time, flowers_time, water);
+            CONSOLE_LOG("phase=%s grown=%d times=%d/%d/%d/ water=%d \n", plant_phase_name[phase], grown, seedling_time, growing_time, flowers_time, water);
         }
     }
     BasePlant * get_base()

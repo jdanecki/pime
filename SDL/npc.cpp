@@ -14,11 +14,12 @@
 Npc2d * current_npc;
 extern int active_hotbar;
 
-
 SDL_Texture * create_npc_texture()
 {
     BaseElement * b = get_base_element(get_tile_at(player->location));
-    ColorRGB c={0,};
+    ColorRGB c = {
+        0,
+    };
     Uint8 mask_r;
     Uint8 mask_g;
     Uint8 mask_b;

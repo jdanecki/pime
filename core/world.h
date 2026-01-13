@@ -40,7 +40,8 @@ InventoryElement * get_item_at_ppos(Player * player);
 void set_item_at(InventoryElement * item, int chunk_x, int chunk_y, int x, int y);
 void set_item_at_ppos(InventoryElement * item, Player * player);
 
-void get_chunks_around(ItemLocation loc, unsigned int *left_chunk_x, unsigned int *right_chunk_x, unsigned int *top_chunk_y, unsigned int *bottom_chunk_y, unsigned int *ltwx, unsigned int *ltwy);
+void get_chunks_around(
+    ItemLocation loc, unsigned int * left_chunk_x, unsigned int * right_chunk_x, unsigned int * top_chunk_y, unsigned int * bottom_chunk_y, unsigned int * ltwx, unsigned int * ltwy);
 
 extern int tile_size;
 #endif

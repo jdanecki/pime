@@ -9,7 +9,7 @@ Seedling::Seedling(InventoryElement * el1, InventoryElement * el2) : ProductServ
 }
 
 ProductServer * Seedling::createSeedling(InventoryElement * el1, InventoryElement * el2)
-{    
+{
     int id1 = el1->get_id();
     int id2 = el2->get_id();
 
@@ -24,21 +24,20 @@ bool Seedling::use(InventoryElement * object, Player * pl)
     int32_t map_x, map_y;
     unsigned int x, y;
 
-    map_x=object->location.chunk.map_x;
-    map_y=object->location.chunk.map_y;
-    x=object->location.get_x();
-    y=object->location.get_y();
+    map_x = object->location.chunk.map_x;
+    map_y = object->location.chunk.map_y;
+    x = object->location.get_x();
+    y = object->location.get_y();
 
-    CONSOLE_LOG("%s: %s on %s @[%d,%d][%d,%d]\n", get_name(), product_action_name[actions[0]],
-        object->get_name(), map_x, map_y, x, y);
+    CONSOLE_LOG("%s: %s on %s @[%d,%d][%d,%d]\n", get_name(), product_action_name[actions[0]], object->get_name(), map_x, map_y, x, y);
     object->show();
 
-    chunk * ch=world_table[map_y][map_x];
-    IngredientServer * ing=(IngredientServer*)(ings[0]);
-    InventoryElement *el = ing->el;
-    size_t b_id=el->get_id();
+    chunk * ch = world_table[map_y][map_x];
+    IngredientServer * ing = (IngredientServer *)(ings[0]);
+    InventoryElement * el = ing->el;
+    size_t b_id = el->get_id();
     BaseListElement * base_el = (BaseListElement *)base_plants.find(&b_id);
-    PlantServer *plant=create_plant((BasePlant *)(base_el->base));
+    PlantServer * plant = create_plant((BasePlant *)(base_el->base));
     ch->add_object(plant, x, y);
     notify_create(plant);
     return false;

@@ -57,7 +57,6 @@ class PlayerClient : public ListElement
     }
 };
 
-
 void add_packet_to_send(Packet * p);
 void add_packet_to_send1(Packet * p);
 void notify_update(const InventoryElement * el);

@@ -113,7 +113,7 @@ Field:     A          B          G        R
 
     int i = 0;
 
-    tiles_textures = new Backend_Texture [TILE_TEXTURES];
+    tiles_textures = new Backend_Texture[TILE_TEXTURES];
     tiles_textures_count = add_textures_from_dir(tiles_textures, i, "textures/game_tiles");
     assert(tiles_textures_count == TILE_TEXTURES);
 
@@ -149,7 +149,7 @@ Field:     A          B          G        R
     base_plants_count = add_textures_from_dir(plant_textures, i, "textures/plants");
     assert(base_plants_count == BASE_PLANTS);
 
-    i=0;
+    i = 0;
     base_animals_count = add_textures_from_dir(animal_textures, i, "textures/animals");
     assert(base_animals_count == BASE_ANIMALS);
 

@@ -94,7 +94,7 @@ class AnimalServer : public Animal, public BeingServer
 {
     int delay_for_move;
     int delay_for_grow;
-    int dst_loc_x, dst_loc_y;    
+    int dst_loc_x, dst_loc_y;
 
   public:
     void move();
@@ -111,7 +111,7 @@ class AnimalServer : public Animal, public BeingServer
 };
 
 class PlantServer : public Plant, public BeingServer
-{    
+{
     int delay_for_grow;
 
   public:
@@ -120,7 +120,7 @@ class PlantServer : public Plant, public BeingServer
     PlantServer(BasePlant * base);
 
     void sow()
-    {        
+    {
         change_phase(Plant_seedling);
     }
     void change_phase(Plant_phase p);
@@ -154,7 +154,7 @@ class IngredientServer : public Ingredient
 class ProductServer : public Product
 {
   public:
-    void* padding;
+    void * padding;
     int ing_count;
     Ingredient ** ings;
 
@@ -166,14 +166,15 @@ class ProductServer : public Product
     {
         if (!actions_count)
             return false;
-        //FIXME use more actions
+        // FIXME use more actions
         CONSOLE_LOG("%s: %s %s\n", get_name(), product_action_name[actions[0]], object->get_name());
         return object->action(actions[0], pl);
         // FIXME change properties of product after action
     }
     virtual bool use_tile(int map_x, int map_y, int x, int y, Player * pl)
     {
-        if (!actions_count) return false;
+        if (!actions_count)
+            return false;
         CONSOLE_LOG("ProductServer(%s): %s tile (%d, %d): (%d, %d)\n", get_name(), product_action_name[actions[0]], map_x, map_y, x, y);
         return true;
     }
@@ -187,6 +188,5 @@ AnimalServer * create_animal(BaseAnimal * base);
 PlantServer * create_plant(BasePlant * base);
 ElementServer * create_element(BaseElement * base);
 ScrollServer * create_scroll(Base * base);
-
 
 #endif

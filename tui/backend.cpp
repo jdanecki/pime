@@ -1,3 +1,3 @@
-void Backend_Wait() {}
-
-
+void Backend_Wait()
+{
+}

@@ -31,10 +31,10 @@ void DialogBox::draw()
         Backend_Draw_Fill_Rectangle(rect, color);
     else
         Backend_Draw_Rectangle(rect, color);
-
 }
 
-DialogText::DialogText(int id, int x, int y, int size, Backend_Color color, std::string text) : DialogElement(id, Backend_Rect(x, y, 0, 0), DialogElementType::Text), size(size), color(color), text(text)
+DialogText::DialogText(int id, int x, int y, int size, Backend_Color color, std::string text)
+    : DialogElement(id, Backend_Rect(x, y, 0, 0), DialogElementType::Text), size(size), color(color), text(text)
 {
 }
 
@@ -46,12 +46,12 @@ void DialogText::draw()
 DialogImage::DialogImage(int id, Backend_Rect rect, std::string filename) : DialogElement(id, rect, DialogElementType::Image)
 {
     texture = load_texture(filename.c_str());
-    texture_loaded=true;
+    texture_loaded = true;
 }
 
 DialogImage::DialogImage(int id, Backend_Rect rect) : DialogElement(id, rect, DialogElementType::Image)
 {
-    texture_loaded=false;
+    texture_loaded = false;
 }
 
 void DialogImage::draw()
@@ -60,7 +60,8 @@ void DialogImage::draw()
         Backend_Texture_Copy(texture, nullptr, &rect);
 }
 
-DialogButton::DialogButton(int id, Backend_Rect rect, int size, Backend_Color bgcolor, Backend_Color fgcolor, std::string text, void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *))
+DialogButton::DialogButton(
+    int id, Backend_Rect rect, int size, Backend_Color bgcolor, Backend_Color fgcolor, std::string text, void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *))
     : DialogElement(id, rect, DialogElementType::Button), on_press(on_press), on_secondary_press(on_secondary_press)
 {
     d_box = new DialogBox(id, rect, bgcolor, 1);

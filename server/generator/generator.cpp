@@ -92,15 +92,15 @@ Region::Region(TerrainType * terrain_type, int x, int y, unsigned int size) : te
 
 void create_regions()
 {
-    terrains_count = TILE_TEXTURES; //random_range(10, TILE_TEXTURES);
+    terrains_count = TILE_TEXTURES; // random_range(10, TILE_TEXTURES);
     terrains = new TerrainType *[terrains_count];
     for (int i = 0; i < terrains_count; i++)
     {
         terrains[i] = new TerrainType(i);
     }
-    CONSOLE_LOG("terrains count=%d\n", terrains_count);    
+    CONSOLE_LOG("terrains count=%d\n", terrains_count);
 
-    all_plants_count = BASE_PLANTS; //random_range(10, BASE_PLANTS);
+    all_plants_count = BASE_PLANTS; // random_range(10, BASE_PLANTS);
     all_plants = new PlantType *[all_plants_count];
     for (int i = 0; i < all_plants_count; i++)
     {
@@ -108,7 +108,7 @@ void create_regions()
     }
     CONSOLE_LOG("plants count=%d\n", all_plants_count);
 
-    all_animals_count = BASE_ANIMALS;//random_range(10, 20);
+    all_animals_count = BASE_ANIMALS; // random_range(10, 20);
     all_animals = new AnimalType *[all_animals_count];
     for (int i = 0; i < all_animals_count; i++)
     {
@@ -203,11 +203,9 @@ AnimalType::AnimalType(int id) : id(id)
     delete[] chosen_indices;
 }
 
-
-
 void show_terrains()
 {
-    for (int i=0; i < terrains_count; i++)
+    for (int i = 0; i < terrains_count; i++)
     {
         terrains[i]->show();
     }
@@ -215,7 +213,7 @@ void show_terrains()
 
 void show_plants()
 {
-    for (int i=0; i < all_plants_count; i++)
+    for (int i = 0; i < all_plants_count; i++)
     {
         all_plants[i]->show();
     }
@@ -223,9 +221,8 @@ void show_plants()
 
 void show_animals()
 {
-    for (int i=0; i < all_animals_count; i++)
+    for (int i = 0; i < all_animals_count; i++)
     {
         all_animals[i]->show();
     }
 }
-

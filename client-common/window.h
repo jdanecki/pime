@@ -8,7 +8,7 @@
 extern int window_width;
 extern int window_height;
 
-int init_window(const char *title, int wx, int wy);
+int init_window(const char * title, int wx, int wy);
 void close_graphics();
 void clear_window();
 unsigned int color(int r, int g, int b, int a);

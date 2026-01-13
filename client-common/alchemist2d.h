@@ -9,7 +9,7 @@
 #include "window.h"
 
 class Renderable
-{    
+{
   protected:
     int w, h;
     bool flip;
@@ -22,7 +22,7 @@ class Renderable
         flip = false;
         w = 0;
         h = 0;
-        texture_created=false;
+        texture_created = false;
     }
     virtual Backend_Texture get_texture()
     {
@@ -49,17 +49,19 @@ class Renderable
         Backend_Rect img_rect((Backend_Rect_Field)x, (Backend_Rect_Field)y, (Backend_Rect_Field)(w * scale), (Backend_Rect_Field)(h * scale));
         Backend_Rect_Field ww = window_width - PANEL_WINDOW;
         Backend_Rect_Field wh = window_height - STATUS_LINES;
-        Backend_Rect src_rect(0, 0 , w, h);
+        Backend_Rect src_rect(0, 0, w, h);
 
-        if (x >= 0 )
+        if (x >= 0)
         {
             if (img_rect.r.x + img_rect.get_w() > ww)
             {
                 img_rect.set_w(ww - img_rect.r.x);
                 src_rect.set_w(img_rect.get_w());
             }
-        } else {
-            if (img_rect.r.x + img_rect.get_w() >=0)
+        }
+        else
+        {
+            if (img_rect.r.x + img_rect.get_w() >= 0)
             {
                 src_rect.r.x = -x;
                 img_rect.add_w(img_rect.r.x);
@@ -67,15 +69,17 @@ class Renderable
                 img_rect.r.x = 0;
             }
         }
-        if (y >= 0 )
+        if (y >= 0)
         {
             if (img_rect.r.y + img_rect.get_h() > wh)
             {
                 img_rect.set_h(wh - img_rect.r.y);
                 src_rect.set_h(img_rect.get_h());
             }
-        } else {
-            if (img_rect.r.y + img_rect.get_h() >=0)
+        }
+        else
+        {
+            if (img_rect.r.y + img_rect.get_h() >= 0)
             {
                 src_rect.r.y = -y;
                 img_rect.add_h(img_rect.r.y);
@@ -94,16 +98,13 @@ class Renderable
         unsigned int rx = x + ((unsigned int)(w * scale) / t_size);
         unsigned int by = y + ((unsigned int)(h * scale) / t_size);
 
-        if (scale < 0.01) {
-        //    CONSOLE_LOG("px=%d  [x=%d..%d) py=%d [y=%d..%d) scale=%f\n", px, x, rx, py, y, by, scale);
+        if (scale < 0.01)
+        {
+            //    CONSOLE_LOG("px=%d  [x=%d..%d) py=%d [y=%d..%d) scale=%f\n", px, x, rx, py, y, by, scale);
             return false;
         }
-        bool ret= (
-            (px >= x) &&
-            (px <= rx) &&
-            (py >= y) &&
-            (py <= by));
-     //   printf("px=%d  [x=%d..%d) py=%d [y=%d..%d) scale=%f ret=%d\n", px, x, rx, py, y, by, scale, ret);
+        bool ret = ((px >= x) && (px <= rx) && (py >= y) && (py <= by));
+        //   printf("px=%d  [x=%d..%d) py=%d [y=%d..%d) scale=%f ret=%d\n", px, x, rx, py, y, by, scale, ret);
         return ret;
     }
 };

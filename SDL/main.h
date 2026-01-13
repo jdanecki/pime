@@ -11,5 +11,5 @@
 #include "../client-common/menu.h"
 #include "../client-common/game.h"
 
-//extern SDL_Texture * map;
+// extern SDL_Texture * map;
 #endif // MAIN_H

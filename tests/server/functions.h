@@ -23,5 +23,3 @@ void shift_output();
 #define MAX_OUTPUT_SIZE 189
 
 #endif
-
-

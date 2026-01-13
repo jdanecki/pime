@@ -2,8 +2,8 @@
 
 Hut::Hut(InventoryElement * el1, InventoryElement * el2) : ProductServer(el1, el2, PROD_HUT, Form_solid, 0)
 {
-    //FIXME
-    //actions = ACT_NOTHING;
+    // FIXME
+    // actions = ACT_NOTHING;
 }
 
 ProductServer * Hut::Hut::createHut(InventoryElement * el1, InventoryElement * el2)

@@ -5,21 +5,22 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
-namespace godot {
+namespace godot
+{
 
-class NetManager : public Node3D {
+class NetManager : public Node3D
+{
     GDCLASS(NetManager, Node3D)
 
-public:
+  public:
     NetManager();
     ~NetManager();
     void _ready() override;
     void _process(double delta) override;
-    
-protected:
-    static void _bind_methods();
 
+  protected:
+    static void _bind_methods();
 };
-}
+} // namespace godot
 
 #endif

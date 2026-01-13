@@ -7,7 +7,9 @@ class NetClient
   public:
     ENetHost * host;
     ENetPeer * peer;
-    NetClient(ENetHost *host, ENetPeer *peer):host(host), peer(peer) {}
+    NetClient(ENetHost * host, ENetPeer * peer) : host(host), peer(peer)
+    {
+    }
 };
 extern NetClient * client;
 
@@ -30,7 +32,7 @@ NetClient * init(const char * server_ip, const char * port);
 
 uint32_t network_tick(NetClient * client);
 
-InventoryElement *get_object_by_id(NetworkObject uid);
+InventoryElement * get_object_by_id(NetworkObject uid);
 
 void register_object(NetworkObject * o);
 
@@ -63,6 +65,5 @@ extern void knowledge_update(size_t pl_id, Class_id cid, int32_t id);
 extern void checked_update(size_t pl_id, uintptr_t el);
 
 extern NetworkObject * el_from_data(const ObjectData * data);
-
 
 #endif // NET_H

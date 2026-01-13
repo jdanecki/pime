@@ -10,15 +10,15 @@ int window_height;
 
 int init_window(const char * title, int wx, int wy)
 {
-   InitWindow(wx, wy, title);
+    InitWindow(wx, wy, title);
 
-    window_width=GetScreenWidth();
-    window_height=GetScreenHeight();
+    window_width = GetScreenWidth();
+    window_height = GetScreenHeight();
     SetTargetFPS(60);
     tile_size = 32;
     SetExitKey(KEY_NULL);
     SetTraceLogLevel(LOG_WARNING);
-//    SetTraceLogLevel(LOG_NONE);
+    //    SetTraceLogLevel(LOG_NONE);
     if (load_font())
         return 1;
 
@@ -48,13 +48,11 @@ void close_graphics()
 
 void clear_window()
 {
-   Color c;
-   c.r=10;
-   c.g=10;
-   c.b=50;
-   c.a=255;
+    Color c;
+    c.r = 10;
+    c.g = 10;
+    c.b = 50;
+    c.a = 255;
 
-   ClearBackground(c);
+    ClearBackground(c);
 }
-
-

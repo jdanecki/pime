@@ -11,6 +11,6 @@ class PlayerUI : public Player
     PlayerUI(Player data);
 };
 
-extern PlayerUI* player;
+extern PlayerUI * player;
 
 #endif

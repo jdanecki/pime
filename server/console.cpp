@@ -9,11 +9,11 @@ int win_w, win_h;
 
 char in_buf[INPUT_SIZE + 1];
 char ** out_buf;
-int show_key=0;
+int show_key = 0;
 
 int history_up;
 int buf_pos;
-bool scrolling=true;
+bool scrolling = true;
 
 void print_status(int l, const char * format, ...)
 {
@@ -32,42 +32,48 @@ void shift_output()
     for (int i = 1; i < history_size; i++)
     {
         strncpy(out_buf[i - 1], out_buf[i], MAX_OUTPUT_SIZE);
-        out_buf[i][0]=0;
+        out_buf[i][0] = 0;
     }
 }
 
-int col=0;
+int col = 0;
 int CONSOLE_LOG(const char * fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    char buf[MAX_OUTPUT_SIZE+1];
-    memset(buf, 0, MAX_OUTPUT_SIZE+1);
+    char buf[MAX_OUTPUT_SIZE + 1];
+    memset(buf, 0, MAX_OUTPUT_SIZE + 1);
     vsnprintf(buf, MAX_OUTPUT_SIZE, fmt, args);
     va_end(args);
 
-    int len=strlen(buf);
-    if (col+strlen(buf) > MAX_OUTPUT_SIZE) {
-       if (buf_pos < history_size-1) buf_pos++;
-            else shift_output();
-       col=0;
-    }
-    for (int ch=0; ch < len; ch++)
+    int len = strlen(buf);
+    if (col + strlen(buf) > MAX_OUTPUT_SIZE)
     {
-        switch(buf[ch])
+        if (buf_pos < history_size - 1)
+            buf_pos++;
+        else
+            shift_output();
+        col = 0;
+    }
+    for (int ch = 0; ch < len; ch++)
+    {
+        switch (buf[ch])
         {
             case 13: // \r
-                col=0;
-            break;
+                col = 0;
+                break;
             case 10: // \n
-                if (buf_pos < history_size-1) buf_pos++;
-                else shift_output();
-                col=0;
-            break;
+                if (buf_pos < history_size - 1)
+                    buf_pos++;
+                else
+                    shift_output();
+                col = 0;
+                break;
             default:
-                out_buf[buf_pos][col]=buf[ch];
-                if (col < MAX_OUTPUT_SIZE-1) col++;
-            break;
+                out_buf[buf_pos][col] = buf[ch];
+                if (col < MAX_OUTPUT_SIZE - 1)
+                    col++;
+                break;
         }
     }
     return 0;
@@ -79,8 +85,8 @@ void clear_history()
     {
         memset(out_buf[i], 0, MAX_OUTPUT_SIZE);
     }
-    history_up=0;
-    buf_pos=0;
+    history_up = 0;
+    buf_pos = 0;
     CONSOLE_LOG("cleared\n");
 }
 
@@ -94,11 +100,13 @@ void ncurses_tick()
     snprintf(buf, 128, "> %s", in_buf);
     waddstr(in_w, buf);
 
-    int lines=0;
-    int start_pos=history_up;
-    if (scrolling) {
-        start_pos=buf_pos-(win_h-1);
-        if (start_pos < 0) start_pos=0;
+    int lines = 0;
+    int start_pos = history_up;
+    if (scrolling)
+    {
+        start_pos = buf_pos - (win_h - 1);
+        if (start_pos < 0)
+            start_pos = 0;
         history_up = start_pos;
     }
     for (int i = 0; i < win_h; i++)
@@ -109,16 +117,16 @@ void ncurses_tick()
             lines++;
         }
     }
-    if (scrolling) {
-        if (lines >= win_h) history_up++;
+    if (scrolling)
+    {
+        if (lines >= win_h)
+            history_up++;
     }
-    
+
     wrefresh(out_w);
     wmove(in_w, 4 + strlen(in_buf), 1);
-    wrefresh(in_w);    
+    wrefresh(in_w);
 }
-
-
 
 void handle_resize()
 {
@@ -141,17 +149,17 @@ char ncurses_init()
     int w, h;
     getmaxyx(stdscr, h, w);
     out_w = newwin(h - 4, w, 0, 0);
-    win_w=w;
-    win_h=h-4;
+    win_w = w;
+    win_h = h - 4;
 
     in_w = newwin(3, w, h - 4, 0);
     status = newwin(1, w, h - 1, 0);
 
     wbkgd(status, COLOR_PAIR(5));
     wbkgd(in_w, COLOR_PAIR(6));
- //   keypad(out_w, TRUE);
+    //   keypad(out_w, TRUE);
     keypad(in_w, TRUE);
-  //  nodelay(out_w, TRUE);
+    //  nodelay(out_w, TRUE);
     nodelay(in_w, TRUE);
 
     out_buf = (char **)calloc(history_size, sizeof(char *));
@@ -167,11 +175,9 @@ char ncurses_init()
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
     init_pair(3, COLOR_YELLOW, COLOR_BLACK);
     init_pair(4, COLOR_BLUE, COLOR_BLACK);
-    init_pair(5,COLOR_BLACK,COLOR_CYAN);
-    init_pair(6,COLOR_BLACK,COLOR_GREEN);
+    init_pair(5, COLOR_BLACK, COLOR_CYAN);
+    init_pair(6, COLOR_BLACK, COLOR_GREEN);
     scrollok(out_w, FALSE);
 
     return 0;
 }
-
-

@@ -21,7 +21,7 @@ class DialogElement
   public:
     Backend_Rect rect;
 
-    Dialog *dialog;
+    Dialog * dialog;
     int id;
     enum DialogElementType c_id;
     DialogElement(int id, Backend_Rect rect, enum DialogElementType c_id);
@@ -41,7 +41,10 @@ class DialogElement
     {
         return id == i && c_id == c;
     }
-    virtual Dialog * get_dialog() {return dialog; }
+    virtual Dialog * get_dialog()
+    {
+        return dialog;
+    }
 };
 
 class Dialog : public DialogElement
@@ -95,7 +98,8 @@ class DialogButton : public DialogElement
   public:
     DialogBox * d_box;
     DialogText * d_text;
-    DialogButton(int id, Backend_Rect rect, int size, Backend_Color bgcolor, Backend_Color fgcolor, std::string text, void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *) = nullptr);
+    DialogButton(
+        int id, Backend_Rect rect, int size, Backend_Color bgcolor, Backend_Color fgcolor, std::string text, void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *) = nullptr);
     void draw();
     bool pressed(int x, int y);
     void (*on_press)(DialogButton *);
@@ -106,6 +110,5 @@ class DialogButton : public DialogElement
         d_text->move(x, y);
     }
 };
-
 
 #endif

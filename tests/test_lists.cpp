@@ -3,13 +3,13 @@
 void test_loops()
 {
     ElementsList list("test-list");
-    ListElement *el1=new ListElement(new InventoryElement(Class_ListElement));
+    ListElement * el1 = new ListElement(new InventoryElement(Class_ListElement));
     list.add_front(el1);
 
-    ListElement *el2=new ListElement(new Place(PLACE_FIELD));
+    ListElement * el2 = new ListElement(new Place(PLACE_FIELD));
     list.add_front(el2);
 
-    ListElement *el3=new ListElement(new Element(new BaseElement(Form_solid, 1)));
+    ListElement * el3 = new ListElement(new Element(new BaseElement(Form_solid, 1)));
     list.add_front(el3);
 
     list.show(true);
@@ -50,14 +50,14 @@ void test_loops()
 
 void test_element_on_2_lists()
 {
-    ElementsList *list1=new ElementsList("list1");
-    ElementsList *list2=new ElementsList("list2");
-    InventoryElement *el=new InventoryElement(Class_ListElement);
+    ElementsList * list1 = new ElementsList("list1");
+    ElementsList * list2 = new ElementsList("list2");
+    InventoryElement * el = new InventoryElement(Class_ListElement);
 
-    for (int i=0; i< 5; i++)
+    for (int i = 0; i < 5; i++)
     {
-        ListElement *le1=new ListElement(el);
-        ListElement *le2=new ListElement(el);
+        ListElement * le1 = new ListElement(el);
+        ListElement * le2 = new ListElement(el);
         printf("le1=%p le2=%p\n", le1, le2);
         list1->add_front(le1);
         list2->add_front(le2);
@@ -72,12 +72,12 @@ void test_element_on_2_lists()
 
 void test_element_on_2_Invlists()
 {
-    InvList *list1=new InvList("list1");
-    InvList *list2=new InvList("list2");
+    InvList * list1 = new InvList("list1");
+    InvList * list2 = new InvList("list2");
 
-    for (int i=0; i< 5; i++)
+    for (int i = 0; i < 5; i++)
     {
-        InventoryElement *el=new InventoryElement(Class_Element);
+        InventoryElement * el = new InventoryElement(Class_Element);
         printf("el=%p\n", el);
         list1->add_front(el);
         list2->add_front(el);
@@ -103,9 +103,8 @@ void test_element_on_2_Invlists()
 int main()
 {
     test_loops();
-    //test_element_on_2_lists();
-//    test_element_on_2_Invlists();
+    // test_element_on_2_lists();
+    //    test_element_on_2_Invlists();
 
     return 0;
-
 }

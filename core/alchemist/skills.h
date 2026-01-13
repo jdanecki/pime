@@ -1,12 +1,11 @@
 #ifndef __SKILL_H__
 #define __SKILL_H__
 
-
 #include "skills_type.h"
 
 class Skill
 {
-public:
+  public:
     Skill_type type;
     int experience;
     Skill();
@@ -16,4 +15,3 @@ public:
 const char * gsn(Skill_type t);
 
 #endif
-

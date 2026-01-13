@@ -2,13 +2,14 @@
 
 using namespace godot;
 
-void ElementGodot::_bind_methods() {
-
+void ElementGodot::_bind_methods()
+{
 }
 
-ElementGodot::ElementGodot() {
+ElementGodot::ElementGodot()
+{
 }
 
-ElementGodot::~ElementGodot() {
+ElementGodot::~ElementGodot()
+{
 }
-

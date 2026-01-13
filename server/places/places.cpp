@@ -2,7 +2,7 @@
 
 Field::Field(Place_id id) : PlaceServer(id)
 {
-    state=FIELD_PLOWED;
+    state = FIELD_PLOWED;
 }
 
 PlaceServer * Field::createField(Place_id id)
@@ -19,7 +19,7 @@ bool Field::action(Product_action action, Player * pl)
 typedef PlaceServer * (*PlaceFunction)(Place_id id);
 
 PlaceFunction PlaceFunctions[] = {
-  Field::createField,
+    Field::createField,
 };
 
 PlaceServer * create_place(Place_id id)

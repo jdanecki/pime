@@ -64,13 +64,14 @@ void button_craft_prod(DialogButton * button)
 void button_switch(DialogButton * button)
 {
     printf("button_switch: id=%d\n", button->id);
-    DCraft * cr = dynamic_cast<DCraft*>(button->dialog);
-    if (cr) cr->in_products = button->id;
+    DCraft * cr = dynamic_cast<DCraft *>(button->dialog);
+    if (cr)
+        cr->in_products = button->id;
 }
 
-DCraft::DCraft() : Dialog(Backend_Rect(50, 50, 500, 500), {125, 125, 125, 255}), 
-    ingredients(Backend_Rect(190, 170, 500 - 140, 500 - 120), {125, 125, 125, 10}), 
-    products(Backend_Rect(190, 170, 500 - 140, 500 - 120), {125, 125, 125, 10})
+DCraft::DCraft()
+    : Dialog(Backend_Rect(50, 50, 500, 500), {125, 125, 125, 255}), ingredients(Backend_Rect(190, 170, 500 - 140, 500 - 120), {125, 125, 125, 10}),
+      products(Backend_Rect(190, 170, 500 - 140, 500 - 120), {125, 125, 125, 10})
 {
     show = false;
     in_products = false;
@@ -184,27 +185,28 @@ void DCraft::update()
     }
 
     DialogImage * img = dynamic_cast<DialogImage *>(ingredients.get_element_from_id(0, DialogElementType::Image));
-    if (img && img->texture_loaded) return;
+    if (img && img->texture_loaded)
+        return;
 
     for (int i = 0; i < ING_COUNT; i++)
     {
         DialogImage * img = dynamic_cast<DialogImage *>(ingredients.get_element_from_id(i, DialogElementType::Image));
         img->texture = ing_textures[i];
-        img->texture_loaded=true;
+        img->texture_loaded = true;
     }
 
     for (int i = 0; i < PROD_COUNT; i++)
     {
         DialogImage * img = dynamic_cast<DialogImage *>(products.get_element_from_id(i, DialogElementType::Image));
         img->texture = prod_textures[i];
-        img->texture_loaded=true;
+        img->texture_loaded = true;
     }
 }
 
-
 void hide_craft_window()
 {
-    if (d_craft.show) {
+    if (d_craft.show)
+    {
         d_craft.show = false;
         return;
     }

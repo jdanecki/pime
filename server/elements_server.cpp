@@ -157,20 +157,20 @@ PlantServer::PlantServer(BasePlant * base) : Plant(base)
     switch (phase)
     {
         case Plant_seedling:
-            age->value = seedling_time;            
+            age->value = seedling_time;
             size = 0.01;
             break;
         case Plant_growing:
-            age->value = growing_time;            
+            age->value = growing_time;
             size = 1.0 * age->value / max_age->value;
             break;
         case Plant_flowers:
-            age->value = flowers_time;            
+            age->value = flowers_time;
             size = 1.0;
             break;
         case Plant_fruits:
             age->value = max_age->value;
-            grown = true;            
+            grown = true;
             size = 1.0;
             break;
     }
@@ -271,7 +271,7 @@ bool PlantServer::grow()
     return !grown;
 }
 
-IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id id, Form f) : Ingredient(id),  el(from)
+IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id id, Form f) : Ingredient(id), el(from)
 {
     req_form = f;
 }
@@ -476,7 +476,7 @@ void ElementServer::show(bool details)
 
 bool ElementServer::can_pickup()
 {
-    //return mass.value < 10000;
+    // return mass.value < 10000;
     return true;
 }
 
@@ -495,7 +495,7 @@ bool BeingServer::grow()
     age->value++;
 
     if (age->value >= max_age->value)
-    {              
+    {
         alive = false;
     }
     return alive;
@@ -527,9 +527,9 @@ bool ScrollServer::player_action(Player_action action, Player * pl)
     return true;
 }
 
-PlaceServer::PlaceServer(Place_id id): Place(id)
+PlaceServer::PlaceServer(Place_id id) : Place(id)
 {
-    //CONSOLE_LOG("PlaceServer::PlaceServer\n");
+    // CONSOLE_LOG("PlaceServer::PlaceServer\n");
 }
 
 void PlaceServer::show(bool details)

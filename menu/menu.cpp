@@ -154,7 +154,7 @@ void Menu::show()
     int modx2 = int((game_size / 2)) + (0.6 * game_size);
 
     Backend_Rect rect(modx, mody, modx2 - modx, mody2 - mody);
-    Backend_Draw_Fill_Rectangle(rect, Backend_Color{0,0,255,100});
+    Backend_Draw_Fill_Rectangle(rect, Backend_Color{0, 0, 255, 100});
 
     int mody3 = mody + (((index + 1) * menu_opt_size) - (menu_opt_size));
     int mody4 = mody + ((index + 1) * menu_opt_size);
@@ -428,12 +428,12 @@ Menu * create_knowledge_classes(enum Class_id c)
         return nullptr;
 }
 
-void save(char with_player)                                                                                                                                                                   
-{                 
-}                 
+void save(char with_player)
+{
+}
 void load(char with_player)
-{                 
-} 
+{
+}
 // create menu for elements with the same base id
 void create_inv_menu(int id)
 {
@@ -463,7 +463,7 @@ void create_inv_menu(int id)
 
 void Menu::go_down()
 {
-//    printf("go_down: index=%d -> ", index);
+    //    printf("go_down: index=%d -> ", index);
     menu_pos = (Menu_entry *)(menu_pos->next);
     index++;
     if (!menu_pos)
@@ -471,12 +471,12 @@ void Menu::go_down()
         menu_pos = (Menu_entry *)(entries->head);
         index = 0;
     }
-//    printf("%d\n", index);
+    //    printf("%d\n", index);
 }
 
 void Menu::go_up()
 {
-//    printf("go_up: index=%d -> ", index);
+    //    printf("go_up: index=%d -> ", index);
     menu_pos = (Menu_entry *)(menu_pos->prev);
     index--;
     if (!menu_pos)
@@ -484,12 +484,12 @@ void Menu::go_up()
         menu_pos = (Menu_entry *)(entries->tail);
         index = entries->nr_elements - 1;
     }
-//    printf("%d\n", index);
+    //    printf("%d\n", index);
 }
 
 void menu_handle_escape()
 {
-    current_menu= nullptr;
+    current_menu = nullptr;
 }
 
 void menu_handle_enter()
@@ -573,7 +573,7 @@ int Menu::interact()
             save(1);
         case MENU_EXIT:
             finish_program = true;
-//            Mix_Quit();
+            //            Mix_Quit();
             exit(0);
         case MENU_LOAD:
             load(1);
@@ -679,7 +679,7 @@ void show_menu()
 
 void show_menu_inventory_categories()
 {
-//    player->inventory.show();
+    //    player->inventory.show();
     current_menu = menu_inventory_categories;
 }
 
@@ -692,10 +692,10 @@ void show_menu_npc()
 
 void show_menu_knowledge()
 {
-    current_menu=menu_knowledge;
+    current_menu = menu_knowledge;
 }
 
 void show_menu_action()
 {
-    current_menu=menu_action;
+    current_menu = menu_action;
 }

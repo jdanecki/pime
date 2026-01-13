@@ -13,7 +13,7 @@ Networked::Networked()
     notify_create((InventoryElement *)this);
 }
 
-//#define SEND_LOG=1
+// #define SEND_LOG=1
 void send_to_all(Packet * p)
 {
     ListElement * pl_el = players->head;
@@ -28,7 +28,6 @@ void send_to_all(Packet * p)
 #endif
         p->send(pl->peer);
         pl_el = pl_el->next;
-
     }
 }
 
@@ -53,7 +52,7 @@ class PacketToSend : public ListElement
 bool handle_packet(ENetPacket * packet, ENetPeer * peer)
 {
     unsigned char * data = packet->data;
-   // CONSOLE_LOG("Received length=%lu: %d\n", packet->dataLength, *data);
+    // CONSOLE_LOG("Received length=%lu: %d\n", packet->dataLength, *data);
 
     Packet * p = check_packet('R', data, packet->dataLength);
     if (!p)
@@ -213,7 +212,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
                 if (Product * prod = dynamic_cast<Product *>(item))
                 {
                     CONSOLE_LOG("use product: %s on tile [%d,%d]:[%d,%d]\n", prod->get_name(), map_x, map_y, x, y);
-                    if (!pl->player->use_product_on_tile(prod,  map_x, map_y, x, y))
+                    if (!pl->player->use_product_on_tile(prod, map_x, map_y, x, y))
                     {
                         p = new PacketActionFailed();
                         p->send(peer);
@@ -283,27 +282,27 @@ void send_updates()
     if (packets_to_send->nr_elements)
     {
         ListElement * el = packets_to_send->head;
-//        CONSOLE_LOG("sending updates elems=%d\n", packets_to_send->nr_elements);
+        //        CONSOLE_LOG("sending updates elems=%d\n", packets_to_send->nr_elements);
         while (el)
         {
             PacketToSend * p = (PacketToSend *)el;
             p->to_all();
             el = el->next;
         }
-//        CONSOLE_LOG("sent updates\n");
+        //        CONSOLE_LOG("sent updates\n");
     }
 
     if (packets_to_send1->nr_elements)
     {
         ListElement * el = packets_to_send1->head;
-       // CONSOLE_LOG("sending updates1 elems=%d\n", packets_to_send1->nr_elements);
+        // CONSOLE_LOG("sending updates1 elems=%d\n", packets_to_send1->nr_elements);
         while (el)
         {
             PacketToSend * p = (PacketToSend *)el;
             p->to_all();
             el = el->next;
         }
-      //  CONSOLE_LOG("sent updates1\n");
+        //  CONSOLE_LOG("sent updates1\n");
     }
 
     if (objects_to_create.nr_elements)
@@ -311,7 +310,7 @@ void send_updates()
         ListElement * el = objects_to_create.head;
         while (el)
         {
-//            CONSOLE_LOG("sending objects to create: %s id=%lx\n", static_cast<InventoryElement*> (el->el.get())->get_name(), el->el.get()->uid);
+            //            CONSOLE_LOG("sending objects to create: %s id=%lx\n", static_cast<InventoryElement*> (el->el.get())->get_name(), el->el.get()->uid);
             Packet * p = new PacketObjectCreate(el->el.get());
             send_to_all(p);
             el = el->next;
@@ -340,8 +339,8 @@ void notify_update(const InventoryElement * el)
 
 void notify_create(const InventoryElement * el)
 {
-    //add_packet_to_send(new PacketObjectCreate((InventoryElement *)el));
-    objects_to_create.add((InventoryElement*)el);
+    // add_packet_to_send(new PacketObjectCreate((InventoryElement *)el));
+    objects_to_create.add((InventoryElement *)el);
 }
 
 void update_location(NetworkObject id, ItemLocation old_loc, ItemLocation new_loc)

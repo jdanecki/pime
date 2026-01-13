@@ -8,7 +8,6 @@
 #include "el_list.h"
 #include "names.h"
 
-
 BaseElement * get_base_element(size_t id);
 BasePlant * get_base_plant(size_t id);
 BaseAnimal * get_base_animal(size_t id);
@@ -70,8 +69,8 @@ const char * places_names[] = {"field"};
 const char * place_states_names[] = {"plowed", "planted"};
 
 const char * plant_phase_name[] = {"Seedling", "Growing", "Flowers", "Fruits"};
-const char * class_name[] = {
-    "unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Scroll", "Place", "Plant", "Animal", "Player", "Npc", "Clan", "ListElement", "KnownElement", "BaseListElement"};
+const char * class_name[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Scroll", "Place", "Plant", "Animal", "Player", "Npc", "Clan", "ListElement",
+    "KnownElement", "BaseListElement"};
 
 Base::Base(int index, Class_id c, const char * name) : name(name), NetworkObject(c, index)
 {
@@ -112,7 +111,7 @@ BaseElement::BaseElement(Form f, int index) : Base(index, Class_BaseElement, cre
         case Form_gas:
             density = Property("density", 1);
             edible.set_no_edible();
-            int r=rand() % 200;
+            int r = rand() % 200;
             color.r = r + rand() % 56;
             color.g = r + rand() % 56;
             color.b = r + rand() % 56;
@@ -140,7 +139,7 @@ void BaseElement::show(bool details)
 
 // called by networking.cpp:create_object
 Element::Element(BaseElement * b)
-   // : InventoryElement(Class_Element), base(b), length("length", 10 + rand() % 200), width("width", 10 + rand() % 200), height("height", 10 + rand() % 200),
+    // : InventoryElement(Class_Element), base(b), length("length", 10 + rand() % 200), width("width", 10 + rand() % 200), height("height", 10 + rand() % 200),
     : InventoryElement(Class_Element), base(b), length("length", 5 + rand() % 60), width("width", 5 + rand() % 60), height("height", 5 + rand() % 60),
       volume("volume", length.value * width.value * height.value), sharpness("sharpness", 0), smoothness("smoothness", 0), mass("mass", b->density.value * volume.value / 1000)
 {
@@ -190,15 +189,13 @@ void Ingredient::show(bool details)
     CONSOLE_LOG("form = %s", Form_name[req_form]);
 }
 
-Product::Product(Product_id id, int actions_count) : InventoryElement(Class_Product),
-                                                    quality("quality", 0), resilience("resilience", 0), usage("usage", 0),
-                                                    actions_count(actions_count), id(id)
-{    
+Product::Product(Product_id id, int actions_count) : InventoryElement(Class_Product), quality("quality", 0), resilience("resilience", 0), usage("usage", 0), actions_count(actions_count), id(id)
+{
     c_id = Class_Product;
 
     assert(actions_count < 10);
 
-    for (int i=0; i < 10; i++)
+    for (int i = 0; i < 10; i++)
     {
         actions[i] = ACT_NOTHING;
     }
@@ -215,7 +212,7 @@ void Product::show(bool details)
     usage.show();
     for (int i = 0; i < actions_count; i++)
     {
-        CONSOLE_LOG("action[%d]: %d -> %s\n", i,  actions[i], product_action_name[actions[i]]);
+        CONSOLE_LOG("action[%d]: %d -> %s\n", i, actions[i], product_action_name[actions[i]]);
     }
 }
 
@@ -277,34 +274,34 @@ Scroll::Scroll(Base * b) : InventoryElement(Class_Scroll), base(b)
     // CONSOLE_LOG("Scroll class=%s id=%d name=%s\n", class_name[b->c_id], b->id, b->get_name());
 }
 
-Place::Place(Place_id id, size_t uid): InventoryElement(Class_Place, uid), id(id)
+Place::Place(Place_id id, size_t uid) : InventoryElement(Class_Place, uid), id(id)
 {
-
 }
 
-Place::Place(Place_id id): InventoryElement(Class_Place), id(id)
+Place::Place(Place_id id) : InventoryElement(Class_Place), id(id)
 {
-
 }
 
 BaseElement * get_base_element(size_t id)
 {
-    BaseListElement *el=(BaseListElement*)base_elements.find(&id);
-    if (!el) return nullptr;
-    return (BaseElement*)((el)->base);
+    BaseListElement * el = (BaseListElement *)base_elements.find(&id);
+    if (!el)
+        return nullptr;
+    return (BaseElement *)((el)->base);
 }
 
 BasePlant * get_base_plant(size_t id)
 {
-    BaseListElement *el=(BaseListElement*)base_plants.find(&id);
-    if (!el) return nullptr;
-    return (BasePlant*)((el)->base);
+    BaseListElement * el = (BaseListElement *)base_plants.find(&id);
+    if (!el)
+        return nullptr;
+    return (BasePlant *)((el)->base);
 }
 
 BaseAnimal * get_base_animal(size_t id)
 {
-    BaseListElement *el=(BaseListElement*)base_animals.find(&id);
-    if (!el) return nullptr;
-    return (BaseAnimal*)((el)->base);
+    BaseListElement * el = (BaseListElement *)base_animals.find(&id);
+    if (!el)
+        return nullptr;
+    return (BaseAnimal *)((el)->base);
 }
-

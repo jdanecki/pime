@@ -9,5 +9,6 @@ IngredientServer * PickaxeBlade::createPickaxeBlade(InventoryElement * from)
 {
     if (from->get_cid() == Class_Element && from->get_form() == Form_solid)
         return new PickaxeBlade(from);
-    else return nullptr;
+    else
+        return nullptr;
 }

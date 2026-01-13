@@ -13,7 +13,7 @@ class BeingSDL : public InventoryElement, public Renderable
 };
 */
 class Plant2d : public Plant, public Renderable
-{    
+{
   public:
     Backend_Texture get_texture() override;
     Plant2d(Plant data);

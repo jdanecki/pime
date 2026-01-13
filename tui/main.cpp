@@ -13,7 +13,8 @@ extern int trace_network;
 struct termios old_stdin, stdin_tty;
 
 void create_menus()
-{}
+{
+}
 
 int init_window(const char * title, int wx, int wy)
 {
@@ -30,7 +31,8 @@ int init_window(const char * title, int wx, int wy)
     return 0;
 }
 
-void close_graphics() {
+void close_graphics()
+{
     tcsetattr(0, TCSANOW, &old_stdin);
 }
 

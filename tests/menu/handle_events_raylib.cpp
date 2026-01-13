@@ -11,32 +11,32 @@ void handle_i();
 void quit_program();
 
 KeyHandler menu_key_handlers[] = {
-    { KEY_ESCAPE, menu_handle_escape, true},
-    { KEY_ENTER, menu_handle_enter, true},
-    { KEY_DOWN, menu_go_down, false},
-    { KEY_UP, menu_go_up, false},
+    {KEY_ESCAPE, menu_handle_escape, true},
+    {KEY_ENTER, menu_handle_enter, true},
+    {KEY_DOWN, menu_go_down, false},
+    {KEY_UP, menu_go_up, false},
 };
 
-KeyHandler key_handlers[] = {
-    { KEY_ESCAPE, handle_escape, true },
-    { KEY_I, handle_i, true},
+KeyHandler key_handlers[] = {{KEY_ESCAPE, handle_escape, true}, {KEY_I, handle_i, true},
 #ifndef DISABLE_NPC
-    { KEY_N, handle_n, true},
+    {KEY_N, handle_n, true},
 #endif
-    { KEY_Q, quit_program, true}
-};
+    {KEY_Q, quit_program, true}};
 
 void check_mouse()
 {
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+    {
         Vector2 pos = GetMousePosition();
         handle_mouse((int)pos.x, (int)pos.y, 1);
     }
-    if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
+    if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON))
+    {
         Vector2 pos = GetMousePosition();
         handle_mouse((int)pos.x, (int)pos.y, 2);
     }
-    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
+    {
         Vector2 pos = GetMousePosition();
         handle_mouse((int)pos.x, (int)pos.y, 3);
     }
@@ -51,28 +51,35 @@ bool handle_events()
     KeyHandler * handlers;
 
     float dt = GetFrameTime();
-    last_key+=dt;
+    last_key += dt;
 
-    if (current_menu) {
-        num_handlers = sizeof(menu_key_handlers)/sizeof(KeyHandler);
-        handlers= menu_key_handlers;
+    if (current_menu)
+    {
+        num_handlers = sizeof(menu_key_handlers) / sizeof(KeyHandler);
+        handlers = menu_key_handlers;
     }
-    else {
-        num_handlers = sizeof(key_handlers)/sizeof(KeyHandler);
-        handlers= key_handlers;
+    else
+    {
+        num_handlers = sizeof(key_handlers) / sizeof(KeyHandler);
+        handlers = key_handlers;
     }
-    for (int i = 0; i < num_handlers; ++i) {
+    for (int i = 0; i < num_handlers; ++i)
+    {
         if (handlers[i].press_key)
         {
-            if (IsKeyPressed(handlers[i].key)) {
+            if (IsKeyPressed(handlers[i].key))
+            {
                 handlers[i].func();
                 break;
             }
         }
-        else {
-            if (IsKeyDown(handlers[i].key)) {
-                if (last_key < 0.15) break;
-                last_key=0;
+        else
+        {
+            if (IsKeyDown(handlers[i].key))
+            {
+                if (last_key < 0.15)
+                    break;
+                last_key = 0;
                 handlers[i].func();
                 break;
             }
@@ -81,4 +88,3 @@ bool handle_events()
 
     return WindowShouldClose() || finish_program;
 }
-

@@ -15,7 +15,6 @@ SDL_Color Red = {255, 0, 0};
 SDL_Color Cyan = {255, 0, 255};
 SDL_Color Yellow = {255, 255, 0};
 
-
 int load_font()
 {
     struct stat statbuf;
@@ -69,5 +68,3 @@ void write_text(int x, int y, const char * text, SDL_Color color, int scale_x, i
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(text_sdl);
 }
-
-

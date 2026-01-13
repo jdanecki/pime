@@ -31,9 +31,9 @@ float c4[3] = {0.0f, 0.33f, 0.66f};
 #define MAX(a, b) (a > b) ? a : b
 #define MIN(a, b) (a < b) ? a : b
 
-void rgb2hsv(int r, int g, int b, int* h, int* s, int* v)
+void rgb2hsv(int r, int g, int b, int * h, int * s, int * v)
 {
-    float r1, g1, b1, h1=0, s1, v1;
+    float r1, g1, b1, h1 = 0, s1, v1;
     float cmax, cmin;
     float t, delta;
 
@@ -92,22 +92,22 @@ void rgb2hsv(int r, int g, int b, int* h, int* s, int* v)
     *v = (int)roundf(100 * v1);
 }
 
-void hsv2rgb(int h, int s, int v, int* r, int* g, int* b)
+void hsv2rgb(int h, int s, int v, int * r, int * g, int * b)
 {
     // h [0..360] hue, odcień
     // s [0..100] saturation, nasycenie 0 =brak koloru (szarość), 1= pełne nasycenie (najczystszy kolor)
     // v [1..100] value, jasność 0 czarny - brak światła, 1 pełna jasność
 
-/* H 
-    0° – czerwony
-    60° – żółty
-    120° – zielony
-    180° – cyjan
-    240° – niebieski
-    300° – magenta
-    360° = 0° – znowu czerwony
-*/    
-    float r1=0, g1=0, b1=0, i, f, p, q, t, h1, s1, v1;
+    /* H
+        0° – czerwony
+        60° – żółty
+        120° – zielony
+        180° – cyjan
+        240° – niebieski
+        300° – magenta
+        360° = 0° – znowu czerwony
+    */
+    float r1 = 0, g1 = 0, b1 = 0, i, f, p, q, t, h1, s1, v1;
     s1 = s / 100.0;
     v1 = v / 100.0;
 
@@ -118,7 +118,8 @@ void hsv2rgb(int h, int s, int v, int* r, int* g, int* b)
         *b = 255 * v1;
         return;
     }
-    if (h == 360) h1 = 0.0;
+    if (h == 360)
+        h1 = 0.0;
     h1 = h / 60.0;
     i = floor(h1);
     f = h1 - i;
@@ -127,36 +128,36 @@ void hsv2rgb(int h, int s, int v, int* r, int* g, int* b)
     t = v1 * (1.0 - (s1 * (1.0 - f)));
     switch ((int)i)
     {
-    case 0:
-        r1 = v1;
-        g1 = t;
-        b1 = p;
-        break;
-    case 1:
-        r1 = q;
-        g1 = v1;
-        b1 = p;
-        break;
-    case 2:
-        r1 = p;
-        g1 = v1;
-        b1 = t;
-        break;
-    case 3:
-        r1 = p;
-        g1 = q;
-        b1 = v1;
-        break;
-    case 4:
-        r1 = t;
-        g1 = p;
-        b1 = v1;
-        break;
-    case 5:
-        r1 = v1;
-        g1 = p;
-        b1 = q;
-        break;
+        case 0:
+            r1 = v1;
+            g1 = t;
+            b1 = p;
+            break;
+        case 1:
+            r1 = q;
+            g1 = v1;
+            b1 = p;
+            break;
+        case 2:
+            r1 = p;
+            g1 = v1;
+            b1 = t;
+            break;
+        case 3:
+            r1 = p;
+            g1 = q;
+            b1 = v1;
+            break;
+        case 4:
+            r1 = t;
+            g1 = p;
+            b1 = v1;
+            break;
+        case 5:
+            r1 = v1;
+            g1 = p;
+            b1 = q;
+            break;
     }
     *r = roundf(255 * r1);
     *g = roundf(255 * g1);
@@ -173,29 +174,29 @@ void show_hsv_palette()
         {
             hsv2rgb(h, s, 100, &r, &g, &b);
             pixelRGBA(renderer, h, s, r, g, b, 255);
-            
+
             hsv2rgb(h, 100, s, &r, &g, &b);
-            pixelRGBA(renderer, h + 370, s, r, g, b, 255);            
+            pixelRGBA(renderer, h + 370, s, r, g, b, 255);
         }
         if (mx < 360)
         {
             for (int y = 0; y < 100; y++)
             {
                 hsv2rgb(mx, y, s, &r, &g, &b);
-                pixelRGBA(renderer, s, 110+y, r, g, b, 255);                
+                pixelRGBA(renderer, s, 110 + y, r, g, b, 255);
             }
-        }        
-    }        
+        }
+    }
 }
 
 void show_rgb_palette(SDL_Texture * texture)
 {
-    unsigned char* pixels;
+    unsigned char * pixels;
     int pitch, x, y;
     int nx, ny;
 
     SDL_Rect window_rec;
-    SDL_LockTexture(texture, NULL, (void**)&pixels, &pitch);
+    SDL_LockTexture(texture, NULL, (void **)&pixels, &pitch);
 
     window_rec.w = window_width;
     window_rec.h = window_height;
@@ -212,7 +213,7 @@ void show_rgb_palette(SDL_Texture * texture)
                 r = 255 - r;
                 nx = (256 + x) << 2;
                 ny = pitch * (256 + y);
-                pixels[ny + nx + 2] |= r ;
+                pixels[ny + nx + 2] |= r;
                 pixels[ny + nx + 3] = 255;
 
                 nx = (384 + x) << 2;
@@ -231,4 +232,3 @@ void show_rgb_palette(SDL_Texture * texture)
     SDL_RenderCopy(renderer, texture, NULL, &window_rec);
 }
 #endif
-
