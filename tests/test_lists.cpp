@@ -1,22 +1,5 @@
 #include "../core/alchemist/el_list.h"
 
-BasePlant * get_base_plant(size_t id)
-{
-    printf("get_base_plant id=%ld\n", id);
-    return nullptr;
-}
-BaseAnimal * get_base_animal(size_t id)
-{
-    printf("get_base_animal id=%ld\n", id);
-    return nullptr;
-}
-
-BaseElement * get_base_element(size_t id)
-{
-    printf("get_base_element id=%ld\n", id);
-    return nullptr;
-}
-
 void test_loops()
 {
     ElementsList list("test-list");

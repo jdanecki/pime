@@ -18,11 +18,9 @@ void send_packet_action_on_object(NetClient * client, int32_t a, uintptr_t oid) 
 void send_packet_pickup(NetClient * client, uintptr_t id) {} 
 void send_packet_item_used_on_tile(NetClient * client, uintptr_t iid, ItemLocation location) {}
 
-void hide_craft_window() {}
 
 void handle_escape()
 {
-    hide_craft_window();
     show_menu();
 }
 
@@ -34,25 +32,6 @@ void handle_i()
 void quit_program()
 {
     finish_program= true;
-}
-
-
-
-BasePlant * get_base_plant(size_t id)
-{
-    printf("get_base_plant id=%ld\n", id);
-    return nullptr;
-}
-BaseAnimal * get_base_animal(size_t id)
-{
-    printf("get_base_animal id=%ld\n", id);
-    return nullptr;
-}
-
-BaseElement * get_base_element(size_t id)
-{
-    printf("get_base_element id=%ld\n", id);
-    return nullptr;
 }
 
 Base * get_base(uint32_t c_id, int32_t id)                                                                                                                                                    

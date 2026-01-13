@@ -3,48 +3,45 @@
 #include "../client-common/inputs.h"
 
 KeyHandler menu_key_handlers[] = {
-    { KEY_ESCAPE, menu_handle_escape },
-    { KEY_ENTER, menu_handle_enter},
-    { KEY_DOWN, menu_go_down},
-    { KEY_UP, menu_go_up},
+    { KEY_ESCAPE, menu_handle_escape, true},
+    { KEY_ENTER, menu_handle_enter, true},
+    { KEY_DOWN, menu_go_down, false},
+    { KEY_UP, menu_go_up, false},
 };
 
+
 KeyHandler key_handlers[] = {
-    { KEY_F1, handle_f1 },
-    { KEY_F2, handle_f2 },
-    { KEY_F3, handle_f3 },
-    { KEY_F4, handle_f4 },
-    { KEY_F5, handle_f5 },
-    { KEY_F6, handle_f6 },
-    { KEY_F7, handle_f7 },
-    { KEY_ENTER, handle_enter },
-    { KEY_ONE, handle_hotbar_0 },
-    { KEY_TWO, handle_hotbar_1 },
-    { KEY_THREE, handle_hotbar_2 },
-    { KEY_FOUR, handle_hotbar_3 },
-    { KEY_FIVE, handle_hotbar_4 },
-    { KEY_SIX, handle_hotbar_5 },
-    { KEY_SEVEN, handle_hotbar_6 },
-    { KEY_EIGHT, handle_hotbar_7 },
-    { KEY_NINE, handle_hotbar_8 },
-    { KEY_ZERO, handle_hotbar_9 },
-    { KEY_LEFT, handle_left },
-    { KEY_RIGHT, handle_right },
-    { KEY_UP, handle_up },
-    { KEY_DOWN, handle_down },    
-    { KEY_C, handle_c },
-    { KEY_I, handle_i},
+    { KEY_F1, handle_f1, true },
+    { KEY_F2, handle_f2, true },
+    { KEY_F3, handle_f3, true },
+    { KEY_F4, handle_f4, true },
+    { KEY_F5, handle_f5, true },
+    { KEY_F6, handle_f6, true },
+    { KEY_F7, handle_f7, true },
+    { KEY_ENTER, handle_enter, true },
+    { KEY_ONE, handle_hotbar_0, true },
+    { KEY_TWO, handle_hotbar_1, true },
+    { KEY_THREE, handle_hotbar_2, true },
+    { KEY_FOUR, handle_hotbar_3, true },
+    { KEY_FIVE, handle_hotbar_4, true },
+    { KEY_SIX, handle_hotbar_5, true },
+    { KEY_SEVEN, handle_hotbar_6, true },
+    { KEY_EIGHT, handle_hotbar_7, true },
+    { KEY_NINE, handle_hotbar_8, true },
+    { KEY_ZERO, handle_hotbar_9, true },
+    { KEY_C, handle_c , true},
+    { KEY_I, handle_i, true},
 #ifndef DISABLE_NPC
-    { KEY_N, handle_n},
+    { KEY_N, handle_n, true},
 #endif
-    { KEY_Q, put_element },
-    { KEY_GRAVE, handle_prev_hotbar  },
-    { KEY_TAB, handle_next_hotbar },
-    { KEY_MINUS, handle_minus },
-    { KEY_EQUAL, handle_equal },
-    { KEY_ESCAPE, handle_escape },
-    { KEY_LEFT_CONTROL, handle_left_control},
-    { KEY_LEFT_SHIFT, handle_left_shift},
+    { KEY_Q, put_element , true},
+    { KEY_GRAVE, handle_prev_hotbar , false },
+    { KEY_TAB, handle_next_hotbar , false},
+    { KEY_MINUS, handle_minus , true},
+    { KEY_EQUAL, handle_equal , true},
+    { KEY_ESCAPE, handle_escape , true},
+    { KEY_LEFT_CONTROL, handle_left_control, true},
+    { KEY_LEFT_SHIFT, handle_left_shift, true},
 };
 
 void mouse_pressed(int x, int y, int button)
@@ -75,14 +72,13 @@ void handle_mouse()
 }
 
 float last_key;
+float last_move;
+
 bool handle_events()
 {
     //FIXME call update_window_size
  
     handle_mouse();
-
-    float dt = GetFrameTime();
-    last_key+=dt;
 
     float time_period = 0.1;
     if (player->sneaking) {
@@ -92,11 +88,11 @@ bool handle_events()
        time_period = 0.05;
     }
 
-    if (last_key < time_period) return 0;
-    last_key=0;
-
     int num_handlers;
     KeyHandler * handlers;
+
+    last_key += GetFrameTime();
+    last_move += GetFrameTime();
 
     if (current_menu) {
         num_handlers = sizeof(menu_key_handlers)/sizeof(KeyHandler);
@@ -106,14 +102,55 @@ bool handle_events()
         num_handlers = sizeof(key_handlers)/sizeof(KeyHandler);
         handlers= key_handlers;
     }
-    player->running = 0;
-    player->sneaking = 0;
+    if (IsKeyReleased(KEY_LEFT_CONTROL))  player->running = 0;
+    if (IsKeyReleased(KEY_LEFT_SHIFT)) player->sneaking = 0;
+
     for (int i = 0; i < num_handlers; ++i) {
-        if (IsKeyDown(handlers[i].key)) {
-            handlers[i].func();
+        if (handlers[i].press_key)
+        {
+            if (IsKeyPressed(handlers[i].key)) {
+                handlers[i].func();
+                break;
+            }
+        }
+        else {
+            if (IsKeyDown(handlers[i].key)) {
+                if (last_key < time_period) break;
+                last_key=0;
+                handlers[i].func();
+                break;
+            }
         }
     }
 
+    if (!current_menu)
+    {
+        if (last_move > time_period)
+        {
+            if (IsKeyDown(KEY_DOWN))
+            {
+                send_packet_move(client, 0, 1);
+                last_move = 0;
+            }
+            if (IsKeyDown(KEY_UP))
+            {
+                send_packet_move(client, 0, -1);
+                last_move = 0;
+            }
+            if (IsKeyDown(KEY_RIGHT))
+            {
+                player->going_right = 1;
+                send_packet_move(client, 1, 0);
+                last_move = 0;
+            }
+            if (IsKeyDown(KEY_LEFT))
+            {
+               player->going_right = 0;
+               send_packet_move(client, -1, 0);
+               last_move = 0;
+            }
+        }
+    }
     return finish_program || WindowShouldClose();
 }
 

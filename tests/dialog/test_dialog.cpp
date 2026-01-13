@@ -20,23 +20,6 @@ int active_hotbar = 0;
 bool handle_events();
 NetClient * client;
 
-BasePlant * get_base_plant(size_t id)
-{
-    printf("get_base_plant id=%ld\n", id);
-    return nullptr;
-}
-BaseAnimal * get_base_animal(size_t id)
-{
-    printf("get_base_animal id=%ld\n", id);
-    return nullptr;
-}
-
-BaseElement * get_base_element(size_t id)
-{
-    printf("get_base_element id=%ld\n", id);
-    return nullptr;
-}
-
 void send_packet_craft(NetClient * client, uintptr_t prod_id, uintptr_t ingredients_num, const uintptr_t * iid)
 {
     printf("send_packet_craft prod=%lu num=%ld id=%lu\n", prod_id, ingredients_num, *iid);

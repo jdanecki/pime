@@ -11,19 +11,19 @@ void handle_i();
 void quit_program();
 
 KeyHandler menu_key_handlers[] = {
-    { KEY_ESCAPE, menu_handle_escape },
-    { KEY_ENTER, menu_handle_enter},
-    { KEY_DOWN, menu_go_down},
-    { KEY_UP, menu_go_up},
+    { KEY_ESCAPE, menu_handle_escape, true},
+    { KEY_ENTER, menu_handle_enter, true},
+    { KEY_DOWN, menu_go_down, false},
+    { KEY_UP, menu_go_up, false},
 };
 
 KeyHandler key_handlers[] = {
-    { KEY_ESCAPE, handle_escape },
-    { KEY_I, handle_i},
+    { KEY_ESCAPE, handle_escape, true },
+    { KEY_I, handle_i, true},
 #ifndef DISABLE_NPC
-    { KEY_N, handle_n},
+    { KEY_N, handle_n, true},
 #endif
-    { KEY_Q, quit_program}
+    { KEY_Q, quit_program, true}
 };
 
 void check_mouse()
@@ -53,9 +53,6 @@ bool handle_events()
     float dt = GetFrameTime();
     last_key+=dt;
 
-    if (last_key < 0.1) return 0;
-    last_key=0;
-
     if (current_menu) {
         num_handlers = sizeof(menu_key_handlers)/sizeof(KeyHandler);
         handlers= menu_key_handlers;
@@ -65,8 +62,20 @@ bool handle_events()
         handlers= key_handlers;
     }
     for (int i = 0; i < num_handlers; ++i) {
-        if (IsKeyDown(handlers[i].key)) {
-            handlers[i].func();
+        if (handlers[i].press_key)
+        {
+            if (IsKeyPressed(handlers[i].key)) {
+                handlers[i].func();
+                break;
+            }
+        }
+        else {
+            if (IsKeyDown(handlers[i].key)) {
+                if (last_key < 0.15) break;
+                last_key=0;
+                handlers[i].func();
+                break;
+            }
         }
     }
 

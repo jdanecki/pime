@@ -446,27 +446,6 @@ void deregister_object(NetworkObject * o)
     objects.remove(obj);
 }
 
-BaseElement * get_base_element(size_t id)
-{
-    BaseListElement *el=(BaseListElement*)base_elements.find(&id);
-    if (!el) return nullptr;
-    return (BaseElement*)((el)->base);
-}
-
-BasePlant * get_base_plant(size_t id)
-{
-    BaseListElement *el=(BaseListElement*)base_plants.find(&id);
-    if (!el) return nullptr;
-    return (BasePlant*)((el)->base);
-}
-
-BaseAnimal * get_base_animal(size_t id)
-{
-    BaseListElement *el=(BaseListElement*)base_animals.find(&id);
-    if (!el) return nullptr;
-    return (BaseAnimal*)((el)->base);
-}
-
 Base * get_base(uint32_t c_id, int32_t id)
 {
     return nullptr;

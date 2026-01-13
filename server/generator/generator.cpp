@@ -1,7 +1,9 @@
 #include "generator.h"
+#include "random_functions.h"
 
 int terrains_count;
 TerrainType ** terrains;
+Region ** regions;
 
 int all_plants_count;
 PlantType ** all_plants;
@@ -10,16 +12,6 @@ int all_animals_count;
 AnimalType ** all_animals;
 
 int all_base_elements_count;
-
-int random_range(int min, int max)
-{
-    return rand() % (max - min) + min;
-}
-
-float random_float_range(float min, float max)
-{
-    return (float) rand() / (1.0 * RAND_MAX) * (max - min) + min;
-}
 
 void choose_multiple(int total, int n, int * out_indices)
 {
@@ -210,3 +202,30 @@ AnimalType::AnimalType(int id) : id(id)
     grounds_count = n;
     delete[] chosen_indices;
 }
+
+
+
+void show_terrains()
+{
+    for (int i=0; i < terrains_count; i++)
+    {
+        terrains[i]->show();
+    }
+}
+
+void show_plants()
+{
+    for (int i=0; i < all_plants_count; i++)
+    {
+        all_plants[i]->show();
+    }
+}
+
+void show_animals()
+{
+    for (int i=0; i < all_animals_count; i++)
+    {
+        all_animals[i]->show();
+    }
+}
+

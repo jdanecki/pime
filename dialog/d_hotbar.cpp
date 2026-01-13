@@ -2,7 +2,7 @@
 #include "playerUI.h"
 
 extern int active_hotbar;
-int hotbar_x=550, hotbar_y=490;
+int hotbar_x=550, hotbar_y=420;
 
 void change_active_hotbar(DialogButton * button)
 {

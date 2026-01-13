@@ -18,10 +18,9 @@ enum class DialogElementType
 class Dialog;
 class DialogElement
 {
-  protected:
+  public:
     Backend_Rect rect;
 
-  public:
     Dialog *dialog;
     int id;
     enum DialogElementType c_id;

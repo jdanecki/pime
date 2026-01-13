@@ -9,6 +9,7 @@ core_sources = [
   'packet_types.cpp',
   'clan.cpp',
   'time.cpp',
+  'packets.cpp'
 ]
 
 core_alchemist_sources = []

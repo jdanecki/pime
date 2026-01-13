@@ -206,7 +206,10 @@ class Region
 };
 
 extern Region ** regions;
-
 void create_regions();
 
 Region * find_region(int x, int y);
+void show_terrains();
+void show_plants();
+void show_animals();
+

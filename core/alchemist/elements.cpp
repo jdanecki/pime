@@ -286,3 +286,25 @@ Place::Place(Place_id id): InventoryElement(Class_Place), id(id)
 {
 
 }
+
+BaseElement * get_base_element(size_t id)
+{
+    BaseListElement *el=(BaseListElement*)base_elements.find(&id);
+    if (!el) return nullptr;
+    return (BaseElement*)((el)->base);
+}
+
+BasePlant * get_base_plant(size_t id)
+{
+    BaseListElement *el=(BaseListElement*)base_plants.find(&id);
+    if (!el) return nullptr;
+    return (BasePlant*)((el)->base);
+}
+
+BaseAnimal * get_base_animal(size_t id)
+{
+    BaseListElement *el=(BaseListElement*)base_animals.find(&id);
+    if (!el) return nullptr;
+    return (BaseAnimal*)((el)->base);
+}
+

@@ -53,11 +53,6 @@ void handle_hotbar_9();
 void handle_prev_hotbar();
 void handle_next_hotbar();
 
-void handle_left();
-void handle_right();
-void handle_up();
-void handle_down();
-
 void handle_minus();
 void handle_equal();
 void handle_left_shift();

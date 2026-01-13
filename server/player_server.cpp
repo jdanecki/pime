@@ -5,6 +5,13 @@
 #include "../core/packet_types.h"
 #include <stdio.h>
 
+ElementsList *players;
+
+void create_players()
+{
+    players = new InvList("Players");
+}
+
 bool check_and_load_chunk(int new_map_x, int new_map_y)
 {
     for (int cy = new_map_y - 1; cy <= new_map_y + 1; cy++)
@@ -250,3 +257,15 @@ Npc * create_npc()
     //return new Npc(ItemLocation::center());
     return nullptr;
 }
+
+void show_players()
+{
+    ListElement * pl_el = players->head;
+    while (pl_el)
+    {
+        PlayerClient * pl = (PlayerClient *)pl_el;
+        pl->show();
+        pl_el = pl_el->next;
+    }
+}
+

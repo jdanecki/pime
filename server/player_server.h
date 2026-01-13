@@ -2,7 +2,6 @@
 #define SERVER_PLAYER_H
 
 #include "../core/player.h"
-#include "networking.h"
 #include "../core/npc.h"
 #include "elements_server.h"
 
@@ -25,7 +24,10 @@ class PlayerServer : public Player, public BeingServer
 };
 
 PlayerServer * create_player(size_t id);
+extern ElementsList *players;
+void create_players();
 
 Npc * create_npc();
+void show_players();
 
 #endif

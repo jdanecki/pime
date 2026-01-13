@@ -50,22 +50,6 @@ void handle_equal() {
         player->craftbar[active_hotbar] = 1;
 }  
 
-void handle_left() {
-    player->going_right = 0;
-    send_packet_move(client, -1, 0);    
-}
-void handle_right() {
-    player->going_right = 1;
-    send_packet_move(client, 1, 0);    
-}
-void handle_up() {
-    send_packet_move(client, 0, -1);
-
-}
-void handle_down() {
-    send_packet_move(client, 0, 1);
-}
-
 void handle_left_shift() {
     player->sneaking = 1;
 }

@@ -36,6 +36,7 @@ test_lists_sources = [
 test_generator_sdl_sources = [
   'test_generator_sdl.cpp',
   '../server/generator/generator.cpp',
+  '../server/generator/random_functions.cpp',
   '../SDL/text.cpp',
   '../SDL/palette.cpp',
   '../client-common/text.cpp'

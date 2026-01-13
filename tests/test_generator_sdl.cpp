@@ -2,7 +2,6 @@
 #include "../client-common/text.h"
 #include "../server/generator/generator.h"
 
-Region **regions;
 Region * current_region;
 
 SDL_Renderer * renderer;
@@ -165,28 +164,8 @@ void clear_window()
     SDL_RenderClear(renderer);
 }
 
-void show_terrains()
-{
-    for (int i=0; i < terrains_count; i++)
-    {
-        terrains[i]->show();
-    }
-}
 
-void show_plants()
-{
-    for (int i=0; i < all_plants_count; i++)
-    {
-        all_plants[i]->show();
-    }
-}
-
-int random_bool(double probability)
-{
-    return ((double)rand() / RAND_MAX) < probability;
-}
-
-typedef void (*callback_fn)(int r);
+typedef void (*callback_fn_test)(int r);
 
 void add_element(int r)
 {
@@ -199,7 +178,7 @@ void add_element(int r)
     chunk[r].y=y;
 }
 
-void do_times(callback_fn f, int r)
+void do_times_test(callback_fn_test f, int r)
 {
 #if 0
  int count = (int)(current_region->rocks_types[i]->value * 2.0f);
@@ -314,7 +293,7 @@ int main() {
                         write_text(260, 32+i*32, buf, White, 15, 30);
 
                         //r->rocks_types[i]->terrain->id < TILE_TEXTURES=15
-                        if (redraw) do_times(add_element, i);
+                        if (redraw) do_times_test(add_element, i);
                     }
                     if (redraw) {
                         draw_map3();

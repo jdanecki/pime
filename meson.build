@@ -8,7 +8,7 @@ project('pime-project', 'cpp',
     'b_pie=true',
     'b_lto=false'
   ],
-  #  version : '0.1'
+  version : '0.7'
 )
 add_project_arguments(
   '-Wno-switch',

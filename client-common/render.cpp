@@ -38,7 +38,7 @@ void draw_texts()
 {
     int tx = window_width - PANEL_WINDOW + 10;
     int ty = 10;
-    Backend_Rect r(tx-10, 0, PANEL_WINDOW, window_height - 64 );
+    Backend_Rect r(tx-10, 0, PANEL_WINDOW, window_height - 64);
     Backend_Draw_Fill_Rectangle(r, Backend_Color{10, 10, 200, 255});
 
     sprintf(text, "Hunger=%d Thirst=%d", player->hunger, player->thirst);
@@ -53,7 +53,7 @@ void draw_texts()
 
     sprintf(text, "%s@[%d,%d][%d,%d]:id=%ld f=%d", player->get_name(),
         pl_ch_x, pl_ch_y, px, py, base->uid, base->form);
-    write_text(tx, window_height - 150, text, White, 15, 30);
+    write_text(tx, window_height - 100, text, White, 15, 30);
 
     InventoryElement * item = get_item_at_ppos(player);
     if (item)
@@ -101,7 +101,7 @@ void draw_texts()
         {
             sprintf(text, "%s (%s)", el->get_name(), el->get_class_name());
         }
-        write_text(window_width - PANEL_WINDOW + 10, window_height-60, text, Cyan, 13, 25);
+        write_text(window_width - PANEL_WINDOW + 10, hotbar.rect.r.y + hotbar.rect.get_h(), text, Cyan, 13, 25);
     }
 }
 
@@ -303,6 +303,7 @@ void draw_players()
     int w=window_width - PANEL_WINDOW;
     int icon_size = w / 10;
     int x = (int)(w - (icon_size * 1.1));
+
     if (player->running)
     {
         Backend_Rect running_icon_rect(x, 0, icon_size, icon_size);
