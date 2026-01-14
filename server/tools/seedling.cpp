@@ -29,8 +29,23 @@ bool Seedling::use(InventoryElement * object, Player * pl)
     x = object->location.get_x();
     y = object->location.get_y();
 
+    if (object->c_id != Class_Place)
+    {
+        CONSOLE_LOG("It's not a place to plow\n");
+        return false;
+    }
+    Place * p = (Place *)object;
+    if (p->get_id() != PLACE_FIELD)
+    {
+        CONSOLE_LOG("It's not a field\n");
+        return false;
+    }
+    if (p->state != FIELD_PLOWED)
+    {
+        CONSOLE_LOG("Field isn't plowed\n");
+        return false;
+    }
     CONSOLE_LOG("%s: %s on %s @[%d,%d][%d,%d]\n", get_name(), product_action_name[actions[0]], object->get_name(), map_x, map_y, x, y);
-    object->show();
 
     chunk * ch = world_table[map_y][map_x];
     IngredientServer * ing = (IngredientServer *)(ings[0]);
@@ -40,5 +55,8 @@ bool Seedling::use(InventoryElement * object, Player * pl)
     PlantServer * plant = create_plant((BasePlant *)(base_el->base));
     ch->add_object(plant, x, y);
     notify_create(plant);
-    return false;
+    p->state = FIELD_PLANTED;
+    notify_update(p); // FIXME - check why is not planted on client
+
+    return true;
 }

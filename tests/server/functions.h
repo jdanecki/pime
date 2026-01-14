@@ -17,7 +17,7 @@ extern int history_size;
 extern int col;
 
 void print_status(const char * format, ...);
-void ncurses_tick();
+void ncurses_tick_test();
 int add_to_output(const char * fmt, ...);
 void shift_output();
 #define MAX_OUTPUT_SIZE 189

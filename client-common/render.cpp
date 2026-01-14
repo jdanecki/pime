@@ -370,17 +370,19 @@ void draw()
 
         //        draw_maps();
     }
+    Backend_Rect r0(0, window_height - 64, window_width, 32);
+    Backend_Draw_Fill_Rectangle(r0, Backend_Color{10, 100, 10, 255});
+
+    Backend_Rect r1(0, window_height - 32, window_width, 32);
+    Backend_Draw_Fill_Rectangle(r1, Backend_Color{10, 100, 10, 255});
+
     if (status_line[0] != ' ')
     {
-        Backend_Rect r(0, window_height - 64, window_width, 32);
-        Backend_Draw_Fill_Rectangle(r, Backend_Color{10, 100, 10, 255});
         write_text(5, window_height - 64, status_line, White, 15, 30, false);
     }
 
     if (status_line2[0] != ' ')
     {
-        Backend_Rect r(0, window_height - 32, window_width, 32);
-        Backend_Draw_Fill_Rectangle(r, Backend_Color{10, 100, 10, 255});
         write_text(5, window_height - 32, status_line2, White, 15, 30, false);
     }
 

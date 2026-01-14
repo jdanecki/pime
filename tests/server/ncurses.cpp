@@ -44,7 +44,7 @@ int main()
     curs_set(0);
     while (key != 'q')
     {
-        ncurses_tick();
+        ncurses_tick_test();
         key = wgetch(out_w);
         if (key != ERR)
         {

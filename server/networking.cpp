@@ -1,6 +1,7 @@
 #include "networking.h"
 #include "elements_server.h"
 #include "craft.h"
+#include "world_server.h"
 
 InvList objects_to_create;
 ENetHost * server;
@@ -390,4 +391,54 @@ bool init_networking()
 
     CONSOLE_LOG("Server Pime started on port %u\n", address.port);
     return true;
+}
+
+char hostname[512] = {
+    0,
+};
+
+void handle_net_event(ENetEvent * event)
+{
+    switch (event->type)
+    {
+        case ENET_EVENT_TYPE_CONNECT:
+        {
+            enet_address_get_host_ip(&event->peer->address, hostname, 512);
+            CONSOLE_LOG("Client connected %s:%d\n", hostname, event->peer->address.port);
+            unsigned short * port = new unsigned short;
+            *port = event->peer->address.port;
+            event->peer->data = (void *)port;
+#if DEBUG_TIMEOUT
+            enet_peer_timeout(event->peer, 5 * 60 * 1000, 5 * 60 * 1000, 5 * 60 * 1000); // 5 minutes
+#endif
+            break;
+        }
+        case ENET_EVENT_TYPE_RECEIVE:
+        {
+            handle_packet(event->packet, event->peer);
+            enet_packet_destroy(event->packet);
+            send_updates();
+            break;
+        }
+        case ENET_EVENT_TYPE_DISCONNECT:
+        {
+            Peer_id peer_id;
+            peer_id.tag = Peer_id::Tag::Peer;
+            peer_id.peer = event->peer;
+            PlayerClient * pl = (PlayerClient *)players->find(&peer_id);
+            enet_address_get_host_ip(&event->peer->address, hostname, 512);
+
+            CONSOLE_LOG("player: %s from %s:%d disconnected\n", pl->player->get_name(), hostname, event->peer->address.port);
+            destroy(pl->player);
+            players->remove(pl);
+            send_updates();
+            event->peer->data = NULL;
+            break;
+        }
+        default:
+            // CONSOLE_LOG("time=%ld\n", get_time_ms());
+            update();
+            send_updates();
+            break;
+    }
 }

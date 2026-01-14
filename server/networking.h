@@ -63,6 +63,6 @@ void notify_update(const InventoryElement * el);
 void notify_create(const InventoryElement * el);
 bool init_networking();
 void send_updates();
-bool handle_packet(ENetPacket * packet, ENetPeer * peer);
+void handle_net_event(ENetEvent * event);
 
 #endif

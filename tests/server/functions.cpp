@@ -90,7 +90,7 @@ void clear_history()
     add_to_output("cleared\n");
 }
 
-void ncurses_tick()
+void ncurses_tick_test()
 {
     werase(out_w);
     int lines = 0;

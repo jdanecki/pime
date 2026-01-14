@@ -11,7 +11,7 @@
 #include "player_actions.h"
 #include "window.h"
 #include "net.h"
-#include "key_handler.h"
+#include "../core/key_handler.h"
 
 extern int active_hotbar;
 extern int auto_explore;
@@ -38,6 +38,7 @@ void handle_f4();
 void handle_f5();
 void handle_f6();
 void handle_f7();
+void handle_f10();
 void handle_f11();
 
 void handle_hotbar_0();

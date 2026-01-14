@@ -44,7 +44,7 @@ KeyHandler key_handlers[] = {
     {SDLK_TAB, handle_next_hotbar, false},
     {SDLK_MINUS, handle_minus, true},
     {SDLK_EQUALS, handle_equal, true},
-    {SDLK_ESCAPE, handle_escape, true},
+    {SDLK_F10, handle_escape, true},
 };
 
 bool key_pressed(int key)

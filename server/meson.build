@@ -4,12 +4,13 @@ server_sources = [
   'console.cpp',
   'server.cpp',
   'chunk.cpp',
-
-  'generator/generator.cpp',
-  'generator/random_functions.cpp',
+  'inputs.cpp',
   'world_server.cpp', 'player_server.cpp',
   'networking.cpp', 'elements_server.cpp',
   'craft.cpp', 'craft_ing.cpp', 'craft_prod.cpp',
+
+  'generator/generator.cpp',
+  'generator/random_functions.cpp',
 
   'tools/axe_blade.cpp', 'tools/axe_handle.cpp', 'tools/axe.cpp',
   'tools/pickaxe_blade.cpp', 'tools/pickaxe_handle.cpp', 'tools/pickaxe.cpp',

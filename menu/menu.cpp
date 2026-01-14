@@ -271,7 +271,7 @@ void create_menus()
     menu_main->add("Cancel", MENU_CANCEL);
 
     menu_help = new Menu("Help");
-    menu_help->add("esc - main menu", MENU_CANCEL);
+    menu_help->add("F10 - main menu", MENU_CANCEL);
 
     menu_help->add("1-9,0 - hotbar", MENU_CANCEL);
     menu_help->add("enter - use item", MENU_CANCEL);

@@ -38,6 +38,7 @@ KeyHandler key_handlers[] = {
     {KEY_TAB, handle_next_hotbar, false},
     {KEY_MINUS, handle_minus, true},
     {KEY_EQUAL, handle_equal, true},
+    {KEY_F10, handle_f10, true},
     {KEY_ESCAPE, handle_escape, true},
     {KEY_LEFT_CONTROL, handle_left_control, true},
     {KEY_LEFT_SHIFT, handle_left_shift, true},
