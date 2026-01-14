@@ -3,6 +3,7 @@
 #include "../core/key_handler.h"
 
 #include "console.h"
+#include "elements_server.h"
 #include "player_server.h"
 #include "places/places.h"
 #include "chunk.h"
@@ -76,6 +77,25 @@ void show_base_animals()
     base_animals.show();
 }
 
+void create_debug_element()
+{
+    chunk * ch = world_table[128][128];
+    PlaceServer * p = create_place(PLACE_FIELD);
+    ch->add_object(p, 9, 9);
+
+    p->state = FIELD_PLANTED;
+    notify_update(p);
+#if 0
+  size_t b_id = 0;
+    BaseListElement * base_el = (BaseListElement *)base_plants.find(&b_id);
+    PlantServer * plant = create_plant((BasePlant *)(base_el->base));
+    ch->add_object(plant, x, y);
+    notify_create(plant);
+    p->state = FIELD_PLANTED;
+    notify_update(p); // FIXME - check why is not planted on client
+#endif
+}
+
 KeyHandler key_handlers[] = {
     {KEY_RESIZE, handle_resize},
     {KEY_END, handle_end},
@@ -83,10 +103,11 @@ KeyHandler key_handlers[] = {
     {KEY_DOWN, handle_down},
     {KEY_UP, handle_up},
     {'#', handle_hash},
+    {'c', clear_history},
     {'e', handle_exit},
     {'h', print_help},
-    {'c', clear_history},
     {'p', show_players},
+
     {'1', show_terrains},
     {'2', show_plants},
     {'3', show_animals},
@@ -94,6 +115,8 @@ KeyHandler key_handlers[] = {
     {'5', show_base_elements},
     {'6', show_base_plants},
     {'7', show_base_animals},
+
+    {'d', create_debug_element},
 };
 
 bool handle_pressed()
