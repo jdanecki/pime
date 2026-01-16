@@ -33,7 +33,7 @@ class ListElement
         return ((InventoryElement *)(el.get()))->tick();
     }
     ListElement(InventoryElement * entry);
-    ListElement(NetworkObject * entry);
+    //ListElement(NetworkObject * entry);
     ListElement() : c_id(Class_ListElement), el(nullptr), next(nullptr), prev(nullptr)
     {
         enable();
@@ -54,6 +54,27 @@ class ListElement
         return c_id;
     }
 };
+
+class BaseListElement : public ListElement
+{
+  public:
+    Base * base;
+    BaseListElement(Base * base) : base(base)
+    {
+        c_id = Class_BaseListElement;
+    }
+    bool check(void * what)
+    {
+        size_t * uid = static_cast<size_t *>(what);
+        return (*uid == base->uid);
+    }
+    size_t get_size()
+    {
+        return base->get_size();
+    }
+    void show(bool details = true);
+};
+
 
 struct ElId
 {
@@ -104,26 +125,6 @@ class KnownElement : public ListElement
     }
 };
 
-class BaseListElement : public ListElement
-{
-  public:
-    Base * base;
-    BaseListElement(Base * base) : base(base)
-    {
-        c_id = Class_BaseListElement;
-    }
-    bool check(void * what)
-    {
-        size_t * pid = (size_t *)what;
-        return (*pid == base->uid);
-    }
-    size_t get_size()
-    {
-        return base->get_size();
-    }
-    void show(bool details = true);
-};
-
 class ElementsListIterator
 {
     ListElement * le;
@@ -165,8 +166,11 @@ class ElementsListReverseIterator
 };
 
 class ReversedView;
+typedef bool (*FindFunc)(NetworkObject * el, void * arg);
 class ElementsList
 {
+    NetworkObject ** find_by_fun(FindFunc fun, void * arg, int * count);
+
   protected:
     void virtual copy(ListElement * el)
     {
@@ -195,6 +199,15 @@ class ElementsList
     void disable_all();
     ListElement * add(ListElement * el);
     ListElement * add_front(ListElement * el);
+    InventoryElement * add(InventoryElement * el);
+    InventoryElement * add_front(InventoryElement * el);
+
+    NetworkObject ** find_form(enum Form f, int * count);
+    NetworkObject ** find_class(enum Class_id cl, int * count);
+    NetworkObject ** find_id(size_t id, int * count);
+    //  bool virtual find_at_check(ListElement *el, void * pos) { return false; }
+
+    void remove(InventoryElement * el);
     void remove(ListElement * el);
     void tick();
     void copy_elements(ElementsList * dst);
@@ -234,28 +247,6 @@ class ReversedView
     {
         return list->rend();
     }
-};
-
-typedef bool (*FindFunc)(InventoryElement * el, void * arg);
-
-class InvList : public ElementsList
-{
-    InventoryElement ** find_by_fun(FindFunc fun, void * arg, int * count);
-
-  public:
-    InvList(const char * n) : ElementsList(n)
-    {
-    }
-    InvList() : ElementsList("Inventory list")
-    {
-    }
-    //  bool virtual find_at_check(ListElement *el, void * pos) { return false; }
-    InventoryElement ** find_form(enum Form f, int * count);
-    InventoryElement ** find_class(enum Class_id cl, int * count);
-    InventoryElement ** find_id(int id, int * count);
-    InventoryElement * add(InventoryElement * el);
-    InventoryElement * add_front(InventoryElement * el);
-    void remove(InventoryElement * el);
 };
 
 extern ElementsList base_elements;

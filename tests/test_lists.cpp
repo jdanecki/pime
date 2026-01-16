@@ -72,8 +72,8 @@ void test_element_on_2_lists()
 
 void test_element_on_2_Invlists()
 {
-    InvList * list1 = new InvList("list1");
-    InvList * list2 = new InvList("list2");
+    ElementsList * list1 = new ElementsList("list1");
+    ElementsList * list2 = new ElementsList("list2");
 
     for (int i = 0; i < 5; i++)
     {
@@ -99,10 +99,38 @@ void test_element_on_2_Invlists()
     delete list1;
     delete list2;
 }
+void test_element()
+{
+    ElementsList list("list for elements");
+    ListElement * el1 = new ListElement(new Element(new BaseElement(Form_solid, 1)));
+    ListElement * el2 = new ListElement(new Element(new BaseElement(Form_liquid, 2)));
+    ListElement * el3 = new ListElement(new Element(new BaseElement(Form_solid, 3)));
+    list.add(el1);
+    list.add(el2);
+    list.add(el3);
+//    list.show(false);
+    el1->show(false);
+    el2->show(false);
+    el3->show(false);
+
+    ListElement * el =list.find(el1);
+    el1->show(false);
+
+    int count;
+    NetworkObject ** elems = list.find_form(Form_solid, &count);
+    printf("solid count=%d\n", count);
+    if (count) {
+        for (int i=0; i < count; i++)
+        {            
+            elems[i]->show(false);
+        }
+    }
+}
 
 int main()
 {
-    test_loops();
+    test_element();
+//    test_loops();
     // test_element_on_2_lists();
     //    test_element_on_2_Invlists();
 

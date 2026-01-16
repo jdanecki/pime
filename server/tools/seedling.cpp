@@ -56,7 +56,7 @@ bool Seedling::use(InventoryElement * object, Player * pl)
     ch->add_object(plant, x, y);
     notify_create(plant);
     p->state = FIELD_PLANTED;
-    notify_update(p); // FIXME - check why is not planted on client
+    notify_update(p);
 
     return true;
 }

@@ -2,7 +2,7 @@ project('pime-project', 'cpp',
   #default_options : ['buildtype=debugoptimized']
   default_options : [
     'buildtype=debug',
-    'optimization=g', 
+    'optimization=0',
     'warning_level=0',
     #'warning_level=3',
     'b_pie=true',

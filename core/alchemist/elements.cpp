@@ -12,8 +12,6 @@ BaseElement * get_base_element(size_t id);
 BasePlant * get_base_plant(size_t id);
 BaseAnimal * get_base_animal(size_t id);
 
-ElementsList * base_list;
-
 const char * ingredient_name[] = {
     "Axe blade",
     "Axe handle",
@@ -74,7 +72,6 @@ const char * class_name[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant"
 
 Base::Base(int index, Class_id c, const char * name) : name(name), NetworkObject(c, index)
 {
-    c_id = c;
     edible.eating_by = 1; // only by animals
 }
 
@@ -186,7 +183,7 @@ void Ingredient::show(bool details)
     quality.show();
     resilience.show();
     usage.show();
-    CONSOLE_LOG("form = %s", Form_name[req_form]);
+    CONSOLE_LOG("form = %s\n", Form_name[req_form]);
 }
 
 Product::Product(Product_id id, int actions_count) : InventoryElement(Class_Product), quality("quality", 0), resilience("resilience", 0), usage("usage", 0), actions_count(actions_count), id(id)

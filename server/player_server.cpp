@@ -9,7 +9,7 @@ ElementsList * players;
 
 void create_players()
 {
-    players = new InvList("Players");
+    players = new ElementsList("Players");
 }
 
 bool check_and_load_chunk(int new_map_x, int new_map_y)
@@ -146,7 +146,7 @@ bool PlayerServer::server_action_on_object(Server_action a, InventoryElement * o
 
 bool PlayerServer::use_product_on_tile(Product * prod, int map_x, int map_y, int x, int y)
 {
-    ProductServer * prod_serv = dynamic_cast<ProductServer *>(prod);
+    ProductServer * prod_serv = static_cast<ProductServer *>(prod);
     if (!prod_serv)
     {
         return false;

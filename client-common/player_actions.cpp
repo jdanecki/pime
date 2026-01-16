@@ -19,7 +19,7 @@ void use_tile()
             if (player == object)
                 goto player_object;
         }
-        if (Product * item = dynamic_cast<Product *>(player->hotbar[active_hotbar]))
+        if (Product * item = static_cast<Product *>(player->hotbar[active_hotbar]))
         {
             CONSOLE_LOG("SDL: using %s on %s uid=%lx\n", item->get_name(), object->get_name(), object->uid);
             send_packet_item_used_on_object(client, item->uid, object->uid);

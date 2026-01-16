@@ -3,7 +3,7 @@
 #include "craft.h"
 #include "world_server.h"
 
-InvList objects_to_create;
+ElementsList objects_to_create;
 ENetHost * server;
 int players_id;
 
@@ -94,14 +94,14 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         }
         case PACKET_PLAYER_MOVE:
         {
-            PacketPlayerMove * move = dynamic_cast<PacketPlayerMove *>(p);
+            PacketPlayerMove * move = static_cast<PacketPlayerMove *>(p);
             pl->player->move(move->get_x(), move->get_y());
             delete p;
             break;
         }
         case PACKET_REQUEST_CHUNK:
         {
-            PacketRequestChunk * req = dynamic_cast<PacketRequestChunk *>(p);
+            PacketRequestChunk * req = static_cast<PacketRequestChunk *>(p);
             int cx = req->get_cx();
             int cy = req->get_cy();
             delete p;
@@ -112,7 +112,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         }
         case PACKET_PLAYER_ACTION_PICKUP:
         {
-            PacketPlayerActionPickup * req = dynamic_cast<PacketPlayerActionPickup *>(p);
+            PacketPlayerActionPickup * req = static_cast<PacketPlayerActionPickup *>(p);
             uintptr_t id = req->get_id();
             InventoryElement * el = find_in_world(&pl->player->location, id);
             delete p;
@@ -129,7 +129,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         }
         case PACKET_PLAYER_ACTION_DROP:
         {
-            PacketPlayerActionDrop * req = dynamic_cast<PacketPlayerActionDrop *>(p);
+            PacketPlayerActionDrop * req = static_cast<PacketPlayerActionDrop *>(p);
             uintptr_t id = req->get_id();
             InventoryElement * el = pl->player->get_item_by_uid(id);
             delete p;
@@ -144,7 +144,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         }
         case PACKET_PLAYER_ACTION_USE_ITEM_ON_OBJECT:
         {
-            PacketPlayerActionUseItemOnObject * req = dynamic_cast<PacketPlayerActionUseItemOnObject *>(p);
+            PacketPlayerActionUseItemOnObject * req = static_cast<PacketPlayerActionUseItemOnObject *>(p);
             uintptr_t iid = req->get_iid();
             uintptr_t oid = req->get_oid();
             InventoryElement * el = pl->player->get_item_by_uid(iid);
@@ -164,7 +164,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         }
         case PACKET_PLAYER_ACTION_ON_OBJECT:
         {
-            PacketPlayerActionOnObject * req = dynamic_cast<PacketPlayerActionOnObject *>(p);
+            PacketPlayerActionOnObject * req = static_cast<PacketPlayerActionOnObject *>(p);
             Player_action a = req->get_a();
             uintptr_t oid = req->get_oid();
             delete p;
@@ -182,7 +182,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         }
         case PACKET_SERVER_ACTION_ON_OBJECT:
         {
-            PacketServerActionOnObject * req = dynamic_cast<PacketServerActionOnObject *>(p);
+            PacketServerActionOnObject * req = static_cast<PacketServerActionOnObject *>(p);
             Server_action a = req->get_a();
             uintptr_t oid = req->get_oid();
             delete p;
@@ -200,7 +200,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         }
         case PACKET_PLAYER_ACTION_USE_ITEM_ON_TILE:
         {
-            PacketPlayerActionUseItemOnTile * req = dynamic_cast<PacketPlayerActionUseItemOnTile *>(p);
+            PacketPlayerActionUseItemOnTile * req = static_cast<PacketPlayerActionUseItemOnTile *>(p);
             int map_x = req->get_map_x();
             int map_y = req->get_map_y();
             int x = req->get_x();
@@ -210,7 +210,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             InventoryElement * item = pl->player->get_item_by_uid(iid);
             if (item)
             {
-                if (Product * prod = dynamic_cast<Product *>(item))
+                if (Product * prod = static_cast<Product *>(item))
                 {
                     CONSOLE_LOG("use product: %s on tile [%d,%d]:[%d,%d]\n", prod->get_name(), map_x, map_y, x, y);
                     if (!pl->player->use_product_on_tile(prod, map_x, map_y, x, y))
@@ -235,7 +235,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
         }
         case PACKET_PLAYER_ACTION_CRAFT:
         {
-            PacketPlayerActionCraft * req = dynamic_cast<PacketPlayerActionCraft *>(p);
+            PacketPlayerActionCraft * req = static_cast<PacketPlayerActionCraft *>(p);
             uintptr_t prod_id = req->get_prod_id();
             uintptr_t ing_num = req->get_ing_num();
             uintptr_t * iid_table = req->get_iid_table();

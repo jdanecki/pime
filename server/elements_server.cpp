@@ -282,6 +282,12 @@ bool IngredientServer::action(Product_action action, Player * pl)
     return false;
 }
 
+void IngredientServer::show(bool details)
+{
+    Ingredient::show(details);
+    el->show(details);
+}
+
 void ProductServer::init(int c, Form f)
 {
     ing_count = c;
@@ -307,6 +313,8 @@ ProductServer::ProductServer(InventoryElement ** from, int count, Product_id id,
 void ProductServer::show(bool details)
 {
     Product::show(details);
+    for (int i=0; i < ing_count; i++)
+        ings[i]->show(details);
 }
 
 AnimalServer * create_animal(BaseAnimal * base)

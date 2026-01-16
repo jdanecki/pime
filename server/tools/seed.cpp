@@ -11,7 +11,7 @@ IngredientServer * Seed::createSeed(InventoryElement * from)
     switch (from->get_cid())
     {
         case Class_Plant:
-            if (dynamic_cast<Plant *>(from)->phase == Plant_fruits)
+            if (static_cast<Plant *>(from)->phase == Plant_fruits)
                 ret = new Seed(from);
             break;
         case Class_Ingredient:
@@ -19,6 +19,6 @@ IngredientServer * Seed::createSeed(InventoryElement * from)
                 ret = new Seed(from);
             break;
     }
-
+    if (!ret) CONSOLE_LOG("Can'_t create Seed\n");
     return ret;
 }

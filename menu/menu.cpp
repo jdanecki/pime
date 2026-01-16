@@ -67,14 +67,14 @@ void Menu::add(const char * e, enum menu_actions a)
 {
     entries->add(new Menu_entry(e, a, nullptr, 0, nullptr));
     if (!menu_pos)
-        menu_pos = dynamic_cast<Menu_entry *>(entries->head);
+        menu_pos = static_cast<Menu_entry *>(entries->head);
 }
 
 void Menu::add(const char * e, menu_actions a, int v)
 {
     entries->add(new Menu_entry(e, a, nullptr, v, nullptr));
     if (!menu_pos)
-        menu_pos = dynamic_cast<Menu_entry *>(entries->head);
+        menu_pos = static_cast<Menu_entry *>(entries->head);
 }
 
 void Menu::add(const char * e, enum Npc_say a, InventoryElement * p_el, Sentence * s)
@@ -82,14 +82,14 @@ void Menu::add(const char * e, enum Npc_say a, InventoryElement * p_el, Sentence
     enum menu_actions conv = (enum menu_actions)((int)MENU_NPC_CONV + (int)a);
     entries->add(new Menu_entry(e, conv, p_el, 0, s));
     if (!menu_pos)
-        menu_pos = dynamic_cast<Menu_entry *>(entries->head);
+        menu_pos = static_cast<Menu_entry *>(entries->head);
 }
 
 void Menu::add(const char * e, enum menu_actions a, InventoryElement * p_el)
 {
     entries->add(new Menu_entry(e, a, p_el, 0, nullptr));
     if (!menu_pos)
-        menu_pos = dynamic_cast<Menu_entry *>(entries->head);
+        menu_pos = static_cast<Menu_entry *>(entries->head);
 }
 
 int Menu::get_val(int v)
@@ -134,7 +134,8 @@ void Menu::show()
         game_size = window_height;
 
     int menu_entries = entries->nr_elements;
-    int menu_opt_size = game_size / (menu_entries + 3);
+    int menu_scale = menu_entries < 3 ? 9 : menu_entries + 5;
+    int menu_opt_size = game_size / menu_scale;
     int mody;
     int mody2;
     // CONSOLE_LOG("menu_entries = %d\n", menu_entries);
@@ -151,10 +152,10 @@ void Menu::show()
     }
 
     int modx = int((game_size / 2)) - (0.4 * game_size);
-    int modx2 = int((game_size / 2)) + (0.6 * game_size);
+    int modx2 = int((game_size / 2)) + (0.8 * game_size);
 
     Backend_Rect rect(modx, mody, modx2 - modx, mody2 - mody);
-    Backend_Draw_Fill_Rectangle(rect, Backend_Color{0, 0, 255, 100});
+    Backend_Draw_Fill_Rectangle(rect, Backend_Color{0, 155, 155, 100});
 
     int mody3 = mody + (((index + 1) * menu_opt_size) - (menu_opt_size));
     int mody4 = mody + ((index + 1) * menu_opt_size);
@@ -351,7 +352,7 @@ void create_menus()
 Menu * create_inv_form(enum Form f)
 {
     int count = 0;
-    InventoryElement ** elements_with_form = player->inventory.find_form(f, &count);
+    NetworkObject ** elements_with_form = player->inventory.find_form(f, &count);
     if (!count)
         return nullptr;
 
@@ -370,7 +371,7 @@ Menu * create_inv_form(enum Form f)
         // menu_inventory_categories2->add(base_elements[i]->name, MENU_CATEGORIES, items_textures[i], menu_index, i);
         //        menu_index++;
         // fixme group elements with the same base id
-        menu_inventory_elements_form->add("*", MENU_ITEMS_GROUP, elements_with_form[i]);
+        menu_inventory_elements_form->add("*", MENU_ITEMS_GROUP, static_cast<InventoryElement*>(elements_with_form[i]));
     }
     return menu_inventory_elements_form;
 }
@@ -378,7 +379,7 @@ Menu * create_inv_form(enum Form f)
 Menu * create_inv_category_classes(enum Class_id c)
 {
     int count = 0;
-    InventoryElement ** elements_with_class = player->inventory.find_class(c, &count);
+    NetworkObject ** elements_with_class = player->inventory.find_class(c, &count);
     if (!count)
         return nullptr;
 
@@ -392,7 +393,7 @@ Menu * create_inv_category_classes(enum Class_id c)
     menu_inventory_class = new Menu(menu_name);
     for (int i = 0; i < count; i++)
     {
-        menu_inventory_class->add("*", MENU_CLASSES, elements_with_class[i]);
+        menu_inventory_class->add("*", MENU_CLASSES, static_cast<InventoryElement*>(elements_with_class[i]));
     }
     return menu_inventory_class;
 }
@@ -413,7 +414,7 @@ Menu * create_knowledge_classes(enum Class_id c)
 
     while (cur)
     {
-        KnownElement * el = dynamic_cast<KnownElement *>(cur);
+        KnownElement * el = static_cast<KnownElement *>(cur);
 
         if (el->check_class(c))
         {
@@ -439,7 +440,7 @@ void create_inv_menu(int id)
 {
     CONSOLE_LOG("szukam %d\n", id);
     int c = 0;
-    InventoryElement ** i_el = player->inventory.find_id(id, &c);
+    NetworkObject ** i_el = player->inventory.find_id(id, &c);
     if (i_el)
     {
         CONSOLE_LOG("found %d elements\n", c);
@@ -452,7 +453,7 @@ void create_inv_menu(int id)
         for (int i = 0; i < c; i++)
         {
             CONSOLE_LOG("%s\n", el[i]->get_name());
-            menu_inventory->add("->", (menu_actions)(MENU_ITEM + i), el[i]);
+            menu_inventory->add("->", (menu_actions)(MENU_ITEM + i), static_cast<InventoryElement*>(el[i]));
         }
         free(el);
         current_menu = menu_inventory;
@@ -554,7 +555,7 @@ int Menu::interact()
     {
         case MENU_ITEMS_GROUP:
         { // get base id
-            // create_inv_menu((Item_id)(menu_inventory_elements_form->get_val()));
+           //  create_inv_menu((Item_id)(menu_inventory_elements_form->get_val()));
             return 0;
         }
             /*

@@ -384,7 +384,7 @@ class PacketObjectCreate : public Packet
                 break;
             }
             case ObjectData::Tag::Player:
-                new (&obj->player.data.inventory) InvList("inventory");
+                new (&obj->player.data.inventory) ElementsList("inventory");
                 new (&obj->player.data.known_elements) ElementsList("known elements");
                 // new (obj->player.data.player_skills) Skills();
                 new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
@@ -472,7 +472,7 @@ class PacketObjectUpdate : public Packet
             }
             case ObjectData::Tag::Player:
                 //    CONSOLE_LOG("ObjectUpdate for player inv_elems=%d\n", obj->player.data.inventory.nr_elements);
-                new (&obj->player.data.inventory) InvList("inventory");
+                new (&obj->player.data.inventory) ElementsList("inventory");
                 //    CONSOLE_LOG("ObjectUpdate for player initialized: inv_elems=%d\n", obj->player.data.inventory.nr_elements);
                 new (&obj->player.data.known_elements) ElementsList("known elements");
                 // new (&obj->player.data.player_skills) Skills();

@@ -29,9 +29,19 @@ enum Class_id
     Class_BaseListElement,
 };
 
+enum Form
+{
+    Form_unknown = 0,
+    Form_solid = 1,
+    Form_liquid,
+    Form_gas,
+};
+
 class NetworkObject
 {
   public:
+    Class_id c_id;
+    size_t uid;
     NetworkObject(Class_id id);
     NetworkObject(Class_id id, size_t uid);
     NetworkObject()
@@ -40,8 +50,8 @@ class NetworkObject
     size_t get_uid() const;
     Class_id get_cid() const;
 
-    Class_id c_id;
-    size_t uid;
+    virtual Form get_form() { return Form_unknown; }
+    virtual void show(bool details = true) {}
 };
 
 #endif

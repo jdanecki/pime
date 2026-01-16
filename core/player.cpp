@@ -37,32 +37,6 @@ size_t Player::get_id()
     return uid;
 }
 
-// Player::Player(int id) : InventoryElement(Class_Player), id(id), name(new char[16])
-// {
-// hunger = 500;
-// thirst = 250;
-// map_x = WORLD_CENTER;
-// map_y = WORLD_CENTER;
-// inventory = new InvList("inventory");
-// relations = nullptr;
-// // direction = direction::right;
-
-// x = 8;
-// y = 8;
-
-// for (int i = 0; i < 10; i++)
-// {
-//     hotbar[i] = NULL;
-//     craftbar[i] = 0;
-// }
-// in_conversation = false;
-// talking_to = nullptr;
-// welcomed = false;
-// sprintf((char*)name.str, "%s%d", "Player", id);
-
-// known_elements = new ElementsList("known elements");
-// }
-
 Player::Player(size_t uid, SerializableCString && name, ItemLocation location, int thirst, int hunger, int nutrition)
     : InventoryElement(Class_Player, uid, location), name(name), thirst(thirst), hunger(hunger), nutrition(nutrition), inventory("inventory"), known_elements("known elements"),
       clan(get_clan_by_id(Clan_Human)), talking_to(nullptr)
@@ -155,7 +129,7 @@ bool Player::say(Sentence * s)
 Sentence * Player::get_answer(Sentence * s)
 {
     Npc_say sid = NPC_Say_Hello;
-    Sentence * a = dynamic_cast<Sentence *>(sentences->find(&sid));
+    Sentence * a = static_cast<Sentence *>(sentences->find(&sid));
 
     const char * n;
     if (get_talking_to()->find_relation(this) == REL_known)
@@ -197,7 +171,7 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
         else
             sid = NPC_Answer_I_dont_know_it;
 
-        a = dynamic_cast<Sentence *>(answers->find(&sid));
+        a = static_cast<Sentence *>(answers->find(&sid));
         if (des)
         {
             print_status(1, "%s says: %s. It's %s", n, a->text, des);
@@ -229,7 +203,7 @@ void Player::ask(enum Npc_say s, InventoryElement * el)
                 get_talking_to()->set_relation(this, REL_known);
                 break;
         }
-        a = dynamic_cast<Sentence *>(answers->find(&sid));
+        a = static_cast<Sentence *>(answers->find(&sid));
         if (a)
             print_status(1, "%s says: %s", n, a->text);
     }
@@ -250,7 +224,7 @@ bool Player::check_known(InventoryElement * el)
     i.c_id = el->get_base_cid();
     i.id = el->get_id();
 
-    KnownElement * k = dynamic_cast<KnownElement *>(known_elements.find(&i));
+    KnownElement * k = static_cast<KnownElement *>(known_elements.find(&i));
     if (!k)
         return false;
     return k->is_known();
@@ -262,7 +236,7 @@ bool Player::set_known(Class_id cid, int el_id)
     i.c_id = cid;
     i.id = el_id;
 
-    KnownElement * k = dynamic_cast<KnownElement *>(known_elements.find(&i));
+    KnownElement * k = static_cast<KnownElement *>(known_elements.find(&i));
     if (!k)
     {
         KnownElement * n = new KnownElement(i.c_id, i.id);

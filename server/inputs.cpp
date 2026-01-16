@@ -8,6 +8,7 @@
 #include "places/places.h"
 #include "chunk.h"
 #include "generator/generator.h"
+#include "tools/tools.h"
 
 void handle_end()
 {
@@ -83,17 +84,46 @@ void create_debug_element()
     PlaceServer * p = create_place(PLACE_FIELD);
     ch->add_object(p, 9, 9);
 
-    p->state = FIELD_PLANTED;
-    notify_update(p);
-#if 0
-  size_t b_id = 0;
+    size_t b_id = 0;
+    BaseListElement * base_el = (BaseListElement *)base_plants.find(&b_id);
+    PlantServer * plant1 = create_plant((BasePlant *)(base_el->base));
+    plant1->phase = Plant_fruits;
+
+    BaseListElement * base_el1 = (BaseListElement *)base_plants.find(&b_id);
+    PlantServer * plant2 = create_plant((BasePlant *)(base_el1->base));
+    plant2->phase = Plant_fruits;
+
+    IngredientServer *s1 = Seed::createSeed(plant1);
+    IngredientServer *s2 = Seed::createSeed(plant2);
+
+    ProductServer *seedl = Seedling::createSeedling(s1, s2);
+    ch->add_object(seedl, 10, 9);
+
+    int count;
+    BaseListElement * base_el2 = (BaseListElement *)base_elements.find_form(Form_solid, &count);
+    ElementServer *el1=create_element((BaseElement *)(base_el2->base));
+    CONSOLE_LOG("count=%d \n", count);
+    if (count && el1) el1->show(false);
+}
+
+void update_debug_element()
+{
+
+/*  size_t b_id = 0;
     BaseListElement * base_el = (BaseListElement *)base_plants.find(&b_id);
     PlantServer * plant = create_plant((BasePlant *)(base_el->base));
     ch->add_object(plant, x, y);
-    notify_create(plant);
-    p->state = FIELD_PLANTED;
-    notify_update(p); // FIXME - check why is not planted on client
-#endif
+    notify_create(plant);*/
+
+    chunk * ch = world_table[128][128];
+    for (InventoryElement * el : ch->objects)
+    {
+        if (el->c_id == Class_Place) {
+            Place *p = (Place*) el;
+            p->state = FIELD_PLANTED;
+            notify_update(p);
+        }
+    }
 }
 
 KeyHandler key_handlers[] = {
@@ -117,6 +147,7 @@ KeyHandler key_handlers[] = {
     {'7', show_base_animals},
 
     {'d', create_debug_element},
+    {'u', update_debug_element},
 };
 
 bool handle_pressed()

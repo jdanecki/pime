@@ -149,6 +149,7 @@ class IngredientServer : public Ingredient
     {
         return true;
     }
+    void show(bool details = true) override;
 };
 
 class ProductServer : public Product

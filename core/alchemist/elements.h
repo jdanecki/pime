@@ -77,11 +77,12 @@ class BaseElement : public Base
     Solid solid;
 
     BaseElement(Form f, int index);
-    void show(bool details = true);
-    virtual size_t get_size()
+    void show(bool details = true) override;
+    virtual size_t get_size() override
     {
         return sizeof(BaseElement);
     }
+    Form get_form() override{ return form; }
 };
 
 class chunk;
@@ -115,7 +116,8 @@ class InventoryElement : public NetworkObject
     }
     virtual void show(bool details = true)
     {
-        CONSOLE_LOG("%s: uid=%lx id=%ld @[%d,%d][%d,%d]\n", get_class_name(), uid, get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
+        CONSOLE_LOG("%s: uid=%lx id=%ld c_id=%d @[%d,%d][%d,%d]\n", get_class_name(), uid, get_id(), c_id,
+                    location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
     }
     virtual bool tick()
     {
@@ -393,7 +395,7 @@ class Ingredient : public InventoryElement
     Ingredient_id id;
     Form req_form;
 
-    Property ** get_properties(int * count)
+    Property ** get_properties(int * count) override
     {
         Property ** props = new Property *[3];
         props[0] = &quality;
@@ -403,25 +405,25 @@ class Ingredient : public InventoryElement
         *count = 3;
         return props;
     }
-    size_t get_id()
+    size_t get_id() override
     {
-        return id;
+        return (size_t) id;
     }
     Ingredient(Ingredient_id i);
 
-    void show(bool details = true);
+    void show(bool details = true) override;
 
-    const char * get_name()
+    const char * get_name() override
     {
         return ingredient_name[id];
     }
-    char * get_description()
+    char * get_description() override
     {
         char * buf = new char[128];
         sprintf(buf, "%s: (%s)", get_class_name(), ingredient_name[id]);
         return buf;
     }
-    bool action(Product_action action, Player * pl)
+    bool action(Product_action action, Player * pl) override
     {
         CONSOLE_LOG("ING: %s %s\n", product_action_name[action], get_name());
         return false;
@@ -442,7 +444,7 @@ class Product : public InventoryElement
     Product_id id;
     size_t get_id() override
     {
-        return id;
+        return (size_t) id;
     }
     Product(Product_id id, int actions_count);
     virtual void add_action(Product_action * a)

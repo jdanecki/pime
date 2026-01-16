@@ -115,7 +115,7 @@ bool Dialog::press(int x, int y, int button)
     {
         if (de->pressed(x, y))
         {
-            DialogButton * d_button = dynamic_cast<DialogButton *>(de);
+            DialogButton * d_button = static_cast<DialogButton *>(de);
             switch (button)
             {
                 case 1:

@@ -53,7 +53,7 @@ class Player : public InventoryElement
     int thirst;
     int hunger; // hungry, very hungry, full
     int nutrition;
-    InvList inventory;
+    ElementsList inventory;
     ElementsList known_elements;
     ElementsList * get_known_elements()
     {

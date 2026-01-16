@@ -91,7 +91,7 @@ void draw_texts()
     {
         if (el->get_cid() == Class_Product)
         {
-            Product * pr = dynamic_cast<Product *>(el);
+            Product * pr = static_cast<Product *>(el);
             if (pr)
             {
                 sprintf(text, "%s -> %s", el->get_name(), product_action_name[pr->actions[0]]);

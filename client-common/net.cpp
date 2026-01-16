@@ -248,21 +248,21 @@ bool handle_packet(ENetPacket * packet)
         }
         case PACKET_PLAYER_ID:
         {
-            PacketPlayerId * id = dynamic_cast<PacketPlayerId *>(p);
+            PacketPlayerId * id = static_cast<PacketPlayerId *>(p);
             got_id(id->get_id(), 0);
             ret = true;
             break;
         }
         case PACKET_CHUNK_UPDATE:
         {
-            PacketChunkUpdate * up = dynamic_cast<PacketChunkUpdate *>(p);
+            PacketChunkUpdate * up = static_cast<PacketChunkUpdate *>(p);
             update_chunk(up->get_x(), up->get_y(), up->get_table());
             ret = true;
             break;
         }
         case PACKET_OBJECT_CREATE:
         {
-            PacketObjectCreate * obj = dynamic_cast<PacketObjectCreate *>(p);
+            PacketObjectCreate * obj = static_cast<PacketObjectCreate *>(p);
 
             create_object(obj->obj);
             ret = true;
@@ -270,7 +270,7 @@ bool handle_packet(ENetPacket * packet)
         }
         case PACKET_OBJECT_UPDATE:
         {
-            PacketObjectUpdate * obj = dynamic_cast<PacketObjectUpdate *>(p);
+            PacketObjectUpdate * obj = static_cast<PacketObjectUpdate *>(p);
 
             update_object(obj->obj);
             ret = true;
@@ -278,7 +278,7 @@ bool handle_packet(ENetPacket * packet)
         }
         case PACKET_OBJECT_DESTROY:
         {
-            PacketObjectDestroy * obj = dynamic_cast<PacketObjectDestroy *>(p);
+            PacketObjectDestroy * obj = static_cast<PacketObjectDestroy *>(p);
 
             destroy_object(NetworkObject(Class_Unknown, obj->get_id()), obj->get_location());
             ret = true;
@@ -286,28 +286,28 @@ bool handle_packet(ENetPacket * packet)
         }
         case PACKET_LOCATION_UPDATE:
         {
-            PacketLocationUpdate * loc = dynamic_cast<PacketLocationUpdate *>(p);
+            PacketLocationUpdate * loc = static_cast<PacketLocationUpdate *>(p);
             update_item_location(loc->get_location());
             ret = true;
             break;
         }
         case PACKET_KNOWLEDGE_UPDATE:
         {
-            PacketKnowledgeUpdate * upd = dynamic_cast<PacketKnowledgeUpdate *>(p);
+            PacketKnowledgeUpdate * upd = static_cast<PacketKnowledgeUpdate *>(p);
             knowledge_update(upd->get_pl_id(), upd->get_cid(), upd->get_id());
             ret = true;
             break;
         }
         case PACKET_CHECKED_UPDATE:
         {
-            PacketCheckedUpdate * upd = dynamic_cast<PacketCheckedUpdate *>(p);
+            PacketCheckedUpdate * upd = static_cast<PacketCheckedUpdate *>(p);
             checked_update(upd->get_pl_id(), upd->get_id());
             ret = true;
             break;
         }
         case PACKET_ELEMENTS_LIST:
         {
-            PacketElementsList * list = dynamic_cast<PacketElementsList *>(p);
+            PacketElementsList * list = static_cast<PacketElementsList *>(p);
             for (int i = 0; i < list->get_nr_elements(); i++)
             {
                 switch (list->get_list_c_id())
@@ -562,17 +562,9 @@ void update_chunk(int32_t x, int32_t y, const chunk_table * data)
     data = (chunk_table *)((char *)(data));
     if (!world_table[y][x])
     {
-        CONSOLE_LOG("SDL: update_chunk new x=%d y=%d\n", x, y);
-        // world_table[y][x] = (chunk*)calloc(1, sizeof(chunk));
-        // world_table[y][x]->objects = InvList();
+        CONSOLE_LOG("update_chunk: new x=%d y=%d\n", x, y);
         world_table[y][x] = new chunk(x, y);
         memcpy(world_table[y][x]->table, &data[0], CHUNK_SIZE * CHUNK_SIZE * sizeof(int));
-        /*CONSOLE_LOG("got %d items\n[", item_num);
-        for (int i = 0; i < 1027 + item_num*20; i++)
-        {
-           CONSOLE_LOG("%d, ", data[i]);
-        }
-       CONSOLE_LOG("\n");*/
     }
 }
 
@@ -582,7 +574,6 @@ void update_object(const ObjectData * data)
     Class_id c_id = data->inv_element.data.c_id;
 
     InventoryElement * el = get_object_by_id(data->inv_element.data);
-    // FIXME why we get el=NULL? -> change this to get_object_by_uid
     //   CONSOLE_LOG("update_object: el=%p chunk[%d,%d]\n", el, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
     if (el)
     {
@@ -595,45 +586,53 @@ void update_object(const ObjectData * data)
         {
             case Class_Element:
             {
-                Element * element = dynamic_cast<Element *>(el);
+                Element * element = static_cast<Element *>(el);
                 *element = data->element.data;
                 break;
             }
             case Class_Ingredient:
             {
-                Ingredient * ing = dynamic_cast<Ingredient *>(el);
+                Ingredient * ing = static_cast<Ingredient *>(el);
                 *ing = data->ingredient.data;
                 break;
             }
             case Class_Product:
             {
-                Product * prod = dynamic_cast<Product *>(el);
+                Product * prod = static_cast<Product *>(el);
                 *prod = data->product.data;
                 break;
             }
             case Class_Plant:
             {
-                Plant * plant = dynamic_cast<Plant *>(el);
+                Plant * plant = static_cast<Plant *>(el);
                 *plant = data->plant.data;
                 // CONSOLE_LOG("%s size=%f\n", plant->get_name(), plant->size);
                 break;
             }
             case Class_Animal:
             {
-                Animal * animal = dynamic_cast<Animal *>(el);
+                Animal * animal = static_cast<Animal *>(el);
                 *animal = data->animal.data;
                 //     CONSOLE_LOG("%s size=%f\n", animal->get_name(), animal->size);
                 break;
             }
             case Class_Player:
             {
-                Player * player = dynamic_cast<Player *>(el);
+                Player * player = static_cast<Player *>(el);
                 CONSOLE_LOG("update_object: player=%s inv.elements=%d\n", player->get_name(), player->inventory.nr_elements);
                 *player = data->player.data;
                 CONSOLE_LOG("update_object: -> update: inv.elements=%d\n", player->inventory.nr_elements);
                 break;
             }
+            case Class_Place:
+            {
+                Place * prod = static_cast<Place *>(el);
+                *prod = data->place.data;
+                break;
+            }
+
             default:
+             CONSOLE_LOG("update_object: unknown c_id=%d\n", c_id);
                 break;
         }
         // CONSOLE_LOG("%s updated\n", el->get_name());

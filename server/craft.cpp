@@ -53,6 +53,8 @@ bool craft_entry(int product_id, int ingredients_num, const size_t * ingredients
     }
     if (crafted)
         add_object_to_world(crafted, player->location);
+    else
+        CONSOLE_LOG("Can't craft\n");
 
     return crafted != nullptr;
 }

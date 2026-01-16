@@ -73,14 +73,6 @@ class Solid
     void show();
 };
 
-enum Form
-{
-    Form_unknown = 0,
-    Form_solid = 1,
-    Form_liquid,
-    Form_gas,
-};
-
 extern const char * Form_name[];
 
 #endif // PROPERTIES_H

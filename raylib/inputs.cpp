@@ -34,6 +34,7 @@ KeyHandler key_handlers[] = {
     {KEY_N, handle_n, true},
 #endif
     {KEY_Q, put_element, true},
+
     {KEY_GRAVE, handle_prev_hotbar, false},
     {KEY_TAB, handle_next_hotbar, false},
     {KEY_MINUS, handle_minus, true},

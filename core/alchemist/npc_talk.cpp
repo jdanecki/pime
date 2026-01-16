@@ -6,12 +6,12 @@
 
 void SentencesList::disable(Npc_say id)
 {
-    Sentence * s = dynamic_cast<Sentence *>(find(&id));
+    Sentence * s = static_cast<Sentence *>(find(&id));
     s->disable();
 }
 
 void SentencesList::enable(Npc_say id)
 {
-    Sentence * s = dynamic_cast<Sentence *>(find(&id));
+    Sentence * s = static_cast<Sentence *>(find(&id));
     s->enable();
 }

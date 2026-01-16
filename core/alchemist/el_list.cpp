@@ -18,13 +18,13 @@ ListElement::ListElement(InventoryElement * entry) : el(entry), c_id(Class_ListE
     enabled = true;
 }
 
-ListElement::ListElement(NetworkObject * entry) : el(entry)
+/*ListElement::ListElement(NetworkObject * entry) : el(entry)
 {
     next = nullptr;
     prev = nullptr;
     enabled = true;
 }
-
+*/
 void ListElement::add(ListElement * entry)
 {
     next = entry;
@@ -254,30 +254,54 @@ void ElementsList::remove(ListElement * el)
     }
 }
 
-InventoryElement ** InvList::find_by_fun(FindFunc fun, void * arg, int * count)
+NetworkObject **ElementsList::find_by_fun(FindFunc fun, void * arg, int * count)
 {
-    // ListElement * cur = head;
-    // InventoryElement ** a = (InventoryElement **)calloc(nr_elements, sizeof(InventoryElement *));
-    // int c = 0;
-    // while (cur)
-    // {
-    //     if (fun(cur->el.get(), arg))
-    //     {
-    //         a[c] = cur->el.get();
-    //         c++;
-    //     }
-    //     cur = cur->next;
-    // }
-    // if (!c)
-    // {
-    //     free(a);
-    //     return NULL;
-    // }
-    // else
-    // {
-    //     *count = c;
-    //     return a;
-    // }
+    ListElement * cur = head;
+    NetworkObject ** a = (NetworkObject **)calloc(nr_elements, sizeof(NetworkObject *));
+    int c = 0;
+    while (cur)
+    {
+        switch(cur->get_cid())
+        {
+            case Class_BaseListElement:
+            {
+                Base *b=(static_cast<BaseListElement*>(cur))->base;
+                if (b->c_id == Class_BaseElement)
+                {
+                    BaseElement * el=static_cast<BaseElement *>(b);
+                    if (fun(el, arg))
+                    {
+                        a[c] = el;
+                        c++;
+                    }
+                }
+                break;
+            }
+
+            case Class_ListElement:
+                if (cur->el.get()->c_id == Class_Element)
+                {
+                    Element *el = static_cast<Element*>(cur->el.get());
+                    if (fun(el, arg))
+                    {
+                        a[c] = el;
+                        c++;
+                    }
+                }
+            default: break;
+        }
+        cur = cur->next;
+    }
+    if (!c)
+    {
+        free(a);
+        return NULL;
+    }
+    else
+    {
+        *count = c;
+        return a;
+    }
     *count = 0;
     return nullptr;
 }
@@ -287,51 +311,55 @@ ReversedView ElementsList::reversed()
     return ReversedView(this);
 }
 
-bool match_form(InventoryElement * el, void * arg)
+bool match_form(NetworkObject * el, void * arg)
 {
     enum Form f = *(enum Form *)arg;
     return el->get_form() == f;
 }
 
-InventoryElement ** InvList::find_form(enum Form f, int * count)
+NetworkObject **ElementsList::find_form(enum Form f, int * count)
 {
     return find_by_fun(match_form, &f, count);
 }
 
-bool match_class(InventoryElement * el, void * arg)
+bool match_class(NetworkObject *el, void * arg)
 {
     enum Class_id cl = *(enum Class_id *)arg;
     return el->get_cid() == cl;
 }
 
-InventoryElement ** InvList::find_class(Class_id cl, int * count)
+NetworkObject ** ElementsList::find_class(Class_id cl, int * count)
 {
-    *count = 0;
-    return nullptr;
-    // return find_by_fun(match_class, &cl, count);
+    return find_by_fun(match_class, &cl, count);
 }
 
-InventoryElement ** InvList::find_id(int id, int * count)
+NetworkObject **ElementsList::find_id(size_t id, int * count)
 {
-    // FIXME
-#if 0
     ListElement * cur = head;
-    InventoryElement ** a = (InventoryElement **)calloc(nr_elements, sizeof(InventoryElement *));
+    NetworkObject ** a = (NetworkObject **)calloc(nr_elements, sizeof(NetworkObject *));
     int c = 0;
 
-  /*  while (cur)
+    while (cur)
     {
-        if (cur && cur->el && cur->el->get_base() && cur->el->get_base()->id == id)
+        switch(cur->el.get()->c_id)
         {
-            a[c] = cur->el;
-            c++;
+            case Class_Element:
+            {
+                Element *el = static_cast<Element*>(cur->el.get());
+                if (el && el->get_id() == id)
+                {
+                    a[c] = el;
+                    c++;
+                }
+            }
+            default: break;
         }
         cur = cur->next;
     }
-*/
+
     if (!c)
     {
-        delete a;
+        free(a);
         return NULL;
     }
     else
@@ -340,47 +368,32 @@ InventoryElement ** InvList::find_id(int id, int * count)
             *count = c;
         return a;
     }
-#endif
     return nullptr;
 }
 
-InventoryElement * InvList::add(InventoryElement * el)
+InventoryElement * ElementsList::add(InventoryElement * el)
 {
     ListElement * entry = new ListElement(el);
-    ElementsList::add(entry);
-    // CONSOLE_LOG("InvList: added to list(%s) elements=%d el_class_name:%s\n", name, nr_elements, el->get_class_name());
+    add(entry);
+    // CONSOLE_LOG("ElementsList: added to list(%s) elements=%d el_class_name:%s\n", name, nr_elements, el->get_class_name());
     return el;
 }
 
-InventoryElement * InvList::add_front(InventoryElement * el)
+InventoryElement * ElementsList::add_front(InventoryElement * el)
 {
     ListElement * entry = new ListElement(el);
-    ElementsList::add_front(entry);
+    add_front(entry);
     // CONSOLE_LOG("%s elements=%d %s\n", name, nr_elements, el->get_class_name());
     return el;
 }
-void InvList::remove(InventoryElement * el)
+void ElementsList::remove(InventoryElement * el)
 {
     assert(head);
-    // if (!head)
-    //     return;
     ListElement * cur = head;
     ListElement * tmp;
     if (head->el.get() == el)
     {
-        tmp = head->next;
-        if (tmp)
-            tmp->prev = nullptr;
-        assert(tail);
-
-        if (tail->el.get() == el) // only 1 element on the list
-        {
-            tail = nullptr;
-        }
-        //   CONSOLE_LOG("Inv: delete %p from %p %s\n", head, this, name);
-        delete head;
-        nr_elements--;
-        head = tmp;
+        remove(head);
         return;
     }
     while (cur) // more then 1 element on the list
@@ -389,17 +402,7 @@ void InvList::remove(InventoryElement * el)
             break;
         if (cur->next->el.get() == el)
         {
-            tmp = cur->next;
-            if (tmp && tmp->next)
-                tmp->next->prev = cur;
-            cur->next = cur->next->next;
-            if (tail->el.get() == el)
-            {
-                tail = cur;
-            }
-            //    CONSOLE_LOG("Inv: delete %p from %p %s\n", tmp, this, name);
-            delete tmp;
-            nr_elements--;
+            remove(cur->next);
             return;
         }
         cur = cur->next;

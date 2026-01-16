@@ -64,7 +64,7 @@ void button_craft_prod(DialogButton * button)
 void button_switch(DialogButton * button)
 {
     printf("button_switch: id=%d\n", button->id);
-    DCraft * cr = dynamic_cast<DCraft *>(button->dialog);
+    DCraft * cr = static_cast<DCraft *>(button->dialog);
     if (cr)
         cr->in_products = button->id;
 }
@@ -137,7 +137,7 @@ void DCraft::update()
                 }
             }
         }
-        DialogImage * img = dynamic_cast<DialogImage *>(get_element_from_id(0, DialogElementType::Image));
+        DialogImage * img = static_cast<DialogImage *>(get_element_from_id(0, DialogElementType::Image));
         img->texture_loaded = false;
         if (el1)
         {
@@ -145,7 +145,7 @@ void DCraft::update()
             img->texture = r->get_texture();
             img->texture_loaded = true;
         }
-        img = dynamic_cast<DialogImage *>(get_element_from_id(1, DialogElementType::Image));
+        img = static_cast<DialogImage *>(get_element_from_id(1, DialogElementType::Image));
         img->texture_loaded = false;
         if (el2)
         {
@@ -156,7 +156,7 @@ void DCraft::update()
     }
     else
     {
-        DialogImage * img = dynamic_cast<DialogImage *>(get_element_from_id(0, DialogElementType::Image));
+        DialogImage * img = static_cast<DialogImage *>(get_element_from_id(0, DialogElementType::Image));
         img->texture_loaded = false;
         if (player->hotbar[active_hotbar])
         {
@@ -164,13 +164,13 @@ void DCraft::update()
             img->texture = r->get_texture();
             img->texture_loaded = true;
         }
-        img = dynamic_cast<DialogImage *>(get_element_from_id(1, DialogElementType::Image));
+        img = static_cast<DialogImage *>(get_element_from_id(1, DialogElementType::Image));
         img->texture_loaded = false;
     }
 
-    DialogButton * ing_button = dynamic_cast<DialogButton *>(get_element_from_id(0, DialogElementType::Button));
-    DialogButton * prod_button = dynamic_cast<DialogButton *>(get_element_from_id(1, DialogElementType::Button));
-    DialogBox * box = dynamic_cast<DialogBox *>(get_element_from_id(1, DialogElementType::Box));
+    DialogButton * ing_button = static_cast<DialogButton *>(get_element_from_id(0, DialogElementType::Button));
+    DialogButton * prod_button = static_cast<DialogButton *>(get_element_from_id(1, DialogElementType::Button));
+    DialogBox * box = static_cast<DialogBox *>(get_element_from_id(1, DialogElementType::Box));
     if (in_products)
     {
         ing_button->d_box->color = {125, 125, 125, 5};
@@ -184,20 +184,20 @@ void DCraft::update()
         box->color.a = 0;
     }
 
-    DialogImage * img = dynamic_cast<DialogImage *>(ingredients.get_element_from_id(0, DialogElementType::Image));
+    DialogImage * img = static_cast<DialogImage *>(ingredients.get_element_from_id(0, DialogElementType::Image));
     if (img && img->texture_loaded)
         return;
 
     for (int i = 0; i < ING_COUNT; i++)
     {
-        DialogImage * img = dynamic_cast<DialogImage *>(ingredients.get_element_from_id(i, DialogElementType::Image));
+        DialogImage * img = static_cast<DialogImage *>(ingredients.get_element_from_id(i, DialogElementType::Image));
         img->texture = ing_textures[i];
         img->texture_loaded = true;
     }
 
     for (int i = 0; i < PROD_COUNT; i++)
     {
-        DialogImage * img = dynamic_cast<DialogImage *>(products.get_element_from_id(i, DialogElementType::Image));
+        DialogImage * img = static_cast<DialogImage *>(products.get_element_from_id(i, DialogElementType::Image));
         img->texture = prod_textures[i];
         img->texture_loaded = true;
     }
