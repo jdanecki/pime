@@ -6,12 +6,12 @@
 class ListElement
 {
     bool enabled;
+    SerializablePointer<NetworkObject> el;
 
   protected:
     Class_id c_id;
 
   public:
-    SerializablePointer<NetworkObject> el;
     ListElement *next, *prev;
 
     void add(ListElement * entry);
@@ -32,8 +32,7 @@ class ListElement
     {
         return ((InventoryElement *)(el.get()))->tick();
     }
-    ListElement(InventoryElement * entry);
-    //ListElement(NetworkObject * entry);
+    ListElement(NetworkObject * entry);
     ListElement() : c_id(Class_ListElement), el(nullptr), next(nullptr), prev(nullptr)
     {
         enable();
@@ -47,32 +46,37 @@ class ListElement
     }
     virtual size_t get_size()
     {
-        return sizeof(size_t);
+        return sizeof(ListElement);
     } // only uid size
     Class_id get_cid()
     {
         return c_id;
+    }
+    NetworkObject * get_el()
+    {
+        return el.get();
     }
 };
 
 class BaseListElement : public ListElement
 {
   public:
-    Base * base;
-    BaseListElement(Base * base) : base(base)
+    BaseListElement(Base * base) : ListElement(base)
     {
         c_id = Class_BaseListElement;
     }
     bool check(void * what)
     {
         size_t * uid = static_cast<size_t *>(what);
-        return (*uid == base->uid);
+        return (*uid == get_el()->get_uid());
     }
     size_t get_size()
     {
-        return base->get_size();
+        Base *b = static_cast<Base *>(get_el());
+        return b->get_size();
     }
     void show(bool details = true);
+
 };
 
 
@@ -161,7 +165,7 @@ class ElementsListReverseIterator
 
     InventoryElement * operator*() const
     {
-        return (InventoryElement *)le->el.get();
+        return (InventoryElement *)le->get_el();
     }
 };
 

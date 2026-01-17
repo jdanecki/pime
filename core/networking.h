@@ -14,12 +14,12 @@ struct ObjectData
 {
     enum class Tag
     {
-        InvElement,
+        InvElement, //0
         Element,
         Plant,
         Animal,
         Ingredient,
-        Product,
+        Product, //5
         Scroll,
         Player,
         Npc,

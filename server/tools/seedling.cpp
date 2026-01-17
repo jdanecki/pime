@@ -21,7 +21,7 @@ ProductServer * Seedling::createSeedling(InventoryElement * el1, InventoryElemen
 
 bool Seedling::use(InventoryElement * object, Player * pl)
 {
-    int32_t map_x, map_y;
+    unsigned int map_x, map_y;
     unsigned int x, y;
 
     map_x = object->location.chunk.map_x;
@@ -52,7 +52,7 @@ bool Seedling::use(InventoryElement * object, Player * pl)
     InventoryElement * el = ing->el;
     size_t b_id = el->get_id();
     BaseListElement * base_el = (BaseListElement *)base_plants.find(&b_id);
-    PlantServer * plant = create_plant((BasePlant *)(base_el->base));
+    PlantServer * plant = create_plant((BasePlant *)(base_el->get_el()));
     ch->add_object(plant, x, y);
     notify_create(plant);
     p->state = FIELD_PLANTED;

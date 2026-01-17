@@ -208,32 +208,14 @@ class PacketElementsList : public Packet
 
     void copy_base_list_element(ListElement * el, serial_data * pdata, int i)
     {
-        BaseListElement * base_el = (BaseListElement *)el;
-        switch (pdata->c_id)
-        {
-            case Class_BaseElement:
-            {
-                BaseElement * dst = &((BaseElement *)&pdata->data)[i];
-                *dst = *((BaseElement *)base_el->base);
-                break;
-            }
-            case Class_BasePlant:
-            {
-                BasePlant * dst = &((BasePlant *)&pdata->data)[i];
-                *dst = *((BasePlant *)base_el->base);
-                break;
-            }
-            case Class_BaseAnimal:
-            {
-                BaseAnimal * dst = &((BaseAnimal *)&pdata->data)[i];
-                *dst = *((BaseAnimal *)base_el->base);
-                break;
-            }
-        }
+        BaseListElement * base_el = static_cast<BaseListElement *>(el);
+        Base * base=static_cast<Base*>(base_el->get_el());
+        base->copy_data(&pdata->data[0], i);
     }
+
     void copy_list_element(ListElement * el, serial_data * pdata, int i)
     {
-        NetworkObject * obj = el->el.get();
+        NetworkObject * obj = el->get_el();
         size_t uid = obj->get_uid();
         size_t * dst = &((size_t *)(&pdata->data))[i];
         *dst = uid;
@@ -255,7 +237,7 @@ class PacketElementsList : public Packet
             switch (pdata->list_c_id)
             {
                 case Class_BaseListElement:
-                    pdata->c_id = ((BaseListElement *)list->head)->base->c_id;
+                    pdata->c_id = ((BaseListElement *)list->head)->get_el()->get_cid();
                     copy_base_list_element(el, pdata, i);
                     break;
                 case Class_ListElement:
@@ -358,7 +340,7 @@ class PacketObjectCreate : public Packet
         /*      for (int i=0; i<100; i++)
                    CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
         */
-        //    CONSOLE_LOG("PacketObjectCreate for objectData::Tag=%d size=%ld\n", (int)obj->tag, obj->size);
+        CONSOLE_LOG("PacketObjectCreate for objectData::Tag=%d size=%ld\n", (int)obj->tag, obj->size);
         switch (obj->tag)
         {
             case ObjectData::Tag::Element:
@@ -532,7 +514,7 @@ class PacketChunkUpdate : public Packet
         ListElement * el = ch->objects.head;
         while (el)
         {
-            Packet * p = new PacketObjectCreate(el->el.get());
+            Packet * p = new PacketObjectCreate(el->get_el());
             ret = p->send(peer);
             el = el->next;
         }

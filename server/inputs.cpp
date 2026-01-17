@@ -85,12 +85,12 @@ void create_debug_element()
     ch->add_object(p, 9, 9);
 
     size_t b_id = 0;
-    BaseListElement * base_el = (BaseListElement *)base_plants.find(&b_id);
-    PlantServer * plant1 = create_plant((BasePlant *)(base_el->base));
+    BaseListElement * base_el = static_cast<BaseListElement *>(base_plants.find(&b_id));
+    PlantServer * plant1 = create_plant((BasePlant *)(base_el->get_el()));
     plant1->phase = Plant_fruits;
 
-    BaseListElement * base_el1 = (BaseListElement *)base_plants.find(&b_id);
-    PlantServer * plant2 = create_plant((BasePlant *)(base_el1->base));
+    BaseListElement * base_el1 = static_cast<BaseListElement *>(base_plants.find(&b_id));
+    PlantServer * plant2 = create_plant((BasePlant *)(base_el1->get_el()));
     plant2->phase = Plant_fruits;
 
     IngredientServer *s1 = Seed::createSeed(plant1);
@@ -100,10 +100,24 @@ void create_debug_element()
     ch->add_object(seedl, 10, 9);
 
     int count;
-    BaseListElement * base_el2 = (BaseListElement *)base_elements.find_form(Form_solid, &count);
-    ElementServer *el1=create_element((BaseElement *)(base_el2->base));
+    NetworkObject ** base_solid = base_elements.find_form(Form_solid, &count);
     CONSOLE_LOG("count=%d \n", count);
-    if (count && el1) el1->show(false);
+    if (count)
+    {
+        for (int i=0; i < count; i++)
+        {
+            BaseElement *base=static_cast<BaseElement*>(base_solid[i]);
+            CONSOLE_LOG("solid: %d/%d\n", i, count);
+//            base->show(false);
+        }
+
+        ElementServer *el1=create_element(static_cast<BaseElement *>(base_solid[0]));
+        ElementServer *el2=create_element(static_cast<BaseElement *>(base_solid[1]));
+        IngredientServer *hb=HoeBlade::createHoeBlade(el1);
+        IngredientServer *hh=HoeHandle::createHoeHandle(el2);
+        ProductServer *hoe = Hoe::createHoe(hb, hh);
+        ch->add_object(hoe, 9, 10);
+    }
 }
 
 void update_debug_element()

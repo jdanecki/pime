@@ -59,6 +59,7 @@ class Base : public NetworkObject
     {
         return sizeof(Base);
     }
+    virtual void copy_data(unsigned char * ptr, int i) {}
 };
 
 struct ColorRGB
@@ -83,6 +84,11 @@ class BaseElement : public Base
         return sizeof(BaseElement);
     }
     Form get_form() override{ return form; }
+    void copy_data(unsigned char * ptr, int i) override
+    {
+        BaseElement * dst = &((BaseElement *)ptr)[i];
+        *dst = *this;
+    }
 };
 
 class chunk;
@@ -486,7 +492,7 @@ class BaseAnimal : public Base
     bool flying;
 
     BaseAnimal(int index);
-    void show(bool details = true)
+    void show(bool details = true) override
     {
         CONSOLE_LOG("BaseAnimal:\n");
         CONSOLE_LOG("carnivorous=%d\n", carnivorous);
@@ -495,9 +501,14 @@ class BaseAnimal : public Base
         if (details)
             Base::show(details);
     }
-    virtual size_t get_size()
+    size_t get_size() override
     {
         return sizeof(BaseAnimal);
+    }
+    void copy_data(unsigned char * ptr, int i) override
+    {
+        BaseAnimal * dst = &((BaseAnimal *)ptr)[i];
+        *dst = *this;
     }
 };
 
@@ -570,7 +581,7 @@ class BasePlant : public Base
     bool flowers;
     bool leaves;
     BasePlant(int index);
-    void show(bool details = true)
+    void show(bool details = true) override
     {
         CONSOLE_LOG("BasePlant:\n");
         CONSOLE_LOG("flowers=%d\n", flowers);
@@ -578,10 +589,16 @@ class BasePlant : public Base
         if (details)
             Base::show(details);
     }
-    virtual size_t get_size()
+    size_t get_size() override
     {
         return sizeof(BasePlant);
     }
+    void copy_data(unsigned char * ptr, int i) override
+    {
+        BasePlant * dst = &((BasePlant *)ptr)[i];
+        *dst = *this;
+    }
+
 };
 
 class Plant : public InventoryElement

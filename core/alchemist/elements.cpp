@@ -284,7 +284,7 @@ BaseElement * get_base_element(size_t id)
     BaseListElement * el = (BaseListElement *)base_elements.find(&id);
     if (!el)
         return nullptr;
-    return (BaseElement *)((el)->base);
+    return (BaseElement *)((el)->get_el());
 }
 
 BasePlant * get_base_plant(size_t id)
@@ -292,7 +292,7 @@ BasePlant * get_base_plant(size_t id)
     BaseListElement * el = (BaseListElement *)base_plants.find(&id);
     if (!el)
         return nullptr;
-    return (BasePlant *)((el)->base);
+    return (BasePlant *)((el)->get_el());
 }
 
 BaseAnimal * get_base_animal(size_t id)
@@ -300,5 +300,5 @@ BaseAnimal * get_base_animal(size_t id)
     BaseListElement * el = (BaseListElement *)base_animals.find(&id);
     if (!el)
         return nullptr;
-    return (BaseAnimal *)((el)->base);
+    return (BaseAnimal *)((el)->get_el());
 }

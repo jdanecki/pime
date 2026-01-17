@@ -33,7 +33,9 @@ GENERATE_TOOL(Axe)
 GENERATE_TOOL(Knife)
 GENERATE_TOOL(Pickaxe)
 
-GENERATE_PRODUCT(Hoe, bool use_tile(int map_x, int map_y, int x, int y, Player * pl);)
+GENERATE_PRODUCT(Hoe, bool use_tile(int map_x, int map_y, int x, int y, Player * pl); \
+bool use(InventoryElement * object, Player * pl);)
+
 GENERATE_INGREDIENT(HoeBlade, )
 GENERATE_INGREDIENT(HoeHandle, )
 

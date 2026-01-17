@@ -29,3 +29,19 @@ bool Hoe::use_tile(int map_x, int map_y, int x, int y, Player * pl)
     ch->add_object(create_place(PLACE_FIELD), x, y);
     return true;
 }
+
+
+bool Hoe::use(InventoryElement * object, Player * pl)
+{
+    unsigned int map_x, map_y;
+    unsigned int x, y;
+
+    map_x = object->location.chunk.map_x;
+    map_y = object->location.chunk.map_y;
+    x = object->location.get_x();
+    y = object->location.get_y();
+
+    CONSOLE_LOG("%s: %s on %s @[%d,%d][%d,%d]\n", get_name(), product_action_name[actions[0]],
+                object->get_name(), map_x, map_y, x, y);
+    return false;
+}

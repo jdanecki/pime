@@ -27,8 +27,8 @@ void update_hotbar()
     {
         if (i >= 10)
             break;
-        if (le->el.get())
-            player->hotbar[i] = (InventoryElement *)le->el.get();
+        if (le->get_el())
+            player->hotbar[i] = (InventoryElement *)le->get_el();
         le = le->next;
         i++;
     }

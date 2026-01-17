@@ -11,19 +11,19 @@ void add_place(chunk * ch, Place_id id, int x, int y)
 void add_element(chunk * ch, size_t id)
 {
     BaseListElement * base_el = (BaseListElement *)base_elements.find(&id);
-    ch->add_object(create_element((BaseElement *)(base_el->base)));
+    ch->add_object(create_element((BaseElement *)(base_el->get_el())));
 }
 
 void add_plant(chunk * ch, size_t id)
 {
     BaseListElement * base_el = (BaseListElement *)base_plants.find(&id);
-    ch->add_object(create_plant((BasePlant *)(base_el->base)));
+    ch->add_object(create_plant((BasePlant *)(base_el->get_el())));
 }
 
 void add_animal(chunk * ch, size_t id)
 {
     BaseListElement * base_el = (BaseListElement *)base_animals.find(&id);
-    ch->add_object(create_animal((BaseAnimal *)(base_el->base)));
+    ch->add_object(create_animal((BaseAnimal *)(base_el->get_el())));
 }
 
 void load_chunk(int cx, int cy)
@@ -56,7 +56,7 @@ try_again:
             ListElement * cur = ch->objects.head;
             while (cur)
             {
-                InventoryElement * el = static_cast<InventoryElement *>(cur->el.get());
+                InventoryElement * el = static_cast<InventoryElement *>(cur->get_el());
                 int dx = x - el->location.get_x();
                 int dy = y - el->location.get_y();
                 int dist = dx * dx + dy * dy;
@@ -91,7 +91,7 @@ try_again:
     for (id = 0; id < BASE_PLANTS; id++)
     {
         BaseListElement * pl = (BaseListElement *)base_plants.find(&id);
-        ch->add_object(create_plant((BasePlant *)(pl->base)), id % CHUNK_SIZE, 3 * (id / CHUNK_SIZE));
+        ch->add_object(create_plant((BasePlant *)(pl->get_el())), id % CHUNK_SIZE, 3 * (id / CHUNK_SIZE));
     }
 #if 0
     for (id=0; id < BASE_ANIMALS; id++)

@@ -11,20 +11,13 @@ ElementsList base_elements("base elements");
 ElementsList base_plants("base plants");
 ElementsList base_animals("base animals");
 
-ListElement::ListElement(InventoryElement * entry) : el(entry), c_id(Class_ListElement)
+ListElement::ListElement(NetworkObject * entry) : el(entry), c_id(Class_ListElement)
 {
     next = nullptr;
     prev = nullptr;
     enabled = true;
 }
 
-/*ListElement::ListElement(NetworkObject * entry) : el(entry)
-{
-    next = nullptr;
-    prev = nullptr;
-    enabled = true;
-}
-*/
 void ListElement::add(ListElement * entry)
 {
     next = entry;
@@ -63,7 +56,7 @@ ElementsListIterator ElementsListIterator::operator++()
 
 InventoryElement * ElementsListIterator::operator*()
 {
-    return (InventoryElement *)le->el.get();
+    return (InventoryElement *)le->get_el();
 }
 
 bool ElementsListIterator::equal(const ElementsListIterator & other)
@@ -261,34 +254,11 @@ NetworkObject **ElementsList::find_by_fun(FindFunc fun, void * arg, int * count)
     int c = 0;
     while (cur)
     {
-        switch(cur->get_cid())
+        NetworkObject *el = cur->get_el();
+        if (fun(el, arg))
         {
-            case Class_BaseListElement:
-            {
-                Base *b=(static_cast<BaseListElement*>(cur))->base;
-                if (b->c_id == Class_BaseElement)
-                {
-                    BaseElement * el=static_cast<BaseElement *>(b);
-                    if (fun(el, arg))
-                    {
-                        a[c] = el;
-                        c++;
-                    }
-                }
-                break;
-            }
-
-            case Class_ListElement:
-                if (cur->el.get()->c_id == Class_Element)
-                {
-                    Element *el = static_cast<Element*>(cur->el.get());
-                    if (fun(el, arg))
-                    {
-                        a[c] = el;
-                        c++;
-                    }
-                }
-            default: break;
+            a[c] = el;
+            c++;
         }
         cur = cur->next;
     }
@@ -333,42 +303,15 @@ NetworkObject ** ElementsList::find_class(Class_id cl, int * count)
     return find_by_fun(match_class, &cl, count);
 }
 
+bool match_uid(NetworkObject *el, void * arg)
+{
+    size_t uid = *(size_t*)arg;
+    return el->get_uid() == uid;
+}
+
 NetworkObject **ElementsList::find_id(size_t id, int * count)
 {
-    ListElement * cur = head;
-    NetworkObject ** a = (NetworkObject **)calloc(nr_elements, sizeof(NetworkObject *));
-    int c = 0;
-
-    while (cur)
-    {
-        switch(cur->el.get()->c_id)
-        {
-            case Class_Element:
-            {
-                Element *el = static_cast<Element*>(cur->el.get());
-                if (el && el->get_id() == id)
-                {
-                    a[c] = el;
-                    c++;
-                }
-            }
-            default: break;
-        }
-        cur = cur->next;
-    }
-
-    if (!c)
-    {
-        free(a);
-        return NULL;
-    }
-    else
-    {
-        if (count)
-            *count = c;
-        return a;
-    }
-    return nullptr;
+    return find_by_fun(match_uid, &id, count);
 }
 
 InventoryElement * ElementsList::add(InventoryElement * el)
@@ -391,7 +334,7 @@ void ElementsList::remove(InventoryElement * el)
     assert(head);
     ListElement * cur = head;
     ListElement * tmp;
-    if (head->el.get() == el)
+    if (head->get_el() == el)
     {
         remove(head);
         return;
@@ -400,7 +343,7 @@ void ElementsList::remove(InventoryElement * el)
     {
         if (!cur->next)
             break;
-        if (cur->next->el.get() == el)
+        if (cur->next->get_el() == el)
         {
             remove(cur->next);
             return;
@@ -438,5 +381,5 @@ ListElement * ElementsList::get_random()
 
 void BaseListElement::show(bool details)
 {
-    base->show(details);
+    get_el()->show(details);
 }

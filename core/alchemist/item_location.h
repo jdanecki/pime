@@ -13,8 +13,8 @@ struct ItemLocation
 
     struct Chunk_Body
     {
-        int32_t map_x;
-        int32_t map_y;
+        unsigned int map_x;
+        unsigned int map_y;
         unsigned int x;
         unsigned int y;
     };

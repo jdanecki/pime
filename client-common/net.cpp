@@ -20,7 +20,7 @@ class ObjectElement : public ListElement
     bool check(void * what)
     {
         uintptr_t * uid = (uintptr_t *)what;
-        return *uid == el.get()->uid;
+        return *uid == get_el()->uid;
     }
 };
 
@@ -427,7 +427,7 @@ unsigned int network_tick(NetClient * client)
 InventoryElement * get_object_by_id(NetworkObject uid)
 {
     ListElement * el = objects.find(&uid.uid);
-    return el ? static_cast<InventoryElement *>(el->el.get()) : nullptr;
+    return el ? static_cast<InventoryElement *>(el->get_el()) : nullptr;
 }
 
 void register_object(NetworkObject * o)
