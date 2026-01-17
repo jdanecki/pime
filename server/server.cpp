@@ -6,9 +6,8 @@
 #include "chunk.h"
 #include "console.h"
 #include "generator/generator.h"
-#include "inputs.h"
+#include "key_handlers.h"
 
-// #define DEBUG_TIMEOUT 1
 
 void generate()
 {
@@ -48,7 +47,7 @@ void generate()
 int main()
 {
     ncurses_init();
-    print_status(0, "pime_enet\n");
+    print_status(0, "pime_enet, press F1 for help\n");
     CONSOLE_LOG("Copyright (C) 2025 Piotr Danecki <i3riced@mailfence.com>\n");
     CONSOLE_LOG("Copyright (C) 2025 Jacek Danecki\n");
     CONSOLE_LOG("This program comes with ABSOLUTELY NO WARRANTY.\n");

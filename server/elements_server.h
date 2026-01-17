@@ -136,6 +136,7 @@ class PlantServer : public Plant, public BeingServer
         return true;
     }
     bool player_action(Player_action action, Player * pl) override;
+    void set_phase(Plant_phase p);
 };
 
 class IngredientServer : public Ingredient
@@ -150,6 +151,18 @@ class IngredientServer : public Ingredient
         return true;
     }
     void show(bool details = true) override;
+    size_t get_base_id() {
+        switch (el->get_cid())
+        {
+            case Class_Ingredient:
+            {
+                IngredientServer * ing=static_cast<IngredientServer*>(el);
+                return ing->get_base_id();
+            }
+            default:
+                return el->get_id();
+        }
+    }
 };
 
 class ProductServer : public Product
@@ -157,11 +170,11 @@ class ProductServer : public Product
   public:
     void * padding;
     int ing_count;
-    Ingredient ** ings;
+    IngredientServer ** ings;
 
     void init(int c, Form f);
     ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id id, Form f, int act_cnt);
-    ProductServer(InventoryElement ** from, int count, Product_id id, Form f, int act_cnt);
+    //ProductServer(InventoryElement ** from, int count, Product_id id, Form f, int act_cnt);
     void show(bool details = true) override;
     virtual bool use(InventoryElement * object, Player * pl)
     {

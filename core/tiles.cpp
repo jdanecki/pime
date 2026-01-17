@@ -1,11 +1,11 @@
 #include "tiles.h"
 
-void chunk::add_object(InventoryElement * object, int x, int y)
+void chunk::add_object(InventoryElement * object, int x, int y, bool front)
 {
-    // if (object->c_id == Class_Player)
-    //   objects.add(object);
-    // else
-    objects.add_front(object);
+    if (front)
+        objects.add_front(object);
+    else
+        objects.add(object);
 
     Class_id cid = object->c_id;
     if (cid == Class_Animal || cid == Class_Plant || cid == Class_Player)

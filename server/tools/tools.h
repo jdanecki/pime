@@ -39,12 +39,15 @@ bool use(InventoryElement * object, Player * pl);)
 GENERATE_INGREDIENT(HoeBlade, )
 GENERATE_INGREDIENT(HoeHandle, )
 
+Hoe * create_hoe();
+
 GENERATE_PRODUCT(Fire, )
 GENERATE_INGREDIENT(Stick, )
 GENERATE_INGREDIENT(Tinder, )
 
 GENERATE_INGREDIENT(Seed, )
 GENERATE_PRODUCT(Seedling, bool use(InventoryElement * object, Player * pl);)
+Seedling * create_seedling();
 
 GENERATE_PRODUCT(RoastedMeat, bool player_action(Player_action, Player *);)
 GENERATE_INGREDIENT(Meat, bool action(Product_action, Player *);)

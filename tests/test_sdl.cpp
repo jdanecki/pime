@@ -2,6 +2,7 @@
 #include "../client-common/alchemist2d.h"
 
 bool handle_events();
+Backend_Texture texture;
 
 Element2d * el;
 
@@ -20,6 +21,12 @@ void draw()
     Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{}, Backend_Color{0, 255, 0, 255});
 
     el->render(10, 500);
+
+    Backend_Rect rect1(10, 10, 32, 32);
+    Backend_Texture_Copy(texture, nullptr, &rect1);
+
+    Backend_Rect rect2(50, 10, 32, 32);
+    Backend_Texture_Copy_Flip(texture, nullptr, &rect2);
 }
 
 bool finish_program = false;
@@ -73,7 +80,7 @@ int main()
     e.height.value = 100;
 
     el = new Element2d(e);
-    ;
+    texture = load_texture("textures/player.png");
 
     while (!finish_program)
     {

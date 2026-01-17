@@ -26,6 +26,7 @@ AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
     max_age = new Property("max age", 1000 + rand() % 1000);
     age = new Property("age", 10 + rand() % max_age->value);
     size = 1.0 * age->value / max_age->value;
+    if (size < 0.2) size=0.2;
 }
 
 bool AnimalServer::action(Product_action action, Player * pl)
@@ -154,34 +155,15 @@ PlantServer::PlantServer(BasePlant * base) : Plant(base)
     delay_for_grow = max_delay_grow;
     max_age->value = flowers_time + 50;
 
-    switch (phase)
-    {
-        case Plant_seedling:
-            age->value = seedling_time;
-            size = 0.01;
-            break;
-        case Plant_growing:
-            age->value = growing_time;
-            size = 1.0 * age->value / max_age->value;
-            break;
-        case Plant_flowers:
-            age->value = flowers_time;
-            size = 1.0;
-            break;
-        case Plant_fruits:
-            age->value = max_age->value;
-            grown = true;
-            size = 1.0;
-            break;
-    }
+    set_phase(phase);
 }
 
 void PlantServer::change_phase(Plant_phase p)
 {
-    notify_update(this);
     if (phase != p)
     {
         //  CONSOLE_LOG("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
+        notify_update(this);
     }
     phase = p;
 }
@@ -210,6 +192,31 @@ bool PlantServer::player_action(Player_action action, Player * pl)
     }
 
     return res;
+}
+
+void PlantServer::set_phase(Plant_phase p)
+{
+    phase=p;
+    switch (phase)
+    {
+        case Plant_seedling:
+            age->value = seedling_time;
+            size = 0.2;
+            break;
+        case Plant_growing:
+            age->value = growing_time;
+            size = 1.0 * age->value / max_age->value;
+            break;
+        case Plant_flowers:
+            age->value = flowers_time;
+            size = 1.0;
+            break;
+        case Plant_fruits:
+            age->value = max_age->value;
+            grown = true;
+            size = 1.0;
+            break;
+    }
 }
 
 bool PlantServer::grow()
@@ -284,8 +291,10 @@ bool IngredientServer::action(Product_action action, Player * pl)
 
 void IngredientServer::show(bool details)
 {
+    CONSOLE_LOG("vvv INGREDIENT_SERVER vvv\n");
     Ingredient::show(details);
     el->show(details);
+    CONSOLE_LOG("!!! INGREDIENT_SERVER !!!\n");
 }
 
 void ProductServer::init(int c, Form f)
@@ -297,24 +306,26 @@ void ProductServer::init(int c, Form f)
 ProductServer::ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id id, Form f, int act_cnt) : Product(id, act_cnt)
 {
     c_id = Class_Product;
-    ings = (Ingredient **)calloc(2, sizeof(Ingredient));
-    ings[0] = dynamic_cast<Ingredient *>(el1);
-    ings[1] = dynamic_cast<Ingredient *>(el2);
+    ings = (IngredientServer **)calloc(2, sizeof(IngredientServer));
+    ings[0] = static_cast<IngredientServer *>(el1);
+    ings[1] = dynamic_cast<IngredientServer *>(el2);
     init(2, f);
 }
 
-ProductServer::ProductServer(InventoryElement ** from, int count, Product_id id, Form f, int act_cnt) : Product(id, act_cnt)
+/*ProductServer::ProductServer(InventoryElement ** from, int count, Product_id id, Form f, int act_cnt) : Product(id, act_cnt)
 {
     c_id = Class_Product;
-    ings = (Ingredient **)from;
+    ings = (IngredientServer **)from;
     init(count, f);
 }
-
+*/
 void ProductServer::show(bool details)
 {
+    CONSOLE_LOG("vvv PRODUCT_SERVER vvv\n");
     Product::show(details);
     for (int i=0; i < ing_count; i++)
         ings[i]->show(details);
+    CONSOLE_LOG("!!! PRODUCT_SERVER !!!\n");
 }
 
 AnimalServer * create_animal(BaseAnimal * base)

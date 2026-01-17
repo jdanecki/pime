@@ -15,7 +15,7 @@ int history_up;
 int buf_pos;
 bool scrolling = true;
 
-void print_status(int l, const char * format, ...)
+void print_status(int , const char * format, ...)
 {
     va_list args;
     char buf[128];

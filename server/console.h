@@ -32,3 +32,5 @@ void handle_resize();
 char ncurses_init();
 void ncurses_tick();
 void print_status(int l, const char * format, ...);
+int CONSOLE_LOG(const char * fmt, ...);
+

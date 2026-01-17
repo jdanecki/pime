@@ -3,6 +3,8 @@
 #include "craft.h"
 #include "world_server.h"
 
+//#define DEBUG_TIMEOUT 1
+
 ElementsList objects_to_create;
 ENetHost * server;
 int players_id;

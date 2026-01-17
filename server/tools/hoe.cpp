@@ -41,7 +41,49 @@ bool Hoe::use(InventoryElement * object, Player * pl)
     x = object->location.get_x();
     y = object->location.get_y();
 
-    CONSOLE_LOG("%s: %s on %s @[%d,%d][%d,%d]\n", get_name(), product_action_name[actions[0]],
+    if (object->c_id != Class_Place)
+    {
+        CONSOLE_LOG("It's not a place to plow\n");
+        return false;
+    }
+    Place * p = (Place *)object;
+    if (p->get_id() != PLACE_FIELD)
+    {
+        CONSOLE_LOG("It's not a field\n");
+        return false;
+    }
+    if (p->state != FIELD_PLOWED)
+    {
+        p->state = FIELD_PLOWED;
+        CONSOLE_LOG("%s: %s on %s @[%d,%d][%d,%d]\n", get_name(), product_action_name[actions[0]],
                 object->get_name(), map_x, map_y, x, y);
+        notify_update(p);
+        return true;
+    }
+    CONSOLE_LOG("%s: already plowed\n", get_name());
     return false;
+}
+
+Hoe * create_hoe()
+{
+    int count;
+    NetworkObject ** base_solid = base_elements.find_form(Form_solid, &count);
+    CONSOLE_LOG("count=%d \n", count);
+    if (count)
+    {
+        for (int i=0; i < count; i++)
+        {
+            BaseElement *base=static_cast<BaseElement*>(base_solid[i]);
+            CONSOLE_LOG("solid: %d/%d\n", i, count);
+//            base->show(false);
+        }
+
+        ElementServer *el1=create_element(static_cast<BaseElement *>(base_solid[0]));
+        ElementServer *el2=create_element(static_cast<BaseElement *>(base_solid[1]));
+        IngredientServer *hb=HoeBlade::createHoeBlade(el1);
+        IngredientServer *hh=HoeHandle::createHoeHandle(el2);
+        return static_cast<Hoe*>(Hoe::createHoe(hb, hh));
+    }
+    return nullptr;
+
 }

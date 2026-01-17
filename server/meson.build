@@ -4,7 +4,7 @@ server_sources = [
   'console.cpp',
   'server.cpp',
   'chunk.cpp',
-  'inputs.cpp',
+  'key_handlers.cpp',
   'world_server.cpp', 'player_server.cpp',
   'networking.cpp', 'elements_server.cpp',
   'craft.cpp', 'craft_ing.cpp', 'craft_prod.cpp',

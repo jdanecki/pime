@@ -33,7 +33,7 @@ class chunk
     ElementsList objects;
     ElementsList beings;
 
-    void add_object(InventoryElement * object, int x, int y);
+    void add_object(InventoryElement * object, int x, int y, bool front=true);
     void add_object(InventoryElement * object);
     void remove_object(InventoryElement * object);
     InventoryElement * find_by_id(size_t id);

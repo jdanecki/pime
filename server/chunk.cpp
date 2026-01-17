@@ -81,25 +81,6 @@ try_again:
     // ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
 
     size_t id;
-#if 0
-    for (id=0; id < all_base_elements_count; id++)
-    {
-        BaseListElement * el = (BaseListElement *)base_elements.find(&id);
-        ch->add_object(create_element((BaseElement *)(el->base)), id % 17, 14 + (id / 17));
-    }
-#endif
-    for (id = 0; id < BASE_PLANTS; id++)
-    {
-        BaseListElement * pl = (BaseListElement *)base_plants.find(&id);
-        ch->add_object(create_plant((BasePlant *)(pl->get_el())), id % CHUNK_SIZE, 3 * (id / CHUNK_SIZE));
-    }
-#if 0
-    for (id=0; id < BASE_ANIMALS; id++)
-    {
-        BaseListElement * an = (BaseListElement *)base_animals.find(&id);
-        ch->add_object(create_animal((BaseAnimal *)(an->base)), id % CHUNK_SIZE, id / CHUNK_SIZE);
-    }
-#endif
     world_table[cy][cx] = ch;
 }
 

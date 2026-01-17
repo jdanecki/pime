@@ -176,14 +176,15 @@ Ingredient::Ingredient(Ingredient_id i) : InventoryElement(Class_Ingredient), qu
 
 void Ingredient::show(bool details)
 {
+    CONSOLE_LOG("(ING)name=%s id=%d\n", get_name(), id);
     InventoryElement::show(details);
-    CONSOLE_LOG("name=%s id=%d\n", get_name(), id);
     if (!details)
         return;
     quality.show();
     resilience.show();
     usage.show();
     CONSOLE_LOG("form = %s\n", Form_name[req_form]);
+    CONSOLE_LOG("^^^ INGREDIENT ^^^\n");
 }
 
 Product::Product(Product_id id, int actions_count) : InventoryElement(Class_Product), quality("quality", 0), resilience("resilience", 0), usage("usage", 0), actions_count(actions_count), id(id)
@@ -200,8 +201,8 @@ Product::Product(Product_id id, int actions_count) : InventoryElement(Class_Prod
 
 void Product::show(bool details)
 {
+    CONSOLE_LOG("(PROD)name=%s id=%d\n", get_name(), id);
     InventoryElement::show(details);
-    CONSOLE_LOG("name=%s id=%d\n", get_name(), id);
     if (!details)
         return;
     quality.show();
@@ -211,6 +212,7 @@ void Product::show(bool details)
     {
         CONSOLE_LOG("action[%d]: %d -> %s\n", i, actions[i], product_action_name[actions[i]]);
     }
+    CONSOLE_LOG("^^^ PRODUCT ^^^\n");
 }
 
 void Animal::init(BaseAnimal * b)
@@ -265,6 +267,7 @@ Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)
 Plant::Plant(int id) : base(get_base_plant(id))
 {
 }
+
 
 Scroll::Scroll(Base * b) : InventoryElement(Class_Scroll), base(b)
 {

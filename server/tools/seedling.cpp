@@ -49,14 +49,33 @@ bool Seedling::use(InventoryElement * object, Player * pl)
 
     chunk * ch = world_table[map_y][map_x];
     IngredientServer * ing = (IngredientServer *)(ings[0]);
-    InventoryElement * el = ing->el;
-    size_t b_id = el->get_id();
+    size_t b_id = ing->get_base_id();
+    CONSOLE_LOG("%s: ing base=%d\n", get_name(), b_id);
     BaseListElement * base_el = (BaseListElement *)base_plants.find(&b_id);
     PlantServer * plant = create_plant((BasePlant *)(base_el->get_el()));
+    plant->set_phase(Plant_seedling);
+    CONSOLE_LOG("%s: planted base=%d\n", get_name(), plant->get_id());
     ch->add_object(plant, x, y);
     notify_create(plant);
     p->state = FIELD_PLANTED;
     notify_update(p);
 
     return true;
+}
+
+Seedling * create_seedling()
+{
+    size_t b_id = rand() % base_plants.nr_elements;
+    BaseListElement * base_el = static_cast<BaseListElement *>(base_plants.find(&b_id));
+    PlantServer * plant1 = create_plant((BasePlant *)(base_el->get_el()));
+    plant1->phase = Plant_fruits;
+
+    BaseListElement * base_el1 = static_cast<BaseListElement *>(base_plants.find(&b_id));
+    PlantServer * plant2 = create_plant((BasePlant *)(base_el1->get_el()));
+    plant2->phase = Plant_fruits;
+
+    IngredientServer *s1 = Seed::createSeed(plant1);
+    IngredientServer *s2 = Seed::createSeed(plant2);
+
+    return static_cast<Seedling*>(Seedling::createSeedling(s1, s2));
 }

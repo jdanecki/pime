@@ -68,9 +68,17 @@ void Backend_Texture_Copy(Texture2D texture, Backend_Rect * srcrect, Backend_Rec
 }
 void Backend_Texture_Copy_Flip(Texture2D texture, Backend_Rect * srcrect, Backend_Rect * dstrect)
 {
-    Rectangle src = srcrect->r;
-    src.width = -src.width;
-    DrawTexturePro(texture, srcrect->r, dstrect->r,
+    Rectangle src;
+    if (srcrect) {
+        src = srcrect->r;
+        src.width *= -1;
+    } else {
+        src.x = 0;
+        src.y = 0;
+        src.width = -texture.width;
+        src.height = texture.height;
+    }
+    DrawTexturePro(texture, src, dstrect->r,
         {
             0,
         },

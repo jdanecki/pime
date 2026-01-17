@@ -122,7 +122,7 @@ class InventoryElement : public NetworkObject
     }
     virtual void show(bool details = true)
     {
-        CONSOLE_LOG("%s: uid=%lx id=%ld c_id=%d @[%d,%d][%d,%d]\n", get_class_name(), uid, get_id(), c_id,
+        CONSOLE_LOG("(INV)%s: uid=%lx id=%ld c_id=%d @[%d,%d][%d,%d]\n", get_class_name(), uid, get_id(), c_id,
                     location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
     }
     virtual bool tick()
