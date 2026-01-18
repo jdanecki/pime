@@ -42,6 +42,7 @@ foreach s : dialog_sources
   client_common_2d += ['../dialog/' + s]
 endforeach
 
+subdir('ogl')
 subdir('SDL')
 subdir('raylib')
 
