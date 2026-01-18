@@ -1,8 +1,9 @@
 #include "net_manager.h"
 
-#include "../../client-common/net.h"
 #include "chunk_renderer.h"
+#include "element_godot.h"
 #include "godot_cpp/classes/engine.hpp"
+#include "godot_cpp/classes/node3d.hpp"
 #include "godot_cpp/core/memory.hpp"
 #include "godot_cpp/variant/string.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
@@ -57,6 +58,17 @@ void NetManager::update_chunk(int x, int y, const chunk_table* data)
     chunk->update(data);
 }
 
+void NetManager::create_object(const ObjectData* data)
+{
+    switch (data->tag)
+    {
+        case ObjectData::Tag::Element: 
+            ElementGodot* el = memnew(ElementGodot(data->element.data));
+            add_child(el);
+            el->set_position(Vector3(data->element.data.location.chunk.x, 1, data->element.data.location.chunk.y ));
+    }
+}
+
 size_t my_id;
 
 // FIXME remove when net.cpp is cleaned up
@@ -79,11 +91,6 @@ int CONSOLE_LOG(const char * fmt, ...)
     return 0;
 }
 
-// FIXME remove when cleaned in core
-void update_player(uintptr_t id, int32_t map_x, int32_t map_y, int32_t x, int32_t y, int32_t thirst, int32_t hunger)
-{
-}
-
 void update_chunk(int32_t x, int32_t y, const chunk_table * data)
 {
     net_manager->update_chunk(x, y, data);
@@ -104,6 +111,7 @@ void update_item_location(LocationUpdateData data)
 
 void create_object(const ObjectData * data)
 {
+    net_manager->create_object(data);
 }
 
 void destroy_object(NetworkObject id, ItemLocation location)
