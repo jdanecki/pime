@@ -1,7 +1,8 @@
+#include <stdarg.h>
 #include "world_server.h"
 #include "elements_server.h"
-#include <stdarg.h>
-
+#include "../core/world.h"
+#include "player_server.h"
 unsigned long get_time_usec()
 {
     struct timespec t;
@@ -17,6 +18,9 @@ unsigned long get_time_ms()
 
 void update()
 {
+    if (!players->nr_elements)
+        return;
+   // CONSOLE_LOG("update: time=%ld\n", get_time_ms());
 #if 1
     // TODO maybe in the future make it smarter
     for (int y = 0; y < WORLD_SIZE; y++)

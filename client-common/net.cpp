@@ -606,7 +606,7 @@ void update_object(const ObjectData * data)
             {
                 Plant * plant = static_cast<Plant *>(el);
                 *plant = data->plant.data;
-                // CONSOLE_LOG("%s size=%f\n", plant->get_name(), plant->size);
+                CONSOLE_LOG("%s size=%f grown=%d phase=%d\n", plant->get_name(), plant->size, plant->grown, plant->phase);
                 break;
             }
             case Class_Animal:

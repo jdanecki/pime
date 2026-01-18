@@ -281,7 +281,7 @@ void send_updates()
 {
     if (!players->nr_elements)
         return;
-
+    //CONSOLE_LOG("send_updates: time=%ld\n", get_time_ms());
     if (objects_to_create.nr_elements)
     {
         ListElement * el = objects_to_create.head;
@@ -438,7 +438,7 @@ void handle_net_event(ENetEvent * event)
             break;
         }
         default:
-            // CONSOLE_LOG("time=%ld\n", get_time_ms());
+            
             update();
             send_updates();
             break;

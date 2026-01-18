@@ -161,7 +161,7 @@ void PlantServer::change_phase(Plant_phase p)
 {
     if (phase != p)
     {
-        //  CONSOLE_LOG("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
+        CONSOLE_LOG("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
         notify_update(this);
     }
     phase = p;
@@ -220,8 +220,8 @@ void PlantServer::set_phase(Plant_phase p)
 
 bool PlantServer::grow()
 {
-    // unsigned long ms=get_time_ms();
-    // CONSOLE_LOG("PlantServer.grow: %llu:%llu ms delay=%d\n", ms/1000, ms % 1000, delay_for_grow);
+    unsigned long ms=get_time_ms();
+  //  CONSOLE_LOG("PlantServer.grow: %llu:%llu ms delay=%d\n", ms/1000, ms % 1000, delay_for_grow);
     if (grown)
         return false;
 
@@ -236,10 +236,11 @@ bool PlantServer::grow()
 
     age->value++;
     size = 1.0 * age->value / max_age->value;
-#ifdef TRACE_PLANTS
-    CONSOLE_LOG("PlantServer:%s growing %d/%d phase=%s grown=%d planted=%d times=%d/%d/%d/ size=%f\n", get_name(), age->value, max_age->value, plant_phase_name[phase], grown, planted, seedling_time,
-        growing_time, flowers_time, size);
-#endif
+
+    /*CONSOLE_LOG("PlantServer:%s growing %d/%d phase=%s grown=%d times=%d/%d/%d/ size=%f\n", get_name(), 
+        age->value, max_age->value, plant_phase_name[phase], grown, 
+        seedling_time, growing_time, flowers_time, size);
+*/
     if (age->value >= max_age->value)
     {
         if (phase != Plant_fruits)

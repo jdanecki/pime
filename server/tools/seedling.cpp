@@ -52,7 +52,7 @@ bool Seedling::use(InventoryElement * object, Player * pl)
     CONSOLE_LOG("%s: ing base=%d\n", get_name(), b_id);
     BaseListElement * base_el = static_cast<BaseListElement *>(base_plants.find(&b_id));
     PlantServer * plant = create_plant((BasePlant *)(base_el->get_el()));
-    plant->set_phase(Plant_seedling);
+    plant->set_phase(Plant_growing);
     CONSOLE_LOG("%s: planted base=%d\n", get_name(), plant->get_id());
     ch->add_object(plant, x, y);
     notify_create(plant);
@@ -67,11 +67,11 @@ Seedling * create_seedling(chunk *ch)
     size_t b_id = rand() % base_plants.nr_elements;
     BaseListElement * base_el = static_cast<BaseListElement *>(base_plants.find(&b_id));
     PlantServer * plant1 = create_plant((BasePlant *)(base_el->get_el()));
-    plant1->phase = Plant_fruits;
+    plant1->set_phase(Plant_fruits);
 
     BaseListElement * base_el1 = static_cast<BaseListElement *>(base_plants.find(&b_id));
     PlantServer * plant2 = create_plant((BasePlant *)(base_el1->get_el()));
-    plant2->phase = Plant_fruits;
+    plant2->set_phase(Plant_fruits);
 
     IngredientServer *s1 = Seed::createSeed(plant1);
     IngredientServer *s2 = Seed::createSeed(plant2);

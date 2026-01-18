@@ -20,6 +20,7 @@ int CONSOLE_LOG(const char * fmt, ...)
     va_end(args);
     return 0;
 }
+unsigned long get_time_ms() { return 0; }
 
 int main()
 {
