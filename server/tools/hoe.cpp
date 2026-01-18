@@ -64,7 +64,7 @@ bool Hoe::use(InventoryElement * object, Player * pl)
     return false;
 }
 
-Hoe * create_hoe()
+Hoe * create_hoe(chunk *ch)
 {
     int count;
     NetworkObject ** base_solid = base_elements.find_form(Form_solid, &count);
@@ -82,7 +82,12 @@ Hoe * create_hoe()
         ElementServer *el2=create_element(static_cast<BaseElement *>(base_solid[1]));
         IngredientServer *hb=HoeBlade::createHoeBlade(el1);
         IngredientServer *hh=HoeHandle::createHoeHandle(el2);
-        return static_cast<Hoe*>(Hoe::createHoe(hb, hh));
+        ch->add_object(hb, 0, 0);
+        ch->add_object(hh, 0, 0);
+        Hoe * hoe = static_cast<Hoe*>(Hoe::createHoe(hb, hh));
+        destroy(hb);
+        destroy(hh);
+        return hoe;
     }
     return nullptr;
 

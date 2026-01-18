@@ -5,7 +5,7 @@
 #include "../../server/networking.h"
 #include "../../server/tools/tools.h"
 
-void notify_destroy(NetworkObject id, ItemLocation location) {}
+void notify_destroy(InventoryElement *el) {}
 void notify_create(const InventoryElement * el) {}
 void notify_update(const InventoryElement * el) {}
 void update_location(NetworkObject id, ItemLocation old_loc, ItemLocation new_loc) {}
@@ -49,10 +49,11 @@ int main()
         base_animals.add(entry);
     }
 
-    Seedling * s1=create_seedling();
+    chunk *ch =  new chunk(0, 0);
+    Seedling * s1=create_seedling(ch);
     printf("Seedling1: id=%ld\n", s1->get_id());
-    printf("ing[0]=%ld\n", s1->ings[0]->get_base_id());
-    printf("ing[1]=%ld\n", s1->ings[1]->get_base_id());
+    printf("ing[0]=%ld\n", s1->ings[0]);
+    printf("ing[1]=%ld\n", s1->ings[1]);
 
     size_t b_id=3;
     BaseListElement * base_el = (BaseListElement *)base_plants.find(&b_id);
@@ -69,8 +70,9 @@ int main()
 
     ProductServer * s2=Seedling::createSeedling(seed1, seed2);
     printf("Seedling2: id=%ld\n", s2->get_id());
-    printf("ing[0]=%ld\n", s2->ings[0]->get_base_id());
-    printf("ing[1]=%ld\n", s2->ings[1]->get_base_id());
+    s2->location.show();
+    printf("ing[0]=%ld\n", s2->ings[0]);
+    printf("ing[1]=%ld\n", s2->ings[1]);
 
     return 0;
 }

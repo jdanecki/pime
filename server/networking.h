@@ -61,6 +61,7 @@ void add_packet_to_send(Packet * p);
 void add_packet_to_send1(Packet * p);
 void notify_update(const InventoryElement * el);
 void notify_create(const InventoryElement * el);
+void notify_destroy(InventoryElement *el);
 bool init_networking();
 void send_updates();
 void handle_net_event(ENetEvent * event);

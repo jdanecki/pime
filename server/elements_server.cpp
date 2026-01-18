@@ -9,12 +9,11 @@ extern unsigned long get_time_ms();
 
 void destroy(InventoryElement * el)
 {
-    notify_destroy(NetworkObject(el->get_cid(), el->get_uid()), el->location);
     if (el->location.tag == ItemLocation::Tag::Chunk)
     {
         world_table[el->location.chunk.map_y][el->location.chunk.map_x]->remove_object(el);
     }
-    delete el;
+    notify_destroy(el);
 }
 
 AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
@@ -278,9 +277,21 @@ bool PlantServer::grow()
     return !grown;
 }
 
-IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id id, Form f) : Ingredient(id), el(from)
+IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id id, Form f) : Ingredient(id)
 {
     req_form = f;
+    switch (from->get_cid())
+    {
+        case Class_Ingredient:
+        {
+            IngredientServer *ing=static_cast<IngredientServer*>(from);
+            el=ing->el;
+            break;
+        }
+        default:
+            el = from->get_uid();
+        break;
+    }
 }
 
 bool IngredientServer::action(Product_action action, Player * pl)
@@ -293,7 +304,7 @@ void IngredientServer::show(bool details)
 {
     CONSOLE_LOG("vvv INGREDIENT_SERVER vvv\n");
     Ingredient::show(details);
-    el->show(details);
+    CONSOLE_LOG("el: base_id=%d\n", el);
     CONSOLE_LOG("!!! INGREDIENT_SERVER !!!\n");
 }
 
@@ -306,9 +317,8 @@ void ProductServer::init(int c, Form f)
 ProductServer::ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id id, Form f, int act_cnt) : Product(id, act_cnt)
 {
     c_id = Class_Product;
-    ings = (IngredientServer **)calloc(2, sizeof(IngredientServer));
-    ings[0] = static_cast<IngredientServer *>(el1);
-    ings[1] = dynamic_cast<IngredientServer *>(el2);
+    ings[0] = (static_cast<IngredientServer *>(el1))->el;
+    ings[1] = (static_cast<IngredientServer *>(el2))->el;
     init(2, f);
 }
 
@@ -324,7 +334,7 @@ void ProductServer::show(bool details)
     CONSOLE_LOG("vvv PRODUCT_SERVER vvv\n");
     Product::show(details);
     for (int i=0; i < ing_count; i++)
-        ings[i]->show(details);
+        CONSOLE_LOG("ings[%d] base=%d\n", i, ings[i]);
     CONSOLE_LOG("!!! PRODUCT_SERVER !!!\n");
 }
 

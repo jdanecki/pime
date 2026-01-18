@@ -49,7 +49,7 @@ bool Seedling::use(InventoryElement * object, Player * pl)
 
     chunk * ch = world_table[map_y][map_x];
     IngredientServer * ing = (IngredientServer *)(ings[0]);
-    size_t b_id = ing->get_base_id();
+    size_t b_id = ing->el;
     CONSOLE_LOG("%s: ing base=%d\n", get_name(), b_id);
     BaseListElement * base_el = (BaseListElement *)base_plants.find(&b_id);
     PlantServer * plant = create_plant((BasePlant *)(base_el->get_el()));
@@ -63,7 +63,7 @@ bool Seedling::use(InventoryElement * object, Player * pl)
     return true;
 }
 
-Seedling * create_seedling()
+Seedling * create_seedling(chunk *ch)
 {
     size_t b_id = rand() % base_plants.nr_elements;
     BaseListElement * base_el = static_cast<BaseListElement *>(base_plants.find(&b_id));
@@ -76,6 +76,11 @@ Seedling * create_seedling()
 
     IngredientServer *s1 = Seed::createSeed(plant1);
     IngredientServer *s2 = Seed::createSeed(plant2);
+    ch->add_object(s1, 0, 0);
+    ch->add_object(s2, 0, 0);
 
-    return static_cast<Seedling*>(Seedling::createSeedling(s1, s2));
+    Seedling * seedl=static_cast<Seedling*>(Seedling::createSeedling(s1, s2));
+    destroy(s1);
+    destroy(s2);
+    return seedl;
 }

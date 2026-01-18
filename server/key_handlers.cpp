@@ -73,24 +73,32 @@ void debug_create_place()
 void debug_create_seedling()
 {
     chunk * ch = world_table[128][128];
-    Seedling * seedl=create_seedling();
+    Seedling * seedl=create_seedling(ch);
     ch->add_object(seedl, 10, 9);
 }
 
 void debug_create_hoe()
 {
     chunk * ch = world_table[128][128];
-    Hoe * hoe=create_hoe();
+    Hoe * hoe=create_hoe(ch);
     if (hoe) ch->add_object(hoe, 11, 9);
+}
+
+void debug_create_knife()
+{
+    chunk * ch = world_table[128][128];
+    Knife * knife=create_knife(ch);
+    if (knife) ch->add_object(knife, 12, 9);
 }
 
 void debug_print_help()
 {
     CONSOLE_LOG("F1 - help\n");
     CONSOLE_LOG("F2 - switch_debug_mode\n");
+    CONSOLE_LOG("h - create hoe\n");
+    CONSOLE_LOG("k - create knife\n");
     CONSOLE_LOG("p - create place\n");
     CONSOLE_LOG("s - create seedling\n");
-    CONSOLE_LOG("h - create hoe\n");
     CONSOLE_LOG("1 - create all base elements\n");
     CONSOLE_LOG("2 - create all base plants\n");
     CONSOLE_LOG("3 - create all animals\n");
@@ -162,9 +170,11 @@ void create_all_base_animals()
 KeyHandler debug_key_handlers[] = {
     {KEY_F(1), debug_print_help},
     {KEY_F(2), switch_debug_mode},
+    {'h', debug_create_hoe},
+    {'k', debug_create_knife},
     {'p', debug_create_place},
     {'s', debug_create_seedling},
-    {'h', debug_create_hoe},
+
     {'1', create_all_base_elements},
     {'2', create_all_base_plants},
     {'3', create_all_base_animals},

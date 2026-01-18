@@ -141,9 +141,8 @@ class PlantServer : public Plant, public BeingServer
 
 class IngredientServer : public Ingredient
 {
-
   public:
-    InventoryElement * el;
+    size_t el;
     IngredientServer(InventoryElement * from, Ingredient_id id, Form f);
     bool action(Product_action action, Player * pl) override;
     bool can_pickup() override
@@ -151,18 +150,6 @@ class IngredientServer : public Ingredient
         return true;
     }
     void show(bool details = true) override;
-    size_t get_base_id() {
-        switch (el->get_cid())
-        {
-            case Class_Ingredient:
-            {
-                IngredientServer * ing=static_cast<IngredientServer*>(el);
-                return ing->get_base_id();
-            }
-            default:
-                return el->get_id();
-        }
-    }
 };
 
 class ProductServer : public Product
@@ -170,7 +157,7 @@ class ProductServer : public Product
   public:
     void * padding;
     int ing_count;
-    IngredientServer ** ings;
+    size_t ings[2];
 
     void init(int c, Form f);
     ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id id, Form f, int act_cnt);

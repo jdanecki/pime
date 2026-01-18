@@ -118,7 +118,7 @@ class PacketObjectDestroy : public Packet
         unsigned long id;
         ItemLocation location;
     } data, *pdata __attribute__((packed));
-
+    InventoryElement * el_to_remove;
   public:
     unsigned long get_id()
     {
@@ -128,11 +128,12 @@ class PacketObjectDestroy : public Packet
     {
         return pdata->location;
     }
-    PacketObjectDestroy(unsigned long id, ItemLocation location) : Packet(PACKET_OBJECT_DESTROY)
+    PacketObjectDestroy(InventoryElement *el) : Packet(PACKET_OBJECT_DESTROY)
     {
         data.t = t;
-        data.id = id;
-        data.location = location;
+        data.id = el->get_uid();
+        data.location = el->location;
+        el_to_remove=el;
     }
     PacketObjectDestroy() : Packet(PACKET_OBJECT_DESTROY)
     {
@@ -149,7 +150,10 @@ class PacketObjectDestroy : public Packet
     int send(ENetPeer * peer)
     {
         // FIXME send as broadcast
-        return send_data(peer, &data, sizeof(struct serial_data));
+        int ret=send_data(peer, &data, sizeof(struct serial_data));
+        delete el_to_remove;
+        return ret;
+
     }
     bool check_size(int s)
     {
