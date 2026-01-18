@@ -161,7 +161,7 @@ void PlantServer::change_phase(Plant_phase p)
 {
     if (phase != p)
     {
-        CONSOLE_LOG("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
+        //CONSOLE_LOG("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
         notify_update(this);
     }
     phase = p;
@@ -176,7 +176,7 @@ void PlantServer::show(bool details)
 bool PlantServer::player_action(Player_action action, Player * pl)
 {
     bool res = false;
-    CONSOLE_LOG("PLANT_SERVER: %s %s\n", player_action_name[action], get_name());
+    //CONSOLE_LOG("PLANT_SERVER: %s %s\n", player_action_name[action], get_name());
     switch (action)
     {
         case PLAYER_EAT:

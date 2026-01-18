@@ -476,6 +476,7 @@ class PacketObjectUpdate : public Packet
 
 class PacketChunkUpdate : public Packet
 {
+    bool chunk_valid;
     struct serial_data
     {
         PacketType t;
@@ -483,7 +484,6 @@ class PacketChunkUpdate : public Packet
         chunk_table table;
     } data, *pdata __attribute__((packed));
     chunk_table * ptable;
-
   public:
     unsigned char get_x()
     {
@@ -502,7 +502,13 @@ class PacketChunkUpdate : public Packet
         data.t = t;
         data.x = x;
         data.y = y;
-        memcpy(&data.table, &world_table[y][x]->table, sizeof(chunk_table));
+        chunk_valid=false;
+        if (world_table[y][x]) {
+            memcpy(&data.table, &world_table[y][x]->table, sizeof(chunk_table));
+            chunk_valid=true;
+        } 
+        else
+            CONSOLE_LOG("PacketChunkUpdate: requested not loaded chunk x=%d y=%d\n", x, y);
     }
     PacketChunkUpdate() : Packet(PACKET_CHUNK_UPDATE)
     {
@@ -510,19 +516,30 @@ class PacketChunkUpdate : public Packet
     int send(ENetPeer * peer)
     {
         int ret;
-        ret = send_data(peer, &data, sizeof(struct serial_data));
-
-        chunk * ch = world_table[data.y][data.x];
-        // ch->objects.show(false);
-        // ch->beings.show(false);
-        ListElement * el = ch->objects.head;
-        while (el)
+        if (chunk_valid) 
         {
-            Packet * p = new PacketObjectCreate(el->get_el());
+            ret = send_data(peer, &data, sizeof(struct serial_data));
+
+            chunk * ch = world_table[data.y][data.x];
+            // ch->objects.show(false);
+            // ch->beings.show(false);
+            ListElement * el = ch->objects.head;
+            while (el)
+            {
+                Packet * p = new PacketObjectCreate(el->get_el());
+                ret = p->send(peer);
+                delete p;
+                el = el->next;
+            }
+            return ret;
+        } 
+        else 
+        {
+            Packet *p = new PacketActionFailed();
             ret = p->send(peer);
-            el = el->next;
+            delete p;
+            return ret;
         }
-        return ret;
     }
     bool update(unsigned char * net_data, size_t s)
     {
