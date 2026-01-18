@@ -8,6 +8,8 @@
 #include "godot_cpp/variant/string.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
+#include "godot_cpp/variant/vector3.hpp"
+#include "player_godot.h"
 
 using namespace godot;
 
@@ -54,18 +56,32 @@ void NetManager::update_chunk(int x, int y, const chunk_table* data)
         chunk = memnew(ChunkRenderer);
         chunk->set_name(name);
         add_child(chunk);
+        chunk->set_position(Vector3(x*CHUNK_SIZE, 0, y*CHUNK_SIZE));
     }
     chunk->update(data);
 }
 
-void NetManager::create_object(const ObjectData* data)
+void NetManager::create_object(const ObjectData* data_c)
 {
+    ObjectData* data = (ObjectData*)data_c;
     switch (data->tag)
     {
         case ObjectData::Tag::Element: 
+            {
             ElementGodot* el = memnew(ElementGodot(data->element.data));
             add_child(el);
-            el->set_position(Vector3(data->element.data.location.chunk.x, 1, data->element.data.location.chunk.y ));
+            el->set_position(Vector3(data->element.data.location.get_world_x(), 1, data->element.data.location.get_world_y()));
+            register_object(el);
+            break;
+            }
+        case ObjectData::Tag::Player:
+            {
+            PlayerGodot* player = memnew(PlayerGodot(data->player.data));
+            add_child(player);
+            player->set_position(Vector3(data->player.data.location.get_world_x(), 1, data->player.data.location.get_world_y()));
+            register_object(player);
+            break;
+            }
     }
 }
 
@@ -103,10 +119,82 @@ void got_id(size_t id, int64_t seed)
 
 void update_object(const ObjectData * data)
 {
+    Class_id c_id = data->inv_element.data.c_id;
+
+    InventoryElement * el = get_object_by_id(data->inv_element.data);
+
+    if (el && el->c_id == c_id)
+    {
+        switch (c_id)
+        {
+            case Class_Element:
+            {
+                Element * element = dynamic_cast<Element *>(el);
+                *element = data->element.data;
+                break;
+            }
+            case Class_Ingredient:
+            {
+                Ingredient * ing = dynamic_cast<Ingredient *>(el);
+                *ing = data->ingredient.data;
+                break;
+            }
+            case Class_Product:
+            {
+                Product * prod = dynamic_cast<Product *>(el);
+                *prod = data->product.data;
+                break;
+            }
+            case Class_Plant:
+            {
+                Plant * plant = dynamic_cast<Plant *>(el);
+                *plant = data->plant.data;
+                // CONSOLE_LOG("%s size=%f\n", plant->get_name(), plant->size);
+                break;
+            }
+            case Class_Animal:
+            {
+                Animal * animal = dynamic_cast<Animal *>(el);
+                *animal = data->animal.data;
+                //     CONSOLE_LOG("%s size=%f\n", animal->get_name(), animal->size);
+                break;
+            }
+            case Class_Player:
+            {
+                Player * player = dynamic_cast<Player *>(el);
+                CONSOLE_LOG("update_object: player=%s inv.elements=%d\n", player->get_name(), player->inventory.nr_elements);
+                *player = data->player.data;
+                CONSOLE_LOG("update_object: -> update: inv.elements=%d\n", player->inventory.nr_elements);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    else
+    {
+        if (el)
+            CONSOLE_LOG("bad data for update object %ld %d real %d", el->uid, c_id, el->c_id);
+        else
+            CONSOLE_LOG("non existing object for update object %ld %d", data->inv_element.data.uid, c_id);
+    }
 }
 
 void update_item_location(LocationUpdateData data)
 {
+    InventoryElement* el = get_object_by_id(data.id);
+    Node3D* node = dynamic_cast<Node3D*>(el);
+    if (!node) { UtilityFunctions::print("INVALID"); return;}
+    if (data.new_.tag == ItemLocation::Tag::Player)
+    {
+        node->set_visible(false);
+        // TODO
+    }
+    else
+    {
+        node->set_visible(true);
+        node->set_position(Vector3(data.new_.get_world_x(), 1, data.new_.get_world_y()));
+    }
 }
 
 void create_object(const ObjectData * data)
