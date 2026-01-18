@@ -2,18 +2,9 @@
 #include <stdio.h>
 
 #include "../../server/elements_server.h"
-#include "../../server/networking.h"
 #include "../../server/tools/tools.h"
 
-void notify_destroy(InventoryElement *el) {}
-void notify_create(const InventoryElement * el) {}
-void notify_update(const InventoryElement * el) {}
-void update_location(NetworkObject id, ItemLocation old_loc, ItemLocation new_loc) {}
-void notify_knowledge(size_t pl_id, Class_id cid, int id) {}
-
-Networked::Networked() {}
-
-void print_status(int , const char * format, ...)
+void print_status(int, const char * format, ...)
 {
     va_list args;
     va_start(args, format);
@@ -32,7 +23,7 @@ int CONSOLE_LOG(const char * fmt, ...)
 
 int main()
 {
-    for (int i=0; i < 5; i++)
+    for (int i = 0; i < 5; i++)
     {
         Form f = Form_solid;
         ListElement * entry = new BaseListElement(new BaseElement(f, i));
@@ -49,26 +40,26 @@ int main()
         base_animals.add(entry);
     }
 
-    chunk *ch =  new chunk(0, 0);
-    Seedling * s1=create_seedling(ch);
+    chunk * ch = new chunk(0, 0);
+    Seedling * s1 = create_seedling(ch);
     printf("Seedling1: id=%ld\n", s1->get_id());
     printf("ing[0]=%ld\n", s1->ings[0]);
     printf("ing[1]=%ld\n", s1->ings[1]);
 
-    size_t b_id=3;
+    size_t b_id = 3;
     BaseListElement * base_el = (BaseListElement *)base_plants.find(&b_id);
-    PlantServer * plant1= create_plant((BasePlant *)(base_el->get_el()));
+    PlantServer * plant1 = create_plant((BasePlant *)(base_el->get_el()));
     plant1->set_phase(Plant_fruits);
-    IngredientServer * fruit1=Fruit::createFruit(plant1);
+    IngredientServer * fruit1 = Fruit::createFruit(plant1);
 
-    PlantServer * plant2= create_plant((BasePlant *)(base_el->get_el()));
+    PlantServer * plant2 = create_plant((BasePlant *)(base_el->get_el()));
     plant2->set_phase(Plant_fruits);
-    IngredientServer * fruit2=Fruit::createFruit(plant2);
+    IngredientServer * fruit2 = Fruit::createFruit(plant2);
 
-    IngredientServer *seed1=Seed::createSeed(fruit1);
-    IngredientServer *seed2=Seed::createSeed(fruit2);
+    IngredientServer * seed1 = Seed::createSeed(fruit1);
+    IngredientServer * seed2 = Seed::createSeed(fruit2);
 
-    ProductServer * s2=Seedling::createSeedling(seed1, seed2);
+    ProductServer * s2 = Seedling::createSeedling(seed1, seed2);
     printf("Seedling2: id=%ld\n", s2->get_id());
     s2->location.show();
     printf("ing[0]=%ld\n", s2->ings[0]);

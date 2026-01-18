@@ -47,11 +47,10 @@ bool Seedling::use(InventoryElement * object, Player * pl)
     }
     CONSOLE_LOG("%s: %s on %s @[%d,%d][%d,%d]\n", get_name(), product_action_name[actions[0]], object->get_name(), map_x, map_y, x, y);
 
-    chunk * ch = world_table[map_y][map_x];
-    IngredientServer * ing = (IngredientServer *)(ings[0]);
-    size_t b_id = ing->el;
+    chunk * ch = world_table[map_y][map_x];    
+    size_t b_id = ings[0];
     CONSOLE_LOG("%s: ing base=%d\n", get_name(), b_id);
-    BaseListElement * base_el = (BaseListElement *)base_plants.find(&b_id);
+    BaseListElement * base_el = static_cast<BaseListElement *>(base_plants.find(&b_id));
     PlantServer * plant = create_plant((BasePlant *)(base_el->get_el()));
     plant->set_phase(Plant_seedling);
     CONSOLE_LOG("%s: planted base=%d\n", get_name(), plant->get_id());

@@ -21,7 +21,7 @@ void use_tile()
         }
         if (Product * item = static_cast<Product *>(player->hotbar[active_hotbar]))
         {
-            CONSOLE_LOG("SDL: using %s on %s uid=%lx\n", item->get_name(), object->get_name(), object->uid);
+            CONSOLE_LOG("use_tile: using %s on %s uid=%lx\n", item->get_name(), object->get_name(), object->uid);
             send_packet_item_used_on_object(client, item->uid, object->uid);
             return;
         }
@@ -43,10 +43,10 @@ void action_tile(Player_action a, ItemLocation loc)
     InventoryElement * object = get_item_at(loc);
     if (!object)
     {
-        CONSOLE_LOG("SDL: nothing on tile\n");
+        CONSOLE_LOG("action_tile: nothing on tile\n");
         return;
     }
 
-    CONSOLE_LOG("SDL: action %s on %s\n", player_action_name[a], object->get_name());
+    CONSOLE_LOG("action_tile: action %s on %s\n", player_action_name[a], object->get_name());
     send_packet_action_on_object(client, a, object->uid);
 }

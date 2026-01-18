@@ -54,6 +54,7 @@ class PlayerClient : public ListElement
         enet_address_get_host_ip(&peer->address, hostname, 64);
         CONSOLE_LOG("player uid=%ld host=%s port=%u\n", player->uid, hostname, peer->address.port);
         player->location.show();
+        player->inventory.show();
     }
 };
 
@@ -61,7 +62,7 @@ void add_packet_to_send(Packet * p);
 void add_packet_to_send1(Packet * p);
 void notify_update(const InventoryElement * el);
 void notify_create(const InventoryElement * el);
-void notify_destroy(InventoryElement *el);
+void notify_destroy(InventoryElement * el);
 bool init_networking();
 void send_updates();
 void handle_net_event(ENetEvent * event);

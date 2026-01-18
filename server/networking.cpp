@@ -3,7 +3,7 @@
 #include "craft.h"
 #include "world_server.h"
 
-//#define DEBUG_TIMEOUT 1
+// #define DEBUG_TIMEOUT 1
 
 ElementsList objects_to_create;
 ENetHost * server;
@@ -298,14 +298,14 @@ void send_updates()
     if (packets_to_send->nr_elements)
     {
         ListElement * el = packets_to_send->head;
-                CONSOLE_LOG("sending updates elems=%d\n", packets_to_send->nr_elements);
+        //  CONSOLE_LOG("sending updates elems=%d\n", packets_to_send->nr_elements);
         while (el)
         {
             PacketToSend * p = (PacketToSend *)el;
             p->to_all();
             el = el->next;
         }
-                CONSOLE_LOG("sent updates\n");
+        //  CONSOLE_LOG("sent updates\n");
     }
 
     if (packets_to_send1->nr_elements)
@@ -354,7 +354,7 @@ void update_location(NetworkObject id, ItemLocation old_loc, ItemLocation new_lo
  */
     add_packet_to_send(new PacketLocationUpdate(id.uid, old_loc, new_loc));
 }
-void notify_destroy(InventoryElement *el)
+void notify_destroy(InventoryElement * el)
 {
     add_packet_to_send(new PacketObjectDestroy(el));
 }

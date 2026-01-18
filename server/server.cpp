@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdarg.h>
 
 #include "../core/alchemist/el_list.h"
@@ -7,7 +6,6 @@
 #include "console.h"
 #include "generator/generator.h"
 #include "key_handlers.h"
-
 
 void generate()
 {

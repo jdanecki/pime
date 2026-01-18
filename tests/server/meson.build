@@ -6,7 +6,7 @@ server_ncurses_sources = [
 ]
 
 tests_server_sources =[
-  'elements_server.cpp',
+  'elements_server.cpp', 
   'craft_ing.cpp',
   'craft_prod.cpp',
 
@@ -24,6 +24,7 @@ tests_server_sources =[
 
 server_elements_sources = [
   'elements.cpp',
+  'network_stub.cpp',
   ]
 
 foreach s : tests_server_sources
@@ -39,6 +40,7 @@ executable('server_ncurses',
 
 executable('server_elements', 
   server_elements_sources,
+  cpp_args : ['-DTESTS'],
   install: false,
   link_with: [core],
 )

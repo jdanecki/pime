@@ -289,7 +289,7 @@ IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id id, Fo
             break;
         }
         default:
-            el = from->get_uid();
+            el = from->get_id();
         break;
     }
 }
