@@ -69,7 +69,7 @@ try_again:
             }
             if (closest_el)
             {
-                ch->table[y][x].tile = closest_el->get_id();
+                ch->table[y][x].tile = closest_el->get_id() % TILE_TEXTURES;
             }
         }
 
