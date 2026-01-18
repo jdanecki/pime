@@ -4,6 +4,8 @@
 #include <godot_cpp/classes/node3d.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
+#include "../../core/tiles.h"
+#include "../../client-common/net.h"
 
 namespace godot
 {
@@ -18,6 +20,9 @@ class NetManager : public Node3D
     void _ready() override;
     void _process(double delta) override;
 
+    void update_chunk(int x, int y, const chunk_table* data);
+    void create_object(const ObjectData* data);
+    
   protected:
     static void _bind_methods();
 };

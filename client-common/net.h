@@ -14,6 +14,7 @@ class NetClient
 extern NetClient * client;
 
 extern ElementsList objects;
+
 extern chunk * check_chunk(int cx, int cy);
 
 void send_packet_move(NetClient * client, int32_t x, int32_t y);
@@ -46,24 +47,17 @@ BaseAnimal * get_base_animal(size_t id);
 
 Base * get_base(uint32_t c_id, int32_t id);
 
-extern void update_chunk(int32_t x, int32_t y, const chunk_table * data);
-
-extern void update_object(const ObjectData * data);
-
-extern void update_item_location(LocationUpdateData data);
-
-extern void create_object(const ObjectData * data);
-
-extern void destroy_object(NetworkObject id, ItemLocation location);
-
-extern void failed_craft();
-
-extern void action_failed();
-
-extern void knowledge_update(size_t pl_id, Class_id cid, int32_t id);
-
-extern void checked_update(size_t pl_id, uintptr_t el);
-
-extern NetworkObject * el_from_data(const ObjectData * data);
+// Client should implement: (or use net2d.cpp)
+void got_id(size_t id, int64_t seed);
+void update_chunk(int32_t x, int32_t y, const chunk_table * data);
+void update_object(const ObjectData * data);
+void update_item_location(LocationUpdateData data);
+void create_object(const ObjectData * data);
+void destroy_object(NetworkObject id, ItemLocation location);
+void failed_craft();
+void action_failed();
+void knowledge_update(size_t pl_id, Class_id cid, int32_t id);
+void checked_update(size_t pl_id, uintptr_t el);
+NetworkObject * el_from_data(const ObjectData * data);
 
 #endif // NET_H

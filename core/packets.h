@@ -529,7 +529,7 @@ class PacketChunkUpdate : public Packet
         if (check_size(s))
         {
             pdata = (struct serial_data *)net_data;
-            ptable = (chunk_table *)(((unsigned char *)&pdata->table));
+            ptable = &pdata->table;
             return true;
         }
         return false;
