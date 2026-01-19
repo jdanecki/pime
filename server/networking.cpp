@@ -273,6 +273,11 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             }
             break;
         }
+        case PACKET_DISCONNECT:
+        {
+            CONSOLE_LOG("player uid=%d sent disconnect\n", pl->player->uid);
+            delete p;
+        } 
     }
     return true;
 }

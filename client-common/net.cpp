@@ -242,6 +242,17 @@ NetClient * init(const char * server_ip, const char * port)
     }
 }
 
+void connect()
+{
+
+}
+
+void disconnect()
+{
+    Packet * p = new PacketDisconnect();
+    p->send(client->peer);
+}
+
 unsigned int network_tick(NetClient * client)
 {
     ENetEvent event;

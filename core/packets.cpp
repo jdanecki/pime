@@ -158,6 +158,14 @@ Packet * check_packet(char dir, unsigned char * data, size_t s)
         case PACKET_ELEMENTS_LIST:
             p = new PacketElementsList();
             break;
+        case PACKET_DISCONNECT:
+            p = new PacketElementsList();
+            break;
+    }
+    if (!p)
+    {
+        CONSOLE_LOG("check_packet: UNKNOWN PACKET %d with size: %ld\n", data[0], s);
+        return nullptr;
     }
     if (p->update(data, s))
     {
@@ -167,7 +175,7 @@ Packet * check_packet(char dir, unsigned char * data, size_t s)
     else
     {
         delete p;
-        CONSOLE_LOG("UNKNOWN PACKET: %d with size: %ld\n", data[0], s);
+        CONSOLE_LOG("check_packet: wrong update for %d\n", data[0]);
         return nullptr;
     }
 }

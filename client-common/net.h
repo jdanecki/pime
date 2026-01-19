@@ -59,5 +59,7 @@ void action_failed();
 void knowledge_update(size_t pl_id, Class_id cid, int32_t id);
 void checked_update(size_t pl_id, uintptr_t el);
 NetworkObject * el_from_data(const ObjectData * data);
+void connect();
+void disconnect();
 
 #endif // NET_H

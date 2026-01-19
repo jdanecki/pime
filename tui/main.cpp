@@ -67,6 +67,8 @@ void help()
 {
     printf("? - show\n");
     printf("1 .. 0 - select n-element in hotbar\n");
+    printf("c - connect\n");
+    printf("e - disconnect\n");
     printf("h - help\n");
     printf("i/I - pickup/drop item at player location\n");
     printf("n - use/don't use network\n");
@@ -161,6 +163,7 @@ void move_player(int dx, int dy)
         printf("\nthere is something here: %s\n", el->get_class_name());
 */
 }
+
 bool do_key_main(char k)
 {
     if (k >= '0' && k <= '9')
@@ -227,6 +230,12 @@ bool do_key_main(char k)
             break;
         case 'd':
             move_player(1, 0);
+            break;
+        case 'c':
+            connect(); 
+            break;
+        case 'e':
+            disconnect();
             break;
     }
     return false;
