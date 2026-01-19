@@ -8,19 +8,19 @@
 
 #include "menu.h"
 #include "../core/alchemist/elements.h"
-#include "../core/tiles.h"
-#include "../core/world.h"
-#include "../client-common/music.h"
-#include "../core/networking.h"
+//#include "../core/tiles.h"
+//#include "../core/world.h"
+//#include "../client-common/music.h"
+//#include "../core/networking.h"
 
 #ifndef DISABLE_NPC
 #include "../client-common/npc.h"
 #endif
 
 #include "../client-common/text.h"
-#include "../client-common/texture.h"
-#include "../client-common/window.h"
-#include "../dialog/d_craft.h"
+//#include "../client-common/texture.h"
+//#include "../client-common/window.h"
+//#include "../dialog/d_craft.h"
 #include "../client-common/player_actions.h"
 
 extern int active_hotbar;
@@ -276,15 +276,16 @@ void create_menus()
     menu_help->add("1-9,0 - hotbar", MENU_CANCEL);
     menu_help->add("enter - use item", MENU_CANCEL);
     menu_help->add("q - drop item", MENU_CANCEL);
+    menu_help->add("e - pickup item", MENU_CANCEL);
     menu_help->add("` - previous item", MENU_CANCEL);
     menu_help->add("tab - next item", MENU_CANCEL);
     menu_help->add("= - select hotbar", MENU_CANCEL);
     menu_help->add("minus - deselect hotbar", MENU_CANCEL);
     menu_help->add("shift/control - sneak/run", MENU_CANCEL);
-    menu_help->add("arrows - move", MENU_CANCEL);
+    menu_help->add("wasd/arrows - move", MENU_CANCEL);
     menu_help->add("n - NPC", MENU_NPC);
     menu_help->add("c - Craft", MENU_CRAFT);
-    menu_help->add("a - Action", MENU_ACTION);
+    menu_help->add("z - Action", MENU_ACTION);
     menu_help->add("i - inventory", MENU_INVENTORY);
     menu_help->add("k - knowledge", MENU_KNOWLEDGE);
 

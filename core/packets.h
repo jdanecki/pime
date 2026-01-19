@@ -119,6 +119,7 @@ class PacketObjectDestroy : public Packet
         ItemLocation location;
     } data, *pdata __attribute__((packed));
     InventoryElement * el_to_remove;
+
   public:
     unsigned long get_id()
     {
@@ -128,12 +129,12 @@ class PacketObjectDestroy : public Packet
     {
         return pdata->location;
     }
-    PacketObjectDestroy(InventoryElement *el) : Packet(PACKET_OBJECT_DESTROY)
+    PacketObjectDestroy(InventoryElement * el) : Packet(PACKET_OBJECT_DESTROY)
     {
         data.t = t;
         data.id = el->get_uid();
         data.location = el->location;
-        el_to_remove=el;
+        el_to_remove = el;
     }
     PacketObjectDestroy() : Packet(PACKET_OBJECT_DESTROY)
     {
@@ -150,10 +151,9 @@ class PacketObjectDestroy : public Packet
     int send(ENetPeer * peer)
     {
         // FIXME send as broadcast
-        int ret=send_data(peer, &data, sizeof(struct serial_data));
+        int ret = send_data(peer, &data, sizeof(struct serial_data));
         delete el_to_remove;
         return ret;
-
     }
     bool check_size(int s)
     {
@@ -213,7 +213,7 @@ class PacketElementsList : public Packet
     void copy_base_list_element(ListElement * el, serial_data * pdata, int i)
     {
         BaseListElement * base_el = static_cast<BaseListElement *>(el);
-        Base * base=static_cast<Base*>(base_el->get_el());
+        Base * base = static_cast<Base *>(base_el->get_el());
         base->copy_data(&pdata->data[0], i);
     }
 
@@ -344,7 +344,7 @@ class PacketObjectCreate : public Packet
         /*      for (int i=0; i<100; i++)
                    CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
         */
-        //CONSOLE_LOG("PacketObjectCreate for objectData::Tag=%d size=%ld\n", (int)obj->tag, obj->size);
+        // CONSOLE_LOG("PacketObjectCreate for objectData::Tag=%d size=%ld\n", (int)obj->tag, obj->size);
         switch (obj->tag)
         {
             case ObjectData::Tag::Element:
@@ -484,6 +484,7 @@ class PacketChunkUpdate : public Packet
         chunk_table table;
     } data, *pdata __attribute__((packed));
     chunk_table * ptable;
+
   public:
     unsigned char get_x()
     {
@@ -502,11 +503,12 @@ class PacketChunkUpdate : public Packet
         data.t = t;
         data.x = x;
         data.y = y;
-        chunk_valid=false;
-        if (world_table[y][x]) {
+        chunk_valid = false;
+        if (world_table[y][x])
+        {
             memcpy(&data.table, &world_table[y][x]->table, sizeof(chunk_table));
-            chunk_valid=true;
-        } 
+            chunk_valid = true;
+        }
         else
             CONSOLE_LOG("PacketChunkUpdate: requested not loaded chunk x=%d y=%d\n", x, y);
     }
@@ -516,7 +518,7 @@ class PacketChunkUpdate : public Packet
     int send(ENetPeer * peer)
     {
         int ret;
-        if (chunk_valid) 
+        if (chunk_valid)
         {
             ret = send_data(peer, &data, sizeof(struct serial_data));
 
@@ -532,10 +534,10 @@ class PacketChunkUpdate : public Packet
                 el = el->next;
             }
             return ret;
-        } 
-        else 
+        }
+        else
         {
-            Packet *p = new PacketActionFailed();
+            Packet * p = new PacketActionFailed();
             ret = p->send(peer);
             delete p;
             return ret;
@@ -1185,7 +1187,6 @@ class PacketCheckedUpdate : public Packet
         return s == sizeof(struct serial_data);
     }
 };
-
 
 Packet * check_packet(char dir, unsigned char * data, size_t s);
 

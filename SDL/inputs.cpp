@@ -6,6 +6,10 @@
 #include <SDL2/SDL_timer.h>
 
 #include "../client-common/inputs.h"
+#include "../core/key_handler.h"
+#include "../menu/menu.h"
+#include "../dialog/d_craft.h"
+#include "playerUI.h"
 
 KeyHandler menu_key_handlers[] = {
     {SDLK_ESCAPE, menu_handle_escape, true},
@@ -16,13 +20,14 @@ KeyHandler menu_key_handlers[] = {
 
 KeyHandler key_handlers[] = {
     {SDLK_F1, handle_f1, true},
-    {SDLK_F2, handle_f2, true},
-    {SDLK_F3, handle_f3, true},
-    {SDLK_F4, handle_f4, true},
-    {SDLK_F5, handle_f5, true},
-    {SDLK_F6, handle_f6, true},
-    {SDLK_F7, handle_f7, true},
-    {SDLK_RETURN, handle_enter, true},
+    {SDLK_F2, handle_show_item, true},
+    {SDLK_F3, handle_show_chunk, true},
+    {SDLK_F4, handle_show_chunk_server, true},
+    {SDLK_F5, handle_trace_network, true},
+    {SDLK_F6, handle_trace_network_server, true},
+    {SDLK_F7, handle_auto_explore, true},
+    {SDLK_RETURN, handle_use_tile, true},
+    {SDLK_e, handle_pickup_item, true},
     {SDLK_1, handle_hotbar_0, true},
     {SDLK_2, handle_hotbar_1, true},
     {SDLK_3, handle_hotbar_2, true},
@@ -33,17 +38,17 @@ KeyHandler key_handlers[] = {
     {SDLK_8, handle_hotbar_7, true},
     {SDLK_9, handle_hotbar_8, true},
     {SDLK_0, handle_hotbar_9, true},
-    {SDLK_c, handle_c, true},
-    {SDLK_i, handle_i, true},
+    {SDLK_c, handle_craft_show, true},
+    {SDLK_i, handle_inventory, true},
 #ifndef DISABLE_NPC
-    {SDLK_n, handle_n, true},
+    {SDLK_n, handle_menu_npc, true},
 #endif
-    {SDLK_q, put_element, true},
+    {SDLK_q, handle_put_item, true},
 
     {SDLK_BACKQUOTE, handle_prev_hotbar, false},
     {SDLK_TAB, handle_next_hotbar, false},
-    {SDLK_MINUS, handle_minus, true},
-    {SDLK_EQUALS, handle_equal, true},    
+    {SDLK_MINUS, handle_craftbar_prev, true},
+    {SDLK_EQUALS, handle_craftbar_next, true},
     {SDLK_ESCAPE, handle_escape, true},
 };
 
@@ -110,23 +115,23 @@ Uint64 handle_keyboard_state(const Uint8 * keys)
 
     if ((!current_menu) && ((current_time - last_time > time_period) || !(last_frame_press)))
     {
-        if (keys[SDL_SCANCODE_DOWN])
+        if (keys[SDL_SCANCODE_DOWN] || keys[SDL_SCANCODE_S])
         {
             send_packet_move(0, 1);
             last_frame_press = 1;
         }
-        else if (keys[SDL_SCANCODE_UP])
+        else if (keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_W])
         {
             send_packet_move(0, -1);
             last_frame_press = 1;
         }
-        if (keys[SDL_SCANCODE_RIGHT])
+        if (keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D])
         {
             player->going_right = 1;
             send_packet_move(1, 0);
             last_frame_press = 1;
         }
-        else if (keys[SDL_SCANCODE_LEFT])
+        else if (keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A])
         {
             player->going_right = 0;
             send_packet_move(-1, 0);
@@ -137,7 +142,8 @@ Uint64 handle_keyboard_state(const Uint8 * keys)
             return SDL_GetTicks64();
         }
     }
-    if (keys[SDL_SCANCODE_DOWN] || keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_LEFT])
+    if (keys[SDL_SCANCODE_DOWN] || keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_D] ||
+        keys[SDL_SCANCODE_A])
     {
         last_frame_press = 1;
         return 0;

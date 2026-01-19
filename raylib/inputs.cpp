@@ -1,6 +1,11 @@
 #include <raylib.h>
 
+#include "../core/key_handler.h"
 #include "../client-common/inputs.h"
+//#include "../client-common/player_actions.h"
+#include "../menu/menu.h"
+#include "../dialog/d_craft.h"
+#include "playerUI.h"
 
 KeyHandler menu_key_handlers[] = {
     {KEY_ESCAPE, menu_handle_escape, true},
@@ -11,13 +16,14 @@ KeyHandler menu_key_handlers[] = {
 
 KeyHandler key_handlers[] = {
     {KEY_F1, handle_f1, true},
-    {KEY_F2, handle_f2, true},
-    {KEY_F3, handle_f3, true},
-    {KEY_F4, handle_f4, true},
-    {KEY_F5, handle_f5, true},
-    {KEY_F6, handle_f6, true},
-    {KEY_F7, handle_f7, true},
-    {KEY_ENTER, handle_enter, true},
+    {KEY_F2, handle_show_item, true},
+    {KEY_F3, handle_show_chunk, true},
+    {KEY_F4, handle_show_chunk_server, true},
+    {KEY_F5, handle_trace_network, true},
+    {KEY_F6, handle_trace_network_server, true},
+    {KEY_F7, handle_auto_explore, true},
+    {KEY_ENTER, handle_use_tile, true},
+    {KEY_E, handle_pickup_item, true},
     {KEY_ONE, handle_hotbar_0, true},
     {KEY_TWO, handle_hotbar_1, true},
     {KEY_THREE, handle_hotbar_2, true},
@@ -28,17 +34,17 @@ KeyHandler key_handlers[] = {
     {KEY_EIGHT, handle_hotbar_7, true},
     {KEY_NINE, handle_hotbar_8, true},
     {KEY_ZERO, handle_hotbar_9, true},
-    {KEY_C, handle_c, true},
-    {KEY_I, handle_i, true},
+    {KEY_C, handle_craft_show, true},
+    {KEY_I, handle_inventory, true},
 #ifndef DISABLE_NPC
-    {KEY_N, handle_n, true},
+    {KEY_N, handle_menu_npc, true},
 #endif
-    {KEY_Q, put_element, true},
+    {KEY_Q, handle_put_item, true},
 
     {KEY_GRAVE, handle_prev_hotbar, false},
     {KEY_TAB, handle_next_hotbar, false},
-    {KEY_MINUS, handle_minus, true},
-    {KEY_EQUAL, handle_equal, true},
+    {KEY_MINUS, handle_craftbar_prev, true},
+    {KEY_EQUAL, handle_craftbar_next, true},
     {KEY_ESCAPE, handle_escape, true},
     {KEY_LEFT_CONTROL, handle_left_control, true},
     {KEY_LEFT_SHIFT, handle_left_shift, true},
@@ -140,23 +146,23 @@ bool handle_events()
     {
         if (last_move > time_period)
         {
-            if (IsKeyDown(KEY_DOWN))
+            if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
             {
                 send_packet_move(0, 1);
                 last_move = 0;
             }
-            if (IsKeyDown(KEY_UP))
+            if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
             {
                 send_packet_move(0, -1);
                 last_move = 0;
             }
-            if (IsKeyDown(KEY_RIGHT))
+            if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
             {
                 player->going_right = 1;
                 send_packet_move(1, 0);
                 last_move = 0;
             }
-            if (IsKeyDown(KEY_LEFT))
+            if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
             {
                 player->going_right = 0;
                 send_packet_move(-1, 0);

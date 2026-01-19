@@ -1,17 +1,17 @@
 #ifndef INPUTS_H
 #define INPUTS_H
 
-#include <stdio.h>
-#include "../core/tiles.h"
-#include "../core/packet_types.h"
-#include "playerUI.h"
-#include "../dialog/d_craft.h"
+//#include <stdio.h>
+//#include "../core/tiles.h"
+//#include "../core/packet_types.h"
+//#include "playerUI.h"
+//#include "../dialog/d_craft.h"
 #include "../dialog/d_hotbar.h"
-#include "../menu/menu.h"
-#include "player_actions.h"
-#include "window.h"
-#include "net.h"
-#include "../core/key_handler.h"
+//#include "../menu/menu.h"
+//#include "player_actions.h"
+//#include "window.h"
+//#include "net.h"
+//#include "../core/key_handler.h"
 
 extern int active_hotbar;
 extern int auto_explore;
@@ -20,26 +20,25 @@ extern bool finish_program;
 
 bool handle_events();
 
-void handle_enter();
+void handle_use_tile();
+void handle_pickup_item();
+void handle_put_item();
 
-void handle_a();
-void handle_c();
-void handle_i();
-void handle_k();
+void handle_craft_show();
+void handle_inventory();
+void handle_menu_knowledge();
 void handle_escape();
 #ifndef DISABLE_NPC
-void handle_n();
+void handle_menu_npc();
 #endif
 
 void handle_f1();
-void handle_f2();
-void handle_f3();
-void handle_f4();
-void handle_f5();
-void handle_f6();
-void handle_f7();
-void handle_f10();
-void handle_f11();
+void handle_show_item();
+void handle_show_chunk();
+void handle_show_chunk_server();
+void handle_trace_network();
+void handle_trace_network_server();
+void handle_auto_explore();
 
 void handle_hotbar_0();
 void handle_hotbar_1();
@@ -54,8 +53,8 @@ void handle_hotbar_9();
 void handle_prev_hotbar();
 void handle_next_hotbar();
 
-void handle_minus();
-void handle_equal();
+void handle_craftbar_prev();
+void handle_craftbar_next();
 void handle_left_shift();
 void handle_left_control();
 

@@ -102,6 +102,7 @@ void debug_print_help()
     CONSOLE_LOG("1 - create all base elements\n");
     CONSOLE_LOG("2 - create all base plants\n");
     CONSOLE_LOG("3 - create all animals\n");
+    CONSOLE_LOG("ESC - exit\n");
 }
 
 void print_help()
@@ -178,6 +179,7 @@ KeyHandler debug_key_handlers[] = {
     {'1', create_all_base_elements},
     {'2', create_all_base_plants},
     {'3', create_all_base_animals},
+    {27, handle_exit},
 };
 
 

@@ -1,7 +1,6 @@
 #ifndef SERVER_PLAYER_H
 #define SERVER_PLAYER_H
 
-#include "../core/player.h"
 #include "../core/npc.h"
 #include "elements_server.h"
 

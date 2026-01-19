@@ -35,7 +35,7 @@ extern void close_graphics();
 extern int init_window(const char * title, int wx, int wy);
 extern void load_textures();
 
-void put_element()
+void put_item()
 {
     InventoryElement * el = player->hotbar[active_hotbar];
     if (el)

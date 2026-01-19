@@ -1,11 +1,11 @@
 #include <sys/ioctl.h>
 #include <termios.h>
-//#include <time.h>
+// #include <time.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
-//#include "../core/time_core.h"
+// #include "../core/time_core.h"
 #include "../client-common/game.h"
 
 extern int trace_network;
@@ -214,7 +214,8 @@ bool do_key_main(char k)
     {
         case 'T':
         {
-            if (player) server_action_tile(SERVER_TRACE_NETWORK, player->location);
+            if (player)
+                server_action_tile(SERVER_TRACE_NETWORK, player->location);
             break;
         }
         case 't':
@@ -250,7 +251,7 @@ bool do_key_main(char k)
         case 'I':
             if (!player)
                 return false;
-            put_element();
+            put_item();
             break;
         case 'w':
             move_player(0, -1);
@@ -265,7 +266,7 @@ bool do_key_main(char k)
             move_player(1, 0);
             break;
         case 'c':
-            init_networking(); 
+            init_networking();
             break;
         case 'e':
             disconnect_user();

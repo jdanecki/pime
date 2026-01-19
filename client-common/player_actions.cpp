@@ -25,8 +25,6 @@ void use_tile()
             send_packet_item_used_on_object(item->uid, object->uid);
             return;
         }
-
-        send_packet_pickup(object->uid);
     }
     else
     {
@@ -35,6 +33,15 @@ void use_tile()
         {
             send_packet_item_used_on_tile(item->uid, player->location);
         }
+    }
+}
+
+void pickup_item()
+{
+    InventoryElement * object = get_item_at(player->location);
+    if (object)
+    {
+        send_packet_pickup(object->uid);
     }
 }
 

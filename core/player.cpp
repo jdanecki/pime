@@ -1,5 +1,5 @@
 #include "clan.h"
-#include "tiles.h"
+//#include "tiles.h"
 #include "player.h"
 #include <string.h>
 
