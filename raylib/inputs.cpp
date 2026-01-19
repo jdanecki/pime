@@ -143,24 +143,24 @@ bool handle_events()
         {
             if (IsKeyDown(KEY_DOWN))
             {
-                send_packet_move(client, 0, 1);
+                send_packet_move(0, 1);
                 last_move = 0;
             }
             if (IsKeyDown(KEY_UP))
             {
-                send_packet_move(client, 0, -1);
+                send_packet_move(0, -1);
                 last_move = 0;
             }
             if (IsKeyDown(KEY_RIGHT))
             {
                 player->going_right = 1;
-                send_packet_move(client, 1, 0);
+                send_packet_move(1, 0);
                 last_move = 0;
             }
             if (IsKeyDown(KEY_LEFT))
             {
                 player->going_right = 0;
-                send_packet_move(client, -1, 0);
+                send_packet_move(-1, 0);
                 last_move = 0;
             }
         }

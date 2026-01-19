@@ -1,11 +1,11 @@
 #include <sys/ioctl.h>
 #include <termios.h>
-#include <time.h>
+//#include <time.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
-#include "../core/time_core.h"
+//#include "../core/time_core.h"
 #include "../client-common/game.h"
 
 extern int trace_network;
@@ -97,6 +97,8 @@ bool do_key_question_mark(char k)
     switch (k)
     {
         case 'b':
+            if (!player)
+                return false;
             for (int i = 0; i < 10; i++)
             {
                 if (player->hotbar[i])
@@ -110,13 +112,19 @@ bool do_key_question_mark(char k)
             base_elements.show(true);
             break;
         case 'c':
+            if (!player)
+                return false;
             show_chunk(player->location);
             break;
         case 'C':
+            if (!player)
+                return false;
             server_action_tile(SERVER_SHOW_CHUNK, player->location);
             break;
         case 'e':
         {
+            if (!player)
+                return false;
             InventoryElement * el = get_item_at_ppos(player);
             if (el)
                 el->show(true);
@@ -125,18 +133,24 @@ bool do_key_question_mark(char k)
             break;
         }
         case 'E':
+            if (!player)
+                return false;
             server_action_tile(SERVER_SHOW_ITEM, player->location);
             break;
         case 'h':
             help_question_mark();
             break;
         case 'i':
+            if (!player)
+                return false;
             player->inventory.show();
             break;
         case 'r':
             submenu = 0;
             break;
         case 'p':
+            if (!player)
+                return false;
             player->show();
             break;
         case 'P':
@@ -157,15 +171,23 @@ bool do_key_question_mark(char k)
 
 void move_player(int dx, int dy)
 {
-    send_packet_move(client, dx, dy);
+    send_packet_move(dx, dy);
     /*InventoryElement * el = get_item_at_ppos(player);
     if (el)
         printf("\nthere is something here: %s\n", el->get_class_name());
 */
 }
 
-bool do_key_main(char k)
+void disconnect_user()
 {
+    disconnect();
+    player = nullptr;
+}
+
+bool check_hotbar(char k)
+{
+    if (!player)
+        return false;
     if (k >= '0' && k <= '9')
     {
         active_hotbar = k - '1';
@@ -179,13 +201,20 @@ bool do_key_main(char k)
         }
         else
             printf("selected %d slot\n", active_hotbar);
-        return false;
+        return true;
     }
+    return false;
+}
+
+bool do_key_main(char k)
+{
+    if (check_hotbar(k))
+        return false;
     switch (k)
     {
         case 'T':
         {
-            server_action_tile(SERVER_TRACE_NETWORK, player->location);
+            if (player) server_action_tile(SERVER_TRACE_NETWORK, player->location);
             break;
         }
         case 't':
@@ -205,9 +234,11 @@ bool do_key_main(char k)
 
         case 'i':
         {
+            if (!player)
+                return false;
             InventoryElement * el = get_item_at_ppos(player);
             if (el)
-                send_packet_pickup(client, el->uid);
+                send_packet_pickup(el->uid);
             else
                 printf("nothing to pickup\n");
             break;
@@ -217,6 +248,8 @@ bool do_key_main(char k)
             break;
 
         case 'I':
+            if (!player)
+                return false;
             put_element();
             break;
         case 'w':
@@ -232,10 +265,10 @@ bool do_key_main(char k)
             move_player(1, 0);
             break;
         case 'c':
-            connect(); 
+            init_networking(); 
             break;
         case 'e':
-            disconnect();
+            disconnect_user();
             break;
     }
     return false;
@@ -274,6 +307,8 @@ void clear_window()
 }
 void draw()
 {
+    if (!player)
+        return;
     printf("\r%s%ld@[%d,%d][%d,%d] %c: ", player->get_name(), player->get_id(), player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y,
         submenu ? submenu : '#');
     for (int y = -1; y < 2; y++)

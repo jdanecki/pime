@@ -1186,14 +1186,6 @@ class PacketCheckedUpdate : public Packet
     }
 };
 
-class PacketDisconnect : public Packet
-{
-  public:
-    PacketDisconnect() : Packet(PACKET_DISCONNECT)
-    {
-    }
-};
-
 
 Packet * check_packet(char dir, unsigned char * data, size_t s);
 

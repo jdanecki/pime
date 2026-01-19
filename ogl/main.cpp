@@ -177,7 +177,7 @@ chunk * check_chunk(int cx, int cy)
     {
         if (loaded_chunks[cy][cx] == CHUNK_NOT_LOADED)
         {
-            send_packet_request_chunk(client, cx, cy);
+            send_packet_request_chunk(cx, cy);
             loaded_chunks[cy][cx] = CHUNK_LOADING;
             return nullptr;
         }
@@ -198,14 +198,23 @@ int main(void)
 {
     SDL_Init(SDL_INIT_VIDEO);
     // client = init("127.0.0.1", "1234");
-    client = init("192.168.0.45", "1234");
+    port = "1234";
+    ip = "127.0.0.1";
+
+    if (init_networking()) {
+        CONSOLE_LOG("Problem with server connection\n");
+        return 1;
+    }
     for (int i = 0; i < WORLD_SIZE; i++)
         for (int j = 0; j < WORLD_SIZE; j++)
             world_table[i][j] = NULL;
 
     SDL_Window * win = SDL_CreateWindow("SDL3 OPENGL", 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (!win)
+    {
+        CONSOLE_LOG("Problem with SDL window creation\n");
         return 2;
+    }
 
     SDL_GL_LoadLibrary(NULL);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -225,7 +234,7 @@ int main(void)
     if (dir == NULL)
     {
         perror("Can't open textures directory'");
-        exit(0);
+        return 4;
     }
     closedir(dir);
 
@@ -267,8 +276,8 @@ int main(void)
     glBufferData = (PFNGLBUFFERDATAPROC)SDL_GL_GetProcAddress("glBufferData");
     if (!glBindBuffer || !glGenBuffers || !glBufferData)
     {
-        printf("Failed to load OpenGL functions!\n");
-        return -1;
+        CONSOLE_LOG("Failed to load OpenGL functions!\n");
+        return 5;
     }
     Vertex * all_vertices = (Vertex *)malloc(100 * 100 * 36 * sizeof(Vertex)); // All cubes at once
     int idx = 0;
@@ -285,7 +294,7 @@ int main(void)
 
     while (running)
     {
-        network_tick(client);
+        network_tick();
         while (SDL_PollEvent(&e))
         {
             if (e.type == SDL_EVENT_MOUSE_MOTION)
@@ -369,7 +378,7 @@ int main(void)
             int camzlt = std::round(cam_z_lt);
             if (camx != camxlt or camz != camzlt)
             {
-                send_packet_move(client, camx - camxlt, -(camz - camzlt));
+                send_packet_move(camx - camxlt, -(camz - camzlt));
             }
         }
         int w, h;

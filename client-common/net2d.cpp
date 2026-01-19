@@ -1,8 +1,9 @@
 #include "net.h"
+#include "playerUI.h"
 #include "players.h"
 #include <cstring>
 
- extern void update_hotbar();
+extern void update_hotbar();
 extern void print_status(int i, const char * format, ...);
 
 void knowledge_update(size_t pl_id, Class_id cid, int id)
@@ -21,19 +22,23 @@ void got_id(size_t id, int64_t seed)
 {
     my_id = id;
 
-    player = (PlayerUI *)calloc(sizeof(PlayerUI), 1);
-    player->location.chunk.map_x = 128;
-    player->location.chunk.map_y = 128;
-    player->location.chunk.x = 8;
-    player->location.chunk.y = 8;
-    player->name=SerializableCString("player");
+    ItemLocation loc;
+    loc.tag = ItemLocation::Tag::Chunk;
+    loc.chunk.map_x = 128;
+    loc.chunk.map_y = 128;
+    loc.chunk.x = 8;
+    loc.chunk.y = 8;
+
+    Player p(id, SerializableCString("player"), loc, 0, 0, 0);
+    player = new PlayerUI(p);
     CONSOLE_LOG("seed: %ld\n", seed);
     srand(seed);
     init_sentences();
     init_questions();
     init_answers();
     CONSOLE_LOG("got id %ld\n", id);
-    print_status(1, "player %ld connected", id);
+
+    print_status(1, "player id=%ld %s connected", id, player->get_name());
 }
 
 void checked_update(size_t pl_id, size_t el)
@@ -48,10 +53,9 @@ void checked_update(size_t pl_id, size_t el)
     p->set_checked(el);
 }
 
-
 InventoryElement * remove_from_location(ItemLocation location, NetworkObject id)
 {
-    InventoryElement * el = (InventoryElement*)get_object_by_id(id);
+    InventoryElement * el = (InventoryElement *)get_object_by_id(id);
     if (!el)
         return nullptr;
     switch (location.tag)
@@ -77,7 +81,7 @@ InventoryElement * remove_from_location(ItemLocation location, NetworkObject id)
 
 void destroy_object(NetworkObject id, ItemLocation location)
 {
-    InventoryElement * el = (InventoryElement*)get_object_by_id(id);
+    InventoryElement * el = (InventoryElement *)get_object_by_id(id);
     if (el)
     {
         InventoryElement * removed = remove_from_location(location, id);
@@ -85,7 +89,7 @@ void destroy_object(NetworkObject id, ItemLocation location)
         {
             abort();
         }
-       CONSOLE_LOG("Client: destroy_object %ld", id.uid);
+        CONSOLE_LOG("Client: destroy_object %ld", id.uid);
         deregister_object(el);
         delete el;
     }
@@ -100,10 +104,10 @@ void update_item_location(LocationUpdateData data)
     ItemLocation & old_loc = data.old;
     ItemLocation & new_loc = data.new_;
 
-/*    CONSOLE_LOG("update item location uid=%lx old_tag=%d new_tag=%d\n", id.uid, (int)old_loc.tag, (int)new_loc.tag);
-    old_loc.show();
-    new_loc.show();
-*/
+    /*    CONSOLE_LOG("update item location uid=%lx old_tag=%d new_tag=%d\n", id.uid, (int)old_loc.tag, (int)new_loc.tag);
+        old_loc.show();
+        new_loc.show();
+    */
     InventoryElement * el = remove_from_location(old_loc, id);
     if (!el)
     { // FIXME
@@ -113,10 +117,8 @@ void update_item_location(LocationUpdateData data)
         //      old_loc.chunk.x, old_loc.chunk.y,
         //      new_loc.chunk.map_x, new_loc.chunk.map_y,
         //      new_loc.chunk.x, new_loc.chunk.y);
-        if (new_loc.tag == ItemLocation::Tag::Chunk
-            && new_loc.chunk.map_x == player->location.chunk.map_x
-            && new_loc.chunk.map_y == player->location.chunk.map_y)
-            send_packet_request_item(client, id.uid);
+        if (new_loc.tag == ItemLocation::Tag::Chunk && new_loc.chunk.map_x == player->location.chunk.map_x && new_loc.chunk.map_y == player->location.chunk.map_y)
+            send_packet_request_item(id.uid);
 
         return;
     }
@@ -134,8 +136,9 @@ void update_item_location(LocationUpdateData data)
 
             if (el->get_cid() == Class_Player)
             {
-//                printf("my_id=%lx id=%lx\n", my_id, el->get_id());
-                if (my_id == el->get_id()) {
+                //                printf("my_id=%lx id=%lx\n", my_id, el->get_id());
+                if (my_id == el->get_id())
+                {
                     print_status(0, " ");
                     print_status(1, " ");
                 }
@@ -147,7 +150,7 @@ void update_item_location(LocationUpdateData data)
             old_l.chunk.y = old_loc.chunk.y;
             new_l.chunk.x = new_loc.chunk.x;
             new_l.chunk.y = new_loc.chunk.y;*/
-            //el->update_item_location(old_l, new_l);
+            // el->update_item_location(old_l, new_l);
             el->update_item_location(old_loc, new_loc);
             add_object_to_world(el, new_loc);
             break;
@@ -175,7 +178,7 @@ chunk * check_chunk(int cx, int cy)
     {
         if (loaded_chunks[cy][cx] == CHUNK_NOT_LOADED)
         {
-            send_packet_request_chunk(client, cx, cy);
+            send_packet_request_chunk(cx, cy);
             loaded_chunks[cy][cx] = CHUNK_LOADING;
             return nullptr;
         }
@@ -217,11 +220,11 @@ void update_object(const ObjectData * data)
     Class_id c_id = data->inv_element.data.c_id;
 
     InventoryElement * el = get_object_by_id(data->inv_element.data);
-    //FIXME why we get el=NULL? -> change this to get_object_by_uid
-    //  CONSOLE_LOG("update_object: el=%p chunk[%d,%d]\n", el, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
+    // FIXME why we get el=NULL? -> change this to get_object_by_uid
+    //   CONSOLE_LOG("update_object: el=%p chunk[%d,%d]\n", el, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
     if (el)
     {
-       // CONSOLE_LOG("update_object: el->cid=%x c_id=%x\n", el->c_id, c_id);
+        // CONSOLE_LOG("update_object: el->cid=%x c_id=%x\n", el->c_id, c_id);
     }
     if (el && el->c_id == c_id)
     {
@@ -263,9 +266,9 @@ void update_object(const ObjectData * data)
             case Class_Player:
             {
                 Player * player = dynamic_cast<Player *>(el);
-//                CONSOLE_LOG("update_object: player=%s inv.elements=%d\n", player->get_name(), player->inventory.nr_elements);
+                //                CONSOLE_LOG("update_object: player=%s inv.elements=%d\n", player->get_name(), player->inventory.nr_elements);
                 *player = data->player.data;
-  //              CONSOLE_LOG("update_object: -> update: inv.elements=%d\n", player->inventory.nr_elements);
+                //              CONSOLE_LOG("update_object: -> update: inv.elements=%d\n", player->inventory.nr_elements);
                 break;
             }
             default:
@@ -290,7 +293,7 @@ void create_object(const ObjectData * data)
         register_object(object);
         if (object->c_id != Class_Clan)
         {
-            InventoryElement* el = (InventoryElement*)object;
+            InventoryElement * el = (InventoryElement *)object;
             add_object_to_world(el, el->location);
         }
     }
@@ -311,4 +314,3 @@ void action_failed()
     CONSOLE_LOG("action FAILED\n");
     print_status(1, "action failed");
 }
-

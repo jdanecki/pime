@@ -24,7 +24,6 @@
 #include "../client-common/player_actions.h"
 
 extern int active_hotbar;
-extern NetClient * client;
 extern bool finish_program;
 
 // Menu * menu_music;
@@ -371,7 +370,7 @@ Menu * create_inv_form(enum Form f)
         // menu_inventory_categories2->add(base_elements[i]->name, MENU_CATEGORIES, items_textures[i], menu_index, i);
         //        menu_index++;
         // fixme group elements with the same base id
-        menu_inventory_elements_form->add("*", MENU_ITEMS_GROUP, static_cast<InventoryElement*>(elements_with_form[i]));
+        menu_inventory_elements_form->add("*", MENU_ITEMS_GROUP, static_cast<InventoryElement *>(elements_with_form[i]));
     }
     return menu_inventory_elements_form;
 }
@@ -393,7 +392,7 @@ Menu * create_inv_category_classes(enum Class_id c)
     menu_inventory_class = new Menu(menu_name);
     for (int i = 0; i < count; i++)
     {
-        menu_inventory_class->add("*", MENU_CLASSES, static_cast<InventoryElement*>(elements_with_class[i]));
+        menu_inventory_class->add("*", MENU_CLASSES, static_cast<InventoryElement *>(elements_with_class[i]));
     }
     return menu_inventory_class;
 }
@@ -453,7 +452,7 @@ void create_inv_menu(int id)
         for (int i = 0; i < c; i++)
         {
             CONSOLE_LOG("%s\n", el[i]->get_name());
-            menu_inventory->add("->", (menu_actions)(MENU_ITEM + i), static_cast<InventoryElement*>(el[i]));
+            menu_inventory->add("->", (menu_actions)(MENU_ITEM + i), static_cast<InventoryElement *>(el[i]));
         }
         free(el);
         current_menu = menu_inventory;
@@ -555,7 +554,7 @@ int Menu::interact()
     {
         case MENU_ITEMS_GROUP:
         { // get base id
-           //  create_inv_menu((Item_id)(menu_inventory_elements_form->get_val()));
+          //  create_inv_menu((Item_id)(menu_inventory_elements_form->get_val()));
             return 0;
         }
             /*

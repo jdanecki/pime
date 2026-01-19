@@ -44,6 +44,7 @@ void generate()
 
 int main()
 {
+    int ret = 0;
     ncurses_init();
     print_status(0, "pime_enet, press F1 for help\n");
     CONSOLE_LOG("Copyright (C) 2025 Piotr Danecki <i3riced@mailfence.com>\n");
@@ -54,8 +55,10 @@ int main()
     //   trace_network = 1;
 
     srand(0);
-    if (!init_networking())
-        return 1;
+    if (!init_networking()) {        
+        ret = 1;
+        goto end_server;
+    }
 
     generate();
     create_players();
@@ -69,10 +72,13 @@ int main()
             break;
         handle_net_event(&event);
     }
+    enet_host_destroy(server);
+
+end_server:
     delwin(in_w);
     delwin(out_w);
     endwin();
-
-    enet_host_destroy(server);
-    return 0;
+    if (ret)
+        fprintf(stderr, "Error: %d\n", ret);
+    return ret;
 }

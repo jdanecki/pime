@@ -11,6 +11,10 @@ int players_id;
 
 ElementsList *packets_to_send, *packets_to_send1;
 
+char hostname[512] = {
+    0,
+};
+
 Networked::Networked()
 {
     notify_create((InventoryElement *)this);
@@ -52,10 +56,15 @@ class PacketToSend : public ListElement
     }
 };
 
+void disconnect_player(ENetPeer * peer)
+{
+    
+}
+
 bool handle_packet(ENetPacket * packet, ENetPeer * peer)
 {
     unsigned char * data = packet->data;
-    // CONSOLE_LOG("Received length=%lu: %d\n", packet->dataLength, *data);
+    //CONSOLE_LOG("Received length=%lu: %d\n", packet->dataLength, *data);
 
     Packet * p = check_packet('R', data, packet->dataLength);
     if (!p)
@@ -68,6 +77,11 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
     if (players->nr_elements)
         pl = (PlayerClient *)players->find(&peer_id);
 
+    if (!pl && p->get_type() != PACKET_JOIN_REQUEST)
+    {
+        CONSOLE_LOG("player not found\n");
+        return false;
+    }
     switch (p->get_type())
     {
         case PACKET_JOIN_REQUEST:
@@ -272,12 +286,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
                 delete p;
             }
             break;
-        }
-        case PACKET_DISCONNECT:
-        {
-            CONSOLE_LOG("player uid=%d sent disconnect\n", pl->player->uid);
-            delete p;
-        } 
+        }         
     }
     return true;
 }
@@ -372,6 +381,7 @@ void notify_checked(size_t pl_id, size_t el)
     add_packet_to_send(new PacketCheckedUpdate(pl_id, el));
 }
 
+
 bool init_networking()
 {
     if (enet_initialize() != 0)
@@ -400,9 +410,6 @@ bool init_networking()
     return true;
 }
 
-char hostname[512] = {
-    0,
-};
 
 void handle_net_event(ENetEvent * event)
 {
@@ -422,6 +429,7 @@ void handle_net_event(ENetEvent * event)
         }
         case ENET_EVENT_TYPE_RECEIVE:
         {
+            CONSOLE_LOG("received packet from %s:%d\n", hostname, event->peer->address.port);
             handle_packet(event->packet, event->peer);
             enet_packet_destroy(event->packet);
             send_updates();
@@ -434,7 +442,6 @@ void handle_net_event(ENetEvent * event)
             peer_id.peer = event->peer;
             PlayerClient * pl = (PlayerClient *)players->find(&peer_id);
             enet_address_get_host_ip(&event->peer->address, hostname, 512);
-
             CONSOLE_LOG("player: %s from %s:%d disconnected\n", pl->player->get_name(), hostname, event->peer->address.port);
             destroy(pl->player);
             players->remove(pl);
@@ -443,7 +450,6 @@ void handle_net_event(ENetEvent * event)
             break;
         }
         default:
-            
             update();
             send_updates();
             break;

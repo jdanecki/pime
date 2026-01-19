@@ -18,9 +18,9 @@ bool show_craft;
 int active_hotbar = 0;
 
 bool handle_events();
-NetClient * client;
 
-void send_packet_craft(NetClient * client, uintptr_t prod_id, uintptr_t ingredients_num, const uintptr_t * iid)
+
+void send_packet_craft(uintptr_t prod_id, uintptr_t ingredients_num, const uintptr_t * iid)
 {
     printf("send_packet_craft prod=%lu num=%ld id=%lu\n", prod_id, ingredients_num, *iid);
 }

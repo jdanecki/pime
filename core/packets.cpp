@@ -157,10 +157,7 @@ Packet * check_packet(char dir, unsigned char * data, size_t s)
             break;
         case PACKET_ELEMENTS_LIST:
             p = new PacketElementsList();
-            break;
-        case PACKET_DISCONNECT:
-            p = new PacketElementsList();
-            break;
+            break;        
     }
     if (!p)
     {

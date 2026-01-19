@@ -7,13 +7,13 @@
 #include "game.h"
 #include "../core/world.h"
 #include "../core/time_core.h"
+#include "net.h"
 
-extern NetClient * client;
 char game_name[30];
 
 bool use_network = true;
 
-extern bool setup(const char * ip, const char * port);
+extern bool setup();
 extern void clear_window();
 extern void draw();
 extern bool handle_events();
@@ -40,7 +40,7 @@ void put_element()
     InventoryElement * el = player->hotbar[active_hotbar];
     if (el)
     {
-        send_packet_drop(client, el->uid);
+        send_packet_drop(el->uid);
         // player->hotbar[active_hotbar] = NULL;
         /*el->set_posittion(player.x, player.y);
         set_item_at_ppos(el, &player);
@@ -56,7 +56,7 @@ void handle_network()
     unsigned int recv = 0;
     if (use_network)
     {
-        recv = network_tick(client);
+        recv = network_tick();
         total_recv += recv;
         unsigned long stop = get_time_usec();
         if (recv > max_recv)
@@ -88,13 +88,13 @@ void do_auto_explore()
         }
     }
     if (dst_map_x > player->location.chunk.map_x)
-        send_packet_move(client, 1, 0);
+        send_packet_move(1, 0);
     if (dst_map_x < player->location.chunk.map_x)
-        send_packet_move(client, -1, 0);
+        send_packet_move(-1, 0);
     if (dst_map_y > player->location.chunk.map_y)
-        send_packet_move(client, 0, 1);
+        send_packet_move(0, 1);
     if (dst_map_y < player->location.chunk.map_y)
-        send_packet_move(client, 0, -1);
+        send_packet_move(0, -1);
 }
 
 void loop()
@@ -133,23 +133,22 @@ int init_graphics()
     return 0;
 }
 
-bool setup(const char * ip, const char * port)
+bool setup()
 {
     setbuf(stdout, nullptr); // fix for qtcreator console
 
     if (init_graphics() != 0)
         return false;
 
-    client = init(ip, port);
-    if (client)
-        return true;
-    else
+    if (!init_networking())
         return false;
+
+    return true;
 }
 
 void start_game(const char * name, int argc, char * argv[])
 {
-    const char * ip;
+
     if (argc < 2)
     {
         CONSOLE_LOG("usage: ./%s <ip> [port]\n", name);
@@ -160,7 +159,6 @@ void start_game(const char * name, int argc, char * argv[])
     {
         ip = argv[1];
     }
-    const char * port;
     if (argc < 3)
     {
         port = "1234";
@@ -170,10 +168,11 @@ void start_game(const char * name, int argc, char * argv[])
         port = argv[2];
     }
     strcpy(game_name, name);
-    if (setup(ip, port))
+    if (setup())
     {
         print_status(0, "Welcome in %s!", name);
         loop();
     }
     close_graphics();
+    disconnect();
 }

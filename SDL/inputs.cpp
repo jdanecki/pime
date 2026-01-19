@@ -113,24 +113,24 @@ Uint64 handle_keyboard_state(const Uint8 * keys)
     {
         if (keys[SDL_SCANCODE_DOWN])
         {
-            send_packet_move(client, 0, 1);
+            send_packet_move(0, 1);
             last_frame_press = 1;
         }
         else if (keys[SDL_SCANCODE_UP])
         {
-            send_packet_move(client, 0, -1);
+            send_packet_move(0, -1);
             last_frame_press = 1;
         }
         if (keys[SDL_SCANCODE_RIGHT])
         {
             player->going_right = 1;
-            send_packet_move(client, 1, 0);
+            send_packet_move(1, 0);
             last_frame_press = 1;
         }
         else if (keys[SDL_SCANCODE_LEFT])
         {
             player->going_right = 0;
-            send_packet_move(client, -1, 0);
+            send_packet_move(-1, 0);
             last_frame_press = 1;
         }
         if (last_frame_press)

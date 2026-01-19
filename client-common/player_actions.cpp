@@ -22,18 +22,18 @@ void use_tile()
         if (Product * item = static_cast<Product *>(player->hotbar[active_hotbar]))
         {
             CONSOLE_LOG("use_tile: using %s on %s uid=%lx\n", item->get_name(), object->get_name(), object->uid);
-            send_packet_item_used_on_object(client, item->uid, object->uid);
+            send_packet_item_used_on_object(item->uid, object->uid);
             return;
         }
 
-        send_packet_pickup(client, object->uid);
+        send_packet_pickup(object->uid);
     }
     else
     {
     player_object:
         if (InventoryElement * item = player->hotbar[active_hotbar])
         {
-            send_packet_item_used_on_tile(client, item->uid, player->location);
+            send_packet_item_used_on_tile(item->uid, player->location);
         }
     }
 }
@@ -48,5 +48,5 @@ void action_tile(Player_action a, ItemLocation loc)
     }
 
     CONSOLE_LOG("action_tile: action %s on %s\n", player_action_name[a], object->get_name());
-    send_packet_action_on_object(client, a, object->uid);
+    send_packet_action_on_object(a, object->uid);
 }

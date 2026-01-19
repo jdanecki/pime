@@ -7,7 +7,9 @@
 ElementsList objects("objects");
 
 NetClient * client;
-
+const char * ip;
+const char * port;
+ENetHost * host;
 extern void print_status(int i, const char * format, ...);
 
 class ObjectElement : public ListElement
@@ -63,7 +65,7 @@ void add_elements(PacketElementsList * list, int i)
     update_hotbar();
 }
 
-void send_packet_request_item(NetClient * client, size_t id)
+void send_packet_request_item(size_t id)
 {
     Packet * p = new PacketRequestItem(id);
     p->send(client->peer);
@@ -169,33 +171,33 @@ bool handle_packet(ENetPacket * packet)
     return ret;
 }
 
-NetClient * init(const char * server_ip, const char * port)
+bool init_networking()
 {
     // trace_network = 1;
 
     if (enet_initialize() != 0)
     {
         fprintf(stderr, "Enet initialization failed\n");
-        return nullptr;
+        return false;
     }
     atexit(enet_deinitialize);
 
-    ENetHost * host = enet_host_create(NULL, 1, 2, 0, 0);
+    host = enet_host_create(NULL, 1, 2, 0, 0);
     if (!host)
     {
         fprintf(stderr, "Can't create client\n");
-        return nullptr;
+        return false;
     }
 
     ENetAddress address;
-    enet_address_set_host(&address, server_ip);
+    enet_address_set_host(&address, ip);
     address.port = atoi(port);
 
     ENetPeer * peer = enet_host_connect(host, &address, 2, 0);
     if (!peer)
     {
         fprintf(stderr, "Can't connect to server\n");
-        return nullptr;
+        return false;
     }
 
     ENetEvent event;
@@ -212,7 +214,7 @@ NetClient * init(const char * server_ip, const char * port)
     {
         enet_peer_reset(peer);
         printf("Can't connect to server\n");
-        return nullptr;
+        return false;
     }
 
     Packet * p = new PacketJoinRequest();
@@ -222,7 +224,8 @@ NetClient * init(const char * server_ip, const char * port)
     {
         handle_packet(event.packet);
         enet_packet_destroy(event.packet);
-        return new NetClient(host, peer);
+        client = new NetClient(host, peer);
+        return true;
     }
     else
     {
@@ -238,22 +241,11 @@ NetClient * init(const char * server_ip, const char * port)
                 break;
             }
         }
-        return nullptr;
+        return false;
     }
 }
 
-void connect()
-{
-
-}
-
-void disconnect()
-{
-    Packet * p = new PacketDisconnect();
-    p->send(client->peer);
-}
-
-unsigned int network_tick(NetClient * client)
+unsigned int network_tick()
 {
     ENetEvent event;
     unsigned int recv = 0;
@@ -301,43 +293,43 @@ Base * get_base(uint32_t c_id, int32_t id)
     // return base.find(&id);
 }
 
-void send_packet_move(NetClient * client, int32_t x, int32_t y)
+void send_packet_move(int32_t x, int32_t y)
 {
     Packet * p = new PacketPlayerMove(x, y);
     p->send(client->peer);
 }
 
-void send_packet_pickup(NetClient * client, uintptr_t id)
+void send_packet_pickup(uintptr_t id)
 {
     Packet * p = new PacketPlayerActionPickup(id);
     p->send(client->peer);
 }
 
-void send_packet_drop(NetClient * client, uintptr_t id)
+void send_packet_drop(uintptr_t id)
 {
     Packet * p = new PacketPlayerActionDrop(id);
     p->send(client->peer);
 }
 
-void send_packet_item_used_on_object(NetClient * client, uintptr_t iid, uintptr_t oid)
+void send_packet_item_used_on_object(uintptr_t iid, uintptr_t oid)
 {
     Packet * p = new PacketPlayerActionUseItemOnObject(iid, oid);
     p->send(client->peer);
 }
 
-void send_packet_action_on_object(NetClient * client, int32_t a, uintptr_t oid)
+void send_packet_action_on_object(int32_t a, uintptr_t oid)
 {
     Packet * p = new PacketPlayerActionOnObject((Player_action)a, oid);
     p->send(client->peer);
 }
 
-void send_packet_server_action_on_object(NetClient * client, int32_t a, uintptr_t oid)
+void send_packet_server_action_on_object(int32_t a, uintptr_t oid)
 {
     Packet * p = new PacketServerActionOnObject((Server_action)a, oid);
     p->send(client->peer);
 }
 
-void send_packet_item_used_on_tile(NetClient * client, uintptr_t iid, ItemLocation location)
+void send_packet_item_used_on_tile(uintptr_t iid, ItemLocation location)
 {
     if (location.tag == ItemLocation::Tag::Chunk)
     {
@@ -346,13 +338,13 @@ void send_packet_item_used_on_tile(NetClient * client, uintptr_t iid, ItemLocati
     }
 }
 
-void send_packet_craft(NetClient * client, uintptr_t prod_id, uintptr_t ingredients_num, const uintptr_t * iid)
+void send_packet_craft(uintptr_t prod_id, uintptr_t ingredients_num, const uintptr_t * iid)
 {
     Packet * p = new PacketPlayerActionCraft(prod_id, ingredients_num, iid);
     p->send(client->peer);
 }
 
-void send_packet_request_chunk(NetClient * client, int32_t cx, int32_t cy)
+void send_packet_request_chunk(int32_t cx, int32_t cy)
 {
     Packet * p = new PacketRequestChunk(cx, cy);
     p->send(client->peer);
@@ -364,7 +356,7 @@ void server_action_tile(Server_action a, ItemLocation loc)
     if (object)
     {
         CONSOLE_LOG("Client: server action %s on %s\n", server_action_name[a], object->get_name());
-        send_packet_server_action_on_object(client, a, object->uid);
+        send_packet_server_action_on_object(a, object->uid);
     }
     else
     {
@@ -373,11 +365,26 @@ void server_action_tile(Server_action a, ItemLocation loc)
             case SERVER_SHOW_CHUNK:
             case SERVER_TRACE_NETWORK:
                 CONSOLE_LOG("Client: server action %s\n", server_action_name[a]);
-                send_packet_server_action_on_object(client, a, 0);
+                send_packet_server_action_on_object(a, 0);
                 break;
             default:
                 CONSOLE_LOG("Client: nothing to show\n");
                 break;
+        }
+    }
+}
+
+void disconnect()
+{
+    ENetEvent event;
+
+    enet_peer_disconnect(client->peer, 0);
+    while (enet_host_service(host, &event, 3000) > 0)
+    {
+        if (event.type == ENET_EVENT_TYPE_DISCONNECT)
+        {
+            CONSOLE_LOG("Disconnected from server\n");
+            break;
         }
     }
 }

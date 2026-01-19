@@ -9,22 +9,17 @@
 
 bool finish_program;
 bool handle_events();
-class NetClient
-{
-};
 
-NetClient * client;
-
-void send_packet_item_used_on_object(NetClient * client, uintptr_t iid, uintptr_t oid)
+void send_packet_item_used_on_object(uintptr_t iid, uintptr_t oid)
 {
 }
-void send_packet_action_on_object(NetClient * client, int32_t a, uintptr_t oid)
+void send_packet_action_on_object(int32_t a, uintptr_t oid)
 {
 }
-void send_packet_pickup(NetClient * client, uintptr_t id)
+void send_packet_pickup(uintptr_t id)
 {
 }
-void send_packet_item_used_on_tile(NetClient * client, uintptr_t iid, ItemLocation location)
+void send_packet_item_used_on_tile(uintptr_t iid, ItemLocation location)
 {
 }
 
