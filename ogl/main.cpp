@@ -201,7 +201,7 @@ int main(void)
     port = "1234";
     ip = "127.0.0.1";
 
-    if (init_networking()) {
+    if (!init_networking()) {
         CONSOLE_LOG("Problem with server connection\n");
         return 1;
     }
@@ -441,5 +441,6 @@ int main(void)
     // SDL_GL_DestroyContext(ctx);
     // SDL_DestroyWindow(win);
     // SDL_Quit();
+    disconnect();
     return 0;
 }

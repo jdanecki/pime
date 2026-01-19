@@ -2,7 +2,7 @@ sdl3_dep = dependency('sdl3', required:true)
 gl_dep = dependency('gl', required:true)
 
 executable(
-  'pime-ogl',
+  'pime_ogl',
   ['main.cpp', '../client-common/net.cpp', 'net.cpp'],
   dependencies: [sdl3_dep, gl_dep, enet_dep],
   link_args: shared_link_args,
