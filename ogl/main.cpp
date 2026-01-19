@@ -34,58 +34,60 @@ typedef struct
     float u, v;       // texture coordinates
 } Vertex;
 
-// Define cube geometry once (36 vertices = 6 faces * 2 triangles * 3 vertices)
 void generate_cube_vertices(Vertex * vertices, float tx, float ty, float tz)
 {
     int idx = 0;
+    const float half = 0.5f; // Half the cube size
 
-    // Top face - y = 1
-    vertices[idx++] = (Vertex){tx - 1, ty + 1, tz + 1, 0, 1, 0, 0, 0};
-    vertices[idx++] = (Vertex){tx + 1, ty + 1, tz + 1, 0, 1, 0, 1, 0};
-    vertices[idx++] = (Vertex){tx + 1, ty + 1, tz - 1, 0, 1, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx + 1, ty + 1, tz - 1, 0, 1, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx - 1, ty + 1, tz - 1, 0, 1, 0, 0, 1};
-    vertices[idx++] = (Vertex){tx - 1, ty + 1, tz + 1, 0, 1, 0, 0, 0};
+    // Top face - y = +half
+    vertices[idx++] = (Vertex){tx - half, ty + half, tz + half, 0, 1, 0, 0, 0};
+    vertices[idx++] = (Vertex){tx + half, ty + half, tz + half, 0, 1, 0, 1, 0};
+    vertices[idx++] = (Vertex){tx + half, ty + half, tz - half, 0, 1, 0, 1, 1};
+    vertices[idx++] = (Vertex){tx + half, ty + half, tz - half, 0, 1, 0, 1, 1};
+    vertices[idx++] = (Vertex){tx - half, ty + half, tz - half, 0, 1, 0, 0, 1};
+    vertices[idx++] = (Vertex){tx - half, ty + half, tz + half, 0, 1, 0, 0, 0};
 
-    // Bottom face - y = -1
-    vertices[idx++] = (Vertex){tx - 1, ty - 1, tz - 1, 0, -1, 0, 0, 0};
-    vertices[idx++] = (Vertex){tx + 1, ty - 1, tz - 1, 0, -1, 0, 1, 0};
-    vertices[idx++] = (Vertex){tx + 1, ty - 1, tz + 1, 0, -1, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx + 1, ty - 1, tz + 1, 0, -1, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx - 1, ty - 1, tz + 1, 0, -1, 0, 0, 1};
-    vertices[idx++] = (Vertex){tx - 1, ty - 1, tz - 1, 0, -1, 0, 0, 0};
+    // Bottom face - y = -half
+    vertices[idx++] = (Vertex){tx - half, ty - half, tz - half, 0, -1, 0, 0, 0};
+    vertices[idx++] = (Vertex){tx + half, ty - half, tz - half, 0, -1, 0, 1, 0};
+    vertices[idx++] = (Vertex){tx + half, ty - half, tz + half, 0, -1, 0, 1, 1};
+    vertices[idx++] = (Vertex){tx + half, ty - half, tz + half, 0, -1, 0, 1, 1};
+    vertices[idx++] = (Vertex){tx - half, ty - half, tz + half, 0, -1, 0, 0, 1};
+    vertices[idx++] = (Vertex){tx - half, ty - half, tz - half, 0, -1, 0, 0, 0};
 
-    // Front face - z = 1
-    vertices[idx++] = (Vertex){tx - 1, ty - 1, tz + 1, 0, 0, 1, 0, 0};
-    vertices[idx++] = (Vertex){tx + 1, ty - 1, tz + 1, 0, 0, 1, 1, 0};
-    vertices[idx++] = (Vertex){tx + 1, ty + 1, tz + 1, 0, 0, 1, 1, 1};
-    vertices[idx++] = (Vertex){tx + 1, ty + 1, tz + 1, 0, 0, 1, 1, 1};
-    vertices[idx++] = (Vertex){tx - 1, ty + 1, tz + 1, 0, 0, 1, 0, 1};
-    vertices[idx++] = (Vertex){tx - 1, ty - 1, tz + 1, 0, 0, 1, 0, 0};
-    // Back face - z = -1
-    vertices[idx++] = (Vertex){tx + 1, ty - 1, tz - 1, 0, 0, -1, 0, 0};
-    vertices[idx++] = (Vertex){tx - 1, ty - 1, tz - 1, 0, 0, -1, 1, 0};
-    vertices[idx++] = (Vertex){tx - 1, ty + 1, tz - 1, 0, 0, -1, 1, 1};
-    vertices[idx++] = (Vertex){tx - 1, ty + 1, tz - 1, 0, 0, -1, 1, 1};
-    vertices[idx++] = (Vertex){tx + 1, ty + 1, tz - 1, 0, 0, -1, 0, 1};
-    vertices[idx++] = (Vertex){tx + 1, ty - 1, tz - 1, 0, 0, -1, 0, 0};
+    // Front face - z = +half
+    vertices[idx++] = (Vertex){tx - half, ty - half, tz + half, 0, 0, 1, 0, 0};
+    vertices[idx++] = (Vertex){tx + half, ty - half, tz + half, 0, 0, 1, 1, 0};
+    vertices[idx++] = (Vertex){tx + half, ty + half, tz + half, 0, 0, 1, 1, 1};
+    vertices[idx++] = (Vertex){tx + half, ty + half, tz + half, 0, 0, 1, 1, 1};
+    vertices[idx++] = (Vertex){tx - half, ty + half, tz + half, 0, 0, 1, 0, 1};
+    vertices[idx++] = (Vertex){tx - half, ty - half, tz + half, 0, 0, 1, 0, 0};
 
-    // Right face - x = 1
-    vertices[idx++] = (Vertex){tx + 1, ty - 1, tz + 1, 1, 0, 0, 0, 0};
-    vertices[idx++] = (Vertex){tx + 1, ty - 1, tz - 1, 1, 0, 0, 1, 0};
-    vertices[idx++] = (Vertex){tx + 1, ty + 1, tz - 1, 1, 0, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx + 1, ty + 1, tz - 1, 1, 0, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx + 1, ty + 1, tz + 1, 1, 0, 0, 0, 1};
-    vertices[idx++] = (Vertex){tx + 1, ty - 1, tz + 1, 1, 0, 0, 0, 0};
+    // Back face - z = -half
+    vertices[idx++] = (Vertex){tx + half, ty - half, tz - half, 0, 0, -1, 0, 0};
+    vertices[idx++] = (Vertex){tx - half, ty - half, tz - half, 0, 0, -1, 1, 0};
+    vertices[idx++] = (Vertex){tx - half, ty + half, tz - half, 0, 0, -1, 1, 1};
+    vertices[idx++] = (Vertex){tx - half, ty + half, tz - half, 0, 0, -1, 1, 1};
+    vertices[idx++] = (Vertex){tx + half, ty + half, tz - half, 0, 0, -1, 0, 1};
+    vertices[idx++] = (Vertex){tx + half, ty - half, tz - half, 0, 0, -1, 0, 0};
 
-    // Left face - x = -1
-    vertices[idx++] = (Vertex){tx - 1, ty - 1, tz - 1, -1, 0, 0, 0, 0};
-    vertices[idx++] = (Vertex){tx - 1, ty - 1, tz + 1, -1, 0, 0, 1, 0};
-    vertices[idx++] = (Vertex){tx - 1, ty + 1, tz + 1, -1, 0, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx - 1, ty + 1, tz + 1, -1, 0, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx - 1, ty + 1, tz - 1, -1, 0, 0, 0, 1};
-    vertices[idx++] = (Vertex){tx - 1, ty - 1, tz - 1, -1, 0, 0, 0, 0};
+    // Right face - x = +half
+    vertices[idx++] = (Vertex){tx + half, ty - half, tz + half, 1, 0, 0, 0, 0};
+    vertices[idx++] = (Vertex){tx + half, ty - half, tz - half, 1, 0, 0, 1, 0};
+    vertices[idx++] = (Vertex){tx + half, ty + half, tz - half, 1, 0, 0, 1, 1};
+    vertices[idx++] = (Vertex){tx + half, ty + half, tz - half, 1, 0, 0, 1, 1};
+    vertices[idx++] = (Vertex){tx + half, ty + half, tz + half, 1, 0, 0, 0, 1};
+    vertices[idx++] = (Vertex){tx + half, ty - half, tz + half, 1, 0, 0, 0, 0};
+
+    // Left face - x = -half
+    vertices[idx++] = (Vertex){tx - half, ty - half, tz - half, -1, 0, 0, 0, 0};
+    vertices[idx++] = (Vertex){tx - half, ty - half, tz + half, -1, 0, 0, 1, 0};
+    vertices[idx++] = (Vertex){tx - half, ty + half, tz + half, -1, 0, 0, 1, 1};
+    vertices[idx++] = (Vertex){tx - half, ty + half, tz + half, -1, 0, 0, 1, 1};
+    vertices[idx++] = (Vertex){tx - half, ty + half, tz - half, -1, 0, 0, 0, 1};
+    vertices[idx++] = (Vertex){tx - half, ty - half, tz - half, -1, 0, 0, 0, 0};
 }
+
 GLuint vbo = 0;
 
 void place_cube(float tx, float ty, float tz, GLuint texture, int r, int g, int b)
@@ -124,8 +126,9 @@ void got_id(unsigned long, long) {};
 
 void get_forward_vector(float yaw, float * x, float * z)
 {
-    *z = cosf(yaw * 3.14 / 180.0);
-    *x = -sinf(yaw * 3.14 / 180.0);
+    float yaw_rad = yaw * M_PI / 180.0f;
+    *x = -sinf(yaw_rad);
+    *z = -cosf(yaw_rad);
 }
 
 GLuint load_texture(const char * filename)
@@ -134,19 +137,6 @@ GLuint load_texture(const char * filename)
     SDL_Surface * surface = SDL_LoadPNG(filename);
     surface = SDL_ConvertSurface(surface, SDL_PIXELFORMAT_RGBA32);
     SDL_FlipSurface(surface, SDL_FLIP_VERTICAL);
-    // for (int i = 0; i < surface->w * surface->h; i++)
-    // {
-    //     unsigned char r, g, b, a;
-    //     SDL_GetRGBA(((Uint32 *)surface->pixels)[i], SDL_GetPixelFormatDetails(surface->format), NULL, &r, &g, &b, &a);
-    //
-    //     // Modify the RGB values (example: invert colors)
-    //     r = 255 - r;
-    //     g = 255 - g;
-    //     b = 255 - b;
-    //
-    //     // Write back the modified pixel
-    //     ((Uint32 *)surface->pixels)[i] = SDL_MapRGBA(SDL_GetPixelFormatDetails(surface->format), NULL, r, g, b, a);
-    // }
 
     unsigned int texture;
 
@@ -197,7 +187,6 @@ chunk * check_chunk(int cx, int cy)
 int main(void)
 {
     SDL_Init(SDL_INIT_VIDEO);
-    // client = init("127.0.0.1", "1234");
     port = "1234";
     ip = "127.0.0.1";
 
@@ -206,6 +195,7 @@ int main(void)
         CONSOLE_LOG("Problem with server connection\n");
         return 1;
     }
+
     for (int i = 0; i < WORLD_SIZE; i++)
         for (int j = 0; j < WORLD_SIZE; j++)
             world_table[i][j] = NULL;
@@ -231,10 +221,9 @@ int main(void)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     DIR * dir = opendir("./textures/game_tiles");
-
     if (dir == NULL)
     {
-        perror("Can't open textures directory'");
+        perror("Can't open textures directory");
         return 4;
     }
     closedir(dir);
@@ -262,11 +251,17 @@ int main(void)
 
     bool running = true;
     SDL_Event e;
-    float cam_x = 8.0f;
-    float cam_x_lt = 8.0f;
+
+    float cam_x = -8.0f;
     float cam_y = 0.0f;
     float cam_z = -8.0f;
-    float cam_z_lt = 8.0f;
+
+    int servx = 0;
+    int servy = 0;
+
+    float cam_x_lt = cam_x;
+    float cam_z_lt = cam_z;
+
     float pitch = 0.0f;
     float yaw = 0.0f;
     glEnable(GL_CULL_FACE);
@@ -280,18 +275,20 @@ int main(void)
         CONSOLE_LOG("Failed to load OpenGL functions!\n");
         return 5;
     }
-    Vertex * all_vertices = (Vertex *)malloc(100 * 100 * 36 * sizeof(Vertex)); // All cubes at once
+
+    Vertex * all_vertices = (Vertex *)malloc(100 * 100 * 36 * sizeof(Vertex));
     int idx = 0;
     for (int i = 0; i < 100; i++)
         for (int j = 0; j < 100; j++)
         {
-            generate_cube_vertices(&all_vertices[idx], j * 2, -4, i * 2);
+            generate_cube_vertices(&all_vertices[idx], j, -4, i);
             idx += 36;
         }
 
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, 100 * 100 * 36 * sizeof(Vertex), all_vertices, GL_STATIC_DRAW);
+    free(all_vertices);
 
     while (running)
     {
@@ -300,8 +297,8 @@ int main(void)
         {
             if (e.type == SDL_EVENT_MOUSE_MOTION)
             {
-                yaw -= e.motion.xrel * 0.5;
-                pitch -= e.motion.yrel * 0.5;
+                yaw -= e.motion.xrel * 0.5f;
+                pitch -= e.motion.yrel * 0.5f;
                 if (pitch > 90)
                     pitch = 90;
                 if (pitch < -90)
@@ -309,12 +306,10 @@ int main(void)
             }
             if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.button == 1)
                 SDL_SetWindowRelativeMouseMode(win, true);
-            if (e.type == SDL_EVENT_QUIT)
+            if (e.type == SDL_EVENT_QUIT || e.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
             {
                 running = false;
             }
-            if (e.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
-                running = false;
             if (e.type == SDL_EVENT_WINDOW_RESIZED)
             {
                 int w = e.window.data1, h = e.window.data2;
@@ -322,24 +317,19 @@ int main(void)
             }
             if (e.type == SDL_EVENT_KEY_DOWN)
             {
-                switch (e.key.scancode)
-                {
-                    case SDL_SCANCODE_ESCAPE:
-                        SDL_SetWindowRelativeMouseMode(win, false);
-                        break;
-                    default:
-                        break;
-                }
+                if (e.key.scancode == SDL_SCANCODE_ESCAPE)
+                    SDL_SetWindowRelativeMouseMode(win, false);
             }
         }
+
         const bool * keyboard_state = SDL_GetKeyboardState(NULL);
-        float speed_multi(0.1);
+        float speed_multi = 0.1f;
         if (keyboard_state[SDL_SCANCODE_LCTRL])
-        {
-            speed_multi = 1;
-        }
+            speed_multi = 1.0f;
+
         cam_x_lt = cam_x;
         cam_z_lt = cam_z;
+
         if (keyboard_state[SDL_SCANCODE_SPACE])
             cam_y += speed_multi;
         if (keyboard_state[SDL_SCANCODE_LSHIFT])
@@ -348,15 +338,15 @@ int main(void)
         {
             float x, z;
             get_forward_vector(yaw, &x, &z);
-            cam_x -= z * speed_multi;
-            cam_z += x * speed_multi;
+            cam_x += z * speed_multi;
+            cam_z -= x * speed_multi;
         }
         if (keyboard_state[SDL_SCANCODE_D])
         {
             float x, z;
             get_forward_vector(yaw, &x, &z);
-            cam_x += z * speed_multi;
-            cam_z -= x * speed_multi;
+            cam_x -= z * speed_multi;
+            cam_z += x * speed_multi;
         }
         if (keyboard_state[SDL_SCANCODE_W])
         {
@@ -372,16 +362,21 @@ int main(void)
             cam_x -= x * speed_multi;
             cam_z -= z * speed_multi;
         }
+
         {
             int camx = std::round(cam_x);
             int camxlt = std::round(cam_x_lt);
             int camz = std::round(cam_z);
             int camzlt = std::round(cam_z_lt);
-            if (camx != camxlt or camz != camzlt)
+            if (camx != camxlt || camz != camzlt)
             {
-                send_packet_move(camx - camxlt, -(camz - camzlt));
+                send_packet_move(camx - camxlt, camz - camzlt);
+                servx += camx - camxlt;
+                servy += camz - camzlt;
+                printf("%f %d %f %d\n", cam_x, servx, cam_z, servy);
             }
         }
+
         int w, h;
         SDL_GetWindowSize(win, &w, &h);
         glViewport(0, 0, w, (h > 0 ? h : 1));
@@ -396,19 +391,12 @@ int main(void)
 
         glRotatef(-pitch, 1.0f, 0.0f, 0.0f);
         glRotatef(-yaw, 0.0f, 1.0f, 0.0f);
-        glTranslatef(-cam_x, -cam_y, cam_z);
-        glScalef(0.5, 0.5, 0.5);
+        glTranslatef(-cam_x, -cam_y, -cam_z);
 
         glEnable(GL_TEXTURE_2D);
-        // for (int i = 0; i < 100; i++)
-        // {
-        //     for (int j = 0; j < 100; j++)
-        //     {
-        //         place_cube(j * 2, i * 2, 0, field_texture);
-        //     }
-        // }
-        glBindTexture(GL_TEXTURE_2D, 1);
 
+        glColor3f(1, 1, 1);
+        glBindTexture(GL_TEXTURE_2D, 1);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
         glEnableClientState(GL_VERTEX_ARRAY);
@@ -422,26 +410,39 @@ int main(void)
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
 
-        //  if (chunk * ch = check_chunk(cam_x / CHUNK_SIZE + 128, cam_z / CHUNK_SIZE + 128))
-        if (chunk * ch = check_chunk(128, 128))
+        // Render chunk tiles
+        int chunk_x = (int)floor(cam_x / CHUNK_SIZE) + 128;
+        int chunk_z = (int)floor(cam_z / CHUNK_SIZE) + 128;
+
+        for (int chi = chunk_x - 5; chi < chunk_x + 5; chi++)
         {
-            for (int i = 0; i < CHUNK_SIZE; i++)
-                for (int j = 0; j < CHUNK_SIZE; j++)
+            for (int chj = chunk_z - 5; chj < chunk_x + 5; chj++)
+            {
+                printf("%d, %d\n", chi, chj);
+                if (chunk * ch = check_chunk(chi, chj))
                 {
-                    BaseElement * be = get_base_element(ch->table[j][i].tile);
-                    place_cube(i * 2 + (int)(cam_x / CHUNK_SIZE) * CHUNK_SIZE * 2, 0, j * 2 + (int)(-cam_z / CHUNK_SIZE) * CHUNK_SIZE * 2, ch->table[j][i].tile % 15 + 1, be->color.r, be->color.g,
-                        be->color.b);
+                    int base_x = (chi - 128) * CHUNK_SIZE;
+                    int base_z = (chj - 128) * CHUNK_SIZE;
+
+                    for (int i = 0; i < CHUNK_SIZE; i++)
+                    {
+                        for (int j = 0; j < CHUNK_SIZE; j++)
+                        {
+                            printf("%d, %d\n", base_x + i, base_x + j);
+                            BaseElement * be = get_base_element(ch->table[j][i].tile);
+                            place_cube(base_x + i, 0, base_z + j, ch->table[j][i].tile % 15 + 1, be->color.r, be->color.g, be->color.b);
+                        }
+                    }
                 }
+            }
         }
+
         glDisable(GL_TEXTURE_2D);
 
         SDL_GL_SwapWindow(win);
         SDL_Delay(16);
     }
 
-    // SDL_GL_DestroyContext(ctx);
-    // SDL_DestroyWindow(win);
-    // SDL_Quit();
     disconnect();
     return 0;
 }
