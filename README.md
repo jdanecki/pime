@@ -5,7 +5,7 @@ This game is currently under development using
 * [SDL2/SDL3](https://www.libsdl.org)
 * [Raylib](https://www.raylib.com/)
 * [Godot](https://godotengine.org)
-* OpenGL (https://www.opengl.org)
+* [OpenGL] (https://www.opengl.org)
 
 ![SDL version](pime-sdl.png)
 ![Raylib version](pime-raylib.png)
