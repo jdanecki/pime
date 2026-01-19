@@ -429,7 +429,7 @@ void handle_net_event(ENetEvent * event)
         }
         case ENET_EVENT_TYPE_RECEIVE:
         {
-            CONSOLE_LOG("received packet from %s:%d\n", hostname, event->peer->address.port);
+          //  CONSOLE_LOG("received packet from %s:%d\n", hostname, event->peer->address.port);
             handle_packet(event->packet, event->peer);
             enet_packet_destroy(event->packet);
             send_updates();

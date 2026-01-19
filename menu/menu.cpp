@@ -496,7 +496,7 @@ void menu_handle_enter()
 {
     if (current_menu->interact())
     {
-        current_menu = NULL;
+        current_menu = nullptr;
     }
 }
 
@@ -574,7 +574,7 @@ int Menu::interact()
         case MENU_EXIT:
             finish_program = true;
             //            Mix_Quit();
-            exit(0);
+            return 1;
         case MENU_LOAD:
             load(1);
             break;
