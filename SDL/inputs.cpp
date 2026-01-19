@@ -19,8 +19,8 @@ KeyHandler menu_key_handlers[] = {
 };
 
 KeyHandler key_handlers[] = {
-    {SDLK_F1, handle_f1, true},
-    {SDLK_F2, handle_show_item, true},
+    {SDLK_F1, handle_show_item, true},
+    {SDLK_F2, handle_show_item_server, true},
     {SDLK_F3, handle_show_chunk, true},
     {SDLK_F4, handle_show_chunk_server, true},
     {SDLK_F5, handle_trace_network, true},
@@ -40,6 +40,8 @@ KeyHandler key_handlers[] = {
     {SDLK_0, handle_hotbar_9, true},
     {SDLK_c, handle_craft_show, true},
     {SDLK_i, handle_inventory, true},
+    {SDLK_z, handle_menu_action, true},
+    {SDLK_k, handle_menu_knowledge, true},
 #ifndef DISABLE_NPC
     {SDLK_n, handle_menu_npc, true},
 #endif

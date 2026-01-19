@@ -8,7 +8,7 @@
 
 bool finish_program;
 
-void handle_f1()
+void handle_show_item()
 {
     InventoryElement * item = get_item_at_ppos(player);
     if (item)
@@ -16,7 +16,7 @@ void handle_f1()
     else
         CONSOLE_LOG("nothing to show\n");
 }
-void handle_show_item()
+void handle_show_item_server()
 {
     server_action_tile(SERVER_SHOW_ITEM, player->location);
 }

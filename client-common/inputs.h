@@ -1,17 +1,17 @@
 #ifndef INPUTS_H
 #define INPUTS_H
 
-//#include <stdio.h>
-//#include "../core/tiles.h"
-//#include "../core/packet_types.h"
-//#include "playerUI.h"
-//#include "../dialog/d_craft.h"
+// #include <stdio.h>
+// #include "../core/tiles.h"
+// #include "../core/packet_types.h"
+// #include "playerUI.h"
+// #include "../dialog/d_craft.h"
 #include "../dialog/d_hotbar.h"
-//#include "../menu/menu.h"
-//#include "player_actions.h"
-//#include "window.h"
-//#include "net.h"
-//#include "../core/key_handler.h"
+// #include "../menu/menu.h"
+// #include "player_actions.h"
+// #include "window.h"
+// #include "net.h"
+// #include "../core/key_handler.h"
 
 extern int active_hotbar;
 extern int auto_explore;
@@ -26,14 +26,16 @@ void handle_put_item();
 
 void handle_craft_show();
 void handle_inventory();
+void handle_menu_action();
 void handle_menu_knowledge();
 void handle_escape();
+
 #ifndef DISABLE_NPC
 void handle_menu_npc();
 #endif
 
-void handle_f1();
 void handle_show_item();
+void handle_show_item_server();
 void handle_show_chunk();
 void handle_show_chunk_server();
 void handle_trace_network();

@@ -2,7 +2,7 @@
 
 #include "../core/key_handler.h"
 #include "../client-common/inputs.h"
-//#include "../client-common/player_actions.h"
+// #include "../client-common/player_actions.h"
 #include "../menu/menu.h"
 #include "../dialog/d_craft.h"
 #include "playerUI.h"
@@ -15,8 +15,8 @@ KeyHandler menu_key_handlers[] = {
 };
 
 KeyHandler key_handlers[] = {
-    {KEY_F1, handle_f1, true},
-    {KEY_F2, handle_show_item, true},
+    {KEY_F1, handle_show_item, true},
+    {KEY_F2, handle_show_item_server, true},
     {KEY_F3, handle_show_chunk, true},
     {KEY_F4, handle_show_chunk_server, true},
     {KEY_F5, handle_trace_network, true},
@@ -36,6 +36,9 @@ KeyHandler key_handlers[] = {
     {KEY_ZERO, handle_hotbar_9, true},
     {KEY_C, handle_craft_show, true},
     {KEY_I, handle_inventory, true},
+    {KEY_Z, handle_menu_action, true},
+    {KEY_K, handle_menu_knowledge, true},
+
 #ifndef DISABLE_NPC
     {KEY_N, handle_menu_npc, true},
 #endif
