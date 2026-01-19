@@ -72,7 +72,7 @@ void help()
     printf("h - help\n");
     printf("i/I - pickup/drop item at player location\n");
     printf("n - use/don't use network\n");
-    printf("q - quit\n");
+    printf("ESC - quit\n");
     printf("r - show counter received packets per tick\n");
     printf("t/T - trace network in client/server\n");
     printf("wasd - move player\n");
@@ -220,7 +220,7 @@ bool do_key_main(char k)
         case 't':
             trace_network += 1;
             break;
-        case 'q':
+        case 27:
             return true;
         case 'h':
             help();

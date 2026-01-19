@@ -203,11 +203,12 @@ void DCraft::update()
     }
 }
 
-void hide_craft_window()
+bool hide_craft_window()
 {
     if (d_craft.show)
     {
         d_craft.show = false;
-        return;
+        return true;
     }
+    return false;
 }

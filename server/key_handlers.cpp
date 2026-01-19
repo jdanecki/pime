@@ -109,7 +109,7 @@ void print_help()
     CONSOLE_LOG("F1 - help\n");
     CONSOLE_LOG("F2 - switch_debug_mode\n");
     CONSOLE_LOG("F3 - clear\n");
-    CONSOLE_LOG("F12 - exit\n");
+    CONSOLE_LOG("ESC - exit\n");
     CONSOLE_LOG("p - players\n");
     CONSOLE_LOG("1 - show terrains types\n");
     CONSOLE_LOG("2 - show plants types\n");
@@ -190,7 +190,7 @@ KeyHandler key_handlers[] = {
     {KEY_F(1), print_help},
     {KEY_F(2), switch_debug_mode},
     {KEY_F(3), clear_history},
-    {KEY_F(12), handle_exit},
+    {27, handle_exit},
     {'p', show_players},
 
     {'1', show_terrains},

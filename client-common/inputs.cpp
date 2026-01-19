@@ -142,13 +142,11 @@ void handle_k()
     show_menu_knowledge();
 }
 
-void handle_f10()
-{
-    show_menu();
-}
+
 void handle_escape()
 {
-    hide_craft_window();
+    if (!hide_craft_window())
+        show_menu();
 }
 
 #ifndef DISABLE_NPC
