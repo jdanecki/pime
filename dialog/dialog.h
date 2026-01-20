@@ -26,25 +26,12 @@ class DialogElement
     enum DialogElementType c_id;
     DialogElement(int id, Backend_Rect rect, enum DialogElementType c_id);
     virtual void draw();
-    virtual bool pressed(int x, int y)
-    {
-        return false;
-    }
+    virtual bool pressed(int x, int y);
     enum DialogElementType get_c_id();
-    virtual void move(int x, int y)
-    {
-        rect.r.x += x;
-        rect.r.y += y;
-    }
+    virtual void move(int x, int y);
     bool in_rect(int x, int y);
-    bool check_id(int i, enum DialogElementType c)
-    {
-        return id == i && c_id == c;
-    }
-    virtual Dialog * get_dialog()
-    {
-        return dialog;
-    }
+    bool check_id(int i, enum DialogElementType c);
+    virtual Dialog * get_dialog();
 };
 
 class Dialog : public DialogElement
@@ -105,11 +92,7 @@ class DialogButton : public DialogElement
     bool pressed(int x, int y);
     void (*on_press)(DialogButton *);
     void (*on_secondary_press)(DialogButton *);
-    void move(int x, int y)
-    {
-        d_box->move(x, y);
-        d_text->move(x, y);
-    }
+    void move(int x, int y);
 };
 
 #endif

@@ -306,3 +306,23 @@ PlayerRelation::PlayerRelation(Player * p, Relations r)
     rel = r;
     next = nullptr;
 }
+ElementsList * Player::get_known_elements()
+{
+    return &known_elements;
+}
+Clan * Player::get_clan()
+{
+    return clan.get();
+}
+Player * Player::get_talking_to()
+{
+    return talking_to.get();
+}
+bool Player::conversation_started()
+{
+    return in_conversation;
+}
+const char * Player::get_name()
+{
+    return name.str;
+}

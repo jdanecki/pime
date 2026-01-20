@@ -7,9 +7,7 @@ class NetClient
   public:
     ENetHost * host;
     ENetPeer * peer;
-    NetClient(ENetHost * host, ENetPeer * peer) : host(host), peer(peer)
-    {
-    }
+    NetClient(ENetHost * host, ENetPeer * peer);
 };
 extern const char * ip;
 extern const char * port;

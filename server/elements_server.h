@@ -48,10 +48,7 @@ class ScrollServer : public Scroll
 {
   public:
     ScrollServer(Base * base);
-    bool can_pickup() override
-    {
-        return true;
-    }
+    bool can_pickup() override;
     bool player_action(Player_action action, Player * pl) override;
 };
 
@@ -62,32 +59,12 @@ class BeingServer
     Property * max_age;
     bool alive;
     int padding;
-    BeingServer()
-    {
-        max_age = new Property("max age", 0);
-        age = new Property("age", 1);
-        alive = true;
-    }
+    BeingServer();
     void show(bool details = true);
-    Property ** get_properties(int * count)
-    {
-        Property ** props = new Property *[2];
-        props[0] = age;
-        props[1] = max_age;
-
-        *count = 2;
-        return props;
-    }
-    ~BeingServer()
-    {
-        delete age;
-        delete max_age;
-    }
+    Property ** get_properties(int * count);
+    ~BeingServer();
     virtual bool grow();
-    virtual bool tick()
-    {
-        return grow();
-    }
+    virtual bool tick();
 };
 
 class AnimalServer : public Animal, public BeingServer
@@ -104,10 +81,7 @@ class AnimalServer : public Animal, public BeingServer
     bool action(Product_action action, Player * pl) override;
     void show(bool details = true) override;
     bool grow() override;
-    bool can_pickup() override
-    {
-        return true;
-    }
+    bool can_pickup() override;
 };
 
 class PlantServer : public Plant, public BeingServer
@@ -119,22 +93,11 @@ class PlantServer : public Plant, public BeingServer
 
     PlantServer(BasePlant * base);
 
-    void sow()
-    {
-        change_phase(Plant_seedling);
-    }
+    void sow();
     void change_phase(Plant_phase p);
-    bool action(Product_action action, Player * pl) override
-    {
-        Plant::action(action, pl);
-        CONSOLE_LOG("PLANT_SERVER: %s %s\n", product_action_name[action], get_name());
-        return false;
-    }
+    bool action(Product_action action, Player * pl) override;
     void show(bool details = true) override;
-    bool can_pickup() override
-    {
-        return true;
-    }
+    bool can_pickup() override;
     bool player_action(Player_action action, Player * pl) override;
     void set_phase(Plant_phase p);
 };
@@ -145,10 +108,7 @@ class IngredientServer : public Ingredient
     size_t el;
     IngredientServer(InventoryElement * from, Ingredient_id id, Form f);
     bool action(Product_action action, Player * pl) override;
-    bool can_pickup() override
-    {
-        return true;
-    }
+    bool can_pickup() override;
     void show(bool details = true) override;
 };
 
@@ -163,26 +123,9 @@ class ProductServer : public Product
     ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id id, Form f, int act_cnt);
     //ProductServer(InventoryElement ** from, int count, Product_id id, Form f, int act_cnt);
     void show(bool details = true) override;
-    virtual bool use(InventoryElement * object, Player * pl)
-    {
-        if (!actions_count)
-            return false;
-        // FIXME use more actions
-        CONSOLE_LOG("%s: %s %s\n", get_name(), product_action_name[actions[0]], object->get_name());
-        return object->action(actions[0], pl);
-        // FIXME change properties of product after action
-    }
-    virtual bool use_tile(int map_x, int map_y, int x, int y, Player * pl)
-    {
-        if (!actions_count)
-            return false;
-        CONSOLE_LOG("ProductServer(%s): %s tile (%d, %d): (%d, %d)\n", get_name(), product_action_name[actions[0]], map_x, map_y, x, y);
-        return true;
-    }
-    bool can_pickup() override
-    {
-        return true;
-    }
+    virtual bool use(InventoryElement * object, Player * pl);
+    virtual bool use_tile(int map_x, int map_y, int x, int y, Player * pl);
+    bool can_pickup() override;
 };
 
 AnimalServer * create_animal(BaseAnimal * base);

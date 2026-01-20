@@ -136,3 +136,25 @@ bool Dialog::press(int x, int y, int button)
     }
     return false;
 }
+bool DialogElement::check_id(int i, enum DialogElementType c)
+{
+    return id == i && c_id == c;
+}
+void DialogElement::move(int x, int y)
+{
+    rect.r.x += x;
+    rect.r.y += y;
+}
+Dialog * DialogElement::get_dialog()
+{
+    return dialog;
+}
+bool DialogElement::pressed(int x, int y)
+{
+    return false;
+}
+void DialogButton::move(int x, int y)
+{
+    d_box->move(x, y);
+    d_text->move(x, y);
+}

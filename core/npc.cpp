@@ -9,3 +9,7 @@ Npc::Npc(ItemLocation location) : Player((size_t)this, SerializableCString(creat
 {
     c_id = Class_Npc;
 }
+bool Npc::check_known(InventoryElement * el)
+{
+    return true;
+}

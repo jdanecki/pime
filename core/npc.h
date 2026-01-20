@@ -7,10 +7,7 @@ class Npc : public Player
 {
   public:
     Npc(ItemLocation location);
-    bool check_known(InventoryElement * el)
-    {
-        return true;
-    }
+    bool check_known(InventoryElement * el);
 };
 
 #endif // NPC_H

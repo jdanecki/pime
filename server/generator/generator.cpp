@@ -1,6 +1,7 @@
+//#include <stdio.h>
 #include "generator.h"
 #include "random_functions.h"
-
+#include "../../core/world_params.h"
 int terrains_count;
 TerrainType ** terrains;
 Region ** regions;
@@ -224,5 +225,122 @@ void show_animals()
     for (int i = 0; i < all_animals_count; i++)
     {
         all_animals[i]->show();
+    }
+}
+Coords::Coords(int x, int y) : x(x), y(y)
+{
+}
+Coords::Coords()
+{
+    x = rand() % WORLD_SIZE;
+    y = rand() % WORLD_SIZE;
+}
+int Coords::distance_squared(Coords * other)
+{
+    int dx = x - other->x;
+    int dy = y - other->y;
+    return dx * dx + dy * dy;
+}
+TerrainType::TerrainType(int id) : id(id)
+{
+    form = random_range(1, 4);
+    // form = 1;
+}
+bool TerrainType::eq(TerrainType * other)
+{
+    return id == other->id;
+}
+void TerrainType::show()
+{
+    CONSOLE_LOG(" TerrainType: id=%d form=%d\n", id, form);
+}
+void PlantType::show()
+{
+    CONSOLE_LOG(" PlanType: id=%d grounds=%d: ", id, grounds_count);
+    for (int i = 0; i < grounds_count; i++)
+    {
+        CONSOLE_LOG("%d ", possible_ground[i]->id);
+    }
+    CONSOLE_LOG("\n");
+}
+bool PlantType::check_ground(int g)
+{
+    for (int i = 0; i < grounds_count; i++)
+    {
+        if (possible_ground[i]->id == g)
+            return true;
+    }
+    return false;
+}
+void AnimalType::show()
+{
+    CONSOLE_LOG(" AnimalType: id=%d grounds=%d: ", id, grounds_count);
+    for (int i = 0; i < grounds_count; i++)
+    {
+        CONSOLE_LOG("%d ", possible_ground[i]->id);
+    }
+    CONSOLE_LOG("\n");
+}
+bool AnimalType::check_ground(int g)
+{
+    for (int i = 0; i < grounds_count; i++)
+    {
+        if (possible_ground[i]->id == g)
+            return true;
+    }
+    return false;
+}
+RockEntry::RockEntry(TerrainType * t, float v) : terrain(t), value(v)
+{
+}
+void RockEntry::show()
+{
+    terrain->show();
+    CONSOLE_LOG("      RockEntry: value=%f\n", value);
+}
+PlantEntry::PlantEntry(PlantType * p, float v) : plant(p), value(v)
+{
+}
+void PlantEntry::show()
+{
+    plant->show();
+    CONSOLE_LOG("      PlantEntry: value=%f\n", value);
+}
+AnimalEntry::AnimalEntry(AnimalType * p, float v) : animal(p), value(v)
+{
+}
+void AnimalEntry::show()
+{
+    animal->show();
+    CONSOLE_LOG("      AnimalEntry: value=%f\n", value);
+}
+Region::~Region()
+{
+    delete rocks_types;
+}
+unsigned int Region::total_size()
+{
+    return size * CHUNK_SIZE * CHUNK_SIZE;
+}
+void Region::show()
+{
+    CONSOLE_LOG("Region terrain(id=%d form=%d) size: %u\n", terrain_type->id, terrain_type->form, total_size());
+    CONSOLE_LOG("%d rocks types in region:\n", rocks_count);
+    for (int i = 0; i < rocks_count; i++)
+    {
+        CONSOLE_LOG("%d: ", i);
+        rocks_types[i]->show();
+    }
+    CONSOLE_LOG("%d plants:\n", plants_count);
+    for (int i = 0; i < plants_count; i++)
+    {
+        CONSOLE_LOG("%d: ", i);
+        plants_types[i]->show();
+    }
+    CONSOLE_LOG("%d animals:\n", animals_count);
+    for (int i = 0; i < animals_count; i++)
+    {
+        CONSOLE_LOG("%d: ", i);
+        animals_types[i]->show();
     }
 }

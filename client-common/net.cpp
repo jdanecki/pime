@@ -393,3 +393,6 @@ void disconnect()
 void add_packet_to_send1(Packet * p)
 {
 }
+NetClient::NetClient(ENetHost * host, ENetPeer * peer) : host(host), peer(peer)
+{
+}

@@ -55,27 +55,18 @@ class Player : public InventoryElement
     int nutrition;
     ElementsList inventory;
     ElementsList known_elements;
-    ElementsList * get_known_elements()
-    {
-        return &known_elements;
-    }
+    ElementsList * get_known_elements();
     size_t checked_element;
 
     SerializablePointer<Clan> clan;
-    Clan * get_clan()
-    {
-        return clan.get();
-    }
+    Clan * get_clan();
     Skill player_skills[SK_NUM];
 
     bool in_conversation;
     bool welcomed;
     // Player * talking_to;
     SerializablePointer<Player> talking_to;
-    Player * get_talking_to()
-    {
-        return talking_to.get();
-    }
+    Player * get_talking_to();
     // FIXME change that to list
     // PlayerRelation * relations;
 
@@ -99,17 +90,11 @@ class Player : public InventoryElement
 
     bool set_known(Class_id cid, int el_id);
 
-    bool conversation_started()
-    {
-        return in_conversation;
-    }
+    bool conversation_started();
     enum Relations find_relation(Player * who);
     void set_relation(Player * who, enum Relations rel);
 
-    const char * get_name()
-    {
-        return name.str;
-    }
+    const char * get_name();
     bool set_checked(size_t el);
 };
 

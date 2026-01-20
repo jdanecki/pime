@@ -572,3 +572,73 @@ bool PlaceServer::can_pickup()
 {
     return false;
 }
+bool ScrollServer::can_pickup()
+{
+    return true;
+}
+BeingServer::BeingServer()
+{
+    max_age = new Property("max age", 0);
+    age = new Property("age", 1);
+    alive = true;
+}
+Property ** BeingServer::get_properties(int * count)
+{
+    Property ** props = new Property *[2];
+    props[0] = age;
+    props[1] = max_age;
+
+    *count = 2;
+    return props;
+}
+BeingServer::~BeingServer()
+{
+    delete age;
+    delete max_age;
+}
+bool BeingServer::tick()
+{
+    return grow();
+}
+bool AnimalServer::can_pickup()
+{
+    return true;
+}
+void PlantServer::sow()
+{
+    change_phase(Plant_seedling);
+}
+bool PlantServer::action(Product_action action, Player * pl)
+{
+    Plant::action(action, pl);
+    CONSOLE_LOG("PLANT_SERVER: %s %s\n", product_action_name[action], get_name());
+    return false;
+}
+bool PlantServer::can_pickup()
+{
+    return true;
+}
+bool IngredientServer::can_pickup()
+{
+    return true;
+}
+bool ProductServer::use(InventoryElement * object, Player * pl)
+{
+    if (!actions_count)
+        return false;
+    // FIXME use more actions
+    CONSOLE_LOG("%s: %s %s\n", get_name(), product_action_name[actions[0]], object->get_name());
+    return object->action(actions[0], pl);
+    // FIXME change properties of product after action
+}
+bool ProductServer::use_tile(int map_x, int map_y, int x, int y, Player * pl)
+{
+    if (!actions_count)
+        return false;
+    CONSOLE_LOG("ProductServer(%s): %s tile (%d, %d): (%d, %d)\n", get_name(), product_action_name[actions[0]], map_x, map_y, x, y);
+    return true;
+}
+bool ProductServer::can_pickup()
+{
+    return true;
+}

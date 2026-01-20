@@ -1,6 +1,8 @@
 #include "backend.inl"
 #include "../client-common/text.h"
 #include "../server/generator/generator.h"
+#include "../core/world_params.h"
+#include <ctime>
 
 Region * current_region;
 
