@@ -60,7 +60,7 @@ void add_elements(PacketElementsList * list, int i)
         InventoryElement * el = get_object_by_id(NetworkObject(Class_Element, uid));
         if (el)
             p->pickup(el);
-        printf("player=%s [%d]=%lx inv.elements=%d\n", p->get_name(), i, uid, p->inventory.nr_elements);
+        //  printf("player=%s [%d]=%lx inv.elements=%d\n", p->get_name(), i, uid, p->inventory.nr_elements);
     }
     update_hotbar();
 }

@@ -48,7 +48,7 @@ bool AnimalServer::action(Product_action action, Player * pl)
     if (crafted)
     {
         add_object_to_world(crafted, pl->location);
-        notify_create(crafted);
+        //  notify_create(crafted);
         CONSOLE_LOG("crafted meat\n");
         destroy(this);
         return true;

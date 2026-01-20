@@ -43,7 +43,7 @@ void show_packet_type_name(char what, unsigned char i)
         case 3: if (i == PACKET_PLAYER_UPDATE || i == PACKET_KEEP_ALIVE) return;
         case 2: if (i == PACKET_PLAYER_UPDATE) return;
         case 1: 
-           CONSOLE_LOG(\"%c %d -> %s\\n\", what, i, i < PACKET_COUNT ? packet_type_names[i] : \"ERROR\" ); break;
+           CONSOLE_LOG(\"<%d>%c %d -> %s\\n\", trace_network, what, i, i < PACKET_COUNT ? packet_type_names[i] : \"ERROR\" ); break;
         default: break;
     }  
     assert(i < PACKET_COUNT);
