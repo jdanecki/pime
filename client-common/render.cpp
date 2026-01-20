@@ -180,16 +180,16 @@ void draw_maps()
 }
 #endif
 
-void render_element(InventoryElement * o, unsigned int ltx, unsigned int lty)
+void render_element(InventoryElement * o, float ltx, float lty)
 {
     Renderable * r = dynamic_cast<Renderable *>(o);
     if (r)
     {
-        int obj_world_x = o->location.get_world_x();
-        int obj_world_y = o->location.get_world_y();
+        float obj_world_x = o->location.get_world_x();
+        float obj_world_y = o->location.get_world_y();
 
-        int screen_x = obj_world_x - ltx;
-        int screen_y = obj_world_y - lty;
+        float screen_x = obj_world_x - ltx;
+        float screen_y = obj_world_y - lty;
 
         if (screen_x < CHUNK_SIZE && screen_y < CHUNK_SIZE)
         {
@@ -205,13 +205,13 @@ void render_element(InventoryElement * o, unsigned int ltx, unsigned int lty)
 
 bool draw_terrain()
 {
-    unsigned int left_top_world_x, left_top_world_y;
+    float left_top_world_x, left_top_world_y;
 
     get_chunks_around(player->location, &left_chunk_x, &right_chunk_x, &top_chunk_y, &bottom_chunk_y, &left_top_world_x, &left_top_world_y);
 
-    for (unsigned int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
+    for (unsigned int cy = top_chunk_y; cy <= bottom_chunk_y + 1; ++cy)
     {
-        for (unsigned int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
+        for (unsigned int cx = left_chunk_x; cx <= right_chunk_x + 1; ++cx)
         {
             chunk * ch = check_chunk(cx, cy);
             if (!ch)
@@ -221,13 +221,13 @@ bool draw_terrain()
             {
                 for (unsigned int tx = 0; tx < CHUNK_SIZE; ++tx)
                 {
-                    int world_x = get_world_pos(cx, tx);
-                    int world_y = get_world_pos(cy, ty);
+                    float world_x = get_world_pos(cx, tx);
+                    float world_y = get_world_pos(cy, ty);
 
-                    int screen_x = world_x - left_top_world_x;
-                    int screen_y = world_y - left_top_world_y;
+                    float screen_x = world_x - left_top_world_x;
+                    float screen_y = world_y - left_top_world_y;
 
-                    if (screen_x >= 0 && screen_x < CHUNK_SIZE && screen_y >= 0 && screen_y < CHUNK_SIZE)
+                    if (screen_x >= -tile_size && screen_x < CHUNK_SIZE + tile_size && screen_y >= -tile_size && screen_y < CHUNK_SIZE + tile_size)
                     {
                         int tile = ch->table[ty][tx].tile;
 
@@ -301,7 +301,7 @@ bool draw_terrain()
     return true;
 }
 
-void draw_players()
+void draw_run_icons()
 {
     int w = window_width - PANEL_WINDOW;
     int icon_size = w / 10;
@@ -365,7 +365,7 @@ void draw()
     bool ret = draw_terrain();
     if (ret)
     {
-        draw_players();
+        draw_run_icons();
         //        draw_npc();
         draw_texts();
 

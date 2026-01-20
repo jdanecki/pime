@@ -11,7 +11,7 @@ void destroy(InventoryElement * el)
 {
     if (el->location.tag == ItemLocation::Tag::Chunk)
     {
-        world_table[el->location.chunk.map_y][el->location.chunk.map_x]->remove_object(el);
+        world_table[(int)el->location.chunk.map_y][(int)el->location.chunk.map_x]->remove_object(el);
     }
     notify_destroy(el);
 }

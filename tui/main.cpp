@@ -310,7 +310,7 @@ void draw()
 {
     if (!player)
         return;
-    printf("\r%s%ld@[%d,%d][%d,%d] %c: ", player->get_name(), player->get_id(), player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y,
+    printf("\r%s%ld@[%d,%d][%.2f,%.2f] %c: ", player->get_name(), player->get_id(), player->location.chunk.map_x, player->location.chunk.map_y, player->location.chunk.x, player->location.chunk.y,
         submenu ? submenu : '#');
     for (int y = -1; y < 2; y++)
     {

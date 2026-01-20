@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <stdint.h>
 #include <cstring>
 // #include "../core/tiles.h"
@@ -293,7 +294,7 @@ Base * get_base(uint32_t c_id, int32_t id)
     // return base.find(&id);
 }
 
-void send_packet_move(int32_t x, int32_t y)
+void send_packet_move(float x, float y)
 {
     Packet * p = new PacketPlayerMove(x, y);
     p->send(client->peer);

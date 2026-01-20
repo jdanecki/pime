@@ -564,11 +564,11 @@ class PacketPlayerMove : public Packet
     struct serial_data
     {
         PacketType t;
-        int x, y;
+        float x, y;
     } data, *pdata __attribute__((packed));
 
   public:
-    PacketPlayerMove(int x, int y) : Packet(PACKET_PLAYER_MOVE)
+    PacketPlayerMove(float x, float y) : Packet(PACKET_PLAYER_MOVE)
     {
         data.t = t;
         data.x = x;
@@ -594,11 +594,11 @@ class PacketPlayerMove : public Packet
     {
         return s == sizeof(struct serial_data);
     }
-    unsigned int get_x()
+    float get_x()
     {
         return pdata->x;
     }
-    unsigned int get_y()
+    float get_y()
     {
         return pdata->y;
     }

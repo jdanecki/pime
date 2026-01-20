@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include "object.h"
-extern unsigned int get_world_pos(unsigned int chunk, unsigned int pos);
+extern float get_world_pos(int, float);
 
 struct ItemLocation
 {
@@ -15,10 +15,10 @@ struct ItemLocation
 
     struct Chunk_Body
     {
-        unsigned int map_x;
-        unsigned int map_y;
-        unsigned int x;
-        unsigned int y;
+        int map_x;
+        int map_y;
+        float x;
+        float y;
     };
 
     struct Player_Body
@@ -49,24 +49,24 @@ struct ItemLocation
     {
         if (tag == Tag::Chunk)
         {
-            CONSOLE_LOG("map_x:%d map_y:%d x:%d y:%d\n", chunk.map_x, chunk.map_y, chunk.x, chunk.y);
+            CONSOLE_LOG("map_x:%d map_y:%d x:%f y:%f\n", chunk.map_x, chunk.map_y, chunk.x, chunk.y);
         }
         else
             CONSOLE_LOG("player: %lu\n", player.id);
     }
-    unsigned int get_world_x()
+    float get_world_x()
     {
         return get_world_pos(chunk.map_x, chunk.x);
     }
-    unsigned int get_world_y()
+    float get_world_y()
     {
         return get_world_pos(chunk.map_y, chunk.y);
     }
-    unsigned int get_x()
+    float get_x()
     {
         return chunk.x;
     }
-    unsigned int get_y()
+    float get_y()
     {
         return chunk.y;
     }

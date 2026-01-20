@@ -1,6 +1,7 @@
 #include "net.h"
 #include "playerUI.h"
 #include "players.h"
+#include <cstdio>
 #include <cstring>
 
 extern void update_hotbar();

@@ -16,7 +16,7 @@ extern ElementsList objects;
 
 extern chunk * check_chunk(int cx, int cy);
 
-void send_packet_move(int32_t x, int32_t y);
+void send_packet_move(float x, float y);
 void send_packet_pickup(uintptr_t id);
 void send_packet_drop(uintptr_t id);
 void send_packet_item_used_on_object(uintptr_t iid, uintptr_t oid);

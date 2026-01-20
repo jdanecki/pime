@@ -11,7 +11,7 @@ class PlayerServer : public Player, public BeingServer
     int hunger_delay_max;
 
   public:
-    void move(int dx, int dy);
+    void move(float dx, float dy);
     bool use_item_on_object(InventoryElement * item, InventoryElement * object);
     bool action_on_object(Player_action a, InventoryElement * object);
     bool server_action_on_object(Server_action a, InventoryElement * object);

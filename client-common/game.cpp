@@ -80,7 +80,7 @@ void do_auto_explore()
 
         if (player->location.chunk.map_y + dy >= 0 && player->location.chunk.map_y + dy < WORLD_SIZE && player->location.chunk.map_x + dx >= 0 && player->location.chunk.map_x + dx < WORLD_SIZE)
         {
-            if (!world_table[player->location.chunk.map_y + dy][player->location.chunk.map_x + dx])
+            if (!world_table[(int)player->location.chunk.map_y + dy][(int)player->location.chunk.map_x + dx])
             {
                 dst_map_x = player->location.chunk.map_x + dx;
                 dst_map_y = player->location.chunk.map_y + dy;

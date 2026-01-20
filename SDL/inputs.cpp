@@ -89,16 +89,15 @@ void mouse_pressed(SDL_MouseButtonEvent * event)
     }
 }
 
-int last_frame_press = 0;
-Uint64 last_time = 0;
-Uint64 handle_keyboard_state(const Uint8 * keys)
+void handle_keyboard_state(const Uint8 * keys)
 {
-    Uint64 current_time = SDL_GetTicks64();
-    Uint64 time_period = 0;
+    // FIXME: USE DELTATIME
+    // FIXME: NORMALIZE THE MOVEMENT VECTOR
+    float speed = 0.2;
     if (keys[SDL_SCANCODE_LSHIFT])
     {
         handle_left_shift();
-        time_period = 200;
+        speed = 0.1;
     }
     else
     {
@@ -106,53 +105,32 @@ Uint64 handle_keyboard_state(const Uint8 * keys)
         if (keys[SDL_SCANCODE_LCTRL] && player->hunger && player->thirst)
         {
             handle_left_control();
-            time_period = 50;
+            speed = 0.4;
         }
         else
         {
             player->running = 0;
-            time_period = 100;
         }
     }
 
-    if ((!current_menu) && ((current_time - last_time > time_period) || !(last_frame_press)))
+    if (keys[SDL_SCANCODE_DOWN] || keys[SDL_SCANCODE_S])
     {
-        if (keys[SDL_SCANCODE_DOWN] || keys[SDL_SCANCODE_S])
-        {
-            send_packet_move(0, 1);
-            last_frame_press = 1;
-        }
-        else if (keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_W])
-        {
-            send_packet_move(0, -1);
-            last_frame_press = 1;
-        }
-        if (keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D])
-        {
-            player->going_right = 1;
-            send_packet_move(1, 0);
-            last_frame_press = 1;
-        }
-        else if (keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A])
-        {
-            player->going_right = 0;
-            send_packet_move(-1, 0);
-            last_frame_press = 1;
-        }
-        if (last_frame_press)
-        {
-            return SDL_GetTicks64();
-        }
+        send_packet_move(0, speed);
     }
-    if (keys[SDL_SCANCODE_DOWN] || keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_D] ||
-        keys[SDL_SCANCODE_A])
+    else if (keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_W])
     {
-        last_frame_press = 1;
-        return 0;
+        send_packet_move(0, -speed);
     }
-
-    last_frame_press = 0;
-    return 0;
+    if (keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D])
+    {
+        player->going_right = 1;
+        send_packet_move(speed, 0);
+    }
+    else if (keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A])
+    {
+        player->going_right = 0;
+        send_packet_move(-speed, 0);
+    }
 }
 
 bool handle_events()
@@ -191,10 +169,6 @@ bool handle_events()
         }
     }
     const Uint8 * currentKeyState = SDL_GetKeyboardState(NULL);
-    Uint64 tmp = handle_keyboard_state(currentKeyState);
-    if (tmp > 0)
-    {
-        last_time = tmp;
-    }
+    handle_keyboard_state(currentKeyState);
     return false;
 }

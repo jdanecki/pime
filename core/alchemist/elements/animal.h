@@ -24,6 +24,9 @@ class Animal : public InventoryElement
     bool action(Product_action action, Player * pl) override;
     const char * get_name() override;
     char * get_description() override;
+    ~Animal()
+    {
+    }
 };
 
 BaseAnimal * get_base_animal(size_t id);

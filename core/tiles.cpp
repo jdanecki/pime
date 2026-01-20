@@ -1,6 +1,6 @@
 #include "tiles.h"
 
-void chunk::add_object(InventoryElement * object, int x, int y, bool front)
+void chunk::add_object(InventoryElement * object, float x, float y, bool front)
 {
     if (front)
         objects.add_front(object);
