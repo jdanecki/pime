@@ -152,7 +152,8 @@ class PacketObjectDestroy : public Packet
     {
         // FIXME send as broadcast
         int ret = send_data(peer, &data, sizeof(struct serial_data));
-        delete el_to_remove;
+     //FIXME
+     //	delete el_to_remove;
         return ret;
     }
     bool check_size(int s)
