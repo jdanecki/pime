@@ -1,7 +1,8 @@
 #ifndef EL_LIST_H
 #define EL_LIST_H
 
-#include "elements.h"
+#include "elements/base.h"
+#include "elements/inventory_element.h"
 
 class ListElement
 {

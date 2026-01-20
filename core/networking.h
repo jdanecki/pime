@@ -1,14 +1,15 @@
 #ifndef NETWORKING_H
 #define NETWORKING_H
 
-#include "world.h"
-#include "npc.h"
-
 #include <cstdarg>
-#include <cstdint>
-#include <ostream>
+//#include <cstdint>
+//#include <ostream>
 #include <new>
 #include <enet/enet.h>
+
+#include "alchemist/elements.h"
+#include "world.h"
+#include "npc.h"
 
 struct ObjectData
 {

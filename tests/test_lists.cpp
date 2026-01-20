@@ -1,4 +1,6 @@
 #include "../core/alchemist/el_list.h"
+#include "../core/alchemist/elements/element.h"
+#include "../core/alchemist/elements/place.h"
 
 void test_loops()
 {

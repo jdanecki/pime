@@ -2,6 +2,8 @@
 #define WORLD_H
 
 #include "tiles.h"
+#include "alchemist/elements/plant.h"
+#include "alchemist/elements/animal.h"
 
 class Player;
 
