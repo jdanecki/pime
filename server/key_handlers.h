@@ -9,4 +9,5 @@ extern struct KeyHandler key_handlers[];
 extern bool finish_program;
 bool handle_pressed();
 
+
 #endif // KEY_HANDLERS_H

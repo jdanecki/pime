@@ -258,7 +258,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             delete p;
             if (craft_entry(prod_id, ing_num, iid_table, pl->player))
             {
-                CONSOLE_LOG("crafted id=%ld\n", prod_id);
+                CONSOLE_LOG("crafted id=%ld %s\n", prod_id, prod_id < ING_COUNT ? ingredient_name[prod_id]:product_name[prod_id-ING_COUNT]);
                 InventoryElement * el1 = pl->player->get_item_by_uid(iid_table[0]);
                 if (el1)
                 {

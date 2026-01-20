@@ -47,6 +47,7 @@ const char * product_name[] = {
     "Roasted meat",
     "Fruit Salad",
     "Seedling",
+    "Feed",
 };
 
 const char * product_action_name[] = {
@@ -58,6 +59,7 @@ const char * product_action_name[] = {
     "plow",
     "plant",
     "invite",
+    "feed",
 };
 const char * player_action_name[] = {"drink", "eat", "read", "check"};
 

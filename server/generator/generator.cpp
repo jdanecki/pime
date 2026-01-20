@@ -98,7 +98,7 @@ void create_regions()
     {
         terrains[i] = new TerrainType(i);
     }
-    CONSOLE_LOG("terrains count=%d\n", terrains_count);
+    CONSOLE_LOG("terrains types count=%d\n", terrains_count);
 
     all_plants_count = BASE_PLANTS; // random_range(10, BASE_PLANTS);
     all_plants = new PlantType *[all_plants_count];
@@ -106,7 +106,7 @@ void create_regions()
     {
         all_plants[i] = new PlantType(i);
     }
-    CONSOLE_LOG("plants count=%d\n", all_plants_count);
+    CONSOLE_LOG("plants types count=%d\n", all_plants_count);
 
     all_animals_count = BASE_ANIMALS; // random_range(10, 20);
     all_animals = new AnimalType *[all_animals_count];
@@ -114,7 +114,7 @@ void create_regions()
     {
         all_animals[i] = new AnimalType(i);
     }
-    CONSOLE_LOG("animals count=%d\n", all_animals_count);
+    CONSOLE_LOG("animals types count=%d\n", all_animals_count);
 
     regions = new Region *[REGIONS_NUM];
     unsigned int sizes[REGIONS_NUM] = {0};

@@ -14,52 +14,53 @@ void create_players()
 
 bool check_and_load_chunk(int new_map_x, int new_map_y)
 {
-    for (int cy = new_map_y - 1; cy <= new_map_y + 1; cy++)
+    for (int cy = new_map_y - 10; cy <= new_map_y + 10; cy++)
     {
         if (cy >= 0 && cy < WORLD_SIZE)
         {
-            for (int cx = new_map_x - 1; cx <= new_map_x + 1; cx++)
+            for (int cx = new_map_x - 10; cx <= new_map_x + 10; cx++)
+            {
                 if (cx >= 0 && cx < WORLD_SIZE)
                 {
                     if (!world_table[cy][cx])
                         load_chunk(cx, cy);
                 }
+                else
+                    return false;
+            }
         }
+        else
+            return false;
     }
     return true;
 }
 
 void PlayerServer::move(int dx, int dy)
 {
+  //  CONSOLE_LOG("SERV: player move dx=%d dy=%d\n", dx, dy);
     ItemLocation old = location;
-    // TODO cleanup
-    int new_x = location.chunk.x + dx;
-    int new_y = location.chunk.y + dy;
-    int new_map_x = location.chunk.map_x;
-    int new_map_y = location.chunk.map_y;
+    
+    int x = location.chunk.x + dx;
+    int y = location.chunk.y + dy;
+    
+    int map_dx = x / CHUNK_SIZE;
+    int map_dy = y / CHUNK_SIZE;
 
-    //   CONSOLE_LOG("SERV: player move dx=%d dy=%d\n", dx, dy);
+    if (x < 0 && x % CHUNK_SIZE != 0) map_dx--;
+    if (y < 0 && y % CHUNK_SIZE != 0) map_dy--;
 
-    if (!((new_x >= 0 && new_x < CHUNK_SIZE) && (new_y >= 0 && new_y < CHUNK_SIZE)))
+    int new_x = x - map_dx * CHUNK_SIZE;
+    int new_y = y - map_dy * CHUNK_SIZE;
+
+    int new_map_x = location.chunk.map_x + map_dx;
+    int new_map_y = location.chunk.map_y + map_dy;
+
+    if (new_map_x != location.chunk.map_x || new_map_y != location.chunk.map_y)
     {
-        if (new_x < 0 || new_x >= CHUNK_SIZE)
-        {
-            new_map_x += dx;
-            new_x += -CHUNK_SIZE * dx;
-            if (!check_and_load_chunk(new_map_x, new_map_y))
-                return;
-            goto move_player;
-        }
-
-        if (new_y < 0 || new_y >= CHUNK_SIZE)
-        {
-            new_map_y += dy;
-            new_y += -CHUNK_SIZE * dy;
-            if (!check_and_load_chunk(new_map_x, new_map_y))
-                return;
-        }
+        if (!check_and_load_chunk(new_map_x, new_map_y))
+            return;
     }
-move_player:
+
     location.chunk.x = new_x;
     location.chunk.y = new_y;
 

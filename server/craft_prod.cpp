@@ -14,6 +14,7 @@ ProductFunction productFunctions[] = {
     RoastedMeat::createRoastedMeat,
     FruitSalad::createFruitSalad,
     Seedling::createSeedling,
+    Feed::createFeed,
 };
 
 InventoryElement * craft_prod(int product_id, InventoryElement * el1, InventoryElement * el2)

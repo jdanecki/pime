@@ -1,7 +1,7 @@
 #include "craft.h"
 
-#include "networking.h"
-#include "world_server.h"
+//#include "networking.h"
+#include "../core/world.h"
 #include "craft_ing.h"
 #include "craft_prod.h"
 #include <stdio.h>

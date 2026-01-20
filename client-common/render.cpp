@@ -15,7 +15,7 @@
 #include "texture.h"
 #include "window.h"
 #include "alchemist2d.h"
-#include "being2d.h"
+//#include "being2d.h"
 #include "../menu/menu.h"
 
 extern Backend_Texture map;
@@ -51,7 +51,7 @@ void draw_texts()
     int tile = ch->table[py][px].tile;
     BaseElement * base = get_base_element(tile % tiles_textures_count);
 
-    sprintf(text, "%s@[%d,%d][%d,%d]:id=%ld f=%d", player->get_name(), pl_ch_x, pl_ch_y, px, py, base->uid, base->form);
+    sprintf(text, "%s@[%d,%d][%d,%d]:id=%ld f=%c", player->get_name(), pl_ch_x, pl_ch_y, px, py, base->uid, (Form_name[base->form])[0]);
     write_text(tx, window_height - 100, text, White, 15, 30);
 
     InventoryElement * item = get_item_at_ppos(player);
@@ -105,15 +105,18 @@ void draw_texts()
     }
 }
 
-// int wait_for_chunk;
-#if 0
-void draw_maps()
-{
-    unsigned int * pixels;
-    int pitch, x, y;
 
-    SDL_LockTexture(map, NULL, (void **)&pixels, &pitch);
-    //    bool sent_request = false;
+#if 0
+int wait_for_chunk;
+Backend_Pixels pixels; 
+void draw_maps()
+{    
+    int x, y;
+    if (!pixels.pixels)
+        pixels = Backend_Allocate_Pixels(WORLD_SIZE, WORLD_SIZE);
+    else Backend_Map_Pixels(pixels);
+
+    bool sent_request = false;
 
     int start_x = player->location.chunk.map_x - 5;
     int start_y = player->location.chunk.map_y - 5;
@@ -121,41 +124,39 @@ void draw_maps()
     for (y = start_y; y < start_y + 10; y++)
     {
         for (x = start_x; x < start_x + 10; x++)
-        {
-            if (x < 0)
-                break;
-            if (y < 0)
-                break;
-            if (x >= WORLD_SIZE)
-                break;
-            if (y >= WORLD_SIZE)
-                break;
-
+        {            
             chunk * chunk = world_table[y][x];
+            unsigned int * pixel=(unsigned int*)(pixels.pixels);
             if (chunk)
-            {
-                int tile = chunk->table[y][x].tile;
-                // BaseElement * b = get_base_element(tile);
-                unsigned long c = 0xff000000 + tile;
-                // unsigned long c = 0xff000000 | (b->color.r) | (b->color.g << 8) | (b->color.b << 16);
-                pixels[y * WORLD_SIZE + x] = c;
+            {                       
+                unsigned char g=chunk->beings.nr_elements *10;
+                unsigned char b=0;
+                unsigned char r=chunk->objects.nr_elements *10;
+                unsigned long c = 0xff000000 | (r) | (g << 8) | (b << 16);
+                pixel[y * WORLD_SIZE + x] = c;                
             }
             else
-            {
-                pixels[y * WORLD_SIZE + x] = 0xff303030;
-                /*if (!wait_for_chunk)
+            {                
+                pixel[y * WORLD_SIZE + x] = 0xff303030;
+                if (!wait_for_chunk)
                 {
                     if (!sent_request)
                     {
                        CONSOLE_LOG("request_chunk: %d %d\n", x, y);
-                        send_packet_request_chunk(client, x, y);
+                        send_packet_request_chunk(x, y);
                         sent_request = true;
+                        //pixel[y * WORLD_SIZE + x] = 0xffff0000;
+                    } else {
+                       // pixel[y * WORLD_SIZE + x] = 0xff0000ff;
                     }
                     wait_for_chunk = 50;
                 }
                 else
+                {
+                    //pixel[y * WORLD_SIZE + x] = 0xff00ffff;
                     wait_for_chunk--;
-                */
+                }
+                
             }
         }
     }
@@ -168,14 +169,15 @@ void draw_maps()
             int py = player->location.chunk.map_y + y - 1;
 
             if (py >= 0 && py < WORLD_SIZE && px >= 0 && px < WORLD_SIZE)
-                pixels[py * WORLD_SIZE + px] = 0xffffffff;
+            {
+                unsigned int * pixel=(unsigned int*)(pixels.pixels);
+                pixel[py * WORLD_SIZE + px] = 0xffffffff;
+            }
         }
-    SDL_UnlockTexture(map);
+    Backend_Update_Texture_Pixels(pixels);
 
-    Backend_Rect window_rec(window_width - PANEL_WINDOW + 280,
-        200, // window_height - WORLD_SIZE - STATUS_LINES;
-        WORLD_SIZE, WORLD_SIZE );
-    SDL_RenderCopy(renderer, map, NULL, &window_rec);
+    Backend_Rect window_rec(window_width - PANEL_WINDOW + 280, window_height - WORLD_SIZE - STATUS_LINES -150,        WORLD_SIZE, WORLD_SIZE );
+    Backend_Texture_Copy(pixels.texture, NULL, &window_rec);
 }
 #endif
 
@@ -368,7 +370,7 @@ void draw()
         //        draw_npc();
         draw_texts();
 
-        //        draw_maps();
+    //    draw_maps();
     }
     Backend_Rect r0(0, window_height - 64, window_width, 32);
     Backend_Draw_Fill_Rectangle(r0, Backend_Color{10, 100, 10, 255});

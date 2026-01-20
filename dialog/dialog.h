@@ -80,6 +80,7 @@ class DialogText : public DialogElement
   public:
     DialogText(int id, int x, int y, int size, Backend_Color color, std::string text);
     void draw();
+    void change_text(std::string text);
 };
 
 class DialogImage : public DialogElement

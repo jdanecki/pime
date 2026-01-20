@@ -1,6 +1,6 @@
 #include "../client-common/game.h"
 
-SDL_Texture * map;
+
 
 void (*callback_daily)();
 void daily_call()

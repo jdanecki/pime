@@ -43,6 +43,11 @@ void DialogText::draw()
     write_text(rect.r.x, rect.r.y, text.c_str(), color, size, size * 1.5);
 }
 
+void DialogText::change_text(std::string text)
+{
+    this->text = text;
+}
+
 DialogImage::DialogImage(int id, Backend_Rect rect, std::string filename) : DialogElement(id, rect, DialogElementType::Image)
 {
     texture = load_texture(filename.c_str());

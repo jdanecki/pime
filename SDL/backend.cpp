@@ -65,6 +65,11 @@ Backend_Pixels Backend_Allocate_Pixels(int w, int h)
     return pixels;
 }
 
+void Backend_Map_Pixels(Backend_Pixels pixels)
+{
+    SDL_LockTexture(pixels.texture, NULL, (void **)&pixels.pixels, &pixels.pitch);
+}
+
 void Backend_Update_Texture_Pixels(Backend_Pixels pixels)
 {
     SDL_UnlockTexture(pixels.texture);

@@ -19,6 +19,8 @@ tests_server_sources =[
   'tools/tinder.cpp', 'tools/log.cpp', 'tools/stick.cpp', 'tools/fire.cpp',
   'tools/fruit.cpp', 'tools/fruit_salad.cpp',
   'tools/seed.cpp', 'tools/seedling.cpp',
+  'tools/feed.cpp',
+  
   'places/places.cpp'
 ]
 
@@ -30,6 +32,15 @@ server_elements_sources = [
 foreach s : tests_server_sources
   server_elements_sources += ['../../server/' + s]
 endforeach
+
+test_chunks_sources = [
+    'chunks.cpp'
+]
+
+executable('test_chunks', 
+  sources: test_chunks_sources,
+  install: false,
+)
 
 executable('server_ncurses', 
   server_ncurses_sources,

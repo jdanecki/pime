@@ -46,7 +46,7 @@ bool craft2elements(Product_id what)
 
 void button_craft_ing(DialogButton * button)
 {
-    CONSOLE_LOG("Crafting ing %d\n", button->id);
+    CONSOLE_LOG("Crafting ing: %d %s\n", button->id, ingredient_name[button->id]);
     if (player->hotbar[active_hotbar])
     {
         send_packet_craft(button->id, 1, &player->hotbar[active_hotbar]->uid);
@@ -54,11 +54,25 @@ void button_craft_ing(DialogButton * button)
         player->set_known(Class_Ingredient, button->id);
     }
 }
+void show_craft_ing(DialogButton * button)
+{
+    DialogText * text = static_cast<DialogText *>(button->dialog->get_element_from_id(0, DialogElementType::Text));
+    if (text)
+        text->change_text(ingredient_name[button->id]);
+}
 
 void button_craft_prod(DialogButton * button)
 {
-    CONSOLE_LOG("Crafting prod %d\n", button->id);
+    CONSOLE_LOG("Crafting prod: %d %s\n", button->id, product_name[button->id]);
     craft2elements((Product_id)button->id);
+}
+
+void show_prod_ing(DialogButton * button)
+{
+    DialogText * text = static_cast<DialogText *>(button->dialog->get_element_from_id(0, DialogElementType::Text));
+    CONSOLE_LOG("show_prod_ing: %p\n", button->dialog);
+    if (text)
+        text->change_text(product_name[button->id]);
 }
 
 void button_switch(DialogButton * button)
@@ -81,22 +95,23 @@ DCraft::DCraft()
     add(new DialogBox(1, Backend_Rect(20, 240, 100, 100), {0, 0, 0, 125}, true));
     add(new DialogImage(0, Backend_Rect(20, 120, 100, 100)));
     add(new DialogImage(1, Backend_Rect(20, 240, 100, 100)));
-
     for (int i = 0; i < ING_COUNT; i++)
     {
         int x = i % 6 * 54;
         int y = i / 6 * 54;
-        ingredients.add(new DialogButton(i, Backend_Rect(x, y, 50, 50), 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", button_craft_ing));
+        ingredients.add(new DialogButton(i, Backend_Rect(x, y, 50, 50), 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", button_craft_ing, show_craft_ing));
         ingredients.add(new DialogImage(i, Backend_Rect(x + 2, y + 2, 46, 46)));
     }
-
+    ingredients.add(new DialogText(0, 0, (1 + ING_COUNT / 6) * 54, 20, {0, 0, 0, 255}, "Ingredient element"));
+       
     for (int i = 0; i < PROD_COUNT; i++)
     {
         int x = i % 6 * 54;
         int y = i / 6 * 54;
-        products.add(new DialogButton(i, Backend_Rect(x, y, 50, 50), 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", button_craft_prod));
+        products.add(new DialogButton(i, Backend_Rect(x, y, 50, 50), 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", button_craft_prod, show_prod_ing));
         products.add(new DialogImage(i, Backend_Rect(x + 2, y + 2, 46, 46)));
     }
+    products.add(new DialogText(0, 0, (1 + PROD_COUNT / 6) * 54, 20, {0, 0, 0, 255}, "Product element"));
 }
 
 void DCraft::draw()
@@ -111,10 +126,18 @@ void DCraft::draw()
 bool DCraft::press(int x, int y, int button)
 {
     Dialog::press(x, y, button);
-    if (in_products)
+    if (in_products) {
+        DialogText * text = static_cast<DialogText *>(products.get_element_from_id(0, DialogElementType::Text));
+        if (text)
+            text->change_text("Product element");
         return products.press(x, y, button);
-    else
+    }
+    else {
+        DialogText * text = static_cast<DialogText *>(ingredients.get_element_from_id(0, DialogElementType::Text));
+        if (text)
+            text->change_text("Ingredient element");
         return ingredients.press(x, y, button);
+    }
 }
 
 void DCraft::update()
@@ -183,7 +206,7 @@ void DCraft::update()
         prod_button->d_box->color = {125, 125, 125, 5};
         box->color.a = 0;
     }
-
+    
     DialogImage * img = static_cast<DialogImage *>(ingredients.get_element_from_id(0, DialogElementType::Image));
     if (img && img->texture_loaded)
         return;
@@ -194,13 +217,14 @@ void DCraft::update()
         img->texture = ing_textures[i];
         img->texture_loaded = true;
     }
-
+   
     for (int i = 0; i < PROD_COUNT; i++)
     {
         DialogImage * img = static_cast<DialogImage *>(products.get_element_from_id(i, DialogElementType::Image));
         img->texture = prod_textures[i];
         img->texture_loaded = true;
     }
+
 }
 
 bool hide_craft_window()

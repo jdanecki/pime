@@ -141,6 +141,7 @@ Field:     A          B          G        R
     add_prod_texture(PROD_ROASTED_MEAT, "textures/items/products/roasted_meat.png");
     add_prod_texture(PROD_FRUIT_SALAD, "textures/items/products/fruit_salad.png");
     add_prod_texture(PROD_SEEDLING, "textures/items/products/seedling.png");
+    add_prod_texture(PROD_FEED, "textures/items/products/feed.png");
 
     add_prod_texture(PROD_HUT, "textures/objects/hut.png");
     add_prod_texture(PROD_TENT, "textures/objects/tent.png");

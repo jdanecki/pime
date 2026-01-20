@@ -61,6 +61,7 @@ extern void Backend_Texture_Copy(SDL_Texture *texture, Backend_Rect *srcrect, Ba
 extern void Backend_Texture_Copy_Flip(SDL_Texture *texture, Backend_Rect *srcrect, Backend_Rect *dstrect);
 extern int Backend_Get_Texture_Size(SDL_Texture *texture, int *w, int *h);
 extern Backend_Pixels Backend_Allocate_Pixels(int w, int h);
+extern void Backend_Map_Pixels(Backend_Pixels pixels);
 extern void Backend_Update_Texture_Pixels(Backend_Pixels pixels);
 
 extern void Backend_Draw_Fill_Rectangle(Backend_Rect r, SDL_Color color);

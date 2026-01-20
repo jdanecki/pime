@@ -128,7 +128,7 @@ int init_graphics()
     }
 
     create_menus();
-    // map = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, WORLD_SIZE, WORLD_SIZE);
+    
 
     return 0;
 }

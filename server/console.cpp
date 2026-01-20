@@ -15,7 +15,7 @@ int history_up;
 int buf_pos;
 bool scrolling = true;
 
-void print_status(int , const char * format, ...)
+void print_status(int, const char * format, ...)
 {
     va_list args;
     char buf[128];
@@ -32,7 +32,7 @@ void shift_output()
     for (int i = 1; i < history_size; i++)
     {
         strncpy(out_buf[i - 1], out_buf[i], MAX_OUTPUT_SIZE);
-        out_buf[i][0] = 0;
+        memset(out_buf[i], 0, MAX_OUTPUT_SIZE);
     }
 }
 
@@ -72,7 +72,10 @@ int CONSOLE_LOG(const char * fmt, ...)
             default:
                 out_buf[buf_pos][col] = buf[ch];
                 if (col < MAX_OUTPUT_SIZE - 1)
+                {
                     col++;
+                    out_buf[buf_pos][col] = 0;
+                }
                 break;
         }
     }

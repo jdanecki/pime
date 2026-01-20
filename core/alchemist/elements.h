@@ -20,6 +20,7 @@ enum Product_action
     ACT_PLOW, // oraj
     ACT_PLANT,
     ACT_INVITE,
+    ACT_FEED,
 };
 
 extern const char * product_action_name[];
@@ -384,6 +385,7 @@ enum Product_id
     PROD_ROASTED_MEAT,
     PROD_FRUIT_SALAD,
     PROD_SEEDLING,
+    PROD_FEED,
     PROD_COUNT
 };
 

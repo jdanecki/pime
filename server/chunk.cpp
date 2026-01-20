@@ -28,7 +28,7 @@ void add_animal(chunk * ch, size_t id)
 
 void load_chunk(int cx, int cy)
 {
-    CONSOLE_LOG("load_chunk(%d, %d)\n", cx, cy);
+  //  CONSOLE_LOG("load_chunk(%d, %d)\n", cx, cy);
     chunk * ch = new chunk(cx, cy);
     Region * r = find_region(cx, cy);
 
@@ -99,9 +99,15 @@ void show_chunk()
     reg->show();
 }
 
+void show_loaded_chunks();
+
 void load_chunks()
 {
-    for (int cy = 127; cy < 130; cy++)
-        for (int cx = 127; cx < 130; cx++)
+    CONSOLE_LOG("Loading chunks\n");    
+    int size=10;
+    for (int cy = 128-size; cy < 128+size; cy++)
+        for (int cx = 128-size; cx < 128+size; cx++)
             load_chunk(cy, cx);
+    CONSOLE_LOG("Chunks loaded\n");
+    show_loaded_chunks();
 }

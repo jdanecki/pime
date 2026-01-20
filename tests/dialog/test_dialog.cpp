@@ -22,7 +22,8 @@ bool handle_events();
 
 void send_packet_craft(uintptr_t prod_id, uintptr_t ingredients_num, const uintptr_t * iid)
 {
-    printf("send_packet_craft prod=%lu num=%ld id=%lu\n", prod_id, ingredients_num, *iid);
+    printf("send_packet_craft prod=%lu %s num=%ld id=%lu\n", prod_id, 
+        prod_id < ING_COUNT ? ingredient_name[prod_id] : product_name[prod_id-ING_COUNT], ingredients_num, *iid);
 }
 bool Player::set_known(Class_id cid, int el_id)
 {

@@ -63,6 +63,21 @@ void show_base_animals()
     base_animals.show();
 }
 
+void show_loaded_chunks()
+{
+    int count = 0;
+    int objects = 0;
+    int beings=0;
+    for (int cy = 0; cy < WORLD_SIZE; cy++)
+        for (int cx = 0; cx < WORLD_SIZE; cx++)
+            if (world_table[cx][cy]) {
+                count++;
+                objects += world_table[cx][cy]->objects.nr_elements;
+                beings += world_table[cx][cy]->beings.nr_elements;
+            }
+    CONSOLE_LOG("Loaded chunks: %d objects: %d beings: %d\n", count, objects, beings);
+}
+
 void debug_create_place()
 {
     chunk * ch = world_table[128][128];
@@ -119,6 +134,7 @@ void print_help()
     CONSOLE_LOG("5 - show base elements\n");
     CONSOLE_LOG("6 - show base plants\n");
     CONSOLE_LOG("7 - show base animals\n");
+    CONSOLE_LOG("8 - show loaded chunks\n");
     CONSOLE_LOG("# - show keys\n");
 }
 void switch_debug_mode()
@@ -202,6 +218,7 @@ KeyHandler key_handlers[] = {
     {'5', show_base_elements},
     {'6', show_base_plants},
     {'7', show_base_animals},
+    {'8', show_loaded_chunks},
     {'#', handle_hash},
 };
 

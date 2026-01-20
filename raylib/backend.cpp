@@ -104,6 +104,11 @@ Backend_Pixels Backend_Allocate_Pixels(int w, int h)
     return pixels;
 }
 
+void Backend_Map_Pixels(Backend_Pixels pixels)
+{
+ 
+}
+
 void Backend_Update_Texture_Pixels(Backend_Pixels pixels)
 {
     UpdateTexture(pixels.texture, pixels.pixels);

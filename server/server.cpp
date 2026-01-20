@@ -7,6 +7,8 @@
 #include "generator/generator.h"
 #include "key_handlers.h"
 
+
+
 void generate()
 {
     create_regions();
@@ -40,6 +42,7 @@ void generate()
         base_animals.add(entry);
     }
     load_chunks();
+    
 }
 
 int main()

@@ -59,6 +59,7 @@ extern void Backend_Wait();
 extern void Backend_Update_Screen();
 extern int Backend_Get_Texture_Size(Texture texture, int *w, int *h);
 extern Backend_Pixels Backend_Allocate_Pixels(int w, int h);
+extern void Backend_Map_Pixels(Backend_Pixels pixels);
 extern void Backend_Update_Texture_Pixels(Backend_Pixels pixels);
 extern void Backend_Draw_Fill_Rectangle(Backend_Rect r, Color color);
 extern void Backend_Draw_Rectangle(Backend_Rect r, Color color);

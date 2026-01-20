@@ -21,6 +21,7 @@ server_sources = [
   'tools/tinder.cpp', 'tools/log.cpp', 'tools/stick.cpp', 'tools/fire.cpp',
   'tools/fruit.cpp', 'tools/fruit_salad.cpp',
   'tools/seed.cpp', 'tools/seedling.cpp',
+  'tools/feed.cpp',
 
   'places/places.cpp'
 ]
