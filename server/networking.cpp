@@ -58,13 +58,12 @@ class PacketToSend : public ListElement
 
 void disconnect_player(ENetPeer * peer)
 {
-    
 }
 
 bool handle_packet(ENetPacket * packet, ENetPeer * peer)
 {
     unsigned char * data = packet->data;
-    //CONSOLE_LOG("Received length=%lu: %d\n", packet->dataLength, *data);
+    // CONSOLE_LOG("Received length=%lu: %d\n", packet->dataLength, *data);
 
     Packet * p = check_packet('R', data, packet->dataLength);
     if (!p)
@@ -258,7 +257,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             delete p;
             if (craft_entry(prod_id, ing_num, iid_table, pl->player))
             {
-                CONSOLE_LOG("crafted id=%ld %s\n", prod_id, prod_id < ING_COUNT ? ingredient_name[prod_id]:product_name[prod_id-ING_COUNT]);
+                CONSOLE_LOG("crafted id=%ld %s\n", prod_id, prod_id < ING_COUNT ? ingredient_name[prod_id] : product_name[prod_id - ING_COUNT]);
                 InventoryElement * el1 = pl->player->get_item_by_uid(iid_table[0]);
                 if (el1)
                 {
@@ -286,7 +285,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
                 delete p;
             }
             break;
-        }         
+        }
     }
     return true;
 }
@@ -295,7 +294,7 @@ void send_updates()
 {
     if (!players->nr_elements)
         return;
-    //CONSOLE_LOG("send_updates: time=%ld\n", get_time_ms());
+    // CONSOLE_LOG("send_updates: time=%ld\n", get_time_ms());
     if (objects_to_create.nr_elements)
     {
         ListElement * el = objects_to_create.head;
@@ -381,7 +380,6 @@ void notify_checked(size_t pl_id, size_t el)
     add_packet_to_send(new PacketCheckedUpdate(pl_id, el));
 }
 
-
 bool init_networking()
 {
     if (enet_initialize() != 0)
@@ -410,7 +408,6 @@ bool init_networking()
     return true;
 }
 
-
 void handle_net_event(ENetEvent * event)
 {
     switch (event->type)
@@ -429,7 +426,7 @@ void handle_net_event(ENetEvent * event)
         }
         case ENET_EVENT_TYPE_RECEIVE:
         {
-          //  CONSOLE_LOG("received packet from %s:%d\n", hostname, event->peer->address.port);
+            //  CONSOLE_LOG("received packet from %s:%d\n", hostname, event->peer->address.port);
             handle_packet(event->packet, event->peer);
             enet_packet_destroy(event->packet);
             send_updates();

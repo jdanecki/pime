@@ -46,8 +46,6 @@ void handle_exit()
     finish_program = true;
 }
 
-
-
 void show_base_elements()
 {
     base_elements.show();
@@ -67,10 +65,11 @@ void show_loaded_chunks()
 {
     int count = 0;
     int objects = 0;
-    int beings=0;
+    int beings = 0;
     for (int cy = 0; cy < WORLD_SIZE; cy++)
         for (int cx = 0; cx < WORLD_SIZE; cx++)
-            if (world_table[cx][cy]) {
+            if (world_table[cx][cy])
+            {
                 count++;
                 objects += world_table[cx][cy]->objects.nr_elements;
                 beings += world_table[cx][cy]->beings.nr_elements;
@@ -88,22 +87,24 @@ void debug_create_place()
 void debug_create_seedling()
 {
     chunk * ch = world_table[128][128];
-    Seedling * seedl=create_seedling(ch);
+    Seedling * seedl = create_seedling(ch);
     ch->add_object(seedl, 10, 9);
 }
 
 void debug_create_hoe()
 {
     chunk * ch = world_table[128][128];
-    Hoe * hoe=create_hoe(ch);
-    if (hoe) ch->add_object(hoe, 11, 9);
+    Hoe * hoe = create_hoe(ch);
+    if (hoe)
+        ch->add_object(hoe, 11, 9);
 }
 
 void debug_create_knife()
 {
     chunk * ch = world_table[128][128];
-    Knife * knife=create_knife(ch);
-    if (knife) ch->add_object(knife, 12, 9);
+    Knife * knife = create_knife(ch);
+    if (knife)
+        ch->add_object(knife, 12, 9);
 }
 
 void debug_print_help()
@@ -139,20 +140,23 @@ void print_help()
 }
 void switch_debug_mode()
 {
-   debug_mode ^= true;
-   print_status(0, "debug_mode=%d press F1 for help       ", debug_mode);
-   if (debug_mode) debug_print_help(); else print_help();
+    debug_mode ^= true;
+    print_status(0, "debug_mode=%d press F1 for help       ", debug_mode);
+    if (debug_mode)
+        debug_print_help();
+    else
+        print_help();
 }
 
 void create_all_base_elements()
 {
     chunk * ch = world_table[128][128];
-    for (size_t id=0; id < all_base_elements_count; id++)
+    for (size_t id = 0; id < all_base_elements_count; id++)
     {
         BaseListElement * ble = (BaseListElement *)base_elements.find(&id);
         BaseElement * bel = (BaseElement *)(ble->get_el());
-        ElementServer *el = create_element(bel);
-        ch->add_object(el, 3*(id % 6), 3*(id / 6));
+        ElementServer * el = create_element(bel);
+        ch->add_object(el, 3 * (id % 6), 3 * (id / 6));
         notify_create(el);
     }
 }
@@ -164,7 +168,7 @@ void create_all_base_plants()
     {
         BaseListElement * ble = (BaseListElement *)base_plants.find(&id);
         BasePlant * bp = (BasePlant *)(ble->get_el());
-        PlantServer *pl= create_plant(bp);
+        PlantServer * pl = create_plant(bp);
         ch->add_object(pl, id % CHUNK_SIZE, 10 + 3 * (id / CHUNK_SIZE));
         notify_create(pl);
     }
@@ -174,11 +178,11 @@ void create_all_base_animals()
 {
     chunk * ch = world_table[128][128];
 
-    for (size_t id=0; id < BASE_ANIMALS; id++)
+    for (size_t id = 0; id < BASE_ANIMALS; id++)
     {
         BaseListElement * ble = (BaseListElement *)base_animals.find(&id);
-        BaseAnimal *ba=(BaseAnimal *)(ble->get_el());
-        AnimalServer *an = create_animal(ba);
+        BaseAnimal * ba = (BaseAnimal *)(ble->get_el());
+        AnimalServer * an = create_animal(ba);
         ch->add_object(an, id % CHUNK_SIZE, 15 + id / CHUNK_SIZE);
         notify_create(an);
     }
@@ -197,7 +201,6 @@ KeyHandler debug_key_handlers[] = {
     {'3', create_all_base_animals},
     {27, handle_exit},
 };
-
 
 KeyHandler key_handlers[] = {
     {KEY_RESIZE, handle_resize},
@@ -237,11 +240,12 @@ bool handle_pressed()
     KeyHandler * handlers;
     if (debug_mode)
     {
-        num_handlers= sizeof(debug_key_handlers) / sizeof(KeyHandler);
+        num_handlers = sizeof(debug_key_handlers) / sizeof(KeyHandler);
         handlers = debug_key_handlers;
     }
-    else {
-        num_handlers= sizeof(key_handlers) / sizeof(KeyHandler);
+    else
+    {
+        num_handlers = sizeof(key_handlers) / sizeof(KeyHandler);
         handlers = key_handlers;
     }
 

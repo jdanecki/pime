@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-//#include <errno.h>
+// #include <errno.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
@@ -247,14 +247,14 @@ void ElementsList::remove(ListElement * el)
     }
 }
 
-NetworkObject **ElementsList::find_by_fun(FindFunc fun, void * arg, int * count)
+NetworkObject ** ElementsList::find_by_fun(FindFunc fun, void * arg, int * count)
 {
     ListElement * cur = head;
     NetworkObject ** a = (NetworkObject **)calloc(nr_elements, sizeof(NetworkObject *));
     int c = 0;
     while (cur)
     {
-        NetworkObject *el = cur->get_el();
+        NetworkObject * el = cur->get_el();
         if (fun(el, arg))
         {
             a[c] = el;
@@ -287,12 +287,12 @@ bool match_form(NetworkObject * el, void * arg)
     return el->get_form() == f;
 }
 
-NetworkObject **ElementsList::find_form(enum Form f, int * count)
+NetworkObject ** ElementsList::find_form(enum Form f, int * count)
 {
     return find_by_fun(match_form, &f, count);
 }
 
-bool match_class(NetworkObject *el, void * arg)
+bool match_class(NetworkObject * el, void * arg)
 {
     enum Class_id cl = *(enum Class_id *)arg;
     return el->get_cid() == cl;
@@ -303,13 +303,13 @@ NetworkObject ** ElementsList::find_class(Class_id cl, int * count)
     return find_by_fun(match_class, &cl, count);
 }
 
-bool match_uid(NetworkObject *el, void * arg)
+bool match_uid(NetworkObject * el, void * arg)
 {
-    size_t uid = *(size_t*)arg;
+    size_t uid = *(size_t *)arg;
     return el->get_uid() == uid;
 }
 
-NetworkObject **ElementsList::find_id(size_t id, int * count)
+NetworkObject ** ElementsList::find_id(size_t id, int * count)
 {
     return find_by_fun(match_uid, &id, count);
 }

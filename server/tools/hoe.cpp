@@ -30,7 +30,6 @@ bool Hoe::use_tile(int map_x, int map_y, int x, int y, Player * pl)
     return true;
 }
 
-
 bool Hoe::use(InventoryElement * object, Player * pl)
 {
     unsigned int map_x, map_y;
@@ -55,8 +54,7 @@ bool Hoe::use(InventoryElement * object, Player * pl)
     if (p->state != FIELD_PLOWED)
     {
         p->state = FIELD_PLOWED;
-        CONSOLE_LOG("%s: %s on %s @[%d,%d][%d,%d]\n", get_name(), product_action_name[actions[0]],
-                object->get_name(), map_x, map_y, x, y);
+        CONSOLE_LOG("%s: %s on %s @[%d,%d][%d,%d]\n", get_name(), product_action_name[actions[0]], object->get_name(), map_x, map_y, x, y);
         notify_update(p);
         return true;
     }
@@ -64,31 +62,30 @@ bool Hoe::use(InventoryElement * object, Player * pl)
     return false;
 }
 
-Hoe * create_hoe(chunk *ch)
+Hoe * create_hoe(chunk * ch)
 {
     int count;
     NetworkObject ** base_solid = base_elements.find_form(Form_solid, &count);
     CONSOLE_LOG("count=%d \n", count);
     if (count)
     {
-        for (int i=0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
-            BaseElement *base=static_cast<BaseElement*>(base_solid[i]);
+            BaseElement * base = static_cast<BaseElement *>(base_solid[i]);
             CONSOLE_LOG("solid: %d/%d\n", i, count);
-//            base->show(false);
+            //            base->show(false);
         }
 
-        ElementServer *el1=create_element(static_cast<BaseElement *>(base_solid[0]));
-        ElementServer *el2=create_element(static_cast<BaseElement *>(base_solid[1]));
-        IngredientServer *hb=HoeBlade::createHoeBlade(el1);
-        IngredientServer *hh=HoeHandle::createHoeHandle(el2);
+        ElementServer * el1 = create_element(static_cast<BaseElement *>(base_solid[0]));
+        ElementServer * el2 = create_element(static_cast<BaseElement *>(base_solid[1]));
+        IngredientServer * hb = HoeBlade::createHoeBlade(el1);
+        IngredientServer * hh = HoeHandle::createHoeHandle(el2);
         ch->add_object(hb, 0, 0);
         ch->add_object(hh, 0, 0);
-        Hoe * hoe = static_cast<Hoe*>(Hoe::createHoe(hb, hh));
+        Hoe * hoe = static_cast<Hoe *>(Hoe::createHoe(hb, hh));
         destroy(hb);
         destroy(hh);
         return hoe;
     }
     return nullptr;
-
 }

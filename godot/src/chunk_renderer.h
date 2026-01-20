@@ -8,22 +8,23 @@
 #include "../../core/tiles.h"
 #include "godot_cpp/classes/mesh_instance3d.hpp"
 
-namespace godot {
+namespace godot
+{
 
-class ChunkRenderer : public Node3D {
+class ChunkRenderer : public Node3D
+{
     GDCLASS(ChunkRenderer, Node3D)
 
-public:
+  public:
     ChunkRenderer();
     ~ChunkRenderer();
 
-    void update(const chunk_table* data);
-    
-protected:
-    static void _bind_methods();
-    MeshInstance3D* tiles[CHUNK_SIZE][CHUNK_SIZE];
+    void update(const chunk_table * data);
 
+  protected:
+    static void _bind_methods();
+    MeshInstance3D * tiles[CHUNK_SIZE][CHUNK_SIZE];
 };
-}
+} // namespace godot
 
 #endif

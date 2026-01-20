@@ -3,8 +3,7 @@
 
 int CONSOLE_LOG(const char * fmt, ...);
 
-template <typename T>
-class SerializablePointer
+template <typename T> class SerializablePointer
 {
     T * ptr;
 
@@ -20,8 +19,7 @@ class SerializablePointer
     }
 };
 
-template <typename T>
-SerializablePointer<T>::SerializablePointer(T * p) : ptr(p)
+template <typename T> SerializablePointer<T>::SerializablePointer(T * p) : ptr(p)
 {
 }
 

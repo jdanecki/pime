@@ -2,8 +2,8 @@
 #define NETWORKING_H
 
 #include <cstdarg>
-//#include <cstdint>
-//#include <ostream>
+// #include <cstdint>
+// #include <ostream>
 #include <new>
 #include <enet/enet.h>
 
@@ -15,12 +15,12 @@ struct ObjectData
 {
     enum class Tag
     {
-        InvElement, //0
+        InvElement, // 0
         Element,
         Plant,
         Animal,
         Ingredient,
-        Product, //5
+        Product, // 5
         Scroll,
         Player,
         Npc,

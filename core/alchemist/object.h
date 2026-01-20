@@ -50,8 +50,13 @@ class NetworkObject
     size_t get_uid() const;
     Class_id get_cid() const;
 
-    virtual Form get_form() { return Form_unknown; }
-    virtual void show(bool details = true) {}
+    virtual Form get_form()
+    {
+        return Form_unknown;
+    }
+    virtual void show(bool details = true)
+    {
+    }
 };
 
 #endif

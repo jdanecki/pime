@@ -73,13 +73,11 @@ class BaseListElement : public ListElement
     }
     size_t get_size()
     {
-        Base *b = static_cast<Base *>(get_el());
+        Base * b = static_cast<Base *>(get_el());
         return b->get_size();
     }
     void show(bool details = true);
-
 };
-
 
 struct ElId
 {

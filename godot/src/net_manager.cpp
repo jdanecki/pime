@@ -13,10 +13,10 @@
 
 using namespace godot;
 
-NetManager* net_manager;
+NetManager * net_manager;
 
-void NetManager::_bind_methods() {
-
+void NetManager::_bind_methods()
+{
 }
 
 NetManager::NetManager()
@@ -30,13 +30,17 @@ NetManager::~NetManager()
 void NetManager::_ready()
 {
     net_manager = this;
-    if (!Engine::get_singleton()->is_editor_hint()) {
-    client = init("127.0.0.1", "1234");
-    if (client) {
-        UtilityFunctions::print("Connected to server");
-    } else {
-        UtilityFunctions::print("Failed to connect");
-    }
+    if (!Engine::get_singleton()->is_editor_hint())
+    {
+        client = init("127.0.0.1", "1234");
+        if (client)
+        {
+            UtilityFunctions::print("Connected to server");
+        }
+        else
+        {
+            UtilityFunctions::print("Failed to connect");
+        }
     }
 }
 
@@ -48,47 +52,50 @@ void NetManager::_process(double delta)
     }
 }
 
-void NetManager::update_chunk(int x, int y, const chunk_table* data)
+void NetManager::update_chunk(int x, int y, const chunk_table * data)
 {
     String name = vformat("%d_%d", x, y);
-    ChunkRenderer* chunk = Object::cast_to<ChunkRenderer>(get_node_or_null(name));
-    if (!chunk) {
+    ChunkRenderer * chunk = Object::cast_to<ChunkRenderer>(get_node_or_null(name));
+    if (!chunk)
+    {
         chunk = memnew(ChunkRenderer);
         chunk->set_name(name);
         add_child(chunk);
-        chunk->set_position(Vector3(x*CHUNK_SIZE, 0, y*CHUNK_SIZE));
+        chunk->set_position(Vector3(x * CHUNK_SIZE, 0, y * CHUNK_SIZE));
     }
     chunk->update(data);
 }
 
-void NetManager::create_object(const ObjectData* data_c)
+void NetManager::create_object(const ObjectData * data_c)
 {
-    ObjectData* data = (ObjectData*)data_c;
+    ObjectData * data = (ObjectData *)data_c;
     switch (data->tag)
     {
-        case ObjectData::Tag::Element: 
-            {
-            ElementGodot* el = memnew(ElementGodot(data->element.data));
+        case ObjectData::Tag::Element:
+        {
+            ElementGodot * el = memnew(ElementGodot(data->element.data));
             add_child(el);
             el->set_position(Vector3(data->element.data.location.get_world_x(), 1, data->element.data.location.get_world_y()));
             register_object(el);
             break;
-            }
+        }
         case ObjectData::Tag::Player:
-            {
-            PlayerGodot* player = memnew(PlayerGodot(data->player.data));
+        {
+            PlayerGodot * player = memnew(PlayerGodot(data->player.data));
             add_child(player);
             player->set_position(Vector3(data->player.data.location.get_world_x(), 1, data->player.data.location.get_world_y()));
             register_object(player);
             break;
-            }
+        }
     }
 }
 
 size_t my_id;
 
 // FIXME remove when net.cpp is cleaned up
-void update_hotbar() {}
+void update_hotbar()
+{
+}
 
 void print_status(int l, const char * format, ...)
 {
@@ -182,9 +189,13 @@ void update_object(const ObjectData * data)
 
 void update_item_location(LocationUpdateData data)
 {
-    InventoryElement* el = get_object_by_id(data.id);
-    Node3D* node = dynamic_cast<Node3D*>(el);
-    if (!node) { UtilityFunctions::print("INVALID"); return;}
+    InventoryElement * el = get_object_by_id(data.id);
+    Node3D * node = dynamic_cast<Node3D *>(el);
+    if (!node)
+    {
+        UtilityFunctions::print("INVALID");
+        return;
+    }
     if (data.new_.tag == ItemLocation::Tag::Player)
     {
         node->set_visible(false);

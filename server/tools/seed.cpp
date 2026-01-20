@@ -19,6 +19,7 @@ IngredientServer * Seed::createSeed(InventoryElement * from)
                 ret = new Seed(from);
             break;
     }
-    if (!ret) CONSOLE_LOG("Can'_t create Seed\n");
+    if (!ret)
+        CONSOLE_LOG("Can'_t create Seed\n");
     return ret;
 }

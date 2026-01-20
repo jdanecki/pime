@@ -6,22 +6,27 @@
 
 using namespace godot;
 
-void PlayerGodot::_bind_methods() {
-
+void PlayerGodot::_bind_methods()
+{
 }
 
-PlayerGodot::PlayerGodot() : Player(0, SerializableCString("none"), ItemLocation::center(), 0, 0, 0) {
+PlayerGodot::PlayerGodot() : Player(0, SerializableCString("none"), ItemLocation::center(), 0, 0, 0)
+{
 }
 
-PlayerGodot::PlayerGodot(Player player) : Player(player) {
+PlayerGodot::PlayerGodot(Player player) : Player(player)
+{
 }
 
-PlayerGodot::~PlayerGodot() {
+PlayerGodot::~PlayerGodot()
+{
 }
 
-void PlayerGodot::_ready() {
+void PlayerGodot::_ready()
+{
     Ref<StandardMaterial3D> mat = memnew(StandardMaterial3D);
-    switch (clan.get()->id) {
+    switch (clan.get()->id)
+    {
         case Clan_Animal:
             mat->set_albedo(Color(0, 1, 0, 1));
             break;

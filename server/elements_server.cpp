@@ -25,7 +25,8 @@ AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
     max_age = new Property("max age", 1000 + rand() % 1000);
     age = new Property("age", 10 + rand() % max_age->value);
     size = 1.0 * age->value / max_age->value;
-    if (size < 0.2) size=0.2;
+    if (size < 0.2)
+        size = 0.2;
 }
 
 bool AnimalServer::action(Product_action action, Player * pl)
@@ -161,7 +162,7 @@ void PlantServer::change_phase(Plant_phase p)
 {
     if (phase != p)
     {
-        //CONSOLE_LOG("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
+        // CONSOLE_LOG("%s changing phase: %s -> %s age=%u/%u\n", get_name(), plant_phase_name[phase], plant_phase_name[p], age->value, max_age->value);
         notify_update(this);
     }
     phase = p;
@@ -176,7 +177,7 @@ void PlantServer::show(bool details)
 bool PlantServer::player_action(Player_action action, Player * pl)
 {
     bool res = false;
-    //CONSOLE_LOG("PLANT_SERVER: %s %s\n", player_action_name[action], get_name());
+    // CONSOLE_LOG("PLANT_SERVER: %s %s\n", player_action_name[action], get_name());
     switch (action)
     {
         case PLAYER_EAT:
@@ -195,7 +196,7 @@ bool PlantServer::player_action(Player_action action, Player * pl)
 
 void PlantServer::set_phase(Plant_phase p)
 {
-    phase=p;
+    phase = p;
     switch (phase)
     {
         case Plant_seedling:
@@ -220,8 +221,8 @@ void PlantServer::set_phase(Plant_phase p)
 
 bool PlantServer::grow()
 {
-    unsigned long ms=get_time_ms();
-  //  CONSOLE_LOG("PlantServer.grow: %llu:%llu ms delay=%d\n", ms/1000, ms % 1000, delay_for_grow);
+    unsigned long ms = get_time_ms();
+    //  CONSOLE_LOG("PlantServer.grow: %llu:%llu ms delay=%d\n", ms/1000, ms % 1000, delay_for_grow);
     if (grown)
         return false;
 
@@ -237,8 +238,8 @@ bool PlantServer::grow()
     age->value++;
     size = 1.0 * age->value / max_age->value;
 
-    /*CONSOLE_LOG("PlantServer:%s growing %d/%d phase=%s grown=%d times=%d/%d/%d/ size=%f\n", get_name(), 
-        age->value, max_age->value, plant_phase_name[phase], grown, 
+    /*CONSOLE_LOG("PlantServer:%s growing %d/%d phase=%s grown=%d times=%d/%d/%d/ size=%f\n", get_name(),
+        age->value, max_age->value, plant_phase_name[phase], grown,
         seedling_time, growing_time, flowers_time, size);
 */
     if (age->value >= max_age->value)
@@ -285,13 +286,13 @@ IngredientServer::IngredientServer(InventoryElement * from, Ingredient_id id, Fo
     {
         case Class_Ingredient:
         {
-            IngredientServer *ing=static_cast<IngredientServer*>(from);
-            el=ing->el;
+            IngredientServer * ing = static_cast<IngredientServer *>(from);
+            el = ing->el;
             break;
         }
         default:
             el = from->get_id();
-        break;
+            break;
     }
 }
 
@@ -334,7 +335,7 @@ void ProductServer::show(bool details)
 {
     CONSOLE_LOG("vvv PRODUCT_SERVER vvv\n");
     Product::show(details);
-    for (int i=0; i < ing_count; i++)
+    for (int i = 0; i < ing_count; i++)
         CONSOLE_LOG("ings[%d] base=%d\n", i, ings[i]);
     CONSOLE_LOG("!!! PRODUCT_SERVER !!!\n");
 }

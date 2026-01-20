@@ -8,23 +8,24 @@
 #include "../../core/player.h"
 #include "godot_cpp/classes/mesh_instance3d.hpp"
 
-namespace godot {
+namespace godot
+{
 
-class PlayerGodot : public CharacterBody3D, public Player {
+class PlayerGodot : public CharacterBody3D, public Player
+{
     GDCLASS(PlayerGodot, CharacterBody3D)
-    MeshInstance3D* mesh;
+    MeshInstance3D * mesh;
 
-public:
+  public:
     PlayerGodot();
     PlayerGodot(Player player);
     ~PlayerGodot();
 
     void _ready() override;
-    
-protected:
-    static void _bind_methods();
 
+  protected:
+    static void _bind_methods();
 };
-}
+} // namespace godot
 
 #endif

@@ -20,9 +20,9 @@ class NetManager : public Node3D
     void _ready() override;
     void _process(double delta) override;
 
-    void update_chunk(int x, int y, const chunk_table* data);
-    void create_object(const ObjectData* data);
-    
+    void update_chunk(int x, int y, const chunk_table * data);
+    void create_object(const ObjectData * data);
+
   protected:
     static void _bind_methods();
 };

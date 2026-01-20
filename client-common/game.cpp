@@ -128,7 +128,6 @@ int init_graphics()
     }
 
     create_menus();
-    
 
     return 0;
 }

@@ -33,11 +33,11 @@ struct ItemLocation
         Chunk_Body chunk;
         Player_Body player;
     };
-/*    ItemLocation()
-    {
-        tag = ItemLocation::Tag::Chunk;
-        chunk = {128, 128, 8, 8};
-    }*/
+    /*    ItemLocation()
+        {
+            tag = ItemLocation::Tag::Chunk;
+            chunk = {128, 128, 8, 8};
+        }*/
     static ItemLocation center()
     {
         ItemLocation l;
@@ -70,6 +70,5 @@ struct ItemLocation
     {
         return chunk.y;
     }
-
 };
 #endif

@@ -1,7 +1,5 @@
 #include "../client-common/game.h"
 
-
-
 void (*callback_daily)();
 void daily_call()
 {

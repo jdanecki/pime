@@ -110,20 +110,21 @@ void test_element()
     list.add(el1);
     list.add(el2);
     list.add(el3);
-//    list.show(false);
+    //    list.show(false);
     el1->show(false);
     el2->show(false);
     el3->show(false);
 
-    ListElement * el =list.find(el1);
+    ListElement * el = list.find(el1);
     el1->show(false);
 
     int count;
     NetworkObject ** elems = list.find_form(Form_solid, &count);
     printf("solid count=%d\n", count);
-    if (count) {
-        for (int i=0; i < count; i++)
-        {            
+    if (count)
+    {
+        for (int i = 0; i < count; i++)
+        {
             elems[i]->show(false);
         }
     }
@@ -132,7 +133,7 @@ void test_element()
 int main()
 {
     test_element();
-//    test_loops();
+    //    test_loops();
     // test_element_on_2_lists();
     //    test_element_on_2_Invlists();
 

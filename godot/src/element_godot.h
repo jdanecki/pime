@@ -13,7 +13,7 @@ namespace godot
 class ElementGodot : public Node3D, public Element
 {
     GDCLASS(ElementGodot, Node3D)
-    MeshInstance3D* mesh;
+    MeshInstance3D * mesh;
 
   public:
     ElementGodot();

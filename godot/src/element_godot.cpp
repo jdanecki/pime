@@ -22,15 +22,16 @@ ElementGodot::~ElementGodot()
 }
 
 ElementGodot::ElementGodot(Element element) : Element(element)
-{}
+{
+}
 
 void ElementGodot::_ready()
 {
     Ref<StandardMaterial3D> mat = memnew(StandardMaterial3D);
-    BaseElement* base = get_base();
-    mat->set_albedo(Color(base->color.r / 255.0, base->color.g / 255.0, base->color.b /255.0, 1));
+    BaseElement * base = get_base();
+    mat->set_albedo(Color(base->color.r / 255.0, base->color.g / 255.0, base->color.b / 255.0, 1));
     Ref<BoxMesh> box = memnew(BoxMesh);
-    box->set_size(Vector3(length.value / 32.0, height.value / 32.0, width.value/ 32.0));
+    box->set_size(Vector3(length.value / 32.0, height.value / 32.0, width.value / 32.0));
     box->set_material(mat);
     mesh = memnew(MeshInstance3D);
     mesh->set_mesh(box);

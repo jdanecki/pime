@@ -37,17 +37,19 @@ bool check_and_load_chunk(int new_map_x, int new_map_y)
 
 void PlayerServer::move(int dx, int dy)
 {
-  //  CONSOLE_LOG("SERV: player move dx=%d dy=%d\n", dx, dy);
+    //  CONSOLE_LOG("SERV: player move dx=%d dy=%d\n", dx, dy);
     ItemLocation old = location;
-    
+
     int x = location.chunk.x + dx;
     int y = location.chunk.y + dy;
-    
+
     int map_dx = x / CHUNK_SIZE;
     int map_dy = y / CHUNK_SIZE;
 
-    if (x < 0 && x % CHUNK_SIZE != 0) map_dx--;
-    if (y < 0 && y % CHUNK_SIZE != 0) map_dy--;
+    if (x < 0 && x % CHUNK_SIZE != 0)
+        map_dx--;
+    if (y < 0 && y % CHUNK_SIZE != 0)
+        map_dy--;
 
     int new_x = x - map_dx * CHUNK_SIZE;
     int new_y = y - map_dy * CHUNK_SIZE;

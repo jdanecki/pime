@@ -7,8 +7,6 @@
 #include "generator/generator.h"
 #include "key_handlers.h"
 
-
-
 void generate()
 {
     create_regions();
@@ -42,7 +40,6 @@ void generate()
         base_animals.add(entry);
     }
     load_chunks();
-    
 }
 
 int main()
@@ -58,7 +55,8 @@ int main()
     //   trace_network = 1;
 
     srand(0);
-    if (!init_networking()) {        
+    if (!init_networking())
+    {
         ret = 1;
         goto end_server;
     }

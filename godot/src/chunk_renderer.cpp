@@ -8,34 +8,41 @@
 
 using namespace godot;
 
-void ChunkRenderer::_bind_methods() {
-
+void ChunkRenderer::_bind_methods()
+{
 }
 
-ChunkRenderer::ChunkRenderer() {
-    for (int y = 0; y < CHUNK_SIZE; y++) {
-        for (int x = 0; x< CHUNK_SIZE; x++) {
-          tiles[y][x] = nullptr;
+ChunkRenderer::ChunkRenderer()
+{
+    for (int y = 0; y < CHUNK_SIZE; y++)
+    {
+        for (int x = 0; x < CHUNK_SIZE; x++)
+        {
+            tiles[y][x] = nullptr;
         }
     }
 }
 
-ChunkRenderer::~ChunkRenderer() {
+ChunkRenderer::~ChunkRenderer()
+{
 }
 
-void ChunkRenderer::update(const chunk_table* data)
+void ChunkRenderer::update(const chunk_table * data)
 {
-    for (int y = 0; y < CHUNK_SIZE; y++) {
-        for (int x = 0; x< CHUNK_SIZE; x++) {
-            if (tiles[y][x]) {
+    for (int y = 0; y < CHUNK_SIZE; y++)
+    {
+        for (int x = 0; x < CHUNK_SIZE; x++)
+        {
+            if (tiles[y][x])
+            {
                 memfree(tiles[y][x]);
             }
-            MeshInstance3D* mesh = memnew(MeshInstance3D);
+            MeshInstance3D * mesh = memnew(MeshInstance3D);
             Ref<PlaneMesh> m = memnew(PlaneMesh);
             m->set_size(Vector2(1, 1));
             Ref<StandardMaterial3D> mat = memnew(StandardMaterial3D);
-            BaseElement* el = get_base_element((*data)[y][x].tile);
-            mat->set_albedo(Color(el->color.r/255.0, el->color.g/255.0, el->color.b/255.0, 1));
+            BaseElement * el = get_base_element((*data)[y][x].tile);
+            mat->set_albedo(Color(el->color.r / 255.0, el->color.g / 255.0, el->color.b / 255.0, 1));
             m->set_material(mat);
             mesh->set_mesh(m);
             tiles[y][x] = mesh;

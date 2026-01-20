@@ -22,7 +22,7 @@ void PlayerUI::render(int x, int y)
     Renderable::render(x, y);
 }
 
-void PlayerUI::update_item_location(ItemLocation &old_loc, ItemLocation &new_loc)
+void PlayerUI::update_item_location(ItemLocation & old_loc, ItemLocation & new_loc)
 {
     going_right = (old_loc.chunk.x < new_loc.chunk.x) ? true : false;
 }

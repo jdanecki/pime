@@ -15,7 +15,7 @@
 #include "texture.h"
 #include "window.h"
 #include "alchemist2d.h"
-//#include "being2d.h"
+// #include "being2d.h"
 #include "../menu/menu.h"
 
 extern Backend_Texture map;
@@ -104,7 +104,6 @@ void draw_texts()
         write_text(window_width - PANEL_WINDOW + 10, hotbar.rect.r.y + hotbar.rect.get_h(), text, Cyan, 13, 25);
     }
 }
-
 
 #if 0
 int wait_for_chunk;
@@ -370,7 +369,7 @@ void draw()
         //        draw_npc();
         draw_texts();
 
-    //    draw_maps();
+        //    draw_maps();
     }
     Backend_Rect r0(0, window_height - 64, window_width, 32);
     Backend_Draw_Fill_Rectangle(r0, Backend_Color{10, 100, 10, 255});

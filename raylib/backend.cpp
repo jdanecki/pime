@@ -69,10 +69,13 @@ void Backend_Texture_Copy(Texture2D texture, Backend_Rect * srcrect, Backend_Rec
 void Backend_Texture_Copy_Flip(Texture2D texture, Backend_Rect * srcrect, Backend_Rect * dstrect)
 {
     Rectangle src;
-    if (srcrect) {
+    if (srcrect)
+    {
         src = srcrect->r;
         src.width *= -1;
-    } else {
+    }
+    else
+    {
         src.x = 0;
         src.y = 0;
         src.width = -texture.width;
@@ -106,7 +109,6 @@ Backend_Pixels Backend_Allocate_Pixels(int w, int h)
 
 void Backend_Map_Pixels(Backend_Pixels pixels)
 {
- 
 }
 
 void Backend_Update_Texture_Pixels(Backend_Pixels pixels)
