@@ -3,6 +3,8 @@
 #include "elements_server.h"
 #include "../core/world.h"
 #include "player_server.h"
+#include "networking.h"
+
 unsigned long get_time_usec()
 {
     struct timespec t;
@@ -20,8 +22,8 @@ void update()
 {
     if (!players->nr_elements)
         return;
-        // CONSOLE_LOG("update: time=%ld\n", get_time_ms());
-#if 1
+    // CONSOLE_LOG("update: time=%ld\n", get_time_ms());
+#if 0
     // TODO maybe in the future make it smarter
     for (int y = 0; y < WORLD_SIZE; y++)
     {
@@ -38,18 +40,23 @@ void update()
         }
     }
 #else
-    chunk * c = world_table[128][128];
-    if (!c)
-        return;
+    ListElement * pl_el = players->head;
 
-    ListElement * el = world_table[128][128]->beings.head;
-    while (el)
+    while (pl_el)
     {
-        BeingServer * b = dynamic_cast<BeingServer *>(el->el);
-        b->tick();
-        // unsigned long ms=get_time_ms();
-        // CONSOLE_LOG("tick: %llu:%llu ms\n", ms/1000, ms % 1000);
-        el = el->next;
+        PlayerServer * pl = ((PlayerServer *)((PlayerClient *)pl_el)->player);
+        int x = pl->location.chunk.map_x;
+        int y = pl->location.chunk.map_y;
+
+        chunk * c = world_table[y][x];
+        if (!c)
+            continue;
+        for (InventoryElement * el : world_table[y][x]->beings)
+        {
+            BeingServer * b = dynamic_cast<BeingServer *>(el);
+            b->tick();
+        }
+        pl_el = pl_el->next;
     }
 #endif
 }

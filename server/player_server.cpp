@@ -244,7 +244,7 @@ bool PlayerServer::tick()
 }
 
 PlayerServer::PlayerServer(size_t uid)
-    : Player(uid, SerializableCString("player"), ItemLocation::center(), 50 + rand() % 100, 50 + rand() % 100, 50 + rand() % 100), hunger_delay(60), hunger_delay_max(600)
+    : Player(uid, SerializableCString("player"), ItemLocation::center(), 50 + rand() % 100, 50 + rand() % 100, 50 + rand() % 100), hunger_delay(600), hunger_delay_max(600)
 {
     CONSOLE_LOG("PlayerServer: uid=%ld\n", uid);
     notify_create(this);

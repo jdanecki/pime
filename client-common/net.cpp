@@ -250,7 +250,7 @@ unsigned int network_tick()
 {
     ENetEvent event;
     unsigned int recv = 0;
-    while (enet_host_service(client->host, &event, 10) > 0)
+    while (enet_host_service(client->host, &event, 1) > 0)
     {
         switch (event.type)
         {
