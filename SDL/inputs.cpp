@@ -138,7 +138,7 @@ bool handle_events()
     int ww = 0, wh = 0;
     SDL_Event event;
     bool ret = false;
-    
+
     while (SDL_PollEvent(&event))
     {
         if (event.type == SDL_QUIT)
@@ -148,9 +148,9 @@ bool handle_events()
         if (event.type == SDL_KEYDOWN)
         {
             int key = event.key.keysym.sym;
-         //   printf("key %d\n", key);
+            //   printf("key %d\n", key);
 
-            ret=key_pressed(key);
+            ret = key_pressed(key);
         }
         if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
         {
@@ -173,8 +173,8 @@ bool handle_events()
     {
         unsigned int now = SDL_GetTicks();
         unsigned int dt = (now - last_move);
-       // printf("dt=%u now=%u last=%u\n", dt, now, last_move);
-        //if (dt > 10)
+        // printf("dt=%u now=%u last=%u\n", dt, now, last_move);
+        // if (dt > 100)
         {
             last_move = now;
             const Uint8 * currentKeyState = SDL_GetKeyboardState(NULL);

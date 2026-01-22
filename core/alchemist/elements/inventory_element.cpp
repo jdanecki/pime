@@ -48,9 +48,13 @@ Class_id InventoryElement::get_base_cid()
 {
     return c_id;
 }
-bool InventoryElement::check_rect(unsigned int px, unsigned int py, int)
+bool InventoryElement::check_rect(float px, float py, int size)
 {
-    return (px == location.get_world_x() && py == location.get_world_y());
+    float lx = location.get_world_x();
+    float ly = location.get_world_y();
+    CONSOLE_LOG("INV: check_rect: pl=(%0.1f,%0.1f) el=(%0.1f, %0.1f)\n", px, py, lx, ly);
+    // return (px >= lx && px < lx + size && py >= ly && py < ly + size);
+    return false;
 }
 char * InventoryElement::get_description()
 {

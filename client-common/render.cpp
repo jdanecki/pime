@@ -51,7 +51,7 @@ void draw_texts()
     int tile = ch->table[(int)(py + 0.5)][(int)(px + 0.5)].tile;
     BaseElement * base = get_base_element(tile % tiles_textures_count);
 
-    sprintf(text, "%s@[%d,%d][%0.1f,%0.1f]:id=%ld f=%c", player->get_name(), pl_ch_x, pl_ch_y, px, py, base->uid, (Form_name[base->form])[0]);
+    sprintf(text, "%s@[%0.1f,%0.1f]:id=%ld f=%c", player->get_name(), player->location.get_world_x(), player->location.get_world_y(), base->uid, (Form_name[base->form])[0]);
     write_text(tx, window_height - 100, text, White, 15, 30);
 
     InventoryElement * item = get_item_at_ppos(player);
@@ -188,8 +188,8 @@ void render_element(InventoryElement * o, float ltx, float lty)
         float obj_world_x = o->location.get_world_x();
         float obj_world_y = o->location.get_world_y();
 
-        float screen_x = obj_world_x - ltx;
-        float screen_y = obj_world_y - lty;
+        float screen_x = (obj_world_x - ltx) / tile_size;
+        float screen_y = (obj_world_y - lty) / tile_size;
 
         if (screen_x < CHUNK_SIZE && screen_y < CHUNK_SIZE)
         {
@@ -207,18 +207,17 @@ bool draw_terrain()
 {
     int size = tile_size;
 
-    float player_world_x = player->location.chunk.map_x * CHUNK_SIZE * size + player->location.chunk.x * size;
-    float player_world_y = player->location.chunk.map_y * CHUNK_SIZE * size + player->location.chunk.y * size;
+    float player_world_x = player->location.get_world_x();
+    float player_world_y = player->location.get_world_y();
 
-    float left_top_world_x = player_world_x - CHUNK_SIZE / 2.0 * size;
-    float left_top_world_y = player_world_y - CHUNK_SIZE / 2.0 * size;   
-       
+    float left_top_world_x = player_world_x - 8 * size;
+    float left_top_world_y = player_world_y - 8 * size;
+
     int first_tile_x = left_top_world_x / size;
     int first_tile_y = left_top_world_y / size;
     int last_tile_x = (left_top_world_x + size * CHUNK_SIZE) / size + 1;
     int last_tile_y = (left_top_world_y + size * CHUNK_SIZE) / size + 1;
-    
-    
+
     Backend_Set_Clip(0, 0, size * CHUNK_SIZE, size * CHUNK_SIZE);
 
     for (int ty = first_tile_y; ty < last_tile_y; ++ty)
@@ -226,17 +225,18 @@ bool draw_terrain()
         for (int tx = first_tile_x; tx < last_tile_x; ++tx)
         {
             int chunk_x = tx / CHUNK_SIZE;
-            int chunk_y = ty / CHUNK_SIZE;  
-            int tile_x = tx - chunk_x * CHUNK_SIZE;
-            int tile_y = ty - chunk_y * CHUNK_SIZE;
+            int chunk_y = ty / CHUNK_SIZE;
             if (chunk_x < 0 || chunk_x >= WORLD_SIZE || chunk_y < 0 || chunk_y >= WORLD_SIZE)
                 continue;
             chunk * chunk = check_chunk(chunk_x, chunk_y);
-            if (!chunk) {
+            if (!chunk)
+            {
                 Backend_Set_Clip(0, 0, 0, 0);
                 return false;
             }
-            
+            int tile_x = tx - chunk_x * CHUNK_SIZE;
+            int tile_y = ty - chunk_y * CHUNK_SIZE;
+
             int tile = chunk->table[tile_y][tile_x].tile;
             Backend_Rect img_rect(tx * size - left_top_world_x, ty * size - left_top_world_y, size, size);
             Backend_Texture texture = tiles_textures[tile % tiles_textures_count];
@@ -261,8 +261,6 @@ bool draw_terrain()
                 Backend_Texture_Copy(texture, NULL, &img_rect);
         }
     }
-    Backend_Set_Clip(0, 0, 0, 0);
-
 
     /*  for (int i=0; i < tiles_textures_count; i++)
       {
@@ -273,16 +271,10 @@ bool draw_terrain()
   */
     int first_chunk_x = first_tile_x / CHUNK_SIZE;
     int first_chunk_y = first_tile_y / CHUNK_SIZE;
-    int last_chunk_x = last_tile_x / CHUNK_SIZE;
-    int last_chunk_y = last_tile_y / CHUNK_SIZE;
-  
-    player_world_x = player->location.get_world_x();
-    player_world_y = player->location.get_world_y();
+    int last_chunk_x = (first_tile_x + CHUNK_SIZE - 1) / CHUNK_SIZE;
+    int last_chunk_y = (first_tile_y + CHUNK_SIZE - 1) / CHUNK_SIZE;
 
-    left_top_world_x = player_world_x - CHUNK_SIZE / 2.0;
-    left_top_world_y = player_world_y - CHUNK_SIZE / 2.0; 
-  
-   // CONSOLE_LOG("%d,%d -> %d,%d\n", first_chunk_x, first_chunk_y, last_chunk_x, last_chunk_y);
+    // CONSOLE_LOG("%d,%d -> %d,%d\n", first_chunk_x, first_chunk_y, last_chunk_x, last_chunk_y);
     for (unsigned int cy = first_chunk_y; cy <= last_chunk_y; ++cy)
     {
         for (unsigned int cx = first_chunk_x; cx <= last_chunk_x; ++cx)
@@ -312,11 +304,12 @@ bool draw_terrain()
             }
         }
     }
-  
-    if (player && player->c_id == Class_Player) {
+
+    if (player && player->c_id == Class_Player)
+    {
         render_element(player, left_top_world_x, left_top_world_y);
     }
-
+    Backend_Set_Clip(0, 0, 0, 0);
     return true;
 }
 
@@ -395,11 +388,11 @@ int ui_updates;
 
 void draw()
 {
-    Backend_Begin_Drawing();    
+    Backend_Begin_Drawing();
     ui_updates++;
     bool ret = draw_terrain();
 
-   // if (ret && ui_updates > 3)
+    // if (ret && ui_updates > 3)
     {
         draw_run_icons();
         // draw_npc();
@@ -409,7 +402,7 @@ void draw()
         draw_status();
         ui_updates = 0;
     }
-    
+
     draw_dialogs();
 
     if (current_menu)

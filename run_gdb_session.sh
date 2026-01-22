@@ -3,5 +3,7 @@
 sudo sysctl -w kernel.yama.ptrace_scope=0
 
 cd build/server
-gdb ./server_pime
+xterm -e ./server_pime &
+sleep 1
+cgdb -p `pidof server_pime`
 

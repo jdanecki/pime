@@ -5,7 +5,7 @@
 
 typedef Texture2D Backend_Texture;
 typedef unsigned int timer_id;
-typedef unsigned int (*timer_callback) (unsigned int interval, void *param);
+typedef unsigned int (*timer_callback)(unsigned int interval, void * param);
 typedef Color Backend_Color;
 typedef Font Backend_Font;
 typedef Image Backend_Surface;
@@ -14,22 +14,40 @@ typedef float Backend_Rect_Field;
 
 class Backend_Rect
 {
-public:
+  public:
     Rectangle r;
     Backend_Rect(Backend_Rect_Field x, Backend_Rect_Field y, Backend_Rect_Field w, Backend_Rect_Field h)
     {
-        r.x=x;
-        r.y=y;
-        r.width=w;
-        r.height=h;
+        r.x = x;
+        r.y = y;
+        r.width = w;
+        r.height = h;
     }
 
-    float get_w() { return r.width; }
-    float get_h() { return r.height; }
-    void set_w(float w) { r.width = w; }
-    void set_h(float h) { r.height = h; }
-    void add_w(float w) { r.width += w; }
-    void add_h(float h) { r.height += h; }
+    float get_w()
+    {
+        return r.width;
+    }
+    float get_h()
+    {
+        return r.height;
+    }
+    void set_w(float w)
+    {
+        r.width = w;
+    }
+    void set_h(float h)
+    {
+        r.height = h;
+    }
+    void add_w(float w)
+    {
+        r.width += w;
+    }
+    void add_h(float h)
+    {
+        r.height += h;
+    }
 };
 
 struct Backend_Pixels
@@ -39,9 +57,9 @@ struct Backend_Pixels
     int pitch;
 };
 
-extern void Backend_Texture_Copy_With_Mask(Texture2D texture, Backend_Rect *srcrect, Backend_Rect *dstrect, Color color, bool mask);
-extern void Backend_Texture_Copy(Texture2D texture, Backend_Rect *srcrect, Backend_Rect *dstrect);
-extern void Backend_Texture_Copy_Flip(Texture2D texture, Backend_Rect *srcrect, Backend_Rect *dstrect);
+extern void Backend_Texture_Copy_With_Mask(Texture2D texture, Backend_Rect * srcrect, Backend_Rect * dstrect, Color color, bool mask);
+extern void Backend_Texture_Copy(Texture2D texture, Backend_Rect * srcrect, Backend_Rect * dstrect);
+extern void Backend_Texture_Copy_Flip(Texture2D texture, Backend_Rect * srcrect, Backend_Rect * dstrect);
 
 #define Backend_Image_Load LoadImage
 #define Backend_Check_Surface(surf) (surf.data != NULL)
@@ -50,14 +68,14 @@ extern void Backend_Texture_Copy_Flip(Texture2D texture, Backend_Rect *srcrect, 
 #define Backend_Begin_Drawing() BeginDrawing()
 #define Backend_End_Drawing() EndDrawing()
 
-//#define BeginBlendMode(BLEND_ALPHA)
-//EndBlendMode(); 
+// #define BeginBlendMode(BLEND_ALPHA)
+// EndBlendMode();
 
 Texture2D Backend_Create_Texture_From_Surface(Image image);
 const char * Backend_Get_Error();
 void Backend_Wait();
 void Backend_Update_Screen();
-int Backend_Get_Texture_Size(Texture texture, int *w, int *h);
+int Backend_Get_Texture_Size(Texture texture, int * w, int * h);
 Backend_Pixels Backend_Allocate_Pixels(int w, int h);
 void Backend_Map_Pixels(Backend_Pixels pixels);
 void Backend_Update_Texture_Pixels(Backend_Pixels pixels);
@@ -65,9 +83,9 @@ void Backend_Draw_Fill_Rectangle(Backend_Rect r, Color color);
 void Backend_Draw_Rectangle(Backend_Rect r, Color color);
 void Backend_Draw_Gradient_Rectangle(int x, int y, int w, int h, Color top, Color bottom);
 
-void Backend_Window_Size(int *w, int *h);
+void Backend_Window_Size(int * w, int * h);
 int Backend_Set_Clip(int x, int y, int w, int h);
-
 int CONSOLE_LOG(const char * fmt, ...);
-#endif
 
+bool Backend_Has_Intersection(Backend_Rect r1, Backend_Rect r2);
+#endif

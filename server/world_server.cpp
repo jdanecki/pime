@@ -22,7 +22,7 @@ void update()
 {
     if (!players->nr_elements)
         return;
-    // CONSOLE_LOG("update: time=%ld\n", get_time_ms());
+        // CONSOLE_LOG("update: time=%ld\n", get_time_ms());
 #if 0
     // TODO maybe in the future make it smarter
     for (int y = 0; y < WORLD_SIZE; y++)

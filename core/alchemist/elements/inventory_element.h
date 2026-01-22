@@ -26,7 +26,7 @@ class InventoryElement : public NetworkObject
     virtual size_t get_id();
     virtual Class_id get_base_cid();
 
-    virtual bool check_rect(unsigned int px, unsigned int py, int);
+    virtual bool check_rect(float px, float py, int size);
 
     virtual char * get_description();
     virtual Property ** get_properties(int * count);

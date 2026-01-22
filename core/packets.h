@@ -152,8 +152,8 @@ class PacketObjectDestroy : public Packet
     {
         // FIXME send as broadcast
         int ret = send_data(peer, &data, sizeof(struct serial_data));
-     //FIXME
-     //	delete el_to_remove;
+        // FIXME
+        //	delete el_to_remove;
         return ret;
     }
     bool check_size(int s)
@@ -574,7 +574,7 @@ class PacketPlayerMove : public Packet
         data.t = t;
         data.x = x;
         data.y = y;
-    //    CONSOLE_LOG("move: x=%f y=%f\n", x, y);
+        //    CONSOLE_LOG("move: x=%f y=%f\n", x, y);
     }
     PacketPlayerMove() : Packet(PACKET_PLAYER_MOVE)
     {
@@ -584,7 +584,7 @@ class PacketPlayerMove : public Packet
         if (check_size(s))
         {
             pdata = (struct serial_data *)net_data;
-        //    CONSOLE_LOG("move: x=%f y=%f\n", pdata->x, pdata->y);
+            //    CONSOLE_LOG("move: x=%f y=%f\n", pdata->x, pdata->y);
             return true;
         }
         return false;

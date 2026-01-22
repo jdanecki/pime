@@ -143,7 +143,7 @@ bool DCraft::press(int x, int y, int button)
 }
 
 void DCraft::update()
-{    
+{
     if (in_products)
     {
         InventoryElement *el1 = nullptr, *el2 = nullptr;

@@ -26,8 +26,8 @@ bool Seedling::use(InventoryElement * object, Player * pl)
 
     map_x = object->location.chunk.map_x;
     map_y = object->location.chunk.map_y;
-    x = object->location.get_x();
-    y = object->location.get_y();
+    x = object->location.get_tile_x();
+    y = object->location.get_tile_y();
 
     if (object->c_id != Class_Place)
     {

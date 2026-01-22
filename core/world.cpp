@@ -1,4 +1,5 @@
 #include "world.h"
+#include "alchemist/item_location.h"
 #include "player.h"
 #include <cstdio>
 
@@ -74,7 +75,18 @@ InventoryElement * get_item_at(ItemLocation loc)
 
     unsigned int left_chunk_x, right_chunk_x, top_chunk_y, bottom_chunk_y;
     float left_top_world_x, left_top_world_y;
-    get_chunks_around(loc, &left_chunk_x, &right_chunk_x, &top_chunk_y, &bottom_chunk_y, &left_top_world_x, &left_top_world_y);
+
+    float player_world_x = loc.get_world_x();
+    float player_world_y = loc.get_world_y();
+
+    left_top_world_x = player_world_x - 8 * tile_size;
+    left_top_world_y = player_world_y - 8 * tile_size;
+
+    left_chunk_x = left_top_world_x / (CHUNK_SIZE * tile_size);
+    right_chunk_x = ((left_top_world_x / tile_size) + CHUNK_SIZE - 1) / CHUNK_SIZE;
+
+    top_chunk_y = left_top_world_y / (CHUNK_SIZE * tile_size);
+    bottom_chunk_y = ((left_top_world_y / tile_size) + CHUNK_SIZE - 1) / CHUNK_SIZE;
 
     for (unsigned int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
     {
@@ -102,23 +114,40 @@ InventoryElement * get_item_at_ppos(Player * player)
     return get_item_at(player->location);
 }
 
-float get_world_pos(int chunk, float pos)
+ItemLocation ItemLocation::center()
 {
-    return chunk * CHUNK_SIZE + pos;
+    ItemLocation l;
+    l.tag = ItemLocation::Tag::Chunk;
+    l.chunk = {128, 128, 8, 8};
+    return l;
+}
+void ItemLocation::show()
+{
+    if (tag == Tag::Chunk)
+    {
+        CONSOLE_LOG("map_x:%d map_y:%d x:%f y:%f\n", chunk.map_x, chunk.map_y, chunk.x, chunk.y);
+    }
+    else
+        CONSOLE_LOG("player: %lu\n", player.id);
+}
+float ItemLocation::get_world_x()
+{
+    return get_world_pos(chunk.map_x, chunk.x);
+}
+float ItemLocation::get_world_y()
+{
+    return get_world_pos(chunk.map_y, chunk.y);
+}
+float ItemLocation::get_tile_x()
+{
+    return chunk.x;
+}
+float ItemLocation::get_tile_y()
+{
+    return chunk.y;
 }
 
-void get_chunks_around(
-    ItemLocation loc, unsigned int * left_chunk_x, unsigned int * right_chunk_x, unsigned int * top_chunk_y, unsigned int * bottom_chunk_y, float * left_top_world_x, float * left_top_world_y)
+float ItemLocation::get_world_pos(int chunk, float pos)
 {
-    float player_world_x = loc.get_world_x();
-    float player_world_y = loc.get_world_y();
-
-    *left_top_world_x = player_world_x - (float)CHUNK_SIZE / 2;
-    *left_top_world_y = player_world_y - (float)CHUNK_SIZE / 2;
-
-    *left_chunk_x = *left_top_world_x / CHUNK_SIZE;
-    *right_chunk_x = (*left_top_world_x + CHUNK_SIZE - 1) / CHUNK_SIZE;
-
-    *top_chunk_y = *left_top_world_y / CHUNK_SIZE;
-    *bottom_chunk_y = (*left_top_world_y + CHUNK_SIZE - 1) / CHUNK_SIZE;
+    return chunk * CHUNK_SIZE * tile_size + pos * tile_size;
 }

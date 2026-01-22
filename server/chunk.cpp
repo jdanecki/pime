@@ -47,7 +47,15 @@ try_again:
         CONSOLE_LOG("empty chunk, trying again %d\n", r->rocks_count);
         goto try_again;
     }
+    /*size_t id1=0;
+    BaseListElement * base_el1 = (BaseListElement *)base_elements.find(&id1);
+    ch->add_object(create_element((BaseElement *)(base_el1->get_el())), 10, 9);
 
+    size_t id2=1;
+    BaseListElement * base_el2 = (BaseListElement *)base_elements.find(&id2);
+    ch->add_object(create_element((BaseElement *)(base_el2->get_el())), 5, 4);
+
+*/
     for (int y = 0; y < CHUNK_SIZE; y++)
         for (int x = 0; x < CHUNK_SIZE; x++)
         {
@@ -57,8 +65,8 @@ try_again:
             while (cur)
             {
                 InventoryElement * el = static_cast<InventoryElement *>(cur->get_el());
-                int dx = x - el->location.get_x();
-                int dy = y - el->location.get_y();
+                int dx = x - el->location.get_tile_x();
+                int dy = y - el->location.get_tile_y();
                 int dist = dx * dx + dy * dy;
                 if (dist < min_dist)
                 {
@@ -71,6 +79,8 @@ try_again:
             {
                 ch->table[y][x].tile = closest_el->get_id() % TILE_TEXTURES;
             }
+
+            //          ch->table[y][x].tile = x % TILE_TEXTURES;
         }
 
     for (int i = 0; i < r->animals_count; i++)
@@ -80,7 +90,6 @@ try_again:
 
     // ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
 
-    size_t id;
     world_table[cy][cx] = ch;
 }
 

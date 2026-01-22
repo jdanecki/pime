@@ -1,4 +1,4 @@
-//#include <stdio.h>
+// #include <stdio.h>
 #include "backend.inl"
 #include <stdlib.h>
 
@@ -138,7 +138,7 @@ void Backend_Window_Size(int * w, int * h)
 
 int Backend_Set_Clip(int x, int y, int w, int h)
 {
-    if (w == 0 || h == 0)   
+    if (w == 0 || h == 0)
     {
         EndScissorMode();
         return 0;
@@ -148,4 +148,9 @@ int Backend_Set_Clip(int x, int y, int w, int h)
         BeginScissorMode(x, y, w, h);
         return 0;
     }
+}
+
+bool Backend_Has_Intersection(Backend_Rect r1, Backend_Rect r2)
+{
+    return CheckCollisionRecs(r1.r, r2.r);
 }

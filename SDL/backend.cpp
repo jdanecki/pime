@@ -12,7 +12,7 @@ const char * Backend_Get_Error()
 
 void Backend_Wait()
 {
- //   SDL_Delay(40);
+    //   SDL_Delay(40);
 }
 
 void Backend_Update_Screen()
@@ -128,9 +128,10 @@ void Backend_Draw_Gradient_Rectangle(int x, int y, int w, int h, SDL_Color top, 
 
 int Backend_Set_Clip(int x, int y, int w, int h)
 {
-    if (w  == 0 || h == 0)
+    if (w == 0 || h == 0)
         return SDL_RenderSetClipRect(renderer, NULL);
-    else {
+    else
+    {
         SDL_Rect clip;
         clip.x = x;
         clip.y = y;
@@ -138,4 +139,9 @@ int Backend_Set_Clip(int x, int y, int w, int h)
         clip.h = h;
         return SDL_RenderSetClipRect(renderer, &clip);
     }
+}
+
+bool Backend_Has_Intersection(Backend_Rect r1, Backend_Rect r2)
+{
+    return SDL_HasIntersection(&r1.r, &r2.r);
 }

@@ -38,3 +38,19 @@ Backend_Texture Plant2d::get_texture()
 Plant2d::Plant2d(Plant data) : Plant(data)
 {
 }
+float Plant2d::get_scale()
+{
+    return size;
+}
+bool Plant2d::check_rect(float px, float py, int t_size)
+{
+    return Renderable::check_rect(px, py, location.get_world_x(), location.get_world_y(), t_size);
+}
+float Animal2d::get_scale()
+{
+    return size;
+}
+bool Animal2d::check_rect(float px, float py, int t_size)
+{
+    return Renderable::check_rect(px, py, location.get_world_x(), location.get_world_y(), t_size);
+}
