@@ -8,12 +8,12 @@ const char * Place::get_name()
 void Place::show(bool details)
 {
     InventoryElement::show(details);
-    CONSOLE_LOG("Place type: %s state: %s\n", get_name(), place_states_names[state]);
+    CONSOLE_LOG("Place type: %s\n", get_name());
 }
 char * Place::get_description()
 {
     char * buf = new char[128];
-    sprintf(buf, "%s: (%s)", get_name(), place_states_names[state]);
+    sprintf(buf, "%s", get_name());
     return buf;
 }
 void Place::show_state()

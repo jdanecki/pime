@@ -1,5 +1,6 @@
 #include "tools.h"
 #include "../../core/world.h"
+#include "../places/places.h"
 
 extern ElementsList base_plants;
 
@@ -19,8 +20,26 @@ ProductServer * Seedling::createSeedling(InventoryElement * el1, InventoryElemen
     return nullptr;
 }
 
-bool Seedling::use(InventoryElement * object, Player * pl)
+bool Seedling::use_on(InventoryElement * object, Player * pl)
 {
+    if (object->c_id != Class_Place)
+    {
+        CONSOLE_LOG("It's not a place to plow\n");
+        return false;
+    }
+    Place * p = static_cast<Place *>(object);
+    if (p->get_id() != PLACE_FIELD)
+    {
+        CONSOLE_LOG("It's not a field\n");
+        return false;
+    }
+    Field * f = static_cast<Field *>(p);
+    if (f->state != FIELD_PLOWED)
+    {
+        CONSOLE_LOG("Field isn't plowed\n");
+        return false;
+    }
+
     unsigned int map_x, map_y;
     unsigned int x, y;
 
@@ -29,22 +48,6 @@ bool Seedling::use(InventoryElement * object, Player * pl)
     x = object->location.get_tile_x();
     y = object->location.get_tile_y();
 
-    if (object->c_id != Class_Place)
-    {
-        CONSOLE_LOG("It's not a place to plow\n");
-        return false;
-    }
-    Place * p = (Place *)object;
-    if (p->get_id() != PLACE_FIELD)
-    {
-        CONSOLE_LOG("It's not a field\n");
-        return false;
-    }
-    if (p->state != FIELD_PLOWED)
-    {
-        CONSOLE_LOG("Field isn't plowed\n");
-        return false;
-    }
     CONSOLE_LOG("%s: %s on %s @[%d,%d][%d,%d]\n", get_name(), product_action_name[actions[0]], object->get_name(), map_x, map_y, x, y);
 
     chunk * ch = world_table[map_y][map_x];
@@ -56,8 +59,8 @@ bool Seedling::use(InventoryElement * object, Player * pl)
     CONSOLE_LOG("%s: planted base=%d\n", get_name(), plant->get_id());
     ch->add_object(plant, x, y);
     notify_create(plant);
-    p->state = FIELD_PLANTED;
-    notify_update(p);
+    f->state = FIELD_PLANTED;
+    notify_update(f);
 
     return true;
 }

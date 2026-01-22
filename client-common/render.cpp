@@ -404,7 +404,7 @@ void draw()
     }
 
     draw_dialogs();
-
+    
     if (current_menu)
         current_menu->show();
 

@@ -12,6 +12,7 @@ class Animal : public InventoryElement
 
   public:
     float size;
+    bool wild;
     Animal(BaseAnimal * b);
     Animal(int id);
     void show(bool details = true) override;

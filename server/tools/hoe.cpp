@@ -30,7 +30,7 @@ bool Hoe::use_tile(int map_x, int map_y, int x, int y, Player * pl)
     return true;
 }
 
-bool Hoe::use(InventoryElement * object, Player * pl)
+bool Hoe::use_on(InventoryElement * object, Player * pl)
 {
     unsigned int map_x, map_y;
     unsigned int x, y;
@@ -45,17 +45,18 @@ bool Hoe::use(InventoryElement * object, Player * pl)
         CONSOLE_LOG("It's not a place to plow\n");
         return false;
     }
-    Place * p = (Place *)object;
+    Place * p = static_cast<Place *>(object);
     if (p->get_id() != PLACE_FIELD)
     {
         CONSOLE_LOG("It's not a field\n");
         return false;
     }
-    if (p->state != FIELD_PLOWED)
+    Field * f = static_cast<Field *>(p);
+    if (f->state != FIELD_PLOWED)
     {
-        p->state = FIELD_PLOWED;
+        f->state = FIELD_PLOWED;
         CONSOLE_LOG("%s: %s on %s @[%d,%d][%d,%d]\n", get_name(), product_action_name[actions[0]], object->get_name(), map_x, map_y, x, y);
-        notify_update(p);
+        notify_update(f);
         return true;
     }
     CONSOLE_LOG("%s: already plowed\n", get_name());

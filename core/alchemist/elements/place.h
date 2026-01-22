@@ -7,8 +7,7 @@ class Place : public InventoryElement
 {
   public:
     Place_id id;
-    Place_states state;
-
+    
     const char * get_name() override;
     Place(Place_id id, size_t uid);
     Place(Place_id id);

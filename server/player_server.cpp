@@ -85,9 +85,21 @@ bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement 
     if (prod)
     {
         CONSOLE_LOG("%s: using %s on %s\n", get_name(), prod->get_name(), object->get_name());
-        if (prod->use(object, this))
+        if (prod->use_on(object, this))
         {
             return true;
+        }
+    } 
+    else if (object->get_cid() == Class_Product)
+    {
+        ProductServer * obj_prod = dynamic_cast<ProductServer *>(object);
+        if (obj_prod)
+        {       
+            CONSOLE_LOG("%s: using %s on %s\n", get_name(), item->get_name(), obj_prod->get_name());
+            if (obj_prod->use_on(item, this))
+            {
+                return true;
+            }
         }
     }
     return false;

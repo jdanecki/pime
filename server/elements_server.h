@@ -82,6 +82,7 @@ class AnimalServer : public Animal, public BeingServer
     void show(bool details = true) override;
     bool grow() override;
     bool can_pickup() override;
+    bool feed();
 };
 
 class PlantServer : public Plant, public BeingServer
@@ -123,7 +124,7 @@ class ProductServer : public Product
     ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id id, Form f, int act_cnt);
     // ProductServer(InventoryElement ** from, int count, Product_id id, Form f, int act_cnt);
     void show(bool details = true) override;
-    virtual bool use(InventoryElement * object, Player * pl);
+    virtual bool use_on(InventoryElement * object, Player * pl);
     virtual bool use_tile(int map_x, int map_y, int x, int y, Player * pl);
     bool can_pickup() override;
 };

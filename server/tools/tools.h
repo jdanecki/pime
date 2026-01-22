@@ -36,7 +36,7 @@ Knife * create_knife(chunk * ch);
 
 GENERATE_TOOL(Pickaxe)
 
-GENERATE_PRODUCT(Hoe, bool use_tile(int map_x, int map_y, int x, int y, Player * pl); bool use(InventoryElement * object, Player * pl);)
+GENERATE_PRODUCT(Hoe, bool use_tile(int map_x, int map_y, int x, int y, Player * pl); bool use_on(InventoryElement * object, Player * pl);)
 
 GENERATE_INGREDIENT(HoeBlade, )
 GENERATE_INGREDIENT(HoeHandle, )
@@ -48,7 +48,7 @@ GENERATE_INGREDIENT(Stick, )
 GENERATE_INGREDIENT(Tinder, )
 
 GENERATE_INGREDIENT(Seed, )
-GENERATE_PRODUCT(Seedling, bool use(InventoryElement * object, Player * pl);)
+GENERATE_PRODUCT(Seedling, bool use_on(InventoryElement * object, Player * pl);)
 Seedling * create_seedling(chunk * ch);
 
 GENERATE_PRODUCT(RoastedMeat, bool player_action(Player_action, Player *);)
@@ -57,11 +57,11 @@ GENERATE_INGREDIENT(Meat, bool action(Product_action, Player *);)
 GENERATE_PRODUCT(FruitSalad, bool player_action(Player_action, Player *);)
 GENERATE_INGREDIENT(Fruit, )
 
-GENERATE_PRODUCT(Hut, bool can_pickup();)
+GENERATE_PRODUCT(Hut, bool can_pickup();bool use_on(InventoryElement * object, Player * pl);)
 GENERATE_PRODUCT(Tent, )
 GENERATE_INGREDIENT(Log, )
 GENERATE_INGREDIENT(Wall, )
 
-GENERATE_PRODUCT(Feed, )
+GENERATE_PRODUCT(Feed, bool use_on(InventoryElement * object, Player * pl);)
 
 #endif

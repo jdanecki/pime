@@ -52,7 +52,7 @@ void add_base_elements(PacketElementsList * list, int i)
 }
 
 extern void update_hotbar();
-void add_elements(PacketElementsList * list, int i)
+void add_elements_to_inventory(PacketElementsList * list, int i)
 {
     size_t uid = ((size_t *)list->get_data())[i];
     Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, list->get_pl_id()));
@@ -160,7 +160,7 @@ bool handle_packet(ENetPacket * packet)
                         add_base_elements(list, i);
                         break;
                     case Class_ListElement:
-                        add_elements(list, i);
+                        add_elements_to_inventory(list, i);
                         break;
                 }
             }

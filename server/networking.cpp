@@ -168,7 +168,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             if (el)
             {
                 InventoryElement * obj = find_in_world(&pl->player->location, oid);
-                CONSOLE_LOG("use item on object: oid=%lx obj=%p\n", oid, obj);
+                CONSOLE_LOG("use item %s on object %s\n", el->get_name(), obj->get_name());
                 if (obj && !pl->player->use_item_on_object(el, obj))
                 {
                     p = new PacketActionFailed();

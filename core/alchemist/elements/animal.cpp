@@ -11,6 +11,7 @@ void Animal::init(BaseAnimal * b)
 Animal::Animal(BaseAnimal * b) : InventoryElement(Class_Animal), base(b)
 {
     init(b);
+    wild = true;
 }
 
 Animal::Animal(int id) : base(get_base_animal(id))
@@ -20,9 +21,11 @@ Animal::Animal(int id) : base(get_base_animal(id))
 void Animal::show(bool details)
 {
     InventoryElement::show(details);
-
     if (details)
+    {
         get_base()->show(details);
+        CONSOLE_LOG("wild: %s\n", wild ? "yes" : "no");
+    }
 }
 size_t Animal::get_id()
 {

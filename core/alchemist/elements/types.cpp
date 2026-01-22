@@ -53,8 +53,9 @@ const char * player_action_name[] = {"drink", "eat", "read", "check"};
 
 const char * server_action_name[] = {"server show item", "server show chunk", "server trace network"};
 
-const char * places_names[] = {"field"};
-const char * place_states_names[] = {"plowed", "planted"};
+const char * places_names[] = {"field", "barn"};
+const char * field_states_names[] = {"plowed", "planted"};
+const char * barn_states_names[] = {"empty", "animal", "full"};
 
 const char * plant_phase_name[] = {"Seedling", "Growing", "Flowers", "Fruits"};
 const char * class_name[] = {"unknown", "BaseElement", "BaseAnimal", "BasePlant", "Element", "Ingredient", "Product", "Scroll", "Place", "Plant", "Animal", "Player", "Npc", "Clan", "ListElement",

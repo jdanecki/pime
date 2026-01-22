@@ -45,18 +45,27 @@ struct ColorRGB
 enum Place_id
 {
     PLACE_FIELD,
+    PLACE_BARN,
     PLACES_COUNT,
 };
 
 extern const char * places_names[];
 
-enum Place_states
+enum Field_states
 {
     FIELD_PLOWED,
     FIELD_PLANTED,
 };
 
-extern const char * place_states_names[];
+enum Barn_states
+{
+    BARN_EMPTY,
+    BARN_ANIMAL,
+    BARN_FULL,
+};
+
+extern const char * field_states_names[];
+extern const char * barn_states_names[];
 
 enum Ingredient_id
 {

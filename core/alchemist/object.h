@@ -12,20 +12,20 @@ enum Class_id
     Class_BasePlant,
 
     Class_Element, // base: BaseElement
-    Class_Ingredient,
+    Class_Ingredient, //5
     Class_Product,
     Class_Scroll,
     Class_Place,
 
     Class_Plant,  // base: BasePlant -> Base
-    Class_Animal, // base: BaseAnimal->Base
+    Class_Animal, // 10 base: BaseAnimal->Base
     Class_Player,
     Class_Npc,
 
     Class_Clan,
 
     Class_ListElement,
-    Class_KnownElement,
+    Class_KnownElement, //15
     Class_BaseListElement,
 };
 

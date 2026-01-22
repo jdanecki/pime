@@ -16,3 +16,14 @@ ProductServer * Feed::createFeed(InventoryElement * el1, InventoryElement * el2)
     CONSOLE_LOG(" wrong ingredients id1=%d id=%d\n", id1, id2);
     return nullptr;
 }
+
+bool Feed::use_on(InventoryElement * object, Player * pl)
+{
+    if (object->c_id == Class_Animal)
+    {
+        CONSOLE_LOG("feeding %s\n", object->get_name());
+        AnimalServer * animal = static_cast<AnimalServer *>(object);
+        return animal->feed();
+    }
+    return false;
+}

@@ -605,6 +605,13 @@ bool AnimalServer::can_pickup()
 {
     return true;
 }
+
+bool AnimalServer::feed()
+{
+    wild = false;
+    return true;
+}
+
 void PlantServer::sow()
 {
     change_phase(Plant_seedling);
@@ -623,7 +630,7 @@ bool IngredientServer::can_pickup()
 {
     return true;
 }
-bool ProductServer::use(InventoryElement * object, Player * pl)
+bool ProductServer::use_on(InventoryElement * object, Player * pl)
 {
     if (!actions_count)
         return false;
