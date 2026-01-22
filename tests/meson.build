@@ -28,6 +28,16 @@ test_sdl_textures_sources = [
     '../client-common/text.cpp'
 ]    
 
+test_sdl_textures1_sources = [
+    'test_sdl_textures1.cpp',
+    '../SDL/window.cpp',
+    '../SDL/text.cpp',
+    '../SDL/backend.cpp',
+    '../client-common/texture.cpp',
+    '../client-common/text.cpp'
+]    
+
+
 test_lists_sources = [
     'test_lists.cpp',
     '../client-common/text.cpp'
@@ -65,6 +75,15 @@ executable('test_raylib',
 
 executable('test_sdl_textures', 
   sources: test_sdl_textures_sources,
+  dependencies: [sdl_deps],
+  include_directories :  include_directories('../SDL'),
+  link_args: shared_link_args,
+  link_with: [core],
+  install: false,
+)
+
+executable('test_sdl_textures1', 
+  sources: test_sdl_textures1_sources,
   dependencies: [sdl_deps],
   include_directories :  include_directories('../SDL'),
   link_args: shared_link_args,

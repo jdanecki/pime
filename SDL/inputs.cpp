@@ -91,8 +91,6 @@ void mouse_pressed(SDL_MouseButtonEvent * event)
 
 void handle_keyboard_state(const Uint8 * keys)
 {
-    // FIXME: USE DELTATIME
-    // FIXME: NORMALIZE THE MOVEMENT VECTOR
     float speed = 0.2;
     if (keys[SDL_SCANCODE_LSHIFT])
     {
@@ -133,12 +131,14 @@ void handle_keyboard_state(const Uint8 * keys)
     }
 }
 
+unsigned int last_move;
+
 bool handle_events()
 {
     int ww = 0, wh = 0;
     SDL_Event event;
-
-    // keyboard handling for not move
+    bool ret = false;
+    
     while (SDL_PollEvent(&event))
     {
         if (event.type == SDL_QUIT)
@@ -148,8 +148,9 @@ bool handle_events()
         if (event.type == SDL_KEYDOWN)
         {
             int key = event.key.keysym.sym;
+         //   printf("key %d\n", key);
 
-            return key_pressed(key);
+            ret=key_pressed(key);
         }
         if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
         {
@@ -168,7 +169,17 @@ bool handle_events()
             mouse_pressed(&event.button);
         }
     }
-    const Uint8 * currentKeyState = SDL_GetKeyboardState(NULL);
-    handle_keyboard_state(currentKeyState);
-    return false;
+    if (!current_menu)
+    {
+        unsigned int now = SDL_GetTicks();
+        unsigned int dt = (now - last_move);
+       // printf("dt=%u now=%u last=%u\n", dt, now, last_move);
+        //if (dt > 10)
+        {
+            last_move = now;
+            const Uint8 * currentKeyState = SDL_GetKeyboardState(NULL);
+            handle_keyboard_state(currentKeyState);
+        }
+    }
+    return ret;
 }

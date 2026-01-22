@@ -2,6 +2,7 @@
 #include <assert.h>
 
 #include "texture.h"
+#include "../core/world_params.h"
 
 struct player_textures Player_textures;
 

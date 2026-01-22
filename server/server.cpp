@@ -66,7 +66,7 @@ int main()
 
     ENetEvent event;
 
-    while (enet_host_service(server, &event, 1) >= 0)
+    while (enet_host_service(server, &event, 20) >= 0)
     {
         ncurses_tick();
         if (handle_pressed())

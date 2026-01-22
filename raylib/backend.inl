@@ -53,19 +53,20 @@ extern void Backend_Texture_Copy_Flip(Texture2D texture, Backend_Rect *srcrect, 
 //#define BeginBlendMode(BLEND_ALPHA)
 //EndBlendMode(); 
 
-extern Texture2D Backend_Create_Texture_From_Surface(Image image);
-extern const char * Backend_Get_Error();
-extern void Backend_Wait();
-extern void Backend_Update_Screen();
-extern int Backend_Get_Texture_Size(Texture texture, int *w, int *h);
-extern Backend_Pixels Backend_Allocate_Pixels(int w, int h);
-extern void Backend_Map_Pixels(Backend_Pixels pixels);
-extern void Backend_Update_Texture_Pixels(Backend_Pixels pixels);
-extern void Backend_Draw_Fill_Rectangle(Backend_Rect r, Color color);
-extern void Backend_Draw_Rectangle(Backend_Rect r, Color color);
-extern void Backend_Draw_Gradient_Rectangle(int x, int y, int w, int h, Color top, Color bottom);
+Texture2D Backend_Create_Texture_From_Surface(Image image);
+const char * Backend_Get_Error();
+void Backend_Wait();
+void Backend_Update_Screen();
+int Backend_Get_Texture_Size(Texture texture, int *w, int *h);
+Backend_Pixels Backend_Allocate_Pixels(int w, int h);
+void Backend_Map_Pixels(Backend_Pixels pixels);
+void Backend_Update_Texture_Pixels(Backend_Pixels pixels);
+void Backend_Draw_Fill_Rectangle(Backend_Rect r, Color color);
+void Backend_Draw_Rectangle(Backend_Rect r, Color color);
+void Backend_Draw_Gradient_Rectangle(int x, int y, int w, int h, Color top, Color bottom);
 
-extern void Backend_Window_Size(int *w, int *h);
+void Backend_Window_Size(int *w, int *h);
+int Backend_Set_Clip(int x, int y, int w, int h);
 
 int CONSOLE_LOG(const char * fmt, ...);
 #endif

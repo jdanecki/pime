@@ -2,7 +2,7 @@
 #define TEXTURE_H
 
 #include "../core/alchemist/elements.h"
-#include "../core/tiles.h"
+#include "../core/world_params.h"
 #include "backend.inl"
 
 struct player_textures
@@ -29,5 +29,5 @@ extern struct player_textures Player_textures;
 
 void load_textures();
 Backend_Texture load_texture(const char * texture_name);
-
+int add_textures_from_dir(Backend_Texture * to, int i, const char * dir_path);
 #endif

@@ -55,11 +55,11 @@ struct ItemLocation
             CONSOLE_LOG("player: %lu\n", player.id);
     }
     float get_world_x()
-    {
+    {//get position in tiles
         return get_world_pos(chunk.map_x, chunk.x);
     }
     float get_world_y()
-    {
+    {//get position in tiles
         return get_world_pos(chunk.map_y, chunk.y);
     }
     float get_x()

@@ -38,6 +38,7 @@ void write_text(int x, int y, const char * text, SDL_Color color, int scale_x, i
     surface = TTF_RenderText_Solid(font, text, color);
     SDL_Texture * text_sdl = SDL_CreateTextureFromSurface(renderer, surface);
 
+ #if 0
     int window_w, window_h;
     SDL_GetWindowSize(main_window, &window_w, &window_h);
 
@@ -51,10 +52,14 @@ void write_text(int x, int y, const char * text, SDL_Color color, int scale_x, i
     {
         game_size = window_h;
     }
-
+#endif
+//window_w=texture_size * CHUNK_SIZE + PANEL_WINDOW = 1084 
+//window_h=texture_size * CHUNK_SIZE + STATUS_LINES = 608
+    int game_size_x=24;
+    int game_size_y=60;
     int x_size, y_size;
-    x_size = strlen(text) * (scale_x ? scale_x : game_size / 25);
-    y_size = scale_y ? scale_y : game_size / 10;
+    x_size = strlen(text) * (scale_x ? scale_x : game_size_x);
+    y_size = scale_y ? scale_y : game_size_y;
 
     SDL_Rect rect = {x, y, x_size, y_size};
 

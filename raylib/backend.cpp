@@ -1,4 +1,4 @@
-#include <stdio.h>
+//#include <stdio.h>
 #include "backend.inl"
 #include <stdlib.h>
 
@@ -134,4 +134,18 @@ void Backend_Window_Size(int * w, int * h)
 {
     *w = GetScreenWidth();
     *h = GetScreenHeight();
+}
+
+int Backend_Set_Clip(int x, int y, int w, int h)
+{
+    if (w == 0 || h == 0)   
+    {
+        EndScissorMode();
+        return 0;
+    }
+    else
+    {
+        BeginScissorMode(x, y, w, h);
+        return 0;
+    }
 }

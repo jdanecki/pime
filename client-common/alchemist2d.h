@@ -91,6 +91,7 @@ class Renderable
             Backend_Texture_Copy_Flip(texture, &src_rect, &img_rect);
         else
             Backend_Texture_Copy_With_Mask(texture, &src_rect, &img_rect, {0}, false);
+        Backend_Draw_Rectangle(img_rect, {255, 0, 0, 255});
     }
     bool check_rect(unsigned int px, unsigned int py, unsigned int x, unsigned int y, int t_size)
     {

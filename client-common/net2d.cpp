@@ -105,10 +105,10 @@ void update_item_location(LocationUpdateData data)
     ItemLocation & old_loc = data.old;
     ItemLocation & new_loc = data.new_;
 
-    /*    CONSOLE_LOG("update item location uid=%lx old_tag=%d new_tag=%d\n", id.uid, (int)old_loc.tag, (int)new_loc.tag);
-        old_loc.show();
-        new_loc.show();
-    */
+  /*  CONSOLE_LOG("update item location uid=%lx old_tag=%d new_tag=%d\n", id.uid, (int)old_loc.tag, (int)new_loc.tag);
+    old_loc.show();
+    new_loc.show();
+*/
     InventoryElement * el = remove_from_location(old_loc, id);
     if (!el)
     { // FIXME

@@ -574,6 +574,7 @@ class PacketPlayerMove : public Packet
         data.t = t;
         data.x = x;
         data.y = y;
+    //    CONSOLE_LOG("move: x=%f y=%f\n", x, y);
     }
     PacketPlayerMove() : Packet(PACKET_PLAYER_MOVE)
     {
@@ -583,6 +584,7 @@ class PacketPlayerMove : public Packet
         if (check_size(s))
         {
             pdata = (struct serial_data *)net_data;
+        //    CONSOLE_LOG("move: x=%f y=%f\n", pdata->x, pdata->y);
             return true;
         }
         return false;

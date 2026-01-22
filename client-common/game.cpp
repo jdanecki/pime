@@ -104,7 +104,7 @@ void loop()
 
     for (;;)
     {
-        handle_network();
+        handle_network(); //~ 10ms
 
         if (handle_events())
             return;

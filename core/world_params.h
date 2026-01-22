@@ -7,6 +7,6 @@
 
 #define BASE_PLANTS 22
 #define BASE_ANIMALS 4
-#define TILE_TEXTURES 15
+#define TILE_TEXTURES 17
 
 #endif // WORLD_PARAMS_H

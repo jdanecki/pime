@@ -45,13 +45,13 @@ void draw_texts()
     write_text(tx, ty, text, (player->hunger < 100 || player->thirst < 100) ? Red : White, 15, 30);
     int32_t pl_ch_x = player->location.chunk.map_x;
     int32_t pl_ch_y = player->location.chunk.map_y;
-    unsigned int px = player->location.chunk.x;
-    unsigned int py = player->location.chunk.y;
+    float px = player->location.chunk.x;
+    float py = player->location.chunk.y;
     chunk * ch = world_table[pl_ch_y][pl_ch_x];
-    int tile = ch->table[py][px].tile;
+    int tile = ch->table[(int)(py + 0.5)][(int)(px + 0.5)].tile;
     BaseElement * base = get_base_element(tile % tiles_textures_count);
 
-    sprintf(text, "%s@[%d,%d][%d,%d]:id=%ld f=%c", player->get_name(), pl_ch_x, pl_ch_y, px, py, base->uid, (Form_name[base->form])[0]);
+    sprintf(text, "%s@[%d,%d][%0.1f,%0.1f]:id=%ld f=%c", player->get_name(), pl_ch_x, pl_ch_y, px, py, base->uid, (Form_name[base->form])[0]);
     write_text(tx, window_height - 100, text, White, 15, 30);
 
     InventoryElement * item = get_item_at_ppos(player);
@@ -205,59 +205,65 @@ void render_element(InventoryElement * o, float ltx, float lty)
 
 bool draw_terrain()
 {
-    float left_top_world_x, left_top_world_y;
+    int size = tile_size;
 
-    get_chunks_around(player->location, &left_chunk_x, &right_chunk_x, &top_chunk_y, &bottom_chunk_y, &left_top_world_x, &left_top_world_y);
+    float player_world_x = player->location.chunk.map_x * CHUNK_SIZE * size + player->location.chunk.x * size;
+    float player_world_y = player->location.chunk.map_y * CHUNK_SIZE * size + player->location.chunk.y * size;
 
-    for (unsigned int cy = top_chunk_y; cy <= bottom_chunk_y + 1; ++cy)
+    float left_top_world_x = player_world_x - CHUNK_SIZE / 2.0 * size;
+    float left_top_world_y = player_world_y - CHUNK_SIZE / 2.0 * size;   
+       
+    int first_tile_x = left_top_world_x / size;
+    int first_tile_y = left_top_world_y / size;
+    int last_tile_x = (left_top_world_x + size * CHUNK_SIZE) / size + 1;
+    int last_tile_y = (left_top_world_y + size * CHUNK_SIZE) / size + 1;
+    
+    
+    Backend_Set_Clip(0, 0, size * CHUNK_SIZE, size * CHUNK_SIZE);
+
+    for (int ty = first_tile_y; ty < last_tile_y; ++ty)
     {
-        for (unsigned int cx = left_chunk_x; cx <= right_chunk_x + 1; ++cx)
+        for (int tx = first_tile_x; tx < last_tile_x; ++tx)
         {
-            chunk * ch = check_chunk(cx, cy);
-            if (!ch)
+            int chunk_x = tx / CHUNK_SIZE;
+            int chunk_y = ty / CHUNK_SIZE;  
+            int tile_x = tx - chunk_x * CHUNK_SIZE;
+            int tile_y = ty - chunk_y * CHUNK_SIZE;
+            if (chunk_x < 0 || chunk_x >= WORLD_SIZE || chunk_y < 0 || chunk_y >= WORLD_SIZE)
+                continue;
+            chunk * chunk = check_chunk(chunk_x, chunk_y);
+            if (!chunk) {
+                Backend_Set_Clip(0, 0, 0, 0);
                 return false;
-
-            for (unsigned int ty = 0; ty < CHUNK_SIZE; ++ty)
-            {
-                for (unsigned int tx = 0; tx < CHUNK_SIZE; ++tx)
-                {
-                    float world_x = get_world_pos(cx, tx);
-                    float world_y = get_world_pos(cy, ty);
-
-                    float screen_x = world_x - left_top_world_x;
-                    float screen_y = world_y - left_top_world_y;
-
-                    if (screen_x >= -tile_size && screen_x < CHUNK_SIZE + tile_size && screen_y >= -tile_size && screen_y < CHUNK_SIZE + tile_size)
-                    {
-                        int tile = ch->table[ty][tx].tile;
-
-                        Backend_Rect img_rect(screen_x * tile_size, screen_y * tile_size, tile_size, tile_size);
-
-                        Backend_Texture texture = tiles_textures[tile % tiles_textures_count];
-                        BaseElement * base = get_base_element(tile % tiles_textures_count);
-                        if (base)
-                        {
-                            Backend_Color color{base->color.r, base->color.g, base->color.b, 255};
-                            switch (base->form)
-                            {
-                                case Form_solid:
-                                    break;
-                                case Form_liquid:
-                                    // b|=128;
-                                    break;
-                                case Form_gas:
-                                    // SDL_SetTextureAlphaMod(texture, 128);
-                                    break;
-                            }
-                            Backend_Texture_Copy_With_Mask(texture, NULL, &img_rect, color, true);
-                        }
-                        else
-                            Backend_Texture_Copy(texture, NULL, &img_rect);
-                    }
-                }
             }
+            
+            int tile = chunk->table[tile_y][tile_x].tile;
+            Backend_Rect img_rect(tx * size - left_top_world_x, ty * size - left_top_world_y, size, size);
+            Backend_Texture texture = tiles_textures[tile % tiles_textures_count];
+            BaseElement * base = get_base_element(tile % tiles_textures_count);
+            if (base)
+            {
+                Backend_Color color{base->color.r, base->color.g, base->color.b, 255};
+                switch (base->form)
+                {
+                    case Form_solid:
+                        break;
+                    case Form_liquid:
+                        // b|=128;
+                        break;
+                    case Form_gas:
+                        // SDL_SetTextureAlphaMod(texture, 128);
+                        break;
+                }
+                Backend_Texture_Copy_With_Mask(texture, NULL, &img_rect, color, true);
+            }
+            else
+                Backend_Texture_Copy(texture, NULL, &img_rect);
         }
     }
+    Backend_Set_Clip(0, 0, 0, 0);
+
+
     /*  for (int i=0; i < tiles_textures_count; i++)
       {
           Backend_Texture texture = tiles_textures[i];
@@ -265,10 +271,21 @@ bool draw_terrain()
           SDL_RenderCopy(renderer, texture, NULL, &img_rect);
       }
   */
-    // CONSOLE_LOG("%d,%d -> %d,%d\n", left_chunk_x, top_chunk_y, right_chunk_x, bottom_chunk_y);
-    for (unsigned int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
+    int first_chunk_x = first_tile_x / CHUNK_SIZE;
+    int first_chunk_y = first_tile_y / CHUNK_SIZE;
+    int last_chunk_x = last_tile_x / CHUNK_SIZE;
+    int last_chunk_y = last_tile_y / CHUNK_SIZE;
+  
+    player_world_x = player->location.get_world_x();
+    player_world_y = player->location.get_world_y();
+
+    left_top_world_x = player_world_x - CHUNK_SIZE / 2.0;
+    left_top_world_y = player_world_y - CHUNK_SIZE / 2.0; 
+  
+   // CONSOLE_LOG("%d,%d -> %d,%d\n", first_chunk_x, first_chunk_y, last_chunk_x, last_chunk_y);
+    for (unsigned int cy = first_chunk_y; cy <= last_chunk_y; ++cy)
     {
-        for (unsigned int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
+        for (unsigned int cx = first_chunk_x; cx <= last_chunk_x; ++cx)
         {
             if (cx >= WORLD_SIZE || cy >= WORLD_SIZE)
                 continue;
@@ -295,8 +312,10 @@ bool draw_terrain()
             }
         }
     }
-    if (player && player->c_id == Class_Player)
+  
+    if (player && player->c_id == Class_Player) {
         render_element(player, left_top_world_x, left_top_world_y);
+    }
 
     return true;
 }
@@ -348,32 +367,17 @@ void draw_dialogs()
 {
     if (d_craft.show)
     {
+        d_craft.update();
         d_craft.draw();
     }
+    hotbar.update();
     hotbar.draw();
 }
 
-void draw()
+void draw_status()
 {
-    hotbar.update();
-    d_craft.update();
-
-    Backend_Begin_Drawing();
-
-    //  clear_window();
-
-    bool ret = draw_terrain();
-    if (ret)
-    {
-        draw_run_icons();
-        //        draw_npc();
-        draw_texts();
-
-        //    draw_maps();
-    }
     Backend_Rect r0(0, window_height - 64, window_width, 32);
     Backend_Draw_Fill_Rectangle(r0, Backend_Color{10, 100, 10, 255});
-
     Backend_Rect r1(0, window_height - 32, window_width, 32);
     Backend_Draw_Fill_Rectangle(r1, Backend_Color{10, 100, 10, 255});
 
@@ -386,15 +390,31 @@ void draw()
     {
         write_text(5, window_height - 32, status_line2, White, 15, 30, false);
     }
+}
+int ui_updates;
 
+void draw()
+{
+    Backend_Begin_Drawing();    
+    ui_updates++;
+    bool ret = draw_terrain();
+
+   // if (ret && ui_updates > 3)
+    {
+        draw_run_icons();
+        // draw_npc();
+        draw_texts();
+
+        // draw_maps();
+        draw_status();
+        ui_updates = 0;
+    }
+    
     draw_dialogs();
 
     if (current_menu)
         current_menu->show();
 
-    if (ret)
-    {
-        Backend_Update_Screen();
-    }
+    Backend_Update_Screen();
     Backend_End_Drawing();
 }

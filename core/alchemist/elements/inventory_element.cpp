@@ -26,7 +26,7 @@ bool InventoryElement::player_action(Player_action action, Player * pl)
 }
 void InventoryElement::show(bool details)
 {
-    CONSOLE_LOG("(INV)%s: uid=%lx id=%ld c_id=%d @[%d,%d][%d,%d]\n", get_class_name(), uid, get_id(), c_id, location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
+    CONSOLE_LOG("(INV)%s: uid=%lx id=%ld c_id=%d @[%d,%d][%f,%f]\n", get_class_name(), uid, get_id(), c_id, location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
 }
 bool InventoryElement::tick()
 {

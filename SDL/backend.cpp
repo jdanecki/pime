@@ -12,7 +12,7 @@ const char * Backend_Get_Error()
 
 void Backend_Wait()
 {
-    //  SDL_Delay(20);
+ //   SDL_Delay(40);
 }
 
 void Backend_Update_Screen()
@@ -124,4 +124,18 @@ void Backend_Draw_Gradient_Rectangle(int x, int y, int w, int h, SDL_Color top, 
     v[3].tex_coord.y = 0;
 
     SDL_RenderGeometry(renderer, NULL, v, 6, i, 6);
+}
+
+int Backend_Set_Clip(int x, int y, int w, int h)
+{
+    if (w  == 0 || h == 0)
+        return SDL_RenderSetClipRect(renderer, NULL);
+    else {
+        SDL_Rect clip;
+        clip.x = x;
+        clip.y = y;
+        clip.w = w;
+        clip.h = h;
+        return SDL_RenderSetClipRect(renderer, &clip);
+    }
 }

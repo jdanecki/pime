@@ -14,11 +14,12 @@ void create_players()
 
 bool check_and_load_chunk(int new_map_x, int new_map_y)
 {
-    for (int cy = new_map_y - 10; cy <= new_map_y + 10; cy++)
+    int size=2;
+    for (int cy = new_map_y - size; cy <= new_map_y + size; cy++)
     {
         if (cy >= 0 && cy < WORLD_SIZE)
         {
-            for (int cx = new_map_x - 10; cx <= new_map_x + 10; cx++)
+            for (int cx = new_map_x - size; cx <= new_map_x + size; cx++)
             {
                 if (cx >= 0 && cx < WORLD_SIZE)
                 {
