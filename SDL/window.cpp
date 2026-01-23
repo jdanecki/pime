@@ -1,7 +1,6 @@
 #include <time.h>
 #include <SDL.h>
 #include <SDL_image.h>
-#include <SDL_ttf.h>
 #include <SDL2_gfxPrimitives.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -62,8 +61,6 @@ int init_window(const char * title, int wx, int wy)
     }
     SDL_SetWindowIcon(main_window, icon);
     SDL_FreeSurface(icon);
-
-    TTF_Init();
 
     if (load_font())
         return 1;

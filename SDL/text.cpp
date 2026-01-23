@@ -1,13 +1,16 @@
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 #include <errno.h>
 #include <stdio.h>
 
 #include "../client-common/text.h"
 #include "../client-common/window.h"
+#include "backend.inl"
 
-TTF_Font * font;
+#define FONT_WIDTH 8
+#define FONT_HEIGHT 12
+SDL_Texture * font;
 
 SDL_Color White = {255, 255, 255};
 SDL_Color Gray = {200, 200, 200};
@@ -19,13 +22,15 @@ int load_font()
 {
     struct stat statbuf;
     int ret;
-    ret = stat(FONT_NAME, &statbuf);
+    ret = stat("font.png", &statbuf);
     if (ret)
     {
-        CONSOLE_LOG("load_font(%s): %s\n", FONT_NAME, strerror(errno));
+        CONSOLE_LOG("load_font(%s): %s\n", "font.png", strerror(errno));
         return 1;
     }
-    font = TTF_OpenFont(FONT_NAME, INITIAL_FONT_SIZE);
+    SDL_Surface * surf = IMG_Load("font.png");
+    font = SDL_CreateTextureFromSurface(renderer, surf);
+    SDL_FreeSurface(surf);
     if (!(font))
         return 1;
     else
@@ -34,42 +39,18 @@ int load_font()
 
 void write_text(int x, int y, const char * text, SDL_Color color, int scale_x, int scale_y, bool clear_bg)
 {
-    SDL_Surface * surface;
-    surface = TTF_RenderText_Solid(font, text, color);
-    SDL_Texture * text_sdl = SDL_CreateTextureFromSurface(renderer, surface);
-
-#if 0
-    int window_w, window_h;
-    SDL_GetWindowSize(main_window, &window_w, &window_h);
-
-    int game_size;
-
-    if (window_w < window_h)
+    const char * c = text;
+    int cx = x;
+    SDL_SetTextureColorMod(font, color.r, color.g, color.b);
+    while (*c)
     {
-        game_size = window_w;
+        int src_top = (*c - 32) / 16 * FONT_HEIGHT;
+        int src_left = (*c - 32) % 16 * FONT_WIDTH;
+        SDL_Rect src_rect = {src_left, src_top, FONT_WIDTH, FONT_HEIGHT};
+        SDL_Rect rect = {cx, y, scale_x, scale_y};
+        SDL_RenderCopy(renderer, font, &src_rect, &rect);
+        c++;
+        cx += scale_x;
     }
-    else
-    {
-        game_size = window_h;
-    }
-#endif
-    // window_w=texture_size * CHUNK_SIZE + PANEL_WINDOW = 1084
-    // window_h=texture_size * CHUNK_SIZE + STATUS_LINES = 608
-    int game_size_x = 24;
-    int game_size_y = 60;
-    int x_size, y_size;
-    x_size = strlen(text) * (scale_x ? scale_x : game_size_x);
-    y_size = scale_y ? scale_y : game_size_y;
-
-    SDL_Rect rect = {x, y, x_size, y_size};
-
-    if (clear_bg)
-    {
-        SDL_SetRenderDrawColor(renderer, 10, 10, 50, 255);
-        SDL_RenderFillRect(renderer, &rect);
-    }
-
-    SDL_RenderCopy(renderer, text_sdl, NULL, &rect);
-    SDL_FreeSurface(surface);
-    SDL_DestroyTexture(text_sdl);
+    SDL_SetTextureColorMod(font, 255, 255, 255);
 }
