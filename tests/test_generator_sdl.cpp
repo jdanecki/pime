@@ -155,7 +155,7 @@ int init_window()
         return 1;
     }
 
-    TTF_Init();
+    // TTF_Init();
     load_font();
     unsigned long t3 = get_time_usec();
     printf("Time it took to initialize SDL2 modules (img, window, renderer): %ldms\n ", (t3 - t1) / 1000);

@@ -3,7 +3,6 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_render.h>
 #include <SDL_mixer.h>
@@ -12,7 +11,7 @@ typedef SDL_Texture * Backend_Texture;
 typedef SDL_TimerID timer_id;
 typedef SDL_TimerCallback timer_callback;
 typedef SDL_Color Backend_Color;
-typedef TTF_Font * Backend_Font;
+typedef SDL_Texture * Backend_Font;
 typedef SDL_Surface * Backend_Surface;
 typedef int Backend_Rect_Field;
 

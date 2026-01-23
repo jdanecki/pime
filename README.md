@@ -55,3 +55,4 @@ This game is currently under development using
 
 * https://github.com/ryanoasis/nerd-fonts
 
+#### aseets/font.png sourced from https://opengameart.org/content/bitmap-font (public domain)

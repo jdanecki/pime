@@ -1,10 +1,9 @@
 sdl_dep = dependency('sdl2', method: 'pkg-config', required: true)
 sdl_image_dep = dependency('SDL2_image', method: 'pkg-config', required: true)
-sdl_ttf_dep = dependency('SDL2_ttf', method: 'pkg-config', required: true)
 sdl_mixer_dep = dependency('SDL2_mixer', method: 'pkg-config', required: true)
 sdl_gfx_dep = dependency('SDL2_gfx', method: 'pkg-config', required: true)
 
-sdl_deps = [sdl_dep, sdl_image_dep, sdl_ttf_dep, sdl_mixer_dep, sdl_gfx_dep, enet_dep]
+sdl_deps = [sdl_dep, sdl_image_dep, sdl_mixer_dep, sdl_gfx_dep, enet_dep]
 
 sdl_sources = [
     'net.cpp',
@@ -48,8 +47,8 @@ custom_target(
 
 custom_target(
   'font_link',
-  output: 'nerdfont.otf',
-  command: ['ln', '-sf', meson.project_source_root() + '/assets/nerdfont.otf', '@OUTPUT@'],
+  output: 'font.png',
+  command: ['ln', '-sf', meson.project_source_root() + '/assets/font.png', '@OUTPUT@'],
   build_by_default: true,
 )
 
