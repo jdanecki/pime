@@ -52,9 +52,15 @@ bool InventoryElement::check_rect(float px, float py, int size)
 {
     float lx = location.get_world_x();
     float ly = location.get_world_y();
-    CONSOLE_LOG("INV: check_rect: pl=(%0.1f,%0.1f) el=(%0.1f, %0.1f)\n", px, py, lx, ly);
-    // return (px >= lx && px < lx + size && py >= ly && py < ly + size);
-    return false;
+    float rx = lx + size;
+    float ry = ly + size;
+    // CONSOLE_LOG("INV: el (%f,%f)-(%f,%f)\n", lx, ly, rx, ry);
+    // CONSOLE_LOG("INV: pl (%f,%f)-(%f,%f)\n", px, py, px + size, py + size);
+    if (px > rx || px + size < lx || py > ry || py + size < ly)
+    {
+        return false;
+    }
+    return true;
 }
 char * InventoryElement::get_description()
 {

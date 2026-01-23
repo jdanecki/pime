@@ -78,7 +78,7 @@ bool handle_packet(ENetPacket * packet)
     unsigned char * data = packet->data;
     //  printf("Received length=%lu: %d\n", packet->dataLength, *data);
 
-    Packet * p = check_packet('R', data, packet->dataLength);
+    Packet * p = check_client_packet('R', data, packet->dataLength);
     if (!p)
         return ret;
 

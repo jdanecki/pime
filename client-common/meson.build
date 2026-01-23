@@ -3,7 +3,8 @@ client_common_sources=[
     'net2d.cpp',
     'game.cpp',
     'players.cpp',
-    'text.cpp'
+    'text.cpp',
+    'packets.cpp'
 ]
 client_common_2d_sources=[
     'player_actions.cpp',

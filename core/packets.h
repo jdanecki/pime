@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include <new>
 #include "packet_types.h"
 #include "tiles.h"
 #include "world.h"
@@ -19,54 +18,26 @@ class Packet
 {
   protected:
     PacketType t;
-    int send_data(ENetPeer * peer, void * data, size_t size)
-    {
-        show_packet_type_name('S', *(unsigned char *)data);
-        ENetPacket * p = enet_packet_create(data, size, ENET_PACKET_FLAG_RELIABLE);
-        int ret = enet_peer_send(peer, 0, p);
-        enet_host_flush(peer->host);
-        return ret;
-    }
+    int send_data(ENetPeer * peer, void * data, size_t size);
 
   public:
-    Packet(PacketType t) : t(t)
-    {
-    }
-    virtual ~Packet()
-    {
-    }
-    virtual int send(ENetPeer * peer)
-    {
-        return send_data(peer, &t, sizeof(PacketType));
-    }
-    PacketType get_type()
-    {
-        return t;
-    }
-    virtual bool check_size(int s)
-    {
-        return s == sizeof(PacketType);
-    }
-    virtual bool update(unsigned char * data, size_t s)
-    {
-        return check_size(s);
-    }
+    Packet(PacketType t);
+    virtual ~Packet();
+    virtual int send(ENetPeer * peer);
+    PacketType get_type();
+    virtual bool update(unsigned char * data, size_t s);
 };
 
 class PacketJoinRequest : public Packet
 {
   public:
-    PacketJoinRequest() : Packet(PACKET_JOIN_REQUEST)
-    {
-    }
+    PacketJoinRequest();
 };
 
 class PacketActionFailed : public Packet
 {
   public:
-    PacketActionFailed() : Packet(PACKET_ACTION_FAILED)
-    {
-    }
+    PacketActionFailed();
 };
 
 class PacketPlayerId : public Packet
@@ -78,36 +49,11 @@ class PacketPlayerId : public Packet
     } data, *pdata __attribute__((packed));
 
   public:
-    PacketPlayerId(unsigned long id) : Packet(PACKET_PLAYER_ID)
-    {
-        data.t = t;
-        data.id = id;
-        pdata = &data;
-    }
-    PacketPlayerId() : Packet(PACKET_PLAYER_ID)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        return send_data(peer, &data, sizeof(struct serial_data));
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
-    unsigned long get_id()
-    {
-        return pdata->id;
-    }
+    PacketPlayerId(unsigned long id);
+    PacketPlayerId();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
+    unsigned long get_id();
 };
 
 class PacketObjectDestroy : public Packet
@@ -121,45 +67,12 @@ class PacketObjectDestroy : public Packet
     InventoryElement * el_to_remove;
 
   public:
-    unsigned long get_id()
-    {
-        return pdata->id;
-    }
-    ItemLocation get_location()
-    {
-        return pdata->location;
-    }
-    PacketObjectDestroy(InventoryElement * el) : Packet(PACKET_OBJECT_DESTROY)
-    {
-        data.t = t;
-        data.id = el->get_uid();
-        data.location = el->location;
-        el_to_remove = el;
-    }
-    PacketObjectDestroy() : Packet(PACKET_OBJECT_DESTROY)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        // FIXME send as broadcast
-        int ret = send_data(peer, &data, sizeof(struct serial_data));
-        // FIXME
-        //	delete el_to_remove;
-        return ret;
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
+    unsigned long get_id();
+    ItemLocation get_location();
+    PacketObjectDestroy(InventoryElement * el);
+    PacketObjectDestroy();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
 };
 
 extern void add_packet_to_send1(Packet * p);
@@ -175,117 +88,27 @@ class PacketElementsList : public Packet
         Class_id list_c_id;
         int pl_id;
         unsigned char data[0];
-        static void * operator new(size_t size_base, size_t extra)
-        {
-            //     CONSOLE_LOG("PacketElementsList: serial_data: allocating %ld + %ld\n", size_base, extra);
-            return ::operator new(size_base + extra);
-        }
-        serial_data(size_t s) : size(s)
-        {
-        }
-        static void operator delete(void * ptr)
-        {
-            ::operator delete(ptr);
-        }
+        static void * operator new(size_t size_base, size_t extra);
+        serial_data(size_t s);
+        static void operator delete(void * ptr);
     } * pdata __attribute__((packed));
 
   public:
-    int get_nr_elements()
-    {
-        return pdata->nr_elements;
-    }
-    Class_id get_c_id()
-    {
-        return pdata->c_id;
-    }
-    Class_id get_list_c_id()
-    {
-        return pdata->list_c_id;
-    }
-    int get_pl_id()
-    {
-        return pdata->pl_id;
-    }
-    unsigned char * get_data()
-    {
-        return pdata->data;
-    }
+    int get_nr_elements();
+    Class_id get_c_id();
+    Class_id get_list_c_id();
+    int get_pl_id();
+    unsigned char * get_data();
 
-    void copy_base_list_element(ListElement * el, serial_data * pdata, int i)
-    {
-        BaseListElement * base_el = static_cast<BaseListElement *>(el);
-        Base * base = static_cast<Base *>(base_el->get_el());
-        base->copy_data(&pdata->data[0], i);
-    }
+    void copy_base_list_element(ListElement * el, serial_data * pdata, int i);
 
-    void copy_list_element(ListElement * el, serial_data * pdata, int i)
-    {
-        NetworkObject * obj = el->get_el();
-        size_t uid = obj->get_uid();
-        size_t * dst = &((size_t *)(&pdata->data))[i];
-        *dst = uid;
-        //    CONSOLE_LOG("copy_list_element: [%d/%d]=%lx\n", i, pdata->nr_elements, uid);
-    }
-    void init(ElementsList * list)
-    {
-        int size = list->nr_elements * list->head->get_size();
-        pdata = new (size) serial_data(sizeof(serial_data) + size);
-        pdata->t = t;
-        pdata->nr_elements = list->nr_elements;
-        strncpy(pdata->name, list->name, strlen(list->name) + 1);
-        pdata->list_c_id = list->head->get_cid();
-
-        int i = 0;
-        ListElement * el = list->head;
-        while (el)
-        {
-            switch (pdata->list_c_id)
-            {
-                case Class_BaseListElement:
-                    pdata->c_id = ((BaseListElement *)list->head)->get_el()->get_cid();
-                    copy_base_list_element(el, pdata, i);
-                    break;
-                case Class_ListElement:
-                    copy_list_element(el, pdata, i);
-                    break;
-            }
-
-            el = el->next;
-            i++;
-        }
-    }
-    PacketElementsList(Player * pl) : Packet(PACKET_ELEMENTS_LIST)
-    {
-        init(&pl->inventory);
-        pdata->pl_id = pl->get_id();
-    }
-    PacketElementsList(ElementsList * list) : Packet(PACKET_ELEMENTS_LIST)
-    {
-        init(list);
-    }
-    PacketElementsList() : Packet(PACKET_ELEMENTS_LIST)
-    {
-    }
-    int send(ENetPeer * peer)
-    {
-        int ret = 0;
-        /*for (int i=0; i< 100; i++)
-           CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
-*/
-        ret = send_data(peer, pdata, pdata->size);
-        return ret;
-    }
-    bool update(unsigned char * data, size_t s)
-    {
-        pdata = (struct serial_data *)data;
-        if (s != pdata->size)
-            return false;
-        /*      for (int i=0; i<100; i++)
-                   CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
-        */
-        //   CONSOLE_LOG("PacketElementList: list=%s elems=%d %s\n", pdata->name, pdata->nr_elements, class_name[get_list_c_id()]);
-        return true;
-    }
+    void copy_list_element(ListElement * el, serial_data * pdata, int i);
+    void init(ElementsList * list);
+    PacketElementsList(Player * pl);
+    PacketElementsList(ElementsList * list);
+    PacketElementsList();
+    int send(ENetPeer * peer);
+    bool update(unsigned char * data, size_t s);
 };
 
 ObjectData * convert_to_data(NetworkObject * el);
@@ -297,92 +120,17 @@ class PacketObjectCreate : public Packet
         PacketType t;
         size_t size;
         unsigned char data[0];
-        static void * operator new(size_t size_base, size_t extra)
-        {
-            //        CONSOLE_LOG("PacketObjectCreate: serial_data: allocating %ld + %ld\n", size_base, extra);
-            return ::operator new(size_base + extra);
-        }
-        serial_data(size_t s) : size(s)
-        {
-            //        CONSOLE_LOG("PacketObjectCreate: serial_data: set size to %ld\n", size);
-        }
-        static void operator delete(void * ptr)
-        {
-            ::operator delete(ptr);
-        }
+        static void * operator new(size_t size_base, size_t extra);
+        serial_data(size_t s);
+        static void operator delete(void * ptr);
     } __attribute__((packed));
 
   public:
     ObjectData * obj;
-    PacketObjectCreate(NetworkObject * el) : Packet(PACKET_OBJECT_CREATE)
-    {
-        obj = convert_to_data(el);
-    }
-    PacketObjectCreate() : Packet(PACKET_OBJECT_CREATE)
-    { // called by client
-        obj = nullptr;
-    }
-    int send(ENetPeer * peer)
-    {
-        int ret = 0;
-        struct serial_data * d = new (obj->size) serial_data(sizeof(serial_data) + obj->size);
-        d->t = t;
-        memcpy(d->data, (void *)obj, obj->size);
-
-        /*for (int i=0; i< 100; i++)
-           CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
-*/
-        ret = send_data(peer, d, d->size);
-        delete (d);
-        return ret;
-    }
-    bool update(unsigned char * data, size_t s)
-    {
-        struct serial_data * d = (struct serial_data *)data;
-        if (s != d->size)
-            return false;
-        obj = (ObjectData *)(&d->data);
-        /*      for (int i=0; i<100; i++)
-                   CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
-        */
-        // CONSOLE_LOG("PacketObjectCreate for objectData::Tag=%d size=%ld\n", (int)obj->tag, obj->size);
-        switch (obj->tag)
-        {
-            case ObjectData::Tag::Element:
-            {
-                new (&obj->element.data) Element(obj->id);
-                break;
-            }
-            case ObjectData::Tag::Place:
-            {
-                size_t * pdata = (size_t *)&obj->data[0];
-                //    CONSOLE_LOG("pdata=%lx\n", *pdata);
-                new (&obj->place.data) Place((Place_id)obj->id, *pdata);
-                break;
-            }
-            case ObjectData::Tag::Plant:
-            {
-                new (&obj->plant.data) Plant(obj->id);
-                break;
-            }
-            case ObjectData::Tag::Animal:
-            {
-                new (&obj->animal.data) Animal(obj->id);
-                break;
-            }
-            case ObjectData::Tag::Player:
-                new (&obj->player.data.inventory) ElementsList("inventory");
-                new (&obj->player.data.known_elements) ElementsList("known elements");
-                // new (obj->player.data.player_skills) Skills();
-                new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
-                // talking_to
-                // relations
-                break;
-            default:
-                break;
-        }
-        return true;
-    }
+    PacketObjectCreate(NetworkObject * el);
+    PacketObjectCreate();
+    int send(ENetPeer * peer);
+    bool update(unsigned char * data, size_t s);
 };
 
 class PacketObjectUpdate : public Packet
@@ -392,87 +140,17 @@ class PacketObjectUpdate : public Packet
         PacketType t;
         size_t size;
         unsigned char data[0];
-        static void * operator new(size_t size_base, size_t extra)
-        {
-            //   CONSOLE_LOG("PacketObjectUpdate: serial_data: allocating %ld + %ld\n", size_base, extra);
-            return ::operator new(size_base + extra);
-        }
-        serial_data(size_t s) : size(s)
-        {
-        }
-        static void operator delete(void * ptr)
-        {
-            ::operator delete(ptr);
-        }
+        static void * operator new(size_t size_base, size_t extra);
+        serial_data(size_t s);
+        static void operator delete(void * ptr);
     } __attribute__((packed));
 
   public:
     ObjectData * obj;
-    PacketObjectUpdate(InventoryElement * el) : Packet(PACKET_OBJECT_UPDATE)
-    {
-        obj = convert_to_data(el);
-    }
-    PacketObjectUpdate() : Packet(PACKET_OBJECT_UPDATE)
-    { // called by client
-        obj = nullptr;
-    }
-    int send(ENetPeer * peer)
-    {
-        int ret = 0;
-        struct serial_data * d = new (obj->size) serial_data(sizeof(serial_data) + obj->size);
-        d->t = t;
-        memcpy(d->data, (void *)obj, obj->size);
-
-        /*for (int i=0; i< 100; i++)
-           CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
-*/
-        ret = send_data(peer, d, d->size);
-        delete (d);
-        return ret;
-    }
-    bool update(unsigned char * data, size_t s)
-    {
-        struct serial_data * d = (struct serial_data *)data;
-        if (s != d->size)
-            return false;
-        obj = (ObjectData *)(&d->data);
-        /*      for (int i=0; i<100; i++)
-                   CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
-        */
-        //   CONSOLE_LOG("PacketObjectUpdate for objectData::Tag=%d\n", (int)obj->tag);
-        switch (obj->tag)
-        {
-            case ObjectData::Tag::Element:
-            {
-                new (&obj->element.data) Element(obj->id);
-                break;
-            }
-            case ObjectData::Tag::Plant:
-            {
-                new (&obj->plant.data) Plant(obj->id);
-                break;
-            }
-            case ObjectData::Tag::Animal:
-            {
-                new (&obj->animal.data) Animal(obj->id);
-                break;
-            }
-            case ObjectData::Tag::Player:
-                //    CONSOLE_LOG("ObjectUpdate for player inv_elems=%d\n", obj->player.data.inventory.nr_elements);
-                new (&obj->player.data.inventory) ElementsList("inventory");
-                //    CONSOLE_LOG("ObjectUpdate for player initialized: inv_elems=%d\n", obj->player.data.inventory.nr_elements);
-                new (&obj->player.data.known_elements) ElementsList("known elements");
-                // new (&obj->player.data.player_skills) Skills();
-                new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
-                // talking_to
-                // relations
-                break;
-            default:
-                break;
-        }
-
-        return true;
-    }
+    PacketObjectUpdate(InventoryElement * el);
+    PacketObjectUpdate();
+    int send(ENetPeer * peer);
+    bool update(unsigned char * data, size_t s);
 };
 
 class PacketChunkUpdate : public Packet
@@ -487,77 +165,13 @@ class PacketChunkUpdate : public Packet
     chunk_table * ptable;
 
   public:
-    unsigned char get_x()
-    {
-        return pdata->x;
-    }
-    unsigned char get_y()
-    {
-        return pdata->y;
-    }
-    chunk_table * get_table()
-    {
-        return ptable;
-    }
-    PacketChunkUpdate(unsigned char x, unsigned char y) : Packet(PACKET_CHUNK_UPDATE)
-    {
-        data.t = t;
-        data.x = x;
-        data.y = y;
-        chunk_valid = false;
-        if (world_table[y][x])
-        {
-            memcpy(&data.table, &world_table[y][x]->table, sizeof(chunk_table));
-            chunk_valid = true;
-        }
-        else
-            CONSOLE_LOG("PacketChunkUpdate: requested not loaded chunk x=%d y=%d\n", x, y);
-    }
-    PacketChunkUpdate() : Packet(PACKET_CHUNK_UPDATE)
-    {
-    }
-    int send(ENetPeer * peer)
-    {
-        int ret;
-        if (chunk_valid)
-        {
-            ret = send_data(peer, &data, sizeof(struct serial_data));
-
-            chunk * ch = world_table[data.y][data.x];
-            // ch->objects.show(false);
-            // ch->beings.show(false);
-            ListElement * el = ch->objects.head;
-            while (el)
-            {
-                Packet * p = new PacketObjectCreate(el->get_el());
-                ret = p->send(peer);
-                delete p;
-                el = el->next;
-            }
-            return ret;
-        }
-        else
-        {
-            Packet * p = new PacketActionFailed();
-            ret = p->send(peer);
-            delete p;
-            return ret;
-        }
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            ptable = &pdata->table;
-            return true;
-        }
-        return false;
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
+    unsigned char get_x();
+    unsigned char get_y();
+    chunk_table * get_table();
+    PacketChunkUpdate(unsigned char x, unsigned char y);
+    PacketChunkUpdate();
+    int send(ENetPeer * peer);
+    bool update(unsigned char * net_data, size_t s);
 };
 
 class PacketPlayerMove : public Packet
@@ -569,42 +183,12 @@ class PacketPlayerMove : public Packet
     } data, *pdata __attribute__((packed));
 
   public:
-    PacketPlayerMove(float x, float y) : Packet(PACKET_PLAYER_MOVE)
-    {
-        data.t = t;
-        data.x = x;
-        data.y = y;
-        //    CONSOLE_LOG("move: x=%f y=%f\n", x, y);
-    }
-    PacketPlayerMove() : Packet(PACKET_PLAYER_MOVE)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            //    CONSOLE_LOG("move: x=%f y=%f\n", pdata->x, pdata->y);
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        return send_data(peer, &data, sizeof(struct serial_data));
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
-    float get_x()
-    {
-        return pdata->x;
-    }
-    float get_y()
-    {
-        return pdata->y;
-    }
+    PacketPlayerMove(float x, float y);
+    PacketPlayerMove();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
+    float get_x();
+    float get_y();
 };
 
 class PacketLocationUpdate : public Packet
@@ -616,38 +200,12 @@ class PacketLocationUpdate : public Packet
     } data, *pdata __attribute__((packed));
 
   public:
-    LocationUpdateData get_location()
-    {
-        return pdata->location;
-    }
+    LocationUpdateData get_location();
 
-    PacketLocationUpdate(size_t i, ItemLocation old_loc, ItemLocation new_loc) : Packet(PACKET_LOCATION_UPDATE)
-    {
-        data.t = t;
-        data.location.id = NetworkObject(Class_Unknown, i);
-        data.location.old = old_loc;
-        data.location.new_ = new_loc;
-    }
-    PacketLocationUpdate() : Packet(PACKET_LOCATION_UPDATE)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        return send_data(peer, &data, sizeof(struct serial_data));
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
+    PacketLocationUpdate(size_t i, ItemLocation old_loc, ItemLocation new_loc);
+    PacketLocationUpdate();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
 };
 
 class PacketRequestChunk : public Packet
@@ -659,41 +217,13 @@ class PacketRequestChunk : public Packet
     } data, *pdata __attribute__((packed));
 
   public:
-    int get_cx()
-    {
-        return pdata->cx;
-    }
-    int get_cy()
-    {
-        return pdata->cy;
-    }
+    int get_cx();
+    int get_cy();
 
-    PacketRequestChunk(int cx, int cy) : Packet(PACKET_REQUEST_CHUNK)
-    {
-        data.t = t;
-        data.cx = cx;
-        data.cy = cy;
-    }
-    PacketRequestChunk() : Packet(PACKET_REQUEST_CHUNK)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        return send_data(peer, &data, sizeof(struct serial_data));
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
+    PacketRequestChunk(int cx, int cy);
+    PacketRequestChunk();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
 };
 
 class PacketRequestItem : public Packet
@@ -705,36 +235,12 @@ class PacketRequestItem : public Packet
     } data, *pdata __attribute__((packed));
 
   public:
-    int get_id()
-    {
-        return pdata->id;
-    }
+    int get_id();
 
-    PacketRequestItem(size_t id) : Packet(PACKET_REQUEST_ITEM)
-    {
-        data.t = t;
-        data.id = id;
-    }
-    PacketRequestItem() : Packet(PACKET_REQUEST_ITEM)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        return send_data(peer, &data, sizeof(struct serial_data));
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
+    PacketRequestItem(size_t id);
+    PacketRequestItem();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
 };
 
 class PacketPlayerActionPickup : public Packet
@@ -746,36 +252,12 @@ class PacketPlayerActionPickup : public Packet
     } data, *pdata __attribute__((packed));
 
   public:
-    uintptr_t get_id()
-    {
-        return pdata->id;
-    }
+    uintptr_t get_id();
 
-    PacketPlayerActionPickup(uintptr_t id) : Packet(PACKET_PLAYER_ACTION_PICKUP)
-    {
-        data.t = t;
-        data.id = id;
-    }
-    PacketPlayerActionPickup() : Packet(PACKET_PLAYER_ACTION_PICKUP)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        return send_data(peer, &data, sizeof(struct serial_data));
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
+    PacketPlayerActionPickup(uintptr_t id);
+    PacketPlayerActionPickup();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
 };
 
 class PacketPlayerActionDrop : public Packet
@@ -787,36 +269,12 @@ class PacketPlayerActionDrop : public Packet
     } data, *pdata __attribute__((packed));
 
   public:
-    uintptr_t get_id()
-    {
-        return pdata->id;
-    }
+    uintptr_t get_id();
 
-    PacketPlayerActionDrop(uintptr_t id) : Packet(PACKET_PLAYER_ACTION_DROP)
-    {
-        data.t = t;
-        data.id = id;
-    }
-    PacketPlayerActionDrop() : Packet(PACKET_PLAYER_ACTION_DROP)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        return send_data(peer, &data, sizeof(struct serial_data));
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
+    PacketPlayerActionDrop(uintptr_t id);
+    PacketPlayerActionDrop();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
 };
 
 class PacketPlayerActionUseItemOnObject : public Packet
@@ -829,41 +287,13 @@ class PacketPlayerActionUseItemOnObject : public Packet
     } data, *pdata __attribute__((packed));
 
   public:
-    uintptr_t get_iid()
-    {
-        return pdata->iid;
-    }
-    uintptr_t get_oid()
-    {
-        return pdata->oid;
-    }
+    uintptr_t get_iid();
+    uintptr_t get_oid();
 
-    PacketPlayerActionUseItemOnObject(uintptr_t iid, uintptr_t oid) : Packet(PACKET_PLAYER_ACTION_USE_ITEM_ON_OBJECT)
-    {
-        data.t = t;
-        data.iid = iid;
-        data.oid = oid;
-    }
-    PacketPlayerActionUseItemOnObject() : Packet(PACKET_PLAYER_ACTION_USE_ITEM_ON_OBJECT)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        return send_data(peer, &data, sizeof(struct serial_data));
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
+    PacketPlayerActionUseItemOnObject(uintptr_t iid, uintptr_t oid);
+    PacketPlayerActionUseItemOnObject();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
 };
 
 class PacketPlayerActionOnObject : public Packet
@@ -876,41 +306,13 @@ class PacketPlayerActionOnObject : public Packet
     } data, *pdata __attribute__((packed));
 
   public:
-    Player_action get_a()
-    {
-        return pdata->a;
-    }
-    uintptr_t get_oid()
-    {
-        return pdata->oid;
-    }
+    Player_action get_a();
+    uintptr_t get_oid();
 
-    PacketPlayerActionOnObject(Player_action a, uintptr_t oid) : Packet(PACKET_PLAYER_ACTION_ON_OBJECT)
-    {
-        data.t = t;
-        data.a = a;
-        data.oid = oid;
-    }
-    PacketPlayerActionOnObject() : Packet(PACKET_PLAYER_ACTION_ON_OBJECT)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        return send_data(peer, &data, sizeof(struct serial_data));
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
+    PacketPlayerActionOnObject(Player_action a, uintptr_t oid);
+    PacketPlayerActionOnObject();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
 };
 
 class PacketServerActionOnObject : public Packet
@@ -923,41 +325,13 @@ class PacketServerActionOnObject : public Packet
     } data, *pdata __attribute__((packed));
 
   public:
-    Server_action get_a()
-    {
-        return pdata->a;
-    }
-    uintptr_t get_oid()
-    {
-        return pdata->oid;
-    }
+    Server_action get_a();
+    uintptr_t get_oid();
 
-    PacketServerActionOnObject(Server_action a, uintptr_t oid) : Packet(PACKET_SERVER_ACTION_ON_OBJECT)
-    {
-        data.t = t;
-        data.a = a;
-        data.oid = oid;
-    }
-    PacketServerActionOnObject() : Packet(PACKET_SERVER_ACTION_ON_OBJECT)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        return send_data(peer, &data, sizeof(struct serial_data));
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
+    PacketServerActionOnObject(Server_action a, uintptr_t oid);
+    PacketServerActionOnObject();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
 };
 
 class PacketPlayerActionUseItemOnTile : public Packet
@@ -973,56 +347,16 @@ class PacketPlayerActionUseItemOnTile : public Packet
     } data, *pdata __attribute__((packed));
 
   public:
-    int get_map_x()
-    {
-        return pdata->map_x;
-    }
-    int get_map_y()
-    {
-        return pdata->map_y;
-    }
-    int get_x()
-    {
-        return pdata->x;
-    }
-    int get_y()
-    {
-        return pdata->y;
-    }
-    uintptr_t get_iid()
-    {
-        return pdata->iid;
-    }
+    int get_map_x();
+    int get_map_y();
+    int get_x();
+    int get_y();
+    uintptr_t get_iid();
 
-    PacketPlayerActionUseItemOnTile(uintptr_t iid, int map_x, int map_y, int x, int y) : Packet(PACKET_PLAYER_ACTION_USE_ITEM_ON_TILE)
-    {
-        data.t = t;
-        data.iid = iid;
-        data.map_x = map_x;
-        data.map_y = map_y;
-        data.x = x;
-        data.y = y;
-    }
-    PacketPlayerActionUseItemOnTile() : Packet(PACKET_PLAYER_ACTION_USE_ITEM_ON_TILE)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        return send_data(peer, &data, sizeof(struct serial_data));
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
+    PacketPlayerActionUseItemOnTile(uintptr_t iid, int map_x, int map_y, int x, int y);
+    PacketPlayerActionUseItemOnTile();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
 };
 
 class PacketPlayerActionCraft : public Packet
@@ -1034,63 +368,20 @@ class PacketPlayerActionCraft : public Packet
         uintptr_t prod_id;
         uintptr_t ing_num;
         uintptr_t iid[0];
-        static void * operator new(size_t size_base, size_t extra)
-        {
-            //        CONSOLE_LOG("serial_data: allocating %ld + %ld\n", size_base, extra);
-            return ::operator new(size_base + extra);
-        }
-        serial_data(uintptr_t prod_id, uintptr_t ing_num, const uintptr_t * iid_tab, PacketType t) : t(t), prod_id(prod_id), ing_num(ing_num)
-        {
-            for (uintptr_t i = 0; i < ing_num; i++)
-            {
-                iid[i] = iid_tab[i];
-            }
-            size = sizeof(struct serial_data) + ing_num * sizeof(*iid_tab);
-        }
-        static void operator delete(void * ptr)
-        {
-            ::operator delete(ptr);
-        }
+        static void * operator new(size_t size_base, size_t extra);
+        serial_data(uintptr_t prod_id, uintptr_t ing_num, const uintptr_t * iid_tab, PacketType t);
+        static void operator delete(void * ptr);
     } * pdata __attribute__((packed));
 
   public:
-    uintptr_t get_prod_id()
-    {
-        return pdata->prod_id;
-    }
-    uintptr_t get_ing_num()
-    {
-        return pdata->ing_num;
-    }
-    uintptr_t * get_iid_table()
-    {
-        return pdata->iid;
-    }
+    uintptr_t get_prod_id();
+    uintptr_t get_ing_num();
+    uintptr_t * get_iid_table();
 
-    PacketPlayerActionCraft(uintptr_t prod_id, uintptr_t ing_num, const uintptr_t * iid) : Packet(PACKET_PLAYER_ACTION_CRAFT)
-    {
-        pdata = new (ing_num * sizeof(*iid)) serial_data(prod_id, ing_num, iid, t);
-    }
-    PacketPlayerActionCraft() : Packet(PACKET_PLAYER_ACTION_CRAFT)
-    {
-    }
-    int send(ENetPeer * peer)
-    {
-        /*for (int i=0; i< 100; i++)
-           CONSOLE_LOG("[%d] = %d %x\n", i, obj->data[i], (obj->data[i]));
-*/
-        return send_data(peer, pdata, pdata->size);
-    }
-    bool update(unsigned char * data, size_t s)
-    {
-        pdata = (struct serial_data *)data;
-        if (s != pdata->size)
-            return false;
-        /*      for (int i=0; i<100; i++)
-                   CONSOLE_LOG("[%d] = %d %x\n", i, pdata->data[i], (pdata->data[i]));
-        */
-        return true;
-    }
+    PacketPlayerActionCraft(uintptr_t prod_id, uintptr_t ing_num, const uintptr_t * iid);
+    PacketPlayerActionCraft();
+    int send(ENetPeer * peer);
+    bool update(unsigned char * data, size_t s);
 };
 
 class PacketKnowledgeUpdate : public Packet
@@ -1104,45 +395,13 @@ class PacketKnowledgeUpdate : public Packet
     } data, *pdata __attribute__((packed));
 
   public:
-    int get_pl_id()
-    {
-        return pdata->pl_id;
-    }
-    Class_id get_cid()
-    {
-        return pdata->cid;
-    }
-    int get_id()
-    {
-        return pdata->id;
-    }
-    PacketKnowledgeUpdate(int pl_id, Class_id cid, int id) : Packet(PACKET_KNOWLEDGE_UPDATE)
-    {
-        data.t = t;
-        data.pl_id = pl_id;
-        data.cid = cid;
-        data.id = id;
-    }
-    PacketKnowledgeUpdate() : Packet(PACKET_KNOWLEDGE_UPDATE)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        return send_data(peer, &data, sizeof(struct serial_data));
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
+    int get_pl_id();
+    Class_id get_cid();
+    int get_id();
+    PacketKnowledgeUpdate(int pl_id, Class_id cid, int id);
+    PacketKnowledgeUpdate();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
 };
 
 class PacketCheckedUpdate : public Packet
@@ -1155,42 +414,30 @@ class PacketCheckedUpdate : public Packet
     } data, *pdata __attribute__((packed));
 
   public:
-    int get_pl_id()
-    {
-        return pdata->pl_id;
-    }
-    uintptr_t get_id()
-    {
-        return pdata->id;
-    }
-    PacketCheckedUpdate(int pl_id, uintptr_t id) : Packet(PACKET_CHECKED_UPDATE)
-    {
-        data.t = t;
-        data.pl_id = pl_id;
-        data.id = id;
-    }
-    PacketCheckedUpdate() : Packet(PACKET_CHECKED_UPDATE)
-    {
-    }
-    bool update(unsigned char * net_data, size_t s)
-    {
-        if (check_size(s))
-        {
-            pdata = (struct serial_data *)net_data;
-            return true;
-        }
-        return false;
-    }
-    int send(ENetPeer * peer)
-    {
-        return send_data(peer, &data, sizeof(struct serial_data));
-    }
-    bool check_size(int s)
-    {
-        return s == sizeof(struct serial_data);
-    }
+    int get_pl_id();
+    uintptr_t get_id();
+    PacketCheckedUpdate(int pl_id, uintptr_t id);
+    PacketCheckedUpdate();
+    bool update(unsigned char * net_data, size_t s);
+    int send(ENetPeer * peer);
 };
 
-Packet * check_packet(char dir, unsigned char * data, size_t s);
+Packet * check_client_packet(char dir, unsigned char * data, size_t s);
+Packet * check_server_packet(char dir, unsigned char * data, size_t s);
+
+#define NOT_SUPPORTED_SEND_METHOD(class_name)                                                                                                                                                          \
+    int class_name::send(ENetPeer * peer)                                                                                                                                                              \
+    {                                                                                                                                                                                                  \
+        assert(0);                                                                                                                                                                                     \
+        return 0;                                                                                                                                                                                      \
+    }
+#define NOT_SUPPORTED_UPDATE_METHOD(class_name)                                                                                                                                                        \
+    bool class_name::update(unsigned char * net_data, size_t s)                                                                                                                                        \
+    {                                                                                                                                                                                                  \
+        assert(0);                                                                                                                                                                                     \
+        return false;                                                                                                                                                                                  \
+    }
+
+#define CHECK_SIZE(s) (s == sizeof(struct serial_data))
 
 #endif

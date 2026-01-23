@@ -67,7 +67,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
     unsigned char * data = packet->data;
     // CONSOLE_LOG("Received length=%lu: %d\n", packet->dataLength, *data);
 
-    Packet * p = check_packet('R', data, packet->dataLength);
+    Packet * p = check_server_packet('R', data, packet->dataLength);
     if (!p)
         return false;
 

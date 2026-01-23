@@ -16,6 +16,8 @@ SDL_Renderer * renderer;
 SDL_Window * main_window;
 int window_width;
 int window_height;
+float left_top_world_x;
+float left_top_world_y;
 
 int init_window(const char * title, int wx, int wy)
 {

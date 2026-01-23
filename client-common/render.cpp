@@ -84,6 +84,7 @@ void draw_texts()
             }
         }
     }
+
     InventoryElement * el = player->hotbar[active_hotbar];
     if (el)
     {
@@ -208,8 +209,8 @@ bool draw_terrain()
     float player_world_x = player->location.get_world_x();
     float player_world_y = player->location.get_world_y();
 
-    float left_top_world_x = player_world_x - 8 * size;
-    float left_top_world_y = player_world_y - 8 * size;
+    left_top_world_x = player_world_x - 8 * size;
+    left_top_world_y = player_world_y - 8 * size;
 
     int first_tile_x = left_top_world_x / size;
     int first_tile_y = left_top_world_y / size;

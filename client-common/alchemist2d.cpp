@@ -250,12 +250,23 @@ bool Renderable::check_rect(float px, float py, float x, float y, int t_size)
     }
     Backend_Rect el_rect((Backend_Rect_Field)x, (Backend_Rect_Field)y, (Backend_Rect_Field)(size_x), (Backend_Rect_Field)(size_y));
     Backend_Rect pl_rect((Backend_Rect_Field)px, (Backend_Rect_Field)py, (Backend_Rect_Field)t_size, (Backend_Rect_Field)t_size);
-
-    // CONSOLE_LOG("el_rect: (%d,%d)-(%d,%d)\n", el_rect.r.x, el_rect.r.y, el_rect.r.x+el_rect.get_w(), el_rect.r.y+el_rect.get_h());
-    // CONSOLE_LOG("pl_rect: (%d,%d)-(%d,%d)\n", pl_rect.r.x, pl_rect.r.y, pl_rect.r.x+pl_rect.get_w(), pl_rect.r.y+pl_rect.get_h());
-    Backend_Draw_Rectangle(el_rect, {255, 0, 0, 255});
-    Backend_Draw_Rectangle(pl_rect, {255, 255, 0, 255});
-    return Backend_Has_Intersection(el_rect, pl_rect);
+    /*    Backend_Rect frame=el_rect;
+        frame.r.x-=left_top_world_x;
+        frame.r.y-=left_top_world_y;
+        Backend_Draw_Rectangle(frame, {255, 0, 255, 255});
+        frame=pl_rect;
+        frame.r.x-=left_top_world_x;
+        frame.r.y-=left_top_world_y;
+        Backend_Draw_Rectangle(frame, {255, 255, 0, 255});
+    */
+    bool ret = Backend_Has_Intersection(el_rect, pl_rect);
+    /*    if (ret)
+        {
+            CONSOLE_LOG("el_rect: (%d,%d)-(%d,%d)\n", el_rect.r.x, el_rect.r.y, el_rect.r.x+el_rect.get_w(), el_rect.r.y+el_rect.get_h());
+            CONSOLE_LOG("pl_rect: (%d,%d)-(%d,%d)\n", pl_rect.r.x, pl_rect.r.y, pl_rect.r.x+pl_rect.get_w(), pl_rect.r.y+pl_rect.get_h());
+        }
+    */
+    return ret;
 }
 float Element2d::get_scale()
 {

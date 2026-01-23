@@ -8,6 +8,7 @@ server_sources = [
   'world_server.cpp', 'player_server.cpp',
   'networking.cpp', 'elements_server.cpp',
   'craft.cpp', 'craft_ing.cpp', 'craft_prod.cpp',
+  'packets.cpp',
 
   'generator/generator.cpp',
   'generator/random_functions.cpp',
