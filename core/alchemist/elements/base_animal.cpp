@@ -1,7 +1,8 @@
-#include "base_animal.h"
-#include "../names.h"
 #include <cstdio>
 #include <cstdlib>
+
+#include "base_animal.h"
+#include "../names.h"
 
 BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(7))
 {

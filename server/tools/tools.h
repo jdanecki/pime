@@ -57,7 +57,7 @@ GENERATE_INGREDIENT(Meat, bool action(Product_action, Player *);)
 GENERATE_PRODUCT(FruitSalad, bool player_action(Player_action, Player *);)
 GENERATE_INGREDIENT(Fruit, )
 
-GENERATE_PRODUCT(Hut, bool can_pickup();bool use_on(InventoryElement * object, Player * pl);)
+GENERATE_PRODUCT(Hut, bool can_pickup(); bool use_on(InventoryElement * object, Player * pl);)
 GENERATE_PRODUCT(Tent, )
 GENERATE_INGREDIENT(Log, )
 GENERATE_INGREDIENT(Wall, )

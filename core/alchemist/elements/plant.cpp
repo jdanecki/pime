@@ -1,7 +1,8 @@
-#include "plant.h"
-#include "../el_list.h"
 #include <cstdio>
 #include <cstdlib>
+
+#include "plant.h"
+#include "../el_list.h"
 
 void Plant::init(BasePlant * b)
 {

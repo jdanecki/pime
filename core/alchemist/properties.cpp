@@ -1,7 +1,8 @@
-#include "properties.h"
 #include <stdlib.h>
-#include "../clan.h"
 #include <cstring>
+
+#include "properties.h"
+#include "../clan.h"
 
 Edible::Edible() : irrigation("irrigation", rand() % 500), poison("poison", 1 + rand() % 250), caloric("caloric", rand() % 1000)
 {
@@ -130,3 +131,36 @@ void Solid::show()
 }
 
 const char * Form_name[]{"unknown", "solid", "liquid", "gas"};
+Property::Property(const char * n, unsigned int v) : name(n)
+{
+    value = v;
+}
+Property::Property()
+{
+}
+void Property::show()
+{
+    CONSOLE_LOG("%s = %u\n", name.str, value);
+}
+unsigned int Property::decrease(unsigned int by)
+{
+    if (value > by)
+    {
+        value -= by;
+    }
+    else
+        value = 0;
+    return value;
+}
+void Edible::set_random()
+{
+    eating_by = rand() % 16;
+}
+void Edible::set_no_edible()
+{
+    eating_by = 0;
+}
+bool Edible::can_be_eaten_by(int who)
+{
+    return eating_by & (1 << who);
+}

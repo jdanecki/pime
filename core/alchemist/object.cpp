@@ -16,3 +16,13 @@ Class_id NetworkObject::get_cid() const
 {
     return c_id;
 }
+NetworkObject::NetworkObject()
+{
+}
+Form NetworkObject::get_form()
+{
+    return Form_unknown;
+}
+void NetworkObject::show(bool details)
+{
+}

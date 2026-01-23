@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "../../client-common/window.h"
+#include "../../client-common/texture.h"
 #include "../../client-common/alchemist2d.h"
 
 bool handle_events();

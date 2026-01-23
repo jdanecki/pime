@@ -1,12 +1,20 @@
+#include <stdio.h>
 #include <sys/ioctl.h>
 #include <termios.h>
-// #include <time.h>
+
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
-// #include "../core/time_core.h"
+
+#include "../core/world.h"
+#include "../core/alchemist/el_list.h"
+
 #include "../client-common/game.h"
+#include "../client-common/net.h"
+#include "../client-common/players.h"
+
+#include "playerUI.h"
 
 extern int trace_network;
 

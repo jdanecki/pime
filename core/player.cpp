@@ -1,7 +1,7 @@
-#include "clan.h"
-// #include "tiles.h"
-#include "player.h"
 #include <string.h>
+
+#include "clan.h"
+#include "player.h"
 
 extern void print_status(int i, const char * format, ...);
 
@@ -10,7 +10,7 @@ const char * relations_names[] = {"unknown", "known"};
 void Player::pickup(InventoryElement * item)
 {
     inventory.add(item);
-    //CONSOLE_LOG("player %p pickup inv=%lx\n", this, item->get_uid());
+    // CONSOLE_LOG("player %p pickup inv=%lx\n", this, item->get_uid());
     ItemLocation location;
     location.tag = ItemLocation::Tag::Player;
     location.player.id = uid;

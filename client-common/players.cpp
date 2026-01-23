@@ -1,4 +1,5 @@
 #include "players.h"
+#include "playerUI.h"
 
 Player * players[PLAYER_NUM];
 PlayerUI * player;

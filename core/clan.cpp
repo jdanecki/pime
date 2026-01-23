@@ -1,6 +1,7 @@
+#include <stdlib.h>
+
 #include "clan.h"
 #include "alchemist/object.h"
-#include <stdlib.h>
 
 const char * clan_names[] = {"Animal", "Human", "Dwarf", "Elf", "Niziolek"};
 

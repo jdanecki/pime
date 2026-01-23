@@ -1,8 +1,9 @@
+#include <cstdio>
+
 #include "networking.h"
 #include "elements_server.h"
 #include "craft.h"
 #include "world_server.h"
-#include <cstdio>
 
 // #define DEBUG_TIMEOUT 1
 

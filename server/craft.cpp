@@ -1,10 +1,10 @@
+#include <stdio.h>
+
 #include "craft.h"
 
-// #include "networking.h"
 #include "../core/world.h"
 #include "craft_ing.h"
 #include "craft_prod.h"
-#include <stdio.h>
 
 // extern class Player player;
 // extern int active_hotbar;

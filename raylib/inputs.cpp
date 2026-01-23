@@ -2,7 +2,8 @@
 
 #include "../core/key_handler.h"
 #include "../client-common/inputs.h"
-// #include "../client-common/player_actions.h"
+#include "../client-common/net.h"
+
 #include "../menu/menu.h"
 #include "../dialog/d_craft.h"
 #include "playerUI.h"

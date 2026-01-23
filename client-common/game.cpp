@@ -5,6 +5,8 @@
 #include "backend.inl"
 
 #include "game.h"
+#include "players.h"
+#include "playerUI.h"
 #include "../core/world.h"
 #include "../core/time_core.h"
 #include "net.h"

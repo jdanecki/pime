@@ -6,6 +6,8 @@
 #include <SDL2/SDL_timer.h>
 
 #include "../client-common/inputs.h"
+#include "../client-common/net.h"
+#include "../client-common/window.h"
 #include "../core/key_handler.h"
 #include "../menu/menu.h"
 #include "../dialog/d_craft.h"

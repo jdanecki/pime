@@ -2,7 +2,7 @@
 #define NPC_TALK_H
 
 #include "el_list.h"
-#include "generated/npc_talk_generated.hpp"
+#include "generated/npc_talk_generated.hpp" // IWYU pragma: keep
 
 class Sentence : public ListElement
 {
@@ -10,32 +10,16 @@ class Sentence : public ListElement
     const char * text;
     enum Npc_say id;
 
-    Sentence(enum Npc_say i, const char * t)
-    {
-        text = t;
-        id = i;
-    }
-    void show(bool details = true)
-    {
-        CONSOLE_LOG("%s\n", text);
-    }
-    bool check(void * what)
-    {
-        enum Npc_say * i = (enum Npc_say *)what;
-        return id == *i;
-    }
+    Sentence(enum Npc_say i, const char * t);
+    void show(bool details = true);
+    bool check(void * what);
 };
 
 class SentencesList : public ElementsList
 {
   public:
-    SentencesList(const char * n) : ElementsList(n)
-    {
-    }
-    Sentence * add(ListElement * el)
-    {
-        return (Sentence *)ElementsList::add(el);
-    }
+    SentencesList(const char * n);
+    Sentence * add(ListElement * el);
     void disable(enum Npc_say id);
     void enable(enum Npc_say id);
 };

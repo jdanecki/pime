@@ -3,7 +3,6 @@
 
 #include "../core/alchemist/npc_talk.h"
 #include "../core/alchemist/el_list.h"
-// #include "../client-common/text.h"
 
 enum menu_actions
 {

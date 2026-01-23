@@ -1,7 +1,8 @@
-#include "element.h"
-#include "../el_list.h"
 #include <cstdio>
 #include <cstdlib>
+
+#include "element.h"
+#include "../el_list.h"
 
 Element::Element(BaseElement * b)
     : InventoryElement(Class_Element), base(b), length("length", 5 + rand() % 60), width("width", 5 + rand() % 60), height("height", 5 + rand() % 60),

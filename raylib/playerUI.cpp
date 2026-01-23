@@ -1,4 +1,5 @@
 #include "playerUI.h"
+#include "../client-common/texture.h"
 
 Texture PlayerUI::get_texture()
 {

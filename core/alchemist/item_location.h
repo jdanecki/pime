@@ -2,7 +2,6 @@
 #define ITEM_LOCATION_H
 
 #include <cstdint>
-#include "object.h"
 
 struct ItemLocation
 {

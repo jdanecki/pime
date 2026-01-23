@@ -1,6 +1,7 @@
-#include "product.h"
 #include <cstdio>
 #include <cassert>
+
+#include "product.h"
 
 Product::Product(Product_id id, int actions_count) : InventoryElement(Class_Product), quality("quality", 0), resilience("resilience", 0), usage("usage", 0), actions_count(actions_count), id(id)
 {

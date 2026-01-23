@@ -2,6 +2,7 @@
 #include "d_craft.h"
 #include "dialog.h"
 #include "../client-common/net.h"
+#include "../client-common/texture.h"
 #include "playerUI.h"
 
 extern int active_hotbar;

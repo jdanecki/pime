@@ -1,5 +1,5 @@
-#include "ingredient.h"
 #include <cstdio>
+#include "ingredient.h"
 
 Ingredient::Ingredient(Ingredient_id i) : InventoryElement(Class_Ingredient), quality("quality", 0), resilience("resilience", 0), usage("usage", 0)
 {

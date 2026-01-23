@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "console.h"
 
 int history_size = 1024;

@@ -3,6 +3,7 @@
 
 #include "base.h"
 #include "../properties.h"
+#include "types.h"
 
 class BaseElement : public Base
 {

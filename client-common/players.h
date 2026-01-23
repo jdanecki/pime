@@ -1,7 +1,7 @@
 #ifndef PLAYERS_H
 #define PLAYERS_H
 
-#include "playerUI.h"
+#include "../core/player.h"
 
 #define PLAYER_NUM 16
 extern Player * players[PLAYER_NUM];

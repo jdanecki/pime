@@ -5,6 +5,7 @@
 #include "../../client-common/window.h"
 #include "../../client-common/text.h"
 #include "../../client-common/alchemist2d.h"
+#include "../../client-common/texture.h"
 #include "playerUI.h"
 
 Dialog * dialog;

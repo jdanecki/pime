@@ -1,7 +1,8 @@
-#include "base_plant.h"
-#include "../names.h"
 #include <cstdio>
 #include <cstdlib>
+
+#include "base_plant.h"
+#include "../names.h"
 
 BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(5))
 {

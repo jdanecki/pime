@@ -8,19 +8,14 @@
 
 #include "menu.h"
 #include "../core/alchemist/elements.h"
-// #include "../core/tiles.h"
-// #include "../core/world.h"
-// #include "../client-common/music.h"
-// #include "../core/networking.h"
 
 #ifndef DISABLE_NPC
 #include "../client-common/npc.h"
 #endif
 
 #include "../client-common/text.h"
-// #include "../client-common/texture.h"
-// #include "../client-common/window.h"
-// #include "../dialog/d_craft.h"
+#include "../client-common/net.h"
+
 #include "../client-common/player_actions.h"
 
 extern int active_hotbar;

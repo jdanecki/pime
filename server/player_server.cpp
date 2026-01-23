@@ -1,9 +1,10 @@
+#include <stdio.h>
+
 #include "player_server.h"
 #include "elements_server.h"
 #include "networking.h"
 #include "world_server.h"
 #include "../core/packet_types.h"
-#include <stdio.h>
 
 ElementsList * players;
 
@@ -89,12 +90,12 @@ bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement 
         {
             return true;
         }
-    } 
+    }
     else if (object->get_cid() == Class_Product)
     {
         ProductServer * obj_prod = dynamic_cast<ProductServer *>(object);
         if (obj_prod)
-        {       
+        {
             CONSOLE_LOG("%s: using %s on %s\n", get_name(), item->get_name(), obj_prod->get_name());
             if (obj_prod->use_on(item, this))
             {

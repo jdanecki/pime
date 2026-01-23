@@ -1,5 +1,4 @@
 #include "tools.h"
-#include <cstdlib>
 
 Log::Log(InventoryElement * from) : IngredientServer(from, ING_LOG, Form_solid)
 {

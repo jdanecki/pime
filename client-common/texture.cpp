@@ -1,5 +1,6 @@
 #include <dirent.h>
 #include <assert.h>
+#include <stdio.h>
 
 #include "texture.h"
 #include "../core/world_params.h"

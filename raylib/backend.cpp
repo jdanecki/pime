@@ -1,6 +1,6 @@
-// #include <stdio.h>
-#include "backend.inl"
 #include <stdlib.h>
+
+#include "backend.inl"
 
 Texture2D Backend_Create_Texture_From_Surface(Image image)
 {

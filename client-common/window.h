@@ -1,10 +1,6 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "backend.inl"
-
-#include "../core/world_params.h"
-
 extern int window_width;
 extern int window_height;
 

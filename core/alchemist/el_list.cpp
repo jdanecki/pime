@@ -1,16 +1,20 @@
-#include "el_list.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-// #include <errno.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+
+#include "el_list.h"
 
 ElementsList base_elements("base elements");
 ElementsList base_plants("base plants");
 ElementsList base_animals("base animals");
 
+ListElement::ListElement() : c_id(Class_ListElement), el(nullptr), next(nullptr), prev(nullptr)
+{
+    enable();
+}
 ListElement::ListElement(NetworkObject * entry) : el(entry), c_id(Class_ListElement)
 {
     next = nullptr;
@@ -382,4 +386,134 @@ ListElement * ElementsList::get_random()
 void BaseListElement::show(bool details)
 {
     get_el()->show(details);
+}
+void ListElement::disable()
+{
+    enabled = false;
+}
+void ListElement::enable()
+{
+    enabled = true;
+}
+bool ListElement::is_enabled()
+{
+    return enabled;
+}
+bool ListElement::tick()
+{
+    return ((InventoryElement *)(el.get()))->tick();
+}
+bool ListElement::check(void * what)
+{
+    return what == this;
+}
+ListElement::~ListElement()
+{
+}
+size_t ListElement::get_size()
+{
+    return sizeof(ListElement);
+}
+Class_id ListElement::get_cid()
+{
+    return c_id;
+}
+NetworkObject * ListElement::get_el()
+{
+    return el.get();
+}
+BaseListElement::BaseListElement(Base * base) : ListElement(base)
+{
+    c_id = Class_BaseListElement;
+}
+bool BaseListElement::check(void * what)
+{
+    size_t * uid = static_cast<size_t *>(what);
+    return (*uid == get_el()->get_uid());
+}
+size_t BaseListElement::get_size()
+{
+    Base * b = static_cast<Base *>(get_el());
+    return b->get_size();
+}
+KnownElement::KnownElement(Class_id t, int i)
+{
+    elid.c_id = t;
+    elid.id = i;
+    known = false;
+    c_id = Class_KnownElement;
+}
+bool KnownElement::is_known()
+{
+    return known;
+}
+void KnownElement::set_known()
+{
+    known = true;
+    CONSOLE_LOG("learning %s %d\n", class_name[elid.c_id], elid.id);
+}
+bool KnownElement::check(void * what)
+{
+    ElId * i = (ElId *)what;
+    return (elid.c_id == i->c_id && elid.id == i->id);
+}
+bool KnownElement::check_class(Class_id id)
+{
+    return elid.c_id == id;
+}
+int KnownElement::get_id()
+{
+    return elid.id;
+}
+size_t KnownElement::get_size()
+{
+    return sizeof(KnownElement);
+}
+ElementsListReverseIterator::ElementsListReverseIterator(ListElement * le) : le(le)
+{
+}
+bool ElementsListReverseIterator::operator!=(const ElementsListReverseIterator & other) const
+{
+    return le != other.le;
+}
+ElementsListReverseIterator & ElementsListReverseIterator::operator++()
+{
+    le = le->prev;
+    return *this;
+}
+InventoryElement * ElementsListReverseIterator::operator*() const
+{
+    return (InventoryElement *)le->get_el();
+}
+ElementsList::~ElementsList()
+{
+    CONSOLE_LOG("~ElementsList %s\n", name);
+    remove_all();
+}
+bool ElementsList::find_check(ListElement * el, void * what)
+{
+    return el->check(what);
+}
+ElementsListReverseIterator ElementsList::rbegin()
+{
+    return tail;
+}
+ElementsListReverseIterator ElementsList::rend()
+{
+    return nullptr;
+}
+ReversedView::ReversedView(ElementsList * list) : list(list)
+{
+}
+void ReversedView::show()
+{
+    list->show(false);
+}
+ElementsListReverseIterator ReversedView::begin()
+{
+    return list->rbegin();
+}
+ElementsListReverseIterator ReversedView::end()
+{
+    return list->rend();
 }

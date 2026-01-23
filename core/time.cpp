@@ -1,5 +1,6 @@
-#include "time_core.h"
 #include <time.h>
+
+#include "time_core.h"
 
 unsigned long get_time_usec()
 {

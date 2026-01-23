@@ -1,5 +1,6 @@
 #include "being2d.h"
-#include "../core/networking.h"
+#include "../core/world_params.h"
+#include "texture.h"
 
 /*Backend_Texture BeingSDL::get_texture()
 {

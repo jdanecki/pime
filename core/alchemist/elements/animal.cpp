@@ -1,6 +1,7 @@
+#include <cstdio>
+
 #include "animal.h"
 #include "../el_list.h"
-#include <cstdio>
 
 void Animal::init(BaseAnimal * b)
 {
@@ -61,4 +62,7 @@ BaseAnimal * get_base_animal(size_t id)
     if (!el)
         return nullptr;
     return (BaseAnimal *)((el)->get_el());
+}
+Animal::~Animal()
+{
 }

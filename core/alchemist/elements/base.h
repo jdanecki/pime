@@ -4,7 +4,6 @@
 #include "../object.h"
 #include "../names.h"
 #include "../properties.h"
-#include "types.h"
 
 class Base : public NetworkObject
 {

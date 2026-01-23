@@ -10,12 +10,10 @@
 
 #include "playerUI.h"
 #include "net.h"
-// #include "npc.h"
-#include "text.h"
 #include "texture.h"
 #include "window.h"
 #include "alchemist2d.h"
-// #include "being2d.h"
+
 #include "../menu/menu.h"
 
 extern Backend_Texture map;
@@ -404,7 +402,7 @@ void draw()
     }
 
     draw_dialogs();
-    
+
     if (current_menu)
         current_menu->show();
 

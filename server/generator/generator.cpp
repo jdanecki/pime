@@ -1,7 +1,8 @@
-// #include <stdio.h>
+
 #include "generator.h"
 #include "random_functions.h"
 #include "../../core/world_params.h"
+
 int terrains_count;
 TerrainType ** terrains;
 Region ** regions;

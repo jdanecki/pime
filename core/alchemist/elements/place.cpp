@@ -1,5 +1,5 @@
-#include "place.h"
 #include <cstdio>
+#include "place.h"
 
 const char * Place::get_name()
 {

@@ -1,5 +1,5 @@
-#include "inventory_element.h"
 #include <cstdio>
+#include "inventory_element.h"
 
 InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : NetworkObject(c_id, uid), location(location)
 {

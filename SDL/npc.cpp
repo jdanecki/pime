@@ -2,14 +2,11 @@
 #include <SDL2/SDL_surface.h>
 #include <stdio.h>
 
-#include "../core/networking.h"
-
 #include "playerUI.h"
 
 #include "../client-common/npc.h"
 #include "../menu/menu.h"
 #include "../client-common/texture.h"
-#include "../client-common/window.h"
 
 Npc2d * current_npc;
 extern int active_hotbar;

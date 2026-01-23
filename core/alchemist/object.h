@@ -2,6 +2,7 @@
 #define OBJECT_H
 
 #include <stddef.h>
+
 int CONSOLE_LOG(const char * fmt, ...);
 
 enum Class_id
@@ -11,8 +12,8 @@ enum Class_id
     Class_BaseAnimal,
     Class_BasePlant,
 
-    Class_Element, // base: BaseElement
-    Class_Ingredient, //5
+    Class_Element,    // base: BaseElement
+    Class_Ingredient, // 5
     Class_Product,
     Class_Scroll,
     Class_Place,
@@ -25,7 +26,7 @@ enum Class_id
     Class_Clan,
 
     Class_ListElement,
-    Class_KnownElement, //15
+    Class_KnownElement, // 15
     Class_BaseListElement,
 };
 
@@ -44,19 +45,12 @@ class NetworkObject
     size_t uid;
     NetworkObject(Class_id id);
     NetworkObject(Class_id id, size_t uid);
-    NetworkObject()
-    {
-    }
+    NetworkObject();
     size_t get_uid() const;
     Class_id get_cid() const;
 
-    virtual Form get_form()
-    {
-        return Form_unknown;
-    }
-    virtual void show(bool details = true)
-    {
-    }
+    virtual Form get_form();
+    virtual void show(bool details = true);
 };
 
 #endif

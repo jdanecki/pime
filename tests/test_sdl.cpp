@@ -1,5 +1,6 @@
 #include "../client-common/window.h"
 #include "../client-common/alchemist2d.h"
+#include "../client-common/texture.h"
 
 bool handle_events();
 Backend_Texture texture;

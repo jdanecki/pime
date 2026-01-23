@@ -1,6 +1,8 @@
 #include <math.h>
 
 #include "alchemist2d.h"
+#include "window.h"
+#include "texture.h"
 
 extern Backend_Texture * add_texture_color(Backend_Surface * s, ColorRGB c);
 

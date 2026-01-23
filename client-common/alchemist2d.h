@@ -2,11 +2,7 @@
 #define ALCHEMIST_SDL_H
 
 #include "../core/alchemist/elements.h"
-#include "../core/player.h"
-
-#include "net.h"
-#include "texture.h"
-#include "window.h"
+#include "backend.inl"
 
 class Renderable
 {

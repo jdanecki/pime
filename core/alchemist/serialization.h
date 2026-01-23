@@ -28,9 +28,7 @@ class SerializableCString
   public:
     char str[60];
     SerializableCString(const char * s);
-    SerializableCString()
-    {
-    }
+    SerializableCString();
 };
 
 #endif

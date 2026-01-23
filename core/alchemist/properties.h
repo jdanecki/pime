@@ -1,7 +1,6 @@
 #ifndef PROPERTIES_H
 #define PROPERTIES_H
 
-#include <stdio.h>
 #include <stdlib.h>
 #include "serialization.h"
 
@@ -10,27 +9,10 @@ class Property
   public:
     SerializableCString name;
     unsigned int value;
-    Property(const char * n, unsigned int v) : name(n)
-    {
-        value = v;
-    }
-    Property()
-    {
-    }
-    void show()
-    {
-        CONSOLE_LOG("%s = %u\n", name.str, value);
-    }
-    unsigned int decrease(unsigned int by)
-    {
-        if (value > by)
-        {
-            value -= by;
-        }
-        else
-            value = 0;
-        return value;
-    }
+    Property(const char * n, unsigned int v);
+    Property();
+    void show();
+    unsigned int decrease(unsigned int by);
 };
 
 class Edible
@@ -43,18 +25,9 @@ class Edible
 
     Edible();
     ~Edible();
-    void set_random()
-    {
-        eating_by = rand() % 16;
-    }
-    void set_no_edible()
-    {
-        eating_by = 0;
-    }
-    bool can_be_eaten_by(int who)
-    {
-        return eating_by & (1 << who);
-    }
+    void set_random();
+    void set_no_edible();
+    bool can_be_eaten_by(int who);
     void show();
 };
 

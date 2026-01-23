@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "../core/alchemist/el_list.h"
 #include "../core/alchemist/elements/element.h"
 #include "../core/alchemist/elements/place.h"

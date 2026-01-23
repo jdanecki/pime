@@ -1,5 +1,4 @@
 #include "tools.h"
-#include <cstdlib>
 
 HoeBlade::HoeBlade(InventoryElement * from) : IngredientServer(from, ING_HOE_BLADE, Form_solid)
 {

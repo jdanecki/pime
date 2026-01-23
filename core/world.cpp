@@ -1,7 +1,8 @@
+#include <cstdio>
+
 #include "world.h"
 #include "alchemist/item_location.h"
 #include "player.h"
-#include <cstdio>
 
 int tile_size;
 chunk * world_table[WORLD_SIZE][WORLD_SIZE];

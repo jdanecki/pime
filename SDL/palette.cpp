@@ -18,7 +18,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <SDL2_gfxPrimitives.h>
-#include "../client-common/window.h"
+#include "backend.inl" // IWYU pragma: keep for renderer
 
 extern int window_width;
 extern int window_height;

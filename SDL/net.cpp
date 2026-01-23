@@ -1,7 +1,9 @@
+#include <cstdio>
 #include "playerUI.h"
+
 #include "../client-common/being2d.h"
 #include "../client-common/players.h"
-#include <cstdio>
+#include "../core/networking.h"
 
 NetworkObject * el_from_data(const ObjectData * data)
 {
