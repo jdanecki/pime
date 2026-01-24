@@ -22,18 +22,12 @@ ProductServer * Seedling::createSeedling(InventoryElement * el1, InventoryElemen
 
 bool Seedling::use_on(InventoryElement * object, Player * pl)
 {
-    if (object->c_id != Class_Place)
+    if (object->c_id != Class_Field)
     {
-        CONSOLE_LOG("It's not a place to plow\n");
+        CONSOLE_LOG("It's not a field to plant\n");
         return false;
     }
-    Place * p = static_cast<Place *>(object);
-    if (p->get_id() != PLACE_FIELD)
-    {
-        CONSOLE_LOG("It's not a field\n");
-        return false;
-    }
-    Field * f = static_cast<Field *>(p);
+    Field * f = static_cast<Field *>(object);
     if (f->state != FIELD_PLOWED)
     {
         CONSOLE_LOG("Field isn't plowed\n");

@@ -14,6 +14,8 @@
 #include "elements/animal.h"            // IWYU pragma: export
 #include "elements/base_plant.h"        // IWYU pragma: export
 #include "elements/plant.h"             // IWYU pragma: export
+#include "elements/field.h"             // IWYU pragma: export
+#include "elements/barn.h"              // IWYU pragma: export
 
 class chunk;
 class Player;

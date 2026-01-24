@@ -24,7 +24,8 @@ struct ObjectData
         Scroll,
         Player,
         Npc,
-        Place,
+        Field,
+        Barn,
         Clan,
     };
 
@@ -72,9 +73,13 @@ struct ObjectData
     {
         Npc data;
     };
-    struct Place_Body
+    struct Field_Body
     {
-        Place data;
+        Field data;
+    };
+    struct Barn_Body
+    {
+        Barn data;
     };
     struct Clan_Body
     {
@@ -122,7 +127,8 @@ struct ObjectData
         Scroll_Body scroll;
         Player_Body player;
         Npc_Body npc;
-        Place_Body place;
+        Field_Body field;
+        Barn_Body barn;
         Clan_Body clan;
     };
     int id;

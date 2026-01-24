@@ -558,21 +558,6 @@ bool ScrollServer::player_action(Player_action action, Player * pl)
     return true;
 }
 
-PlaceServer::PlaceServer(Place_id id) : Place(id)
-{
-    // CONSOLE_LOG("PlaceServer::PlaceServer\n");
-}
-
-void PlaceServer::show(bool details)
-{
-    CONSOLE_LOG("PlaceServer\n");
-    Place::show(details);
-}
-
-bool PlaceServer::can_pickup()
-{
-    return false;
-}
 bool ScrollServer::can_pickup()
 {
     return true;

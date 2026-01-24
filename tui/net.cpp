@@ -15,9 +15,14 @@ NetworkObject * el_from_data(const ObjectData * data)
             el = new Element(data->element.data);
             break;
         }
-        case ObjectData::Tag::Place:
+        case ObjectData::Tag::Field:
         {
-            el = new Place(data->place.data);
+            el = new Field(data->field.data);
+            break;
+        }
+        case ObjectData::Tag::Barn:
+        {
+            el = new Barn(data->barn.data);
             break;
         }
         case ObjectData::Tag::Scroll:

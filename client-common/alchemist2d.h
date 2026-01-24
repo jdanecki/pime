@@ -34,11 +34,18 @@ class Product2d : public Product, public Renderable
     Product2d(Product data);
 };
 
-class Place2d : public Place, public Renderable
+class Field2d : public Field, public Renderable
 {
   public:
     Backend_Texture get_texture();
-    Place2d(Place data);
+    Field2d(Field data);
+};
+
+class Barn2d : public Barn, public Renderable
+{
+  public:
+    Backend_Texture get_texture();
+    Barn2d(Barn data);
 };
 
 class Element2d : public Element, public Renderable

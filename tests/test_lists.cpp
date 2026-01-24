@@ -2,7 +2,7 @@
 
 #include "../core/alchemist/el_list.h"
 #include "../core/alchemist/elements/element.h"
-#include "../core/alchemist/elements/place.h"
+#include "../core/alchemist/elements/field.h"
 
 void test_loops()
 {
@@ -10,7 +10,7 @@ void test_loops()
     ListElement * el1 = new ListElement(new InventoryElement(Class_ListElement));
     list.add_front(el1);
 
-    ListElement * el2 = new ListElement(new Place(PLACE_FIELD));
+    ListElement * el2 = new ListElement(new Field(PLACE_FIELD));
     list.add_front(el2);
 
     ListElement * el3 = new ListElement(new Element(new BaseElement(Form_solid, 1)));

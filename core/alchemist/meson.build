@@ -14,6 +14,8 @@ alchemist_sources = [
   'elements/animal.cpp',
   'elements/base_plant.cpp',
   'elements/plant.cpp',
+  'elements/field.cpp',
+  'elements/barn.cpp',
   'names.cpp',
   'el_list.cpp',
   'npc_talk.cpp',

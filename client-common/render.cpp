@@ -46,10 +46,16 @@ void draw_texts()
     float px = player->location.chunk.x;
     float py = player->location.chunk.y;
     chunk * ch = world_table[pl_ch_y][pl_ch_x];
-    int tile = ch->table[(int)(py + 0.5)][(int)(px + 0.5)].tile;
+    int tile_x = (int)(px + 0.5);
+    int tile_y = (int)(py + 0.5);
+    if (tile_x < 0 || tile_x >= CHUNK_SIZE || tile_y < 0 || tile_y >= CHUNK_SIZE)
+    {
+        return;
+    }
+    int tile = ch->table[tile_y][tile_x].tile;
     BaseElement * base = get_base_element(tile % tiles_textures_count);
 
-    sprintf(text, "%s@[%0.1f,%0.1f]:id=%ld f=%c", player->get_name(), player->location.get_world_x(), player->location.get_world_y(), base->uid, (Form_name[base->form])[0]);
+    sprintf(text, "%s@%0.1f,%0.1f id=%ld f=%c", player->get_name(), player->location.get_world_x(), player->location.get_world_y(), base->uid, (Form_name[base->form])[0]);
     write_text(tx, window_height - 100, text, White, 15, 30);
 
     InventoryElement * item = get_item_at_ppos(player);
@@ -391,7 +397,7 @@ void draw()
     ui_updates++;
     bool ret = draw_terrain();
 
-    // if (ret && ui_updates > 3)
+    if (ret && ui_updates > 3 && !current_menu)
     {
         draw_run_icons();
         // draw_npc();
@@ -402,10 +408,14 @@ void draw()
         ui_updates = 0;
     }
 
-    draw_dialogs();
-
     if (current_menu)
+    {
         current_menu->show();
+    }
+    else
+    {
+        draw_dialogs();
+    }
 
     Backend_Update_Screen();
     Backend_End_Drawing();

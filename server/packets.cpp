@@ -559,6 +559,7 @@ Packet * check_server_packet(char dir, unsigned char * data, size_t s)
 ObjectData * convert_to_data(NetworkObject * el)
 {
     ObjectData * obj = nullptr;
+    //  CONSOLE_LOG("convert_to_data: c_id=%d uid=%lx\n", el->c_id, el->get_uid());
     switch (el->c_id)
     {
         case Class_Element:
@@ -569,17 +570,21 @@ ObjectData * convert_to_data(NetworkObject * el)
             obj->id = element->get_id();
             break;
         }
-        case Class_Place:
+        case Class_Field:
         {
-            Place * place = static_cast<Place *>(el);
-            // obj = new ObjectData(ObjectData::Tag::Place);
-            size_t new_size = sizeof(struct ObjectData) + sizeof(size_t);
-            obj = new (new_size) ObjectData(ObjectData::Tag::Place, new_size);
-            obj->place.data = *place;
-            obj->id = place->get_id();
-            size_t * pdata = (size_t *)&obj->data[0];
-            *pdata = place->get_uid();
-            //     CONSOLE_LOG("pdata=%lx size=%d\n", *pdata, obj->size);
+            Field * field = static_cast<Field *>(el);
+            obj = new ObjectData(ObjectData::Tag::Field);
+            obj->field.data = *field;
+            obj->id = field->get_id();
+            break;
+        }
+        case Class_Barn:
+        {
+            Barn * barn = static_cast<Barn *>(el);
+            obj = new ObjectData(ObjectData::Tag::Barn);
+            obj->barn.data = *barn;
+            //   CONSOLE_LOG("Barn: uid=%lx\n", barn->get_uid());
+            obj->id = barn->get_id();
             break;
         }
         case Class_Player:

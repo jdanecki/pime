@@ -77,18 +77,25 @@ void show_loaded_chunks()
     CONSOLE_LOG("Loaded chunks: %d objects: %d beings: %d\n", count, objects, beings);
 }
 
-void debug_create_place()
+void debug_create_field()
 {
     chunk * ch = world_table[128][128];
-    PlaceServer * p = create_place(PLACE_FIELD);
+    InventoryElement * p = create_place(PLACE_FIELD);
     ch->add_object(p, 9, 9);
+}
+
+void debug_create_barn()
+{
+    chunk * ch = world_table[128][128];
+    InventoryElement * p = create_place(PLACE_BARN);
+    ch->add_object(p, 10, 9);
 }
 
 void debug_create_seedling()
 {
     chunk * ch = world_table[128][128];
     Seedling * seedl = create_seedling(ch);
-    ch->add_object(seedl, 10, 9);
+    ch->add_object(seedl, 9, 10);
 }
 
 void debug_create_hoe()
@@ -96,7 +103,7 @@ void debug_create_hoe()
     chunk * ch = world_table[128][128];
     Hoe * hoe = create_hoe(ch);
     if (hoe)
-        ch->add_object(hoe, 11, 9);
+        ch->add_object(hoe, 10, 10);
 }
 
 void debug_create_knife()
@@ -104,16 +111,18 @@ void debug_create_knife()
     chunk * ch = world_table[128][128];
     Knife * knife = create_knife(ch);
     if (knife)
-        ch->add_object(knife, 12, 9);
+        ch->add_object(knife, 11, 10);
 }
 
 void debug_print_help()
 {
     CONSOLE_LOG("F1 - help\n");
     CONSOLE_LOG("F2 - switch_debug_mode\n");
+    CONSOLE_LOG("b - create barn\n");
+    CONSOLE_LOG("f - create field\n");
     CONSOLE_LOG("h - create hoe\n");
     CONSOLE_LOG("k - create knife\n");
-    CONSOLE_LOG("p - create place\n");
+
     CONSOLE_LOG("s - create seedling\n");
     CONSOLE_LOG("1 - create all base elements\n");
     CONSOLE_LOG("2 - create all base plants\n");
@@ -193,7 +202,8 @@ KeyHandler debug_key_handlers[] = {
     {KEY_F(2), switch_debug_mode},
     {'h', debug_create_hoe},
     {'k', debug_create_knife},
-    {'p', debug_create_place},
+    {'f', debug_create_field},
+    {'b', debug_create_barn},
     {'s', debug_create_seedling},
 
     {'1', create_all_base_elements},

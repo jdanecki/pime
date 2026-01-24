@@ -302,7 +302,7 @@ void send_updates()
         ListElement * el = objects_to_create.head;
         while (el)
         {
-            //            CONSOLE_LOG("sending objects to create: %s id=%lx\n", static_cast<InventoryElement*> (el->el.get())->get_name(), el->el.get()->uid);
+            //    CONSOLE_LOG("sending objects to create: %s id=%lx\n", static_cast<InventoryElement*> (el->get_el())->get_name(), (el->get_el())->get_uid());
             Packet * p = new PacketObjectCreate(el->get_el());
             send_to_all(p);
             el = el->next;

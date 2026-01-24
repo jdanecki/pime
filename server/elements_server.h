@@ -36,14 +36,6 @@ class ElementServer : public Element
     bool can_pickup() override;
 };
 
-class PlaceServer : public Place
-{
-  public:
-    PlaceServer(Place_id id);
-    void show(bool details = true) override;
-    bool can_pickup() override;
-};
-
 class ScrollServer : public Scroll
 {
   public:

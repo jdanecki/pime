@@ -1,23 +1,30 @@
-#include "../elements_server.h"
+#include "../../core/alchemist/elements.h"
 #include "../networking.h"
 
 #ifndef PLACES_H
 #define PLACES_H
 
-#define GENERATE_PLACE(name, body)                                                                                                                                                                     \
-    class name : public PlaceServer, public Networked                                                                                                                                                  \
-    {                                                                                                                                                                                                  \
-        name(Place_id id);                                                                                                                                                                             \
-                                                                                                                                                                                                       \
-      public:                                                                                                                                                                                          \
-        static PlaceServer * create##name(Place_id id);                                                                                                                                                \
-        name##_states state;                                                                                                                                                                           \
-        void show_state() override;                                                                                                                                                                    \
-        body                                                                                                                                                                                           \
-    };
+class FieldServer : public Field, public Networked
+{
+  public:
+    FieldServer(Place_id id);
+    static InventoryElement * createField(Place_id id);
 
-GENERATE_PLACE(Field, bool action(Product_action, Player *) override;)
-GENERATE_PLACE(Barn, bool action(Product_action, Player *) override;)
+    void show_state() override;
+    bool action(Product_action, Player *) override;
+    bool can_pickup() override;
+};
 
-PlaceServer * create_place(Place_id id);
+class BarnServer : public Barn, public Networked
+{
+  public:
+    BarnServer(Place_id id);
+    static InventoryElement * createBarn(Place_id id);
+
+    void show_state() override;
+    bool action(Product_action, Player *) override;
+    bool can_pickup() override;
+};
+
+InventoryElement * create_place(Place_id id);
 #endif

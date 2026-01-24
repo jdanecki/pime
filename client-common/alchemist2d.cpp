@@ -8,16 +8,25 @@ extern Backend_Texture * add_texture_color(Backend_Surface * s, ColorRGB c);
 
 void hsv2rgb(int h, int s, int v, int * r, int * g, int * b);
 
-Backend_Texture Place2d::get_texture()
+Backend_Texture Field2d::get_texture()
 {
     texture_created = true;
     return places_textures[id];
 }
 
-Place2d::Place2d(Place data) : Place(data)
+Field2d::Field2d(Field data) : Field(data)
 {
 }
 
+Backend_Texture Barn2d::get_texture()
+{
+    texture_created = true;
+    return places_textures[id];
+}
+
+Barn2d::Barn2d(Barn data) : Barn(data)
+{
+}
 Element2d::Element2d(Element data) : Element(data)
 {
     w = width.value;

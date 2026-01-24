@@ -90,7 +90,7 @@ void destroy_object(NetworkObject id, ItemLocation location)
         {
             abort();
         }
-        CONSOLE_LOG("Client: destroy_object %ld", id.uid);
+        //     CONSOLE_LOG("Client: destroy_object %ld\n", id.uid);
         deregister_object(el);
         delete el;
     }

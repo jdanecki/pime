@@ -1,4 +1,5 @@
 #include "../core/packets.h"
+#include <cstddef>
 
 PacketObjectCreate::PacketObjectCreate() : Packet(PACKET_OBJECT_CREATE)
 {
@@ -93,11 +94,23 @@ bool PacketObjectCreate::update(unsigned char * data, size_t s)
             new (&obj->element.data) Element(obj->id);
             break;
         }
-        case ObjectData::Tag::Place:
+        case ObjectData::Tag::Field:
         {
             size_t * pdata = (size_t *)&obj->data[0];
-            //    CONSOLE_LOG("pdata=%lx\n", *pdata);
-            new (&obj->place.data) Place((Place_id)obj->id, *pdata);
+            Field * field = static_cast<Field *>(&obj->field.data);
+            //  CONSOLE_LOG("PacketObjectCreate: Field uid=%lx\n", field->get_uid());
+            // CONSOLE_LOG("pdata=%lx\n", *pdata);
+            new (&obj->field.data) Field((Place_id)obj->id, field->get_uid());
+            // CONSOLE_LOG("PacketObjectCreate: new Field uid=%lx\n", field->get_uid());
+            break;
+        }
+        case ObjectData::Tag::Barn:
+        {
+            size_t * pdata = (size_t *)&obj->data[0];
+            Barn * barn = static_cast<Barn *>(&obj->barn.data);
+            //  CONSOLE_LOG("PacketObjectCreate: Barn uid=%lx\n", barn->get_uid());
+            new (&obj->barn.data) Barn((Place_id)obj->id, barn->get_uid());
+            //  CONSOLE_LOG("PacketObjectCreate: new Barn uid=%lx\n", barn->get_uid());
             break;
         }
         case ObjectData::Tag::Plant:

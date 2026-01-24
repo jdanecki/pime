@@ -23,6 +23,7 @@ Backend_Texture places_textures[PLACES_COUNT];
 Backend_Texture load_texture(const char * texture_name)
 {
     Backend_Texture texture;
+    CONSOLE_LOG("loading texture: %s\n", texture_name);
     Backend_Surface loadedSurface = Backend_Image_Load(texture_name);
     if (!Backend_Check_Surface(loadedSurface))
     {
@@ -50,13 +51,11 @@ void add_items_texture(int id, const char * file)
 
 void add_ing_texture(int id, const char * file)
 {
-    CONSOLE_LOG("adding ing texture: %s\n", file);
     ing_textures[id] = load_texture(file);
 }
 
 void add_prod_texture(int id, const char * file)
 {
-    CONSOLE_LOG("adding product texture: %s\n", file);
     prod_textures[id] = load_texture(file);
 }
 
@@ -85,7 +84,6 @@ int add_textures_from_dir(Backend_Texture * to, int i, const char * dir_path)
                 continue;
             }
             sprintf(path, "%s/%s", dir_path, namelist[n]->d_name);
-            CONSOLE_LOG("adding texture: %s\n", path);
             to[i++] = load_texture(path);
             free(namelist[n]);
         }
@@ -159,4 +157,5 @@ Field:     A          B          G        R
     scroll_surface = Backend_Image_Load("textures/scroll.png");
 
     places_textures[PLACE_FIELD] = load_texture("textures/objects/field.png");
+    places_textures[PLACE_BARN] = load_texture("textures/objects/barn.png");
 }

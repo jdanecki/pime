@@ -7,7 +7,7 @@ Backend_Texture texture;
 
 Element2d * el;
 
-void draw()
+void test_draw()
 {
     SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
     SDL_RenderClear(renderer);
@@ -88,7 +88,7 @@ int main()
         if (handle_events())
             return 0;
 
-        draw();
+        test_draw();
         Backend_Update_Screen();
     }
 

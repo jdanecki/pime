@@ -1,54 +1,63 @@
 #include "places.h"
 
-Field::Field(Place_id id) : PlaceServer(id)
+FieldServer::FieldServer(Place_id id) : Field(id)
 {
-    state = FIELD_PLOWED;
 }
 
-void Field::show_state()
+void FieldServer::show_state()
 {
     CONSOLE_LOG("Field state: %s\n", field_states_names[state]);
 }
 
-PlaceServer * Field::createField(Place_id id)
+InventoryElement * FieldServer::createField(Place_id id)
 {
-    return new Field(id);
+    return new FieldServer(id);
 }
 
-Barn::Barn(Place_id id) : PlaceServer(id)
+bool FieldServer::can_pickup()
+{
+    return false;
+}
+
+bool BarnServer::can_pickup()
+{
+    return false;
+}
+
+BarnServer::BarnServer(Place_id id) : Barn(id)
 {
     state = BARN_ANIMAL;
 }
 
-void Barn::show_state()
+void BarnServer::show_state()
 {
     CONSOLE_LOG("Barn state: %s\n", barn_states_names[state]);
 }
 
-PlaceServer * Barn::createBarn(Place_id id)
+InventoryElement * BarnServer::createBarn(Place_id id)
 {
-    return new Barn(id);
+    return new BarnServer(id);
 }
-bool Field::action(Product_action action, Player * pl)
+bool FieldServer::action(Product_action action, Player * pl)
 {
     CONSOLE_LOG("Field: %s %s\n", product_action_name[action], get_name());
     return false;
 }
 
-bool Barn::action(Product_action action, Player * pl)
+bool BarnServer::action(Product_action action, Player * pl)
 {
     CONSOLE_LOG("Barn: %s %s\n", product_action_name[action], get_name());
     return false;
 }
 
-typedef PlaceServer * (*PlaceFunction)(Place_id id);
+typedef InventoryElement * (*PlaceFunction)(Place_id id);
 
 PlaceFunction PlaceFunctions[] = {
-    Field::createField,
-    Barn::createBarn,
+    FieldServer::createField,
+    BarnServer::createBarn,
 };
 
-PlaceServer * create_place(Place_id id)
+InventoryElement * create_place(Place_id id)
 {
     if (id >= PLACES_COUNT)
         return nullptr;

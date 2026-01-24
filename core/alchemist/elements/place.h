@@ -1,20 +1,17 @@
 #ifndef __ELEMENTS_PLACE_H
 #define __ELEMENTS_PLACE_H
 
-#include "inventory_element.h"
+#include "types.h"
 
-class Place : public InventoryElement
+class Place
 {
   public:
     Place_id id;
-
-    const char * get_name() override;
-    Place(Place_id id, size_t uid);
+    const char * get_place_name();
     Place(Place_id id);
-    void show(bool details = true) override;
-    char * get_description() override;
+    void show(bool details = true);
+    char * get_description();
     virtual void show_state();
-    size_t get_id() override;
 };
 
 #endif

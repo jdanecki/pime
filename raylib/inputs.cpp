@@ -92,14 +92,15 @@ bool handle_events()
 
     handle_mouse();
 
-    float time_period = 0.1;
+    float speed = 0.2;
+
     if (player->sneaking)
     {
-        time_period = 0.2;
+        speed = 0.1;
     }
     if (player->running)
     {
-        time_period = 0.05;
+        speed = 0.4;
     }
 
     int num_handlers;
@@ -137,7 +138,7 @@ bool handle_events()
         {
             if (IsKeyDown(handlers[i].key))
             {
-                if (last_key < time_period)
+                if (last_key < 0.1)
                     break;
                 last_key = 0;
                 handlers[i].func();
@@ -148,28 +149,28 @@ bool handle_events()
 
     if (!current_menu)
     {
-        if (last_move > time_period)
+        //   if (last_move > 0.1)
         {
             if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
             {
-                send_packet_move(0, 1);
+                send_packet_move(0, speed);
                 last_move = 0;
             }
             if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
             {
-                send_packet_move(0, -1);
+                send_packet_move(0, -speed);
                 last_move = 0;
             }
             if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
             {
                 player->going_right = 1;
-                send_packet_move(1, 0);
+                send_packet_move(speed, 0);
                 last_move = 0;
             }
             if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
             {
                 player->going_right = 0;
-                send_packet_move(-1, 0);
+                send_packet_move(-speed, 0);
                 last_move = 0;
             }
         }

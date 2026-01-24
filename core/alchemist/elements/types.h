@@ -53,6 +53,7 @@ extern const char * places_names[];
 
 enum Field_states
 {
+    FIELD_EMPTY,
     FIELD_PLOWED,
     FIELD_PLANTED,
 };

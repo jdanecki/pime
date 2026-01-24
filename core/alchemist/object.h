@@ -16,17 +16,18 @@ enum Class_id
     Class_Ingredient, // 5
     Class_Product,
     Class_Scroll,
-    Class_Place,
+    Class_Field,
+    Class_Barn,
 
-    Class_Plant,  // base: BasePlant -> Base
-    Class_Animal, // 10 base: BaseAnimal->Base
+    Class_Plant,  // 10 base: BasePlant -> Base
+    Class_Animal, // base: BaseAnimal->Base
     Class_Player,
     Class_Npc,
 
     Class_Clan,
 
-    Class_ListElement,
-    Class_KnownElement, // 15
+    Class_ListElement, // 15
+    Class_KnownElement,
     Class_BaseListElement,
 };
 
