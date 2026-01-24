@@ -6,7 +6,7 @@
 class Npc : public Player
 {
   public:
-    Npc(ItemLocation location);
+    Npc(size_t uid, ItemLocation location);
     bool check_known(InventoryElement * el);
 };
 

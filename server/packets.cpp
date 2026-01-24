@@ -602,6 +602,13 @@ ObjectData * convert_to_data(NetworkObject * el)
             // obj->player.data.relations = nullptr;
             break;
         }
+        case Class_Npc:
+        {
+            Npc * npc = static_cast<Npc *>(el);
+            obj = new ObjectData(ObjectData::Tag::Npc);
+            obj->npc.data = *npc;
+            break;
+        }
         case Class_Ingredient:
         {
             Ingredient * ing = static_cast<Ingredient *>(el);
@@ -639,13 +646,7 @@ ObjectData * convert_to_data(NetworkObject * el)
             obj->scroll.data = *scroll;
             break;
         }
-        case Class_Npc:
-        {
-            Npc * npc = static_cast<Npc *>(el);
-            obj = new ObjectData(ObjectData::Tag::Npc);
-            obj->npc.data = *npc;
-            break;
-        }
+
         default:
             //    CONSOLE_LOG("Unknown class ID=%d in convert_to_data\n", el->c_id);
             assert(0);

@@ -137,6 +137,7 @@ void print_help()
     CONSOLE_LOG("F3 - clear\n");
     CONSOLE_LOG("ESC - exit\n");
     CONSOLE_LOG("p - players\n");
+    CONSOLE_LOG("n - npcs\n");
     CONSOLE_LOG("1 - show terrains types\n");
     CONSOLE_LOG("2 - show plants types\n");
     CONSOLE_LOG("3 - show animals types\n");
@@ -223,6 +224,7 @@ KeyHandler key_handlers[] = {
     {KEY_F(3), clear_history},
     {27, handle_exit},
     {'p', show_players},
+    {'n', show_npcs},
 
     {'1', show_terrains},
     {'2', show_plants},

@@ -10,7 +10,6 @@ extern int npc_say(Sentence * s, InventoryElement * el);
 
 class Npc2d : public Npc, public Renderable
 {
-    void init();
 
   public:
     Npc2d(Npc data);

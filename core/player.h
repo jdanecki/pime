@@ -76,7 +76,7 @@ class Player : public InventoryElement
     size_t get_id();
     // Player(int uid);
     Player(size_t uid, SerializableCString && name, ItemLocation location, int thirst, int hunger, int nutrition);
-    int conversation(Player * who, Sentence * s, InventoryElement * el);
+    Player * conversation(Sentence * s, InventoryElement * el);
     void stop_conversation();
 
     void show(bool details = true);

@@ -327,6 +327,7 @@ void create_menus()
     menu_action->add("Eat", MENU_EAT);
     menu_action->add("Read", MENU_READ);
     menu_action->add("Check", MENU_CHECK);
+    menu_action->add("Task/Ask Npc", MENU_NPC);
     menu_action->add("Cancel", MENU_CANCEL);
 
     menu_knowledge = new Menu("Knowledge");
@@ -534,7 +535,14 @@ int Menu::interact()
         return menu_inventory->handle_item(a & ~MENU_ITEM);
     if (a & MENU_NPC_CONV)
     {
-        return player->conversation(current_npc, menu_dialog->get_sentence(), menu_dialog->get_el());
+        Player * who = player->conversation(menu_dialog->get_sentence(), menu_dialog->get_el());
+        if (who)
+        {
+            current_npc = static_cast<Npc2d *>(who);
+            return 0;
+        }
+        else
+            return 1;
     }
     switch (a)
     {
@@ -594,8 +602,15 @@ int Menu::interact()
 #endif
 
         case MENU_NPC:
-            current_menu = menu_npc;
-            return 0;
+        {
+            InventoryElement * object = get_item_at(player->location);
+            if (object && object->get_cid() == Class_Npc)
+            {
+                current_menu = menu_npc;
+                return 0;
+            }
+            return 1;
+        }
 
         case MENU_INV_ELEMENTS:
             current_menu = menu_inventory_elements;

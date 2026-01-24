@@ -91,6 +91,7 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             p = new PacketPlayerId(players_id++);
             p->send(peer);
             PlayerClient * new_pl = new PlayerClient(new PlayerServer(((PacketPlayerId *)p)->get_id()), peer);
+            new_pl->player->show();
             players->add(new_pl);
             delete p;
             p = new PacketElementsList(&base_elements);

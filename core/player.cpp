@@ -1,7 +1,9 @@
 #include <string.h>
 
+#include "alchemist/object.h"
 #include "clan.h"
 #include "player.h"
+#include "world.h"
 
 extern void print_status(int i, const char * format, ...);
 
@@ -52,11 +54,17 @@ Player::Player(size_t uid, SerializableCString && name, ItemLocation location, i
     memcpy(player_skills, clan.get()->skills, sizeof(player_skills));
     running = 0;
     sneaking = 0;
-    show(true);
 }
 
-int Player::conversation(Player * who, Sentence * s, InventoryElement * el)
+Player * Player::conversation(Sentence * s, InventoryElement * el)
 {
+    Player * who = nullptr;
+    InventoryElement * item = get_item_at_ppos(this);
+    if (!item || item->get_cid() != Class_Npc)
+    {
+        return nullptr;
+    }
+    who = static_cast<Player *>(item);
     if (!in_conversation)
     {
         in_conversation = true;
@@ -67,13 +75,16 @@ int Player::conversation(Player * who, Sentence * s, InventoryElement * el)
     if (s->id < NPC_Say_Nothing)
     {
         ask(s, el);
-        return 0;
+        return who;
     }
     else
     {
-
-        return say(s) ? 1 : 0;
+        if (say(s))
+        {
+            return nullptr;
+        }
     }
+    return who;
 }
 
 void Player::stop_conversation()
@@ -91,7 +102,7 @@ void Player::stop_conversation()
 
 void Player::show(bool details)
 {
-    CONSOLE_LOG("%s %s clan=%s id=%ld @ [%d,%d]:[%d,%d] <%c %c>\n", class_name[c_id], get_name(), clan_names[clan.get()->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x,
+    CONSOLE_LOG("%s %s clan=%s id=%ld @ [%d,%d]:[%f,%f] <%c %c>\n", class_name[c_id], get_name(), clan_names[clan.get()->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x,
         location.chunk.y, running ? 'R' : ' ', sneaking ? 'S' : ' ');
     if (details)
     {

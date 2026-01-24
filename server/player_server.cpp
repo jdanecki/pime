@@ -7,10 +7,20 @@
 #include "../core/packet_types.h"
 
 ElementsList * players;
+ElementsList * npcs;
+int npcs_id = 100;
 
 void create_players()
 {
     players = new ElementsList("Players");
+    npcs = new ElementsList("NPCs");
+    NPCServer * npc1 = new NPCServer(npcs_id++);
+    npcs->add(npc1);
+    add_object_to_world(npc1, npc1->location);
+
+    NPCServer * npc2 = new NPCServer(npcs_id++);
+    npcs->add(npc2);
+    add_object_to_world(npc2, npc2->location);
 }
 
 bool check_and_load_chunk(int new_map_x, int new_map_y)
@@ -264,16 +274,33 @@ PlayerServer::PlayerServer(size_t uid)
     notify_create(this);
 }
 
+void PlayerServer::show(bool details)
+{
+
+    Player::show(details);
+    BeingServer::show(details);
+}
+
+void NPCServer::show(bool details)
+{
+
+    Npc::show(details);
+    BeingServer::show(details);
+}
+
 PlayerServer * create_player(size_t id)
 {
     CONSOLE_LOG("CREATE PLAYER SERVER\n\n");
     return new PlayerServer(id);
 }
 
-Npc * create_npc()
+NPCServer::NPCServer(size_t uid) : Npc(uid, ItemLocation::center())
 {
-    // return new Npc(ItemLocation::center());
-    return nullptr;
+    CONSOLE_LOG("NPCServer: uid=%ld\n", uid);
+    location.chunk.x = rand() % CHUNK_SIZE;
+    location.chunk.y = rand() % CHUNK_SIZE;
+
+    notify_create(this);
 }
 
 void show_players()
@@ -281,7 +308,18 @@ void show_players()
     ListElement * pl_el = players->head;
     while (pl_el)
     {
-        PlayerClient * pl = (PlayerClient *)pl_el;
+        PlayerClient * pl = static_cast<PlayerClient *>(pl_el);
+        pl->show();
+        pl_el = pl_el->next;
+    }
+}
+
+void show_npcs()
+{
+    ListElement * pl_el = npcs->head;
+    while (pl_el)
+    {
+        NPCServer * pl = static_cast<NPCServer *>(pl_el->get_el());
         pl->show();
         pl_el = pl_el->next;
     }

@@ -123,6 +123,14 @@ bool PacketObjectCreate::update(unsigned char * data, size_t s)
             new (&obj->animal.data) Animal(obj->id);
             break;
         }
+        case ObjectData::Tag::Npc:
+            new (&obj->npc.data.inventory) ElementsList("inventory");
+            new (&obj->npc.data.known_elements) ElementsList("known elements");
+            // new (obj->npc.data.player_skills) Skills();
+            new (&obj->npc.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
+            // talking_to
+            // relations
+            break;
         case ObjectData::Tag::Player:
             new (&obj->player.data.inventory) ElementsList("inventory");
             new (&obj->player.data.known_elements) ElementsList("known elements");
@@ -132,6 +140,7 @@ bool PacketObjectCreate::update(unsigned char * data, size_t s)
             // relations
             break;
         default:
+            CONSOLE_LOG("Unknown tag=%d in PacketObjectCreate\n", (int)obj->tag);
             break;
     }
     return true;

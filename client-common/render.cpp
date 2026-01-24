@@ -316,10 +316,7 @@ bool draw_terrain()
     {
         render_element(player);
     }
-    if (current_npc)
-    {
-        render_element(current_npc);
-    }
+
     Backend_Set_Clip(0, 0, 0, 0);
     return true;
 }

@@ -20,14 +20,22 @@ class PlayerServer : public Player, public BeingServer
 
     PlayerServer(size_t uid);
     bool use_product_on_tile(Product * prod, int map_x, int map_y, int x, int y);
-    virtual bool tick() override;
+    bool tick() override;
+    void show(bool details = true) override;
 };
 
+class NPCServer : public Npc, public BeingServer
+{
+  public:
+    NPCServer(size_t uid);
+    void show(bool details = true) override;
+};
 PlayerServer * create_player(size_t id);
 extern ElementsList * players;
 void create_players();
 
 Npc * create_npc();
 void show_players();
+void show_npcs();
 
 #endif
