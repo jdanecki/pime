@@ -1,5 +1,6 @@
 #include "../client-common/net.h"
 #include "../client-common/players.h"
+
 #include "playerUI.h"
 
 NetworkObject * el_from_data(const ObjectData * data)
@@ -50,16 +51,11 @@ NetworkObject * el_from_data(const ObjectData * data)
                 CONSOLE_LOG("new player uid=%ld name=%s\n", player->uid, player->get_name());
             }
             break;
-#ifdef DISABLE_NPC
-#warning DISABLE_NPC
-#endif
 
         case ObjectData::Tag::Npc:
-#if !defined(DISABLE_NPC)
             el = new Npc(data->npc.data);
             el->c_id = Class_Npc;
             CONSOLE_LOG("creating NPC");
-#endif
             break;
 
         case ObjectData::Tag::Clan:

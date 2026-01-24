@@ -19,9 +19,7 @@ KeyHandler menu_key_handlers[] = {
 };
 
 KeyHandler key_handlers[] = {{SDLK_ESCAPE, handle_escape}, {SDLK_i, handle_i},
-#ifndef DISABLE_NPC
-    {SDLK_n, handle_n},
-#endif
+    //{SDLK_n, handle_n},
     {SDLK_q, quit_program}};
 
 bool key_pressed(int key)

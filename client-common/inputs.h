@@ -20,9 +20,7 @@ void handle_menu_action();
 void handle_menu_knowledge();
 void handle_escape();
 
-#ifndef DISABLE_NPC
 void handle_menu_npc();
-#endif
 
 void handle_show_item();
 void handle_show_item_server();

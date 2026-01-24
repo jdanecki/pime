@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "render.h"
+#include "backend.inl"
 #include "text.h"
 
 #include "../dialog/d_craft.h"
@@ -13,6 +14,7 @@
 #include "texture.h"
 #include "window.h"
 #include "alchemist2d.h"
+#include "npc.h"
 
 #include "../menu/menu.h"
 
@@ -185,7 +187,7 @@ void draw_maps()
 }
 #endif
 
-void render_element(InventoryElement * o, float ltx, float lty)
+void render_element(InventoryElement * o)
 {
     Renderable * r = dynamic_cast<Renderable *>(o);
     if (r)
@@ -193,8 +195,8 @@ void render_element(InventoryElement * o, float ltx, float lty)
         float obj_world_x = o->location.get_world_x();
         float obj_world_y = o->location.get_world_y();
 
-        float screen_x = (obj_world_x - ltx) / tile_size;
-        float screen_y = (obj_world_y - lty) / tile_size;
+        float screen_x = (obj_world_x - left_top_world_x) / tile_size;
+        float screen_y = (obj_world_y - left_top_world_y) / tile_size;
 
         if (screen_x < CHUNK_SIZE && screen_y < CHUNK_SIZE)
         {
@@ -305,14 +307,18 @@ bool draw_terrain()
                 }
                 if (o == player)
                     continue;
-                render_element(o, left_top_world_x, left_top_world_y);
+                render_element(o);
             }
         }
     }
 
     if (player && player->c_id == Class_Player)
     {
-        render_element(player, left_top_world_x, left_top_world_y);
+        render_element(player);
+    }
+    if (current_npc)
+    {
+        render_element(current_npc);
     }
     Backend_Set_Clip(0, 0, 0, 0);
     return true;
@@ -335,31 +341,6 @@ void draw_run_icons()
         Backend_Texture_Copy(Player_textures.sneak_icon, NULL, &sneaking_icon_rect);
     }
 }
-
-#if 0
-
-void draw_npc()
-{
-    // FIXME
-    if (!current_npc)
-        return;
-    Backend_Rect img_rect(5 * tile_size, 5 * tile_size, tile_size, tile_size);
-    static int tick = 0;
-    static int dir = 1;
-    int side;
-    tick++;
-    if (!(tick % 50))
-    {
-        dir *= -1;
-    }
-
-    side = dir > 0 ? 0 : 1;
-    if (side)
-        SDL_RenderCopy(renderer, current_npc->get_texture(), NULL, &img_rect);
-    else
-        SDL_RenderCopyEx(renderer, current_npc->get_texture(), NULL, &img_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
-}
-#endif
 
 void draw_dialogs()
 {
@@ -396,12 +377,13 @@ void draw()
     Backend_Begin_Drawing();
     ui_updates++;
     bool ret = draw_terrain();
-
-    if (ret && ui_updates > 3 && !current_menu)
+    if (ret && ui_updates > 3)
     {
-        draw_run_icons();
-        // draw_npc();
-        draw_texts();
+        if (!current_menu)
+        {
+            draw_run_icons();
+            draw_texts();
+        }
 
         // draw_maps();
         draw_status();

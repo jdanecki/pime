@@ -9,9 +9,7 @@
 #include "menu.h"
 #include "../core/alchemist/elements.h"
 
-#ifndef DISABLE_NPC
 #include "../client-common/npc.h"
-#endif
 
 #include "../client-common/text.h"
 #include "../client-common/net.h"
@@ -31,11 +29,7 @@ Menu * menu_inventory_elements;
 Menu * menu_inventory;
 Menu * menu_inventory_elements_form;
 Menu * menu_inventory_class;
-
-#ifndef DISABLE_NPC
 Menu * menu_npc;
-#endif
-
 Menu * menu_dialog;
 Menu * menu_action;
 Menu * menu_knowledge;
@@ -324,12 +318,10 @@ void create_menus()
     menu_inventory_elements->add("Liquid form", MENU_INV_LIGQUID, Form_liquid);
     menu_inventory_elements->add("Gas form", MENU_INV_GAS, Form_gas);
     menu_inventory_elements->add("Cancel", MENU_CANCEL);
-#ifndef DISABLE_NPC
     menu_npc = new Menu("NPC");
     menu_npc->add("Talk to NPC", MENU_NPC_SAY);
     menu_npc->add("Ask NPC", MENU_NPC_ASK);
     menu_npc->add("Cancel", MENU_CANCEL);
-#endif
     menu_action = new Menu("Action");
     menu_action->add("Drink", MENU_DRINK);
     menu_action->add("Eat", MENU_EAT);
@@ -540,12 +532,10 @@ int Menu::interact()
 
     if (a & MENU_ITEM)
         return menu_inventory->handle_item(a & ~MENU_ITEM);
-#ifndef DISABLE_NPC
     if (a & MENU_NPC_CONV)
     {
         return player->conversation(current_npc, menu_dialog->get_sentence(), menu_dialog->get_el());
     }
-#endif
     switch (a)
     {
         case MENU_ITEMS_GROUP:
@@ -603,11 +593,10 @@ int Menu::interact()
             return 1; // hide menu
 #endif
 
-#ifndef DISABLE_NPC
         case MENU_NPC:
             current_menu = menu_npc;
             return 0;
-#endif
+
         case MENU_INV_ELEMENTS:
             current_menu = menu_inventory_elements;
             return 0;
@@ -639,11 +628,9 @@ int Menu::interact()
             CONSOLE_LOG("%d\n%d\n", Mix_Volume(1, -1), Mix_Volume(0, -1));
             return 0;
 #endif
-#ifndef DISABLE_NPC
         case MENU_NPC_SAY:
         case MENU_NPC_ASK:
             return npc(a);
-#endif
 
         case MENU_ACTION:
             current_menu = menu_action;
@@ -679,12 +666,10 @@ void show_menu_inventory_categories()
     current_menu = menu_inventory_categories;
 }
 
-#ifndef DISABLE_NPC
 void show_menu_npc()
 {
     current_menu = menu_npc;
 }
-#endif
 
 void show_menu_knowledge()
 {

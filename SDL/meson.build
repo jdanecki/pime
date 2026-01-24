@@ -14,7 +14,6 @@ sdl_sources = [
     'texture.cpp',
     'backend.cpp',
     'inputs.cpp',
-#    'npc.cpp',
     'playerUI.cpp',
     'palette.cpp'
 ]
@@ -24,14 +23,12 @@ inc = include_directories('.')
 
 client_common_sdl = static_library('client_common_sdl', 
   client_common_2d,
-  #  cpp_args : ['-DDISABLE_NPC'],
   include_directories : inc,
   dependencies: [sdl_deps], 
 )
 
 executable('pime_SDL', 
   sources: sdl_sources,
-  #  cpp_args : ['-DDISABLE_NPC'],
   dependencies: [sdl_deps],
   link_args: shared_link_args,
   link_with: [core, client_common_sdl ],

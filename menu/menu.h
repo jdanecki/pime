@@ -108,10 +108,7 @@ void show_menu();
 void show_menu_inventory_categories();
 void show_menu_action();
 void show_menu_knowledge();
-
-#ifndef DISABLE_NPC
 void show_menu_npc();
-#endif
 void create_menus();
 void menu_handle_escape();
 void menu_handle_enter();

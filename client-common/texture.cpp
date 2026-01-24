@@ -95,7 +95,7 @@ int add_textures_from_dir(Backend_Texture * to, int i, const char * dir_path)
 
 void load_textures()
 {
-    Player_textures.npc = Backend_Image_Load("textures/player.png");
+    Player_textures.npc = load_texture("textures/npc.png");
     // SDL_PIXELFORMAT_ABGR8888 for surface
     // CONSOLE_LOG("surface format=%x %s rgba=%x argb=%x\n", surface->format->format, SDL_GetPixelFormatName(surface->format->format), SDL_PIXELFORMAT_RGBA8888, SDL_PIXELFORMAT_ARGB8888);
     /*
@@ -106,7 +106,7 @@ void load_textures()
 Bits:   [31..24]   [23..16]   [15..8]   [7..0]
 Field:     A          B          G        R
 */
-    Player_textures.player = Backend_Create_Texture_From_Surface(Player_textures.npc);
+    Player_textures.player = load_texture("textures/player.png");
 
     Player_textures.run_icon = load_texture("textures/gui/run_icon.png");
     Player_textures.sneak_icon = load_texture("textures/gui/sneak_icon.png");

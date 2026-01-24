@@ -163,9 +163,7 @@ void handle_escape()
         show_menu();
 }
 
-#ifndef DISABLE_NPC
 void handle_menu_npc()
 {
     show_menu_npc();
 }
-#endif

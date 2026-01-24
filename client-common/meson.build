@@ -8,6 +8,7 @@ client_common_sources=[
 ]
 client_common_2d_sources=[
     'player_actions.cpp',
+    'npc.cpp',
     'texture.cpp',
     'render.cpp',
     'alchemist2d.cpp',

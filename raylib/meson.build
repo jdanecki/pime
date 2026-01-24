@@ -19,14 +19,12 @@ inc = include_directories('.')
 
 client_common_raylib = static_library('client_common_raylib', 
   client_common_2d,
-  #  cpp_args : ['-DDISABLE_NPC'],
   include_directories : inc,
   dependencies: [raylib_deps], 
 )
 
 executable('pime_raylib', 
   sources: raylib_sources,
-  #  cpp_args : ['-DDISABLE_NPC'],
   dependencies: [raylib_deps],
   link_args: shared_link_args,
   link_with: [core, client_common_raylib ],

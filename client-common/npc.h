@@ -14,6 +14,7 @@ class Npc2d : public Npc, public Renderable
 
   public:
     Npc2d(Npc data);
+    Backend_Texture get_texture() override;
 };
 
 extern Npc2d * current_npc;

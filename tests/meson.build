@@ -55,7 +55,6 @@ test_generator_sdl_sources = [
 
 executable('test_sdl', 
   sources: test_sdl_sources,
-  cpp_args : ['-DDISABLE_NPC'],
   dependencies: [sdl_deps],
   include_directories :  include_directories('../SDL'),
   link_args: shared_link_args,
@@ -65,7 +64,6 @@ executable('test_sdl',
 
 executable('test_raylib', 
   sources: test_raylib_sources,
-  cpp_args : ['-DDISABLE_NPC'],
   dependencies: [raylib_deps],
   include_directories :  include_directories('../raylib'),
   link_args: shared_link_args,

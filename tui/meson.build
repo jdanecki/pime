@@ -19,7 +19,6 @@ client_common_tui = static_library('client_common_tui',
 
 executable('pime_tui', 
   sources: [tui_sources],
-  #  cpp_args : ['-DDISABLE_NPC'],
   dependencies: [enet_dep],
   #  link_args: shared_link_args,
   link_with: [core, client_common_tui ],

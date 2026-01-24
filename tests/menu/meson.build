@@ -26,7 +26,6 @@ test_menu_raylib_sources = [
 
 executable('test_menu_sdl', 
   sources: test_menu_sdl_sources,
-  cpp_args : ['-DDISABLE_NPC'],
   dependencies: [sdl_deps],
   include_directories :  include_directories('../../SDL'),
   link_args: shared_link_args,
@@ -36,7 +35,6 @@ executable('test_menu_sdl',
 
 executable('test_menu_raylib', 
   sources: test_menu_raylib_sources,
-  cpp_args : ['-DDISABLE_NPC'],
   dependencies: [raylib_deps],
   include_directories :  include_directories('../../raylib'),
   link_args: shared_link_args,

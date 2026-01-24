@@ -29,7 +29,6 @@ test_dialog_raylib_sources = [
 
 executable('test__dialog_sdl', 
   sources: test_dialog_sdl_sources,
-  cpp_args : ['-DDISABLE_NPC'],
   dependencies: [sdl_deps],
   include_directories :  include_directories('../../SDL'),
   link_args: shared_link_args,
@@ -39,7 +38,6 @@ executable('test__dialog_sdl',
 
 executable('test_dialog_raylib', 
   sources: test_dialog_raylib_sources,
-  cpp_args : ['-DDISABLE_NPC'],
   dependencies: [raylib_deps],
   include_directories :  include_directories('../../raylib'),
   link_args: shared_link_args,

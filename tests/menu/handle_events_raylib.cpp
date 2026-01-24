@@ -18,9 +18,7 @@ KeyHandler menu_key_handlers[] = {
 };
 
 KeyHandler key_handlers[] = {{KEY_ESCAPE, handle_escape, true}, {KEY_I, handle_i, true},
-#ifndef DISABLE_NPC
-    {KEY_N, handle_n, true},
-#endif
+    //  {KEY_N, handle_n, true},
     {KEY_Q, quit_program, true}};
 
 void check_mouse()

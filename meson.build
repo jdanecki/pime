@@ -14,7 +14,6 @@ add_project_arguments(
   '-Wno-switch',
   '-Wno-reorder',
   '-Wno-unused-but-set-variable',
-  '-DDISABLE_NPC',
   language : 'cpp'
 )
 enet_dep = dependency('libenet', method: 'pkg-config', required: true)

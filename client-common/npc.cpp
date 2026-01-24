@@ -1,9 +1,5 @@
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_surface.h>
-#include <stdio.h>
-
 #include "playerUI.h"
-
+#include "../core/world.h"
 #include "../client-common/npc.h"
 #include "../menu/menu.h"
 #include "../client-common/texture.h"
@@ -11,65 +7,14 @@
 Npc2d * current_npc;
 extern int active_hotbar;
 
-SDL_Texture * create_npc_texture()
-{
-    BaseElement * b = get_base_element(get_tile_at(player->location));
-    ColorRGB c = {
-        0,
-    };
-    Uint8 mask_r;
-    Uint8 mask_g;
-    Uint8 mask_b;
-    if (b)
-    {
-        c = b->color;
-        mask_r = c.r;
-        mask_g = c.g;
-        mask_b = c.b;
-    }
-    else
-    {
-        mask_r = c.r;
-        mask_g = c.g;
-        mask_b = c.b;
-    }
-    SDL_Surface * surface = SDL_CreateRGBSurface(0, 32, 32, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-    SDL_BlitSurface(Player_textures.npc, NULL, surface, NULL);
-    SDL_LockSurface(surface);
-
-    SDL_PixelFormat * fmt = surface->format;
-    Uint32 * pixels = (Uint32 *)surface->pixels;
-
-    for (int y = 0; y < surface->h; ++y)
-    {
-        for (int x = 0; x < surface->w; ++x)
-        {
-            Uint32 * p = pixels + y * surface->w + x;
-            Uint8 r, g, b, a;
-            SDL_GetRGBA(*p, fmt, &r, &g, &b, &a);
-
-            if (r == g && g == b)
-            {
-                Uint8 gray = (r + g + b) / 3;
-                Uint8 nr = (mask_r * gray) / 255;
-                Uint8 ng = (mask_g * gray) / 255;
-                Uint8 nb = (mask_b * gray) / 255;
-                *p = SDL_MapRGBA(fmt, nr, ng, nb, a);
-            }
-        }
-    }
-
-    SDL_UnlockSurface(surface);
-    SDL_Texture * retval = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
-    return retval;
-}
-
 Npc2d::Npc2d(Npc data) : Npc(data)
 {
-    w = 32;
-    h = 32;
-    texture = create_npc_texture();
+}
+
+Backend_Texture Npc2d::get_texture()
+{
+    texture_created = true;
+    return Player_textures.npc;
 }
 
 int npc(menu_actions a)

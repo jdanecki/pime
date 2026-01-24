@@ -1,4 +1,5 @@
 #include "../client-common/game.h"
+#include "../client-common/npc.h"
 
 void (*callback_daily)();
 void daily_call()
@@ -36,5 +37,9 @@ void intro()
 
 int main(int argc, char * argv[])
 {
+    ItemLocation location = ItemLocation::center();
+    location.chunk.x = 9;
+    location.chunk.y = 9;
+    current_npc = new Npc2d(Npc(location));
     start_game("pime_SDL", argc, argv);
 }

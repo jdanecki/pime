@@ -1,8 +1,9 @@
-#ifndef PLAYER_TUI
-#define PLAYER_TUI
+#ifndef PLAYER_RAYLIB
+#define PLAYER_RAYLIB
 
 #include "../core/player.h"
 #include "../client-common/alchemist2d.h"
+#include "backend.inl"
 
 class PlayerUI : public Player, public Renderable
 {
@@ -10,7 +11,7 @@ class PlayerUI : public Player, public Renderable
     bool going_right;
     InventoryElement * hotbar[10];
     int craftbar[10];
-    Texture get_texture() override;
+    Backend_Texture get_texture() override;
     PlayerUI(Player data);
     void render(int x, int y) override;
     void update_item_location(ItemLocation & old_loc, ItemLocation & new_loc) override;

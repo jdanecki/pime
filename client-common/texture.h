@@ -8,7 +8,7 @@
 struct player_textures
 {
     Backend_Texture player;
-    Backend_Surface npc;
+    Backend_Texture npc;
     Backend_Texture run_icon;
     Backend_Texture sneak_icon;
 };

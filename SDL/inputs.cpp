@@ -44,9 +44,7 @@ KeyHandler key_handlers[] = {
     {SDLK_i, handle_inventory, true},
     {SDLK_z, handle_menu_action, true},
     {SDLK_k, handle_menu_knowledge, true},
-#ifndef DISABLE_NPC
     {SDLK_n, handle_menu_npc, true},
-#endif
     {SDLK_q, handle_put_item, true},
 
     {SDLK_BACKQUOTE, handle_prev_hotbar, false},

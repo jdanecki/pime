@@ -39,12 +39,8 @@ KeyHandler key_handlers[] = {
     {KEY_I, handle_inventory, true},
     {KEY_Z, handle_menu_action, true},
     {KEY_K, handle_menu_knowledge, true},
-
-#ifndef DISABLE_NPC
     {KEY_N, handle_menu_npc, true},
-#endif
     {KEY_Q, handle_put_item, true},
-
     {KEY_GRAVE, handle_prev_hotbar, false},
     {KEY_TAB, handle_next_hotbar, false},
     {KEY_MINUS, handle_craftbar_prev, true},
