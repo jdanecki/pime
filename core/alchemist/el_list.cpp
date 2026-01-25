@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include "el_list.h"
+#include "alchemist/random_functions.h"
 
 ElementsList base_elements("base elements");
 ElementsList base_plants("base plants");
@@ -370,7 +371,7 @@ ListElement * ElementsList::get_random()
 {
     if (!nr_elements)
         return nullptr;
-    int i = rand() % nr_elements;
+    int i = random_range(0, nr_elements - 1);
     int cnt = 0;
     ListElement * el = head;
     while (el)

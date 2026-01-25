@@ -13,5 +13,6 @@ client_common_2d_sources=[
     'render.cpp',
     'alchemist2d.cpp',
     'being2d.cpp',
-    'inputs.cpp'
+    'inputs.cpp',
+    'window.cpp'
 ]

@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <termios.h>
-
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <termios.h>
 #include <unistd.h>
 
 #include "../core/world.h"
@@ -124,11 +122,15 @@ bool do_key_question_mark(char k)
                 return false;
             show_chunk(player->location);
             break;
+
         case 'C':
+        {
             if (!player)
                 return false;
-            server_action_tile(SERVER_SHOW_CHUNK, player->location);
+            InventoryElement * object = get_item_at_ppos(player);
+            server_action_tile(SERVER_SHOW_CHUNK, object);
             break;
+        }
         case 'e':
         {
             if (!player)
@@ -141,10 +143,13 @@ bool do_key_question_mark(char k)
             break;
         }
         case 'E':
+        {
             if (!player)
                 return false;
-            server_action_tile(SERVER_SHOW_ITEM, player->location);
+            InventoryElement * object = get_item_at_ppos(player);
+            server_action_tile(SERVER_SHOW_ITEM, object);
             break;
+        }
         case 'h':
             help_question_mark();
             break;
@@ -223,7 +228,10 @@ bool do_key_main(char k)
         case 'T':
         {
             if (player)
-                server_action_tile(SERVER_TRACE_NETWORK, player->location);
+            {
+                InventoryElement * object = get_item_at_ppos(player);
+                server_action_tile(SERVER_TRACE_NETWORK, object);
+            }
             break;
         }
         case 't':

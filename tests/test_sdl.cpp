@@ -21,13 +21,16 @@ void test_draw()
     Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{0, 255, 0, 255}, Backend_Color{});
     Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{}, Backend_Color{0, 255, 0, 255});
 
-    el->render(10, 500);
+    el->render(1, 5, 32, 32);
 
     Backend_Rect rect1(10, 10, 32, 32);
     Backend_Texture_Copy(texture, nullptr, &rect1);
 
     Backend_Rect rect2(50, 10, 32, 32);
     Backend_Texture_Copy_Flip(texture, nullptr, &rect2);
+
+    Backend_Line(50, 500, 100, 550, {255, 0, 0, 255});
+    Backend_Line(50, 550, 100, 500, {255, 0, 0, 255});
 }
 
 bool finish_program = false;
@@ -77,8 +80,8 @@ int main()
     init_window("test_sdl", 1000, 800);
 
     Element e(new BaseElement(Form_solid, 0));
-    e.width.value = 100;
-    e.height.value = 100;
+    e.dimensions.width.value = 100;
+    e.dimensions.height.value = 100;
 
     el = new Element2d(e);
     texture = load_texture("textures/player.png");

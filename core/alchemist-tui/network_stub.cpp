@@ -10,7 +10,7 @@ const NetClient * init()
     chunk_table table;
     for (int y = 0; y < CHUNK_SIZE; y++)
         for (int x = 0; x < CHUNK_SIZE; x++)
-            table[y][x].tile = (game_tiles)(rand() % TILE_MAX_NUM);
+            table[y][x].tile = (game_tiles)(random_range(0, TILE_MAX_NUM - 1));
 
     table[5][5].tile = TILE_AIR;
     update_chunk(128, 128, (uint8_t *)table);

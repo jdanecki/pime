@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "../../core/alchemist/random_functions.h"
 
 struct ItemLocation
 {
@@ -10,8 +11,51 @@ struct ItemLocation
     unsigned int y;
 } location;
 
+struct ItemLocationFloat
+{
+    unsigned int map_x;
+    unsigned int map_y;
+    float x;
+    float y;
+} location_float;
+
 #define CHUNK_SIZE 17
 typedef void (*move_function)(int dx, int dy);
+
+void move3(float dx, float dy)
+{
+    float new_x = location_float.x + dx;
+    float new_y = location_float.y + dy;
+    int new_map_x = location_float.map_x;
+    int new_map_y = location_float.map_y;
+
+    if (new_x < 0)
+    {
+        new_map_x = location_float.map_x - 1;
+        new_x = CHUNK_SIZE + new_x;
+    }
+    if (new_y < 0)
+    {
+        new_map_y = location_float.map_y - 1;
+        new_y = CHUNK_SIZE + new_y;
+    }
+    if (new_x >= CHUNK_SIZE)
+    {
+        new_map_x = location_float.map_x + 1;
+        new_x -= CHUNK_SIZE;
+    }
+    if (new_y >= CHUNK_SIZE)
+    {
+        new_map_y = location_float.map_y + 1;
+        new_y -= CHUNK_SIZE;
+    }
+
+    location_float.x = new_x;
+    location_float.y = new_y;
+    location_float.map_x = new_map_x;
+    location_float.map_y = new_map_y;
+    printf("player moved to dx=%f dy=%f [%d,%d][%f,%f]\n", dx, dy, new_map_x, new_map_y, new_x, new_y);
+}
 
 void move2(int dx, int dy)
 {
@@ -99,7 +143,8 @@ void move_by(move_function move, int dx, int dy)
         exit(1);
     }
 }
-int main(int argc, char ** argv)
+
+void test1()
 {
     location.map_x = 128;
     location.map_y = 128;
@@ -111,10 +156,34 @@ int main(int argc, char ** argv)
     for (int i = 0; i < max_moves; i++)
     {
         printf("move %d/%d\n", i, max_moves);
-        move_by(move1, rand() % (CHUNK_SIZE * 2) - CHUNK_SIZE, rand() % (CHUNK_SIZE * 2) - CHUNK_SIZE);
-        move_by(move2, rand() % (CHUNK_SIZE * 2) - CHUNK_SIZE, rand() % (CHUNK_SIZE * 2) - CHUNK_SIZE);
+        move_by(move1, random_range(-CHUNK_SIZE, CHUNK_SIZE), random_range(-CHUNK_SIZE, CHUNK_SIZE));
+        move_by(move2, random_range(-CHUNK_SIZE, CHUNK_SIZE), random_range(-CHUNK_SIZE, CHUNK_SIZE));
     }
     printf("move %d/%d\n", max_moves, max_moves);
+}
 
+void test2()
+{
+    location_float.map_x = 128;
+    location_float.map_y = 128;
+    location_float.x = 0.1;
+    location_float.y = 0.1;
+
+    printf("player started at [%d,%d][%f,%f]\n", location_float.map_x, location_float.map_y, location_float.x, location_float.y);
+
+    for (int i = 0; i < 15; i++)
+    {
+        move3(-0.1, -0.2);
+    }
+    for (int i = 0; i < 15; i++)
+    {
+        move3(0.1, 0.2);
+    }
+}
+
+int main(int argc, char ** argv)
+{
+    //    test1();
+    test2();
     return 0;
 }

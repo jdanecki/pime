@@ -1,5 +1,6 @@
 #include <cstdio>
 #include "inventory_element.h"
+#include "world.h"
 
 InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : NetworkObject(c_id, uid), location(location)
 {
@@ -27,6 +28,7 @@ bool InventoryElement::player_action(Player_action action, Player * pl)
 void InventoryElement::show(bool details)
 {
     CONSOLE_LOG("(INV)%s: uid=%lx id=%ld c_id=%d @[%d,%d][%f,%f]\n", get_class_name(), uid, get_id(), c_id, location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
+    dimensions.show();
 }
 bool InventoryElement::tick()
 {
@@ -48,18 +50,26 @@ Class_id InventoryElement::get_base_cid()
 {
     return c_id;
 }
-bool InventoryElement::check_rect(float px, float py, int size)
+bool InventoryElement::check_rect(InventoryElement * pl)
 {
-    float lx = location.get_world_x();
-    float ly = location.get_world_y();
-    float rx = lx + size;
-    float ry = ly + size;
-    // CONSOLE_LOG("INV: el (%f,%f)-(%f,%f)\n", lx, ly, rx, ry);
-    // CONSOLE_LOG("INV: pl (%f,%f)-(%f,%f)\n", px, py, px + size, py + size);
-    if (px > rx || px + size < lx || py > ry || py + size < ly)
-    {
+    float px = pl->location.get_world_x();
+    float py = pl->location.get_world_y();
+    float pw = pl->dimensions.width.value;
+    float ph = pl->dimensions.height.value;
+    float el_x = location.get_world_x();
+    float el_y = location.get_world_y();
+    float el_w = dimensions.width.value;
+    float el_h = dimensions.height.value;
+    if (px > el_x + el_w || py > el_y + el_h || px + pw < el_x || py + ph < el_y)
         return false;
-    }
+
+    /*  CONSOLE_LOG("INV: check_rect this=%s pl=%s\n", get_class_name(), pl->get_class_name());
+        CONSOLE_LOG("element:\n");
+        location.show();
+        dimensions.show(false);
+        CONSOLE_LOG("player:\n");
+        pl->location.show();
+        pl->dimensions.show(false);*/
     return true;
 }
 char * InventoryElement::get_description()

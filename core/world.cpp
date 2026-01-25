@@ -2,9 +2,9 @@
 
 #include "world.h"
 #include "alchemist/item_location.h"
+#include "alchemist/object.h"
 #include "player.h"
 
-int tile_size;
 chunk * world_table[WORLD_SIZE][WORLD_SIZE];
 Chunk_state loaded_chunks[WORLD_SIZE][WORLD_SIZE];
 
@@ -64,43 +64,37 @@ InventoryElement * find_in_world(ItemLocation * loc, size_t uid)
     return nullptr;
 }
 
-int get_tile_at(ItemLocation loc)
+InventoryElement * get_item_at_ppos(Player * player)
 {
-    return world_table[(int)loc.chunk.map_y][(int)loc.chunk.map_x]->table[(int)loc.chunk.y][(int)loc.chunk.x].tile;
-}
-
-InventoryElement * get_item_at(ItemLocation loc)
-{ // loc is player position
-    if (loc.tag == ItemLocation::Tag::Player)
+    if (player->location.tag == ItemLocation::Tag::Player)
         abort();
 
-    unsigned int left_chunk_x, right_chunk_x, top_chunk_y, bottom_chunk_y;
-    float left_top_world_x, left_top_world_y;
+    int top = player->location.chunk.map_y - 1;
+    if (top < 0)
+        top = 0;
+    int bottom = player->location.chunk.map_y + 1;
+    if (bottom >= WORLD_SIZE)
+        bottom = WORLD_SIZE - 1;
+    int left = player->location.chunk.map_x - 1;
+    if (left < 0)
+        left = 0;
+    int right = player->location.chunk.map_x + 1;
+    if (right >= WORLD_SIZE)
+        right = WORLD_SIZE - 1;
 
-    float player_world_x = loc.get_world_x();
-    float player_world_y = loc.get_world_y();
-
-    left_top_world_x = player_world_x - 8 * tile_size;
-    left_top_world_y = player_world_y - 8 * tile_size;
-
-    left_chunk_x = left_top_world_x / (CHUNK_SIZE * tile_size);
-    right_chunk_x = ((left_top_world_x / tile_size) + CHUNK_SIZE - 1) / CHUNK_SIZE;
-
-    top_chunk_y = left_top_world_y / (CHUNK_SIZE * tile_size);
-    bottom_chunk_y = ((left_top_world_y / tile_size) + CHUNK_SIZE - 1) / CHUNK_SIZE;
-
-    for (unsigned int cy = top_chunk_y; cy <= bottom_chunk_y; ++cy)
+    // CONSOLE_LOG("left=%d right=%d top=%d bottom=%d\n", left, right, top, bottom);
+    for (unsigned int cy = top; cy <= bottom; ++cy)
     {
-        for (unsigned int cx = left_chunk_x; cx <= right_chunk_x; ++cx)
+        for (unsigned int cx = left; cx <= right; ++cx)
         {
             chunk * ch = world_table[cy][cx];
             if (!ch)
-                return nullptr;
+                continue;
             for (InventoryElement * el : ch->objects)
             {
                 if (el->c_id == Class_Player)
                     continue;
-                if (el->check_rect(loc.get_world_x(), loc.get_world_y(), tile_size))
+                if (el->check_rect(player))
                 {
                     return el;
                 }
@@ -110,16 +104,11 @@ InventoryElement * get_item_at(ItemLocation loc)
     return nullptr;
 }
 
-InventoryElement * get_item_at_ppos(Player * player)
-{
-    return get_item_at(player->location);
-}
-
 ItemLocation ItemLocation::center()
 {
     ItemLocation l;
     l.tag = ItemLocation::Tag::Chunk;
-    l.chunk = {128, 128, 8, 8};
+    l.chunk = {128, 128, 8.5, 8.5};
     return l;
 }
 void ItemLocation::show()
@@ -150,5 +139,5 @@ float ItemLocation::get_tile_y()
 
 float ItemLocation::get_world_pos(int chunk, float pos)
 {
-    return chunk * CHUNK_SIZE * tile_size + pos * tile_size;
+    return chunk * CHUNK_SIZE + pos;
 }

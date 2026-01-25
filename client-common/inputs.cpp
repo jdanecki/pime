@@ -6,6 +6,7 @@
 
 #include "playerUI.h"
 #include "player_actions.h"
+#include "net.h"
 
 #include "../menu/menu.h"
 #include "../dialog/d_craft.h"
@@ -22,15 +23,18 @@ void handle_show_item()
 }
 void handle_show_item_server()
 {
-    server_action_tile(SERVER_SHOW_ITEM, player->location);
+    InventoryElement * object = get_item_at_ppos(player);
+    server_action_tile(SERVER_SHOW_ITEM, object);
 }
+
 void handle_show_chunk()
 {
     show_chunk(player->location);
 }
 void handle_show_chunk_server()
 {
-    server_action_tile(SERVER_SHOW_CHUNK, player->location);
+    InventoryElement * object = get_item_at_ppos(player);
+    server_action_tile(SERVER_SHOW_CHUNK, object);
 }
 void handle_trace_network()
 {
@@ -38,7 +42,7 @@ void handle_trace_network()
 }
 void handle_trace_network_server()
 {
-    server_action_tile(SERVER_TRACE_NETWORK, player->location);
+    server_action_tile(SERVER_TRACE_NETWORK, player);
 }
 void handle_auto_explore()
 {

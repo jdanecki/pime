@@ -238,10 +238,10 @@ float PacketPlayerMove::get_y()
     return pdata->y;
 }
 
-PacketLocationUpdate::PacketLocationUpdate(size_t i, ItemLocation old_loc, ItemLocation new_loc) : Packet(PACKET_LOCATION_UPDATE)
+PacketLocationUpdate::PacketLocationUpdate(size_t uid, ItemLocation old_loc, ItemLocation new_loc) : Packet(PACKET_LOCATION_UPDATE)
 {
     data.t = t;
-    data.location.id = NetworkObject(Class_Unknown, i);
+    data.location.id = NetworkObject(Class_Unknown, uid);
     data.location.old = old_loc;
     data.location.new_ = new_loc;
 }

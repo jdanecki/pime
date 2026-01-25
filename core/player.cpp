@@ -54,6 +54,10 @@ Player::Player(size_t uid, SerializableCString && name, ItemLocation location, i
     memcpy(player_skills, clan.get()->skills, sizeof(player_skills));
     running = 0;
     sneaking = 0;
+    dimensions.length.value = 1;
+    dimensions.width.value = 1;
+    dimensions.height.value = 1;
+    dimensions.volume.value = 1;
 }
 
 Player * Player::conversation(Sentence * s, InventoryElement * el)

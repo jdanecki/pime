@@ -3,9 +3,9 @@
 #include <stdio.h>
 
 // #include "../core/tiles.h"
+#include "../core/alchemist/random_functions.h"
 
 #include "../client-common/window.h"
-
 #include "../client-common/texture.h"
 
 int tile_size = 32;
@@ -40,7 +40,7 @@ class chunk
         {
             for (int tx = 0; tx < CHUNK_SIZE; ++tx)
             {
-                table[ty][tx].tile = rand() % TILE_TEXTURES;
+                table[ty][tx].tile = random_range(0, TILE_TEXTURES - 1);
             }
         }
     }

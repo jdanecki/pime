@@ -16,13 +16,15 @@ alchemist_sources = [
   'elements/plant.cpp',
   'elements/field.cpp',
   'elements/barn.cpp',
+  'elements/dimensions.cpp',
   'names.cpp',
   'el_list.cpp',
   'npc_talk.cpp',
   'properties.cpp',
   'skills.cpp',
   'serialization.cpp',
-  'object.cpp'
+  'object.cpp',
+  'random_functions.cpp',
   ]
 
 

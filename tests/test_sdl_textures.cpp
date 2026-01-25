@@ -3,9 +3,9 @@
 #include <stdio.h>
 
 #include "../core/tiles.h"
+#include "../core/alchemist/random_functions.h"
 
 #include "../client-common/window.h"
-#include "../client-common/text.h"
 #include "../client-common/texture.h"
 
 int tile_size = 32;
@@ -87,7 +87,7 @@ void blend_pixels(unsigned int * pxA, unsigned int * pxB, SDL_PixelFormat * form
 
     SDL_GetRGBA(*pxA, format, &rA, &gA, &bA, &aA);
     SDL_GetRGBA(*pxB, format, &rB, &gB, &bB, &aB);
-    unsigned char noise = rand() % 40;
+    unsigned char noise = random_range(0, 39);
     unsigned char r = (rA + rB + noise) / 2;
     unsigned char g = (gA + gB + noise) / 2;
     unsigned char b = (bA + bB + noise) / 2;
@@ -293,11 +293,11 @@ int main()
         {
             memset(objects, 0, sizeof(objects));
             redraw = false;
-            int tiles = 1 + (rand() % (TILE_TEXTURES - 1));
+            int tiles = random_range(1, TILE_TEXTURES);
             for (int t = 0; t < tiles; t++)
             {
-                int x = rand() % CHUNK_SIZE;
-                int y = rand() % CHUNK_SIZE;
+                int x = random_range(0, CHUNK_SIZE - 1);
+                int y = random_range(0, CHUNK_SIZE - 1);
 
                 objects[t].x = x;
                 objects[t].y = y;

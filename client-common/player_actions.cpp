@@ -9,7 +9,7 @@ extern int active_hotbar;
 
 void use_tile()
 {
-    InventoryElement * object = get_item_at(player->location);
+    InventoryElement * object = get_item_at_ppos(player);
 
     if (object)
     {
@@ -38,22 +38,9 @@ void use_tile()
 
 void pickup_item()
 {
-    InventoryElement * object = get_item_at(player->location);
+    InventoryElement * object = get_item_at_ppos(player);
     if (object)
     {
         send_packet_pickup(object->uid);
     }
-}
-
-void action_tile(Player_action a, ItemLocation loc)
-{
-    InventoryElement * object = get_item_at(loc);
-    if (!object)
-    {
-        CONSOLE_LOG("action_tile: nothing on tile\n");
-        return;
-    }
-
-    CONSOLE_LOG("action_tile: action %s on %s\n", player_action_name[a], object->get_name());
-    send_packet_action_on_object(a, object->uid);
 }

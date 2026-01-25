@@ -8,11 +8,12 @@ class Property
 {
   public:
     SerializableCString name;
-    unsigned int value;
-    Property(const char * n, unsigned int v);
+    float value;
+    Property(const char * n, float v);
+    Property(const char * n, int min, int max);
     Property();
     void show();
-    unsigned int decrease(unsigned int by);
+    float decrease(float by);
 };
 
 class Edible

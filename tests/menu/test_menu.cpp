@@ -7,6 +7,7 @@
 
 #include "../../menu/menu.h"
 
+int tile_size = 32;
 bool finish_program;
 bool handle_events();
 class Npc2d;
@@ -28,7 +29,9 @@ void send_packet_pickup(uintptr_t id)
 void send_packet_item_used_on_tile(uintptr_t iid, ItemLocation location)
 {
 }
-
+void action_tile(Player_action a, InventoryElement * object)
+{
+}
 void handle_escape()
 {
     show_menu();

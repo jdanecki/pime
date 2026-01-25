@@ -26,7 +26,9 @@ void send_packet_item_used_on_tile(uintptr_t iid, ItemLocation location);
 void send_packet_craft(uintptr_t prod_id, uintptr_t ingredients_num, const uintptr_t * iid);
 void send_packet_request_chunk(int32_t x, int32_t y);
 void send_packet_request_item(size_t id);
-void server_action_tile(Server_action a, ItemLocation loc);
+
+void action_tile(Player_action a, InventoryElement * object);
+void server_action_tile(Server_action a, InventoryElement * object);
 
 bool init_networking();
 

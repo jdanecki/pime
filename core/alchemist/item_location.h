@@ -42,6 +42,6 @@ struct ItemLocation
     float get_world_y();
     float get_tile_x();
     float get_tile_y();
-    float get_world_pos(int, float);
+    float get_world_pos(int, float); // position in tiles
 };
 #endif

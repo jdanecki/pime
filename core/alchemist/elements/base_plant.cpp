@@ -3,11 +3,12 @@
 
 #include "base_plant.h"
 #include "../names.h"
+#include "alchemist/random_functions.h"
 
 BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(5))
 {
-    flowers = rand() % 2;
-    leaves = rand() % 2;
+    flowers = random_range(0, 1);
+    leaves = random_range(0, 1);
     edible.set_random();
 }
 

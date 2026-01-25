@@ -3,12 +3,17 @@
 
 #include "element.h"
 #include "../el_list.h"
+#include "../random_functions.h"
 
-Element::Element(BaseElement * b)
-    : InventoryElement(Class_Element), base(b), length("length", 5 + rand() % 60), width("width", 5 + rand() % 60), height("height", 5 + rand() % 60),
-      volume("volume", length.value * width.value * height.value), sharpness("sharpness", 0), smoothness("smoothness", 0), mass("mass", b->density.value * volume.value / 1000)
+Element::Element(BaseElement * b) : InventoryElement(Class_Element), base(b), sharpness("sharpness", 0), smoothness("smoothness", 0), mass("mass", b->density.value * dimensions.volume.value / 1000)
 {
+    if (b->form == Form_solid)
+    {
+        sharpness.value = random_float_range(1, 100);
+        smoothness.value = random_float_range(1, 100);
+    }
 }
+
 Element::Element(int id) : base(get_base_element(id))
 {
 }
@@ -20,10 +25,6 @@ void Element::show(bool details)
     if (!details)
         return;
     CONSOLE_LOG("form=%s\n", get_form_name());
-    length.show();
-    width.show();
-    height.show();
-    volume.show();
 
     if (details)
     {
@@ -65,10 +66,10 @@ Property ** Element::get_properties(int * count)
     if (f == Form_solid)
         *count += 6;
     Property ** props = new Property *[*count];
-    props[0] = &length;
-    props[1] = &width;
-    props[2] = &height;
-    props[3] = &volume;
+    props[0] = &dimensions.length;
+    props[1] = &dimensions.width;
+    props[2] = &dimensions.height;
+    props[3] = &dimensions.volume;
     props[4] = &sharpness;
     props[5] = &smoothness;
     props[6] = &mass;

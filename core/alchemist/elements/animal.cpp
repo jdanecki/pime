@@ -6,7 +6,6 @@
 void Animal::init(BaseAnimal * b)
 {
     c_id = Class_Animal;
-    size = 0;
 }
 
 Animal::Animal(BaseAnimal * b) : InventoryElement(Class_Animal), base(b)

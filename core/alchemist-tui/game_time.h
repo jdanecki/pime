@@ -2,6 +2,7 @@
 #define GAME_TIME_H
 
 #include "../alchemist/el_list.h"
+#include "alchemist/random_functions.h"
 
 class Game_time
 {
@@ -16,11 +17,11 @@ class Game_time
     void update_time(int sec);
     Game_time()
     {
-        seconds = rand() % 60;
-        minutes = rand() % 60;
-        hours = rand() % 24;
-        days = rand() % 360;
-        years = 1000 + rand() % 1000;
+        seconds = random_range(0, 59);
+        minutes = random_range(0, 59);
+        hours = random_range(0, 23);
+        days = random_range(0, 359);
+        years = random_range(1000, 2000);
     }
     char * get_time();
 };

@@ -14,8 +14,6 @@
 #include "../client-common/text.h"
 #include "../client-common/net.h"
 
-#include "../client-common/player_actions.h"
-
 extern int active_hotbar;
 extern bool finish_program;
 
@@ -603,7 +601,7 @@ int Menu::interact()
 
         case MENU_NPC:
         {
-            InventoryElement * object = get_item_at(player->location);
+            InventoryElement * object = get_item_at_ppos(player);
             if (object && object->get_cid() == Class_Npc)
             {
                 current_menu = menu_npc;
@@ -652,17 +650,29 @@ int Menu::interact()
             return 0;
 
         case MENU_DRINK:
-            action_tile(PLAYER_DRINK, player->location);
+        {
+            InventoryElement * object = get_item_at_ppos(player);
+            action_tile(PLAYER_DRINK, object);
             return 0;
+        }
         case MENU_EAT:
-            action_tile(PLAYER_EAT, player->location);
+        {
+            InventoryElement * object = get_item_at_ppos(player);
+            action_tile(PLAYER_EAT, object);
             return 0;
+        }
         case MENU_READ:
-            action_tile(PLAYER_READ, player->location);
+        {
+            InventoryElement * object = get_item_at_ppos(player);
+            action_tile(PLAYER_READ, object);
             return 0;
+        }
         case MENU_CHECK:
-            action_tile(PLAYER_CHECK, player->location);
+        {
+            InventoryElement * object = get_item_at_ppos(player);
+            action_tile(PLAYER_CHECK, object);
             return 0;
+        }
 
         default:
             return 1; // hide menu

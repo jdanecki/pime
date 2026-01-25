@@ -3,8 +3,9 @@
 
 #include "properties.h"
 #include "../clan.h"
+#include "random_functions.h"
 
-Edible::Edible() : irrigation("irrigation", rand() % 500), poison("poison", 1 + rand() % 250), caloric("caloric", rand() % 1000)
+Edible::Edible() : irrigation("irrigation", 0, 500), poison("poison", 1, 250), caloric("caloric", 0, 1000)
 {
     set_random();
 }
@@ -29,8 +30,7 @@ void Edible::show()
 }
 
 Solid::Solid()
-    : tooling("tooling", 1 + rand() % 100), stretching("stretching", 1 + rand() % 10000), squeezing("squezzing", 1 + rand() % 20000), bending("bending", 1 + rand() % 100),
-      solubility("solubility", 1 + rand() % 100), hardness("hardness", 1 + rand() % 100)
+    : tooling("tooling", 1, 100), stretching("stretching", 1, 10000), squeezing("squezzing", 1, 20000), bending("bending", 1, 100), solubility("solubility", 1, 100), hardness("hardness", 1, 100)
 {
     // tooling
     //  1 - trudna - potrzebne narzędzia
@@ -131,18 +131,22 @@ void Solid::show()
 }
 
 const char * Form_name[]{"unknown", "solid", "liquid", "gas"};
-Property::Property(const char * n, unsigned int v) : name(n)
+Property::Property(const char * n, float v) : name(n), value(v)
 {
-    value = v;
+}
+
+Property::Property(const char * n, int min, int max) : name(n)
+{
+    value = random_float_range(min, max);
 }
 Property::Property()
 {
 }
 void Property::show()
 {
-    CONSOLE_LOG("%s = %u\n", name.str, value);
+    CONSOLE_LOG("%s = %f\n", name.str, value);
 }
-unsigned int Property::decrease(unsigned int by)
+float Property::decrease(float by)
 {
     if (value > by)
     {
@@ -154,7 +158,7 @@ unsigned int Property::decrease(unsigned int by)
 }
 void Edible::set_random()
 {
-    eating_by = rand() % 16;
+    eating_by = random_range(0, 15);
 }
 void Edible::set_no_edible()
 {

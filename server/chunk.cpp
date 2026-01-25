@@ -1,7 +1,21 @@
 #include "chunk.h"
 #include "places/places.h"
 #include "generator/generator.h"
-#include "generator/random_functions.h"
+#include "../core/alchemist/random_functions.h"
+
+typedef void (*callback_fn)(chunk * ch, size_t id);
+
+void do_times(float prob, callback_fn f, chunk * ch, int id)
+{
+    int count = (int)(prob * 2.0f);
+    for (int i = 0; i < count; ++i)
+    {
+        if (random_bool(0.5))
+        {
+            f(ch, id);
+        }
+    }
+}
 
 void add_place(chunk * ch, Place_id id, int x, int y)
 {
@@ -80,7 +94,7 @@ try_again:
                 ch->table[y][x].tile = closest_el->get_id() % TILE_TEXTURES;
             }
 
-            //          ch->table[y][x].tile = x % TILE_TEXTURES;
+            //            ch->table[y][x].tile = (x + y) % TILE_TEXTURES;
         }
 
     for (int i = 0; i < r->animals_count; i++)

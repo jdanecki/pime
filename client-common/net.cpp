@@ -351,9 +351,39 @@ void send_packet_request_chunk(int32_t cx, int32_t cy)
     p->send(client->peer);
 }
 
-void server_action_tile(Server_action a, ItemLocation loc)
+void disconnect()
 {
-    InventoryElement * object = get_item_at(loc);
+    ENetEvent event;
+
+    enet_peer_disconnect(client->peer, 0);
+    while (enet_host_service(host, &event, 3000) > 0)
+    {
+        if (event.type == ENET_EVENT_TYPE_DISCONNECT)
+        {
+            CONSOLE_LOG("Disconnected from server\n");
+            break;
+        }
+    }
+}
+
+NetClient::NetClient(ENetHost * host, ENetPeer * peer) : host(host), peer(peer)
+{
+}
+
+void action_tile(Player_action a, InventoryElement * object)
+{
+    if (!object)
+    {
+        CONSOLE_LOG("action_tile: nothing on tile\n");
+        return;
+    }
+
+    CONSOLE_LOG("action_tile: action %s on %s\n", player_action_name[a], object->get_name());
+    send_packet_action_on_object(a, object->uid);
+}
+
+void server_action_tile(Server_action a, InventoryElement * object)
+{
     if (object)
     {
         CONSOLE_LOG("Client: server action %s on %s\n", server_action_name[a], object->get_name());
@@ -373,27 +403,4 @@ void server_action_tile(Server_action a, ItemLocation loc)
                 break;
         }
     }
-}
-
-void disconnect()
-{
-    ENetEvent event;
-
-    enet_peer_disconnect(client->peer, 0);
-    while (enet_host_service(host, &event, 3000) > 0)
-    {
-        if (event.type == ENET_EVENT_TYPE_DISCONNECT)
-        {
-            CONSOLE_LOG("Disconnected from server\n");
-            break;
-        }
-    }
-}
-
-// FIXME @jacek remove this
-void add_packet_to_send1(Packet * p)
-{
-}
-NetClient::NetClient(ENetHost * host, ENetPeer * peer) : host(host), peer(peer)
-{
 }

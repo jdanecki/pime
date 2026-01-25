@@ -2,6 +2,7 @@
 #include <cstdlib>
 
 #include "base_element.h"
+#include "../random_functions.h"
 
 BaseElement::BaseElement(Form f, int index) : Base(index, Class_BaseElement, create_name(5 - f)), form(f), density("", 0)
 {
@@ -10,24 +11,24 @@ BaseElement::BaseElement(Form f, int index) : Base(index, Class_BaseElement, cre
     switch (form)
     {
         case Form_solid:
-            density = Property("density", 50 + rand() % 2000);
-            color.r = rand() % 256;
-            color.g = rand() % 256;
-            color.b = rand() % 256;
+            density = Property("density", 50, 2000);
+            color.r = random_range(0, 255);
+            color.g = random_range(0, 255);
+            color.b = random_range(0, 255);
             break;
         case Form_liquid:
-            density = Property("density", 500 + rand() % 500);
-            color.r = rand() % 64;
-            color.g = rand() % 256;
+            density = Property("density", 500, 2000);
+            color.r = random_range(0, 63);
+            color.g = random_range(0, 255);
             color.b = 255;
             break;
         case Form_gas:
             density = Property("density", 1);
             edible.set_no_edible();
-            int r = rand() % 200;
-            color.r = r + rand() % 56;
-            color.g = r + rand() % 56;
-            color.b = r + rand() % 56;
+            int r = random_range(0, 199);
+            color.r = random_range(r, r + 55);
+            color.g = random_range(r, r + 55);
+            color.b = random_range(r, r + 55);
             break;
     }
 }

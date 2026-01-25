@@ -9,7 +9,7 @@ bool handle_events();
 Element2d * el;
 Backend_Texture texture;
 
-void draw()
+void test_draw()
 {
     Color c;
     c.r = 100;
@@ -30,7 +30,7 @@ void draw()
     Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{0, 255, 0, 255}, Backend_Color{});
     Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{}, Backend_Color{0, 255, 0, 255});
 
-    el->render(10, 500);
+    el->render(1, 5, 32, 32);
     Backend_Rect rect1(10, 10, 32, 32);
     Backend_Texture_Copy(texture, nullptr, &rect1);
 
@@ -91,8 +91,8 @@ int main()
     init_window("test_raylib", 1000, 800);
 
     Element e(new BaseElement(Form_solid, 0));
-    e.width.value = 100;
-    e.height.value = 100;
+    e.dimensions.width.value = 100;
+    e.dimensions.height.value = 100;
 
     el = new Element2d(e);
 
@@ -103,7 +103,7 @@ int main()
         if (handle_events())
             return 0;
 
-        draw();
+        test_draw();
     }
 
     close_graphics();

@@ -5,11 +5,6 @@
 #include "../client-common/text.h"
 #include "../client-common/texture.h"
 
-int window_width;
-int window_height;
-float left_top_world_x;
-float left_top_world_y;
-
 int init_window(const char * title, int wx, int wy)
 {
     InitWindow(wx, wy, title);

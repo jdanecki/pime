@@ -11,7 +11,6 @@ class Animal : public InventoryElement
     void init(BaseAnimal * b);
 
   public:
-    float size;
     bool wild;
     Animal(BaseAnimal * b);
     Animal(int id);

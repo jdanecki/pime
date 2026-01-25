@@ -14,15 +14,3 @@ int random_bool(double probability)
 {
     return ((double)rand() / RAND_MAX) < probability;
 }
-
-void do_times(float prob, callback_fn f, chunk * ch, int id)
-{
-    int count = (int)(prob * 2.0f);
-    for (int i = 0; i < count; ++i)
-    {
-        if (random_bool(0.5))
-        {
-            f(ch, id);
-        }
-    }
-}

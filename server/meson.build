@@ -11,7 +11,6 @@ server_sources = [
   'packets.cpp',
 
   'generator/generator.cpp',
-  'generator/random_functions.cpp',
 
   'tools/axe_blade.cpp', 'tools/axe_handle.cpp', 'tools/axe.cpp',
   'tools/pickaxe_blade.cpp', 'tools/pickaxe_handle.cpp', 'tools/pickaxe.cpp',

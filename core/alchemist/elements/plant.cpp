@@ -3,17 +3,17 @@
 
 #include "plant.h"
 #include "../el_list.h"
+#include "alchemist/random_functions.h"
 
 void Plant::init(BasePlant * b)
 {
     base = b;
-    seedling_time = 10 + rand() % 20;
-    growing_time = seedling_time + rand() % 150;
-    flowers_time = growing_time + rand() % 30;
-    size = 0;
+    seedling_time = 10 + random_range(10, 30);
+    growing_time = random_range(seedling_time, seedling_time + 150);
+    flowers_time = random_range(growing_time, growing_time + 30);
     phase = (Plant_phase)(rand() % (Plant_fruits + 1));
     grown = false;
-    water = rand() % 100;
+    water = random_range(0, 99);
 }
 
 Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)

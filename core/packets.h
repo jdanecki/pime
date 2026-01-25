@@ -202,7 +202,7 @@ class PacketLocationUpdate : public Packet
   public:
     LocationUpdateData get_location();
 
-    PacketLocationUpdate(size_t i, ItemLocation old_loc, ItemLocation new_loc);
+    PacketLocationUpdate(size_t uid, ItemLocation old_loc, ItemLocation new_loc);
     PacketLocationUpdate();
     bool update(unsigned char * net_data, size_t s);
     int send(ENetPeer * peer);

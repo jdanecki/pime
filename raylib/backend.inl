@@ -88,4 +88,5 @@ int Backend_Set_Clip(int x, int y, int w, int h);
 int CONSOLE_LOG(const char * fmt, ...);
 
 bool Backend_Has_Intersection(Backend_Rect r1, Backend_Rect r2);
+void Backend_Line(int x1, int y1, int x2, int y2, Backend_Color color);
 #endif

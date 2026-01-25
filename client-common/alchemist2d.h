@@ -7,7 +7,6 @@
 class Renderable
 {
   protected:
-    int w, h;
     bool flip;
     Backend_Texture texture;
     bool texture_created;
@@ -15,9 +14,7 @@ class Renderable
   public:
     Renderable();
     virtual Backend_Texture get_texture();
-    virtual float get_scale();
-    virtual void render(int x, int y);
-    bool check_rect(float px, float py, float x, float y, int t_size);
+    virtual void render(float el_x, float el_y, float w, float h);
 };
 
 class Ingredient2d : public Ingredient, public Renderable
@@ -50,13 +47,9 @@ class Barn2d : public Barn, public Renderable
 
 class Element2d : public Element, public Renderable
 {
-    int start_width;
-
   public:
     Element2d(Element data);
-    float get_scale() override;
     void show(bool details = true) override;
-    bool check_rect(float px, float py, int t_size) override;
 };
 
 class Scroll2d : public Scroll, public Renderable

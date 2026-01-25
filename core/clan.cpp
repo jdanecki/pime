@@ -2,6 +2,7 @@
 
 #include "clan.h"
 #include "alchemist/object.h"
+#include "alchemist/random_functions.h"
 
 const char * clan_names[] = {"Animal", "Human", "Dwarf", "Elf", "Niziolek"};
 
@@ -78,6 +79,6 @@ Clan * get_clan_by_id(ClanId id)
 }
 Clan * get_random_clan()
 {
-    int c = rand() % 4;
+    int c = random_range(0, 4);
     return get_clan_by_id((ClanId)c);
 }

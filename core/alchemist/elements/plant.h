@@ -16,7 +16,6 @@ class Plant : public InventoryElement
     unsigned int flowers_time;
 
   public:
-    float size;
     int water;
 
     Plant_phase phase;

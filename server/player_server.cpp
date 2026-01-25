@@ -2,6 +2,7 @@
 
 #include "player_server.h"
 #include "elements_server.h"
+#include "../core/alchemist/random_functions.h"
 #include "networking.h"
 #include "world_server.h"
 #include "../core/packet_types.h"
@@ -52,22 +53,31 @@ void PlayerServer::move(float dx, float dy)
     // CONSOLE_LOG("SERV: player move dx=%f dy=%f\n", dx, dy);
     ItemLocation old = location;
 
-    float x = location.chunk.x + dx;
-    float y = location.chunk.y + dy;
+    float new_x = location.chunk.x + dx;
+    float new_y = location.chunk.y + dy;
+    int new_map_x = location.chunk.map_x;
+    int new_map_y = location.chunk.map_y;
 
-    int map_dx = x / CHUNK_SIZE;
-    int map_dy = y / CHUNK_SIZE;
-
-    if (x < 0 && (int)x % CHUNK_SIZE != 0)
-        map_dx--;
-    if (y < 0 && (int)y % CHUNK_SIZE != 0)
-        map_dy--;
-
-    float new_x = x - map_dx * CHUNK_SIZE;
-    float new_y = y - map_dy * CHUNK_SIZE;
-
-    int new_map_x = location.chunk.map_x + map_dx;
-    int new_map_y = location.chunk.map_y + map_dy;
+    if (new_x < 0)
+    {
+        new_map_x = location.chunk.map_x - 1;
+        new_x += CHUNK_SIZE;
+    }
+    if (new_y < 0)
+    {
+        new_map_y = location.chunk.map_y - 1;
+        new_y += CHUNK_SIZE;
+    }
+    if (new_x >= CHUNK_SIZE)
+    {
+        new_map_x++;
+        new_x -= CHUNK_SIZE;
+    }
+    if (new_y >= CHUNK_SIZE)
+    {
+        new_map_y++;
+        new_y -= CHUNK_SIZE;
+    }
 
     if (new_map_x != location.chunk.map_x || new_map_y != location.chunk.map_y)
     {
@@ -268,7 +278,7 @@ bool PlayerServer::tick()
 }
 
 PlayerServer::PlayerServer(size_t uid)
-    : Player(uid, SerializableCString("player"), ItemLocation::center(), 50 + rand() % 100, 50 + rand() % 100, 50 + rand() % 100), hunger_delay(600), hunger_delay_max(600)
+    : Player(uid, SerializableCString("player"), ItemLocation::center(), random_range(50, 150), random_range(50, 150), random_range(50, 150)), hunger_delay(600), hunger_delay_max(600)
 {
     CONSOLE_LOG("PlayerServer: uid=%ld\n", uid);
     notify_create(this);
@@ -297,8 +307,8 @@ PlayerServer * create_player(size_t id)
 NPCServer::NPCServer(size_t uid) : Npc(uid, ItemLocation::center())
 {
     CONSOLE_LOG("NPCServer: uid=%ld\n", uid);
-    location.chunk.x = rand() % CHUNK_SIZE;
-    location.chunk.y = rand() % CHUNK_SIZE;
+    location.chunk.x = random_range(0, CHUNK_SIZE - 1);
+    location.chunk.y = random_range(0, CHUNK_SIZE - 1);
 
     notify_create(this);
 }

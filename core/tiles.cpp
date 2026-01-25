@@ -1,4 +1,5 @@
 #include "tiles.h"
+#include "alchemist/random_functions.h"
 
 void chunk::add_object(InventoryElement * object, float x, float y, bool front)
 {
@@ -22,8 +23,8 @@ void chunk::add_object(InventoryElement * object, float x, float y, bool front)
 
 void chunk::add_object(InventoryElement * object)
 {
-    int x = rand() % CHUNK_SIZE;
-    int y = rand() % CHUNK_SIZE;
+    int x = random_range(0, CHUNK_SIZE);
+    int y = random_range(0, CHUNK_SIZE);
     //    CONSOLE_LOG("class %d, %d %d, %ld\n", object->get_cid(), x, y, object->get_uid());
     add_object(object, x, y);
 }

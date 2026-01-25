@@ -34,7 +34,8 @@ foreach s : tests_server_sources
 endforeach
 
 test_chunks_sources = [
-    'chunks.cpp'
+    'chunks.cpp',
+    '../../core/alchemist/random_functions.cpp'
 ]
 
 executable('test_chunks', 

@@ -1,6 +1,6 @@
 
 #include "generator.h"
-#include "random_functions.h"
+#include "../../core/alchemist/random_functions.h"
 #include "../../core/world_params.h"
 
 int terrains_count;
@@ -25,7 +25,7 @@ void choose_multiple(int total, int n, int * out_indices)
 
     for (int i = total - 1; i > 0; i--)
     {
-        int j = rand() % (i + 1);
+        int j = random_range(0, i);
         int tmp = indices[i];
         indices[i] = indices[j];
         indices[j] = tmp;
@@ -233,8 +233,8 @@ Coords::Coords(int x, int y) : x(x), y(y)
 }
 Coords::Coords()
 {
-    x = rand() % WORLD_SIZE;
-    y = rand() % WORLD_SIZE;
+    x = random_range(0, WORLD_SIZE - 1);
+    y = random_range(0, WORLD_SIZE - 1);
 }
 int Coords::distance_squared(Coords * other)
 {

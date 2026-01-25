@@ -174,7 +174,7 @@ bool handle_events()
         unsigned int now = SDL_GetTicks();
         unsigned int dt = (now - last_move);
         // printf("dt=%u now=%u last=%u\n", dt, now, last_move);
-        // if (dt > 100)
+        //        if (dt > 100)
         {
             last_move = now;
             const Uint8 * currentKeyState = SDL_GetKeyboardState(NULL);

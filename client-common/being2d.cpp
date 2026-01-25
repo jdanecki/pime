@@ -17,12 +17,6 @@ Animal2d::Animal2d(Animal data) : Animal(data)
 {
 }
 
-void Animal2d::render(int x, int y)
-{
-    flip = !going_right;
-    Renderable::render(x, y);
-}
-
 void Animal2d::update_item_location(ItemLocation & old_loc, ItemLocation & new_loc)
 {
     going_right = (old_loc.chunk.x < new_loc.chunk.x) ? true : false;
@@ -38,20 +32,4 @@ Backend_Texture Plant2d::get_texture()
 
 Plant2d::Plant2d(Plant data) : Plant(data)
 {
-}
-float Plant2d::get_scale()
-{
-    return size;
-}
-bool Plant2d::check_rect(float px, float py, int t_size)
-{
-    return Renderable::check_rect(px, py, location.get_world_x(), location.get_world_y(), t_size);
-}
-float Animal2d::get_scale()
-{
-    return size;
-}
-bool Animal2d::check_rect(float px, float py, int t_size)
-{
-    return Renderable::check_rect(px, py, location.get_world_x(), location.get_world_y(), t_size);
 }

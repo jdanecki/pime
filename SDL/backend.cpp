@@ -1,4 +1,5 @@
 #include "backend.inl"
+#include "SDL2_gfxPrimitives.h"
 
 SDL_Texture * Backend_Create_Texture_From_Surface(SDL_Surface * image)
 {
@@ -144,4 +145,8 @@ int Backend_Set_Clip(int x, int y, int w, int h)
 bool Backend_Has_Intersection(Backend_Rect r1, Backend_Rect r2)
 {
     return SDL_HasIntersection(&r1.r, &r2.r);
+}
+void Backend_Line(int x1, int y1, int x2, int y2, Backend_Color color)
+{
+    lineRGBA(renderer, x1, y1, x2, y2, color.r, color.g, color.b, color.a);
 }

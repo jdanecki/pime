@@ -10,10 +10,6 @@ class Element : public InventoryElement
     SerializablePointer<BaseElement> base;
 
   public:
-    Property length;
-    Property width;
-    Property height;
-    Property volume;     // lenght*width*height
     Property sharpness;  // ostrość
     Property smoothness; // gładkość
     Property mass;       // density*volume

@@ -5,7 +5,8 @@ test_sdl_sources = [
     '../SDL/text.cpp',
     '../client-common/alchemist2d.cpp',
     '../client-common/texture.cpp',
-    '../client-common/text.cpp'
+    '../client-common/text.cpp',
+    '../client-common/window.cpp'
 ]
 
 test_raylib_sources = [
@@ -15,7 +16,8 @@ test_raylib_sources = [
     '../raylib/text.cpp',
     '../client-common/alchemist2d.cpp',
     '../client-common/texture.cpp',
-    '../client-common/text.cpp'
+    '../client-common/text.cpp',
+    '../client-common/window.cpp'
 ]
 
 
@@ -25,7 +27,8 @@ test_sdl_textures_sources = [
     '../SDL/text.cpp',
     '../SDL/backend.cpp',
     '../client-common/texture.cpp',
-    '../client-common/text.cpp'
+    '../client-common/text.cpp',
+    '../client-common/window.cpp'
 ]    
 
 test_sdl_textures1_sources = [
@@ -34,7 +37,8 @@ test_sdl_textures1_sources = [
     '../SDL/text.cpp',
     '../SDL/backend.cpp',
     '../client-common/texture.cpp',
-    '../client-common/text.cpp'
+    '../client-common/text.cpp',
+    '../client-common/window.cpp'
 ]    
 
 
@@ -46,7 +50,7 @@ test_lists_sources = [
 test_generator_sdl_sources = [
   'test_generator_sdl.cpp',
   '../server/generator/generator.cpp',
-  '../server/generator/random_functions.cpp',
+  '../core/alchemist/random_functions.cpp',
   '../SDL/text.cpp',
   '../SDL/palette.cpp',
   '../client-common/text.cpp'
@@ -117,7 +121,12 @@ custom_target(
   command: ['ln', '-sf', meson.project_source_root() + '/assets/nerdfont.otf', '@OUTPUT@'],
   build_by_default: true,
 )
-
+custom_target(
+  'font_png_link',
+  output: 'font.png',
+  command: ['ln', '-sf', meson.project_source_root() + '/assets/font.png', '@OUTPUT@'],
+  build_by_default: true,
+)
 subdir('dialog')
 subdir('menu')
 subdir('server')

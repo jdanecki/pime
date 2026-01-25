@@ -12,6 +12,7 @@ void update_window_size();
 
 #define PANEL_WINDOW 540
 #define STATUS_LINES (2 * 32)
+
 extern int tile_size;
 extern float left_top_world_x;
 extern float left_top_world_y;

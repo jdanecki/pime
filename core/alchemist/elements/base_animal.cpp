@@ -3,12 +3,13 @@
 
 #include "base_animal.h"
 #include "../names.h"
+#include "alchemist/random_functions.h"
 
 BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(7))
 {
-    carnivorous = rand() % 2;
-    swimming = rand() % 2;
-    flying = rand() % 2;
+    carnivorous = random_range(0, 1);
+    swimming = random_range(0, 1);
+    flying = random_range(0, 1);
     edible.set_random();
 }
 

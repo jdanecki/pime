@@ -8,6 +8,7 @@ test_dialog_sdl_sources = [
     '../../client-common/alchemist2d.cpp',
     '../../client-common/texture.cpp',
     '../../client-common/text.cpp',
+    '../../client-common/window.cpp',
     '../../dialog/dialog.cpp',
     '../../dialog/d_craft.cpp',
     '../../dialog/d_action.cpp'
@@ -22,12 +23,13 @@ test_dialog_raylib_sources = [
     '../../client-common/alchemist2d.cpp',
     '../../client-common/texture.cpp',
     '../../client-common/text.cpp',
+    '../../client-common/window.cpp',
     '../../dialog/dialog.cpp',
     '../../dialog/d_craft.cpp',
     '../../dialog/d_action.cpp'
 ]
 
-executable('test__dialog_sdl', 
+executable('test_dialog_sdl', 
   sources: test_dialog_sdl_sources,
   dependencies: [sdl_deps],
   include_directories :  include_directories('../../SDL'),
@@ -58,4 +60,9 @@ custom_target(
   command: ['ln', '-sf', meson.project_source_root() + '/assets/nerdfont.otf', '@OUTPUT@'],
   build_by_default: true,
 )
-
+custom_target(
+  'font_png_link',
+  output: 'font.png',
+  command: ['ln', '-sf', meson.project_source_root() + '/assets/font.png', '@OUTPUT@'],
+  build_by_default: true,
+)

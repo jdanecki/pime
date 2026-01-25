@@ -4,7 +4,8 @@
 #include "../object.h"
 #include "../item_location.h"
 #include "types.h"
-#include "../properties.h"
+
+#include "dimensions.h"
 
 class Player;
 
@@ -12,7 +13,7 @@ class InventoryElement : public NetworkObject
 {
   public:
     ItemLocation location;
-
+    Dimensions dimensions;
     InventoryElement(Class_id c_id, size_t uid, ItemLocation location);
     InventoryElement(Class_id c_id, size_t uid);
     InventoryElement(Class_id c_id);
@@ -26,7 +27,7 @@ class InventoryElement : public NetworkObject
     virtual size_t get_id();
     virtual Class_id get_base_cid();
 
-    virtual bool check_rect(float px, float py, int size);
+    bool check_rect(InventoryElement * pl);
 
     virtual char * get_description();
     virtual Property ** get_properties(int * count);

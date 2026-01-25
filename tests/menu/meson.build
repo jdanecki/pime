@@ -8,6 +8,7 @@ test_menu_sdl_sources = [
     '../../client-common/player_actions.cpp',
     '../../client-common/texture.cpp',
     '../../client-common/text.cpp',
+    '../../client-common/window.cpp',
     '../../menu/menu.cpp',
 ]
 
@@ -21,6 +22,7 @@ test_menu_raylib_sources = [
     '../../client-common/player_actions.cpp',
     '../../client-common/texture.cpp',
     '../../client-common/text.cpp',
+    '../../client-common/window.cpp',
     '../../menu/menu.cpp'
 ]
 
@@ -50,9 +52,15 @@ custom_target(
 )
 
 custom_target(
-  'font_link',
+  'font_otf_link',
   output: 'nerdfont.otf',
   command: ['ln', '-sf', meson.project_source_root() + '/assets/nerdfont.otf', '@OUTPUT@'],
   build_by_default: true,
 )
 
+custom_target(
+  'font_png_link',
+  output: 'font.png',
+  command: ['ln', '-sf', meson.project_source_root() + '/assets/font.png', '@OUTPUT@'],
+  build_by_default: true,
+)

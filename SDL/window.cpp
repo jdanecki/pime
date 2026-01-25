@@ -13,10 +13,6 @@
 
 SDL_Renderer * renderer;
 SDL_Window * main_window;
-int window_width;
-int window_height;
-float left_top_world_x;
-float left_top_world_y;
 
 int init_window(const char * title, int wx, int wy)
 {
@@ -45,6 +41,7 @@ int init_window(const char * title, int wx, int wy)
     CONSOLE_LOG("window_width=%d window_height=%d\n", window_width, window_height);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_ShowWindow(main_window);
+    tile_size = 32;
 
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags))

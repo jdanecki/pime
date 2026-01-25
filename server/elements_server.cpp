@@ -1,4 +1,5 @@
 #include "elements_server.h"
+#include "../core/alchemist/random_functions.h"
 #include "networking.h"
 #include "world_server.h"
 #include "craft_ing.h"
@@ -20,13 +21,13 @@ AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
 {
     delay_for_move = max_delay_move;
     delay_for_grow = max_delay_grow;
-    dst_loc_x = rand() % CHUNK_SIZE;
-    dst_loc_y = rand() % CHUNK_SIZE;
-    max_age = new Property("max age", 1000 + rand() % 1000);
-    age = new Property("age", 10 + rand() % max_age->value);
-    size = 1.0 * age->value / max_age->value;
-    if (size < 0.2)
-        size = 0.2;
+    dst_loc_x = random_range(0, CHUNK_SIZE - 1);
+    dst_loc_y = random_range(0, CHUNK_SIZE - 1);
+    max_age = new Property("max age", 1000, 2000);
+    age = new Property("age", 10, max_age->value);
+    dimensions.width.value = 2.0 * age->value / max_age->value;
+    dimensions.height.value = 2.0 * age->value / max_age->value;
+    dimensions.volume.value = dimensions.width.value * dimensions.height.value * dimensions.length.value;
 }
 
 bool AnimalServer::action(Product_action action, Player * pl)
@@ -85,7 +86,9 @@ bool AnimalServer::grow()
     }
     else
     {
-        size = 1.0 * age->value / max_age->value;
+        dimensions.width.value = 2.0 * age->value / max_age->value;
+        dimensions.height.value = 2.0 * age->value / max_age->value;
+        dimensions.volume.value = dimensions.width.value * dimensions.height.value * dimensions.length.value;
         notify_update(this);
         //  CONSOLE_LOG("%s:%s growing size=%f %d/%d \n", get_class_name(), get_name(), size, age->value, max_age->value);
     }
@@ -103,21 +106,21 @@ void AnimalServer::move()
     int _x = location.chunk.x;
     int _y = location.chunk.y;
 
-    if ((_x == dst_loc_x && _y == dst_loc_y) /*|| (rand() % 5 ==1)*/)
+    if ((_x == dst_loc_x && _y == dst_loc_y) || (random_range(0, 5) == 1))
     {
-        dst_loc_x = rand() % CHUNK_SIZE;
-        dst_loc_y = rand() % CHUNK_SIZE;
+        dst_loc_x = random_range(0, CHUNK_SIZE - 1);
+        dst_loc_y = random_range(0, CHUNK_SIZE - 1);
     }
     else
     {
-        if (rand() % 2)
+        if (random_range(0, 1))
         {
             if (_x < dst_loc_x)
                 _x++;
             else
                 _x--;
         }
-        if (rand() % 2)
+        if (random_range(0, 1))
         {
             if (_y < dst_loc_y)
                 _y++;
@@ -201,22 +204,22 @@ void PlantServer::set_phase(Plant_phase p)
     {
         case Plant_seedling:
             age->value = seedling_time;
-            size = 0.2;
             break;
         case Plant_growing:
             age->value = growing_time;
-            size = 1.0 * age->value / max_age->value;
             break;
         case Plant_flowers:
             age->value = flowers_time;
-            size = 1.0;
             break;
         case Plant_fruits:
             age->value = max_age->value;
             grown = true;
-            size = 1.0;
             break;
     }
+    dimensions.width.value = 2.0 * age->value / max_age->value;
+    dimensions.height.value = 2.0 * age->value / max_age->value;
+    dimensions.volume.value = dimensions.width.value * dimensions.height.value * dimensions.length.value;
+    notify_update(this);
 }
 
 bool PlantServer::grow()
@@ -236,8 +239,10 @@ bool PlantServer::grow()
     // water--;
 
     age->value++;
-    size = 1.0 * age->value / max_age->value;
-
+    dimensions.width.value = 2.0 * age->value / max_age->value;
+    dimensions.height.value = 2.0 * age->value / max_age->value;
+    dimensions.volume.value = dimensions.width.value * dimensions.height.value * dimensions.length.value;
+    notify_update(this);
     /*CONSOLE_LOG("PlantServer:%s growing %d/%d phase=%s grown=%d times=%d/%d/%d/ size=%f\n", get_name(),
         age->value, max_age->value, plant_phase_name[phase], grown,
         seedling_time, growing_time, flowers_time, size);
@@ -365,13 +370,7 @@ ScrollServer * create_scroll(Base * base)
 
 ElementServer::ElementServer(BaseElement * b) : Element(b)
 {
-    if (b->form == Form_solid)
-    {
-        sharpness.value = rand() % 100;
-        smoothness.value = rand() % 100;
-    }
 }
-
 bool ElementServer::action(Product_action action, Player * pl)
 {
     CONSOLE_LOG("ELEMENT_SERVER: %s %s\n", product_action_name[action], get_name());
@@ -386,7 +385,7 @@ bool ElementServer::action(Product_action action, Player * pl)
             res = action_hit();
             break;
     }
-    if (volume.value < 1)
+    if (dimensions.volume.value < 1)
     {
         destroy(this);
     }
@@ -404,8 +403,8 @@ bool ElementServer::action_cut()
     {
         //    if (b->solid->hardness < 50)
         {
-            volume.value = length.decrease(1) * width.decrease(1) * height.decrease(1);
-            mass.value = b->density.value * volume.value / 1000;
+            dimensions.volume.value = dimensions.length.decrease(1) * dimensions.width.decrease(1) * dimensions.height.decrease(1);
+            mass.value = b->density.value * dimensions.volume.value / 1000;
         }
 
         return true;
@@ -420,8 +419,8 @@ bool ElementServer::action_hit()
     {
         //    if (b->solid->hardness < 50)
         {
-            volume.value = length.decrease(3) * width.decrease(3) * height.decrease(3);
-            mass.value = b->density.value * volume.value / 1000;
+            dimensions.volume.value = dimensions.length.decrease(3) * dimensions.width.decrease(3) * dimensions.height.decrease(3);
+            mass.value = b->density.value * dimensions.volume.value / 1000;
         }
 
         return true;
@@ -453,7 +452,7 @@ bool ElementServer::player_action(Player_action action, Player * pl)
             break;
     }
 
-    if (volume.value < 1)
+    if (dimensions.volume.value < 1)
     {
         destroy(this);
     }
@@ -471,8 +470,8 @@ bool ElementServer::action_drink()
     {
         //    if (b->solid->hardness < 50)
         {
-            volume.value = length.decrease(2) * width.decrease(2) * height.decrease(2);
-            mass.value = b->density.value * volume.value / 1000;
+            dimensions.volume.value = dimensions.length.decrease(2) * dimensions.width.decrease(2) * dimensions.height.decrease(2);
+            mass.value = b->density.value * dimensions.volume.value / 1000;
             CONSOLE_LOG("drunk %s\n", get_name());
         }
         return true;
@@ -489,8 +488,8 @@ bool ElementServer::action_eat()
     {
         //    if (b->solid->hardness < 50)
         {
-            volume.value = length.decrease(4) * width.decrease(4) * height.decrease(4);
-            mass.value = b->density.value * volume.value / 1000;
+            dimensions.volume.value = dimensions.length.decrease(4) * dimensions.width.decrease(4) * dimensions.height.decrease(4);
+            mass.value = b->density.value * dimensions.volume.value / 1000;
             CONSOLE_LOG("ate %s\n", get_name());
         }
         return true;

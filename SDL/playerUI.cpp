@@ -16,15 +16,9 @@ PlayerUI::PlayerUI(Player data) : Player(data)
     }
 }
 
-void PlayerUI::render(int x, int y)
-{
-    flip = !going_right;
-    Renderable::render(x, y);
-}
-
 void PlayerUI::update_item_location(ItemLocation & old_loc, ItemLocation & new_loc)
 {
-    going_right = (old_loc.chunk.x < new_loc.chunk.x) ? true : false;
+    flip = old_loc.chunk.x < new_loc.chunk.x;
 }
 
 void update_hotbar()

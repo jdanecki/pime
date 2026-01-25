@@ -154,3 +154,8 @@ bool Backend_Has_Intersection(Backend_Rect r1, Backend_Rect r2)
 {
     return CheckCollisionRecs(r1.r, r2.r);
 }
+
+void Backend_Line(int x1, int y1, int x2, int y2, Backend_Color color)
+{
+    DrawLine(x1, y1, x2, y2, color);
+}
