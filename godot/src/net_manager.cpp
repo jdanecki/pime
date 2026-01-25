@@ -34,7 +34,8 @@ void NetManager::_ready()
     if (!Engine::get_singleton()->is_editor_hint())
     {
         // FIXME when init_networking is fixed
-        ip = "192.168.0.3";
+        ip = "127.0.0.1";
+        // ip = "192.168.0.3";
         port = "1234";
         if (init_networking(/*"127.0.0.1", "1234"*/))
         {
@@ -212,14 +213,22 @@ void update_item_location(LocationUpdateData data)
         UtilityFunctions::print("INVALID");
         return;
     }
+    if (data.old.tag == ItemLocation::Tag::Player)
+    {
+        node->set_visible(true);
+        Player* p = (Player*)get_object_by_id(NetworkObject(Class_Player, data.old.player.id));
+        p->drop(el);
+        
+    }
     if (data.new_.tag == ItemLocation::Tag::Player)
     {
         node->set_visible(false);
+        Player* p = (Player*)get_object_by_id(NetworkObject(Class_Player, data.new_.player.id));
+        p->pickup(el);
         // TODO
     }
     else
     {
-        node->set_visible(true);
         node->set_position(Vector3(data.new_.get_world_x() / 32.0, 1, data.new_.get_world_y() / 32.0));
     }
 }

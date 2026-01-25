@@ -41,19 +41,19 @@ func _ready():
 func foo():
 	make_current()
 	
-# var boo = false;
+var is_current = false;
 
 func _input(event):
 	# Receives mouse motion
 	if event is InputEventMouseMotion:
 		_mouse_position = event.relative
 		
-	#if event.is_action_pressed("boo"):
-		#boo = !boo
-		#if boo:
-			#foo()
-		#else:
-			#$"../Player/Camera3D".make_current()
+	if event.is_action_pressed("toggle_camera"):
+		is_current = !is_current
+		if is_current:
+			make_current()
+		else:
+			get_node("../NetManager/MainPlayer/Camera3D").make_current()
 		
 	
 	# Receives mouse button input

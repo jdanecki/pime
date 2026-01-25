@@ -3,6 +3,7 @@
 
 #include "godot_cpp/classes/mesh_instance3d.hpp"
 #include <godot_cpp/classes/node3d.hpp>
+#include <godot_cpp/classes/static_body3d.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 #include "../../core/alchemist/elements.h"
@@ -10,9 +11,9 @@
 namespace godot
 {
 
-class ElementGodot : public Node3D, public Element
+class ElementGodot : public StaticBody3D, public Element
 {
-    GDCLASS(ElementGodot, Node3D)
+    GDCLASS(ElementGodot, StaticBody3D)
     MeshInstance3D * mesh;
 
   public:

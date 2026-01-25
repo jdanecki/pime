@@ -1,6 +1,8 @@
 #include "element_godot.h"
 #include "godot_cpp/classes/box_mesh.hpp"
+#include "godot_cpp/classes/box_shape3d.hpp"
 #include "godot_cpp/classes/material.hpp"
+#include "godot_cpp/classes/collision_shape3d.hpp"
 #include "godot_cpp/classes/mesh_instance3d.hpp"
 #include "godot_cpp/classes/standard_material3d.hpp"
 #include "godot_cpp/core/memory.hpp"
@@ -36,4 +38,10 @@ void ElementGodot::_ready()
     mesh = memnew(MeshInstance3D);
     mesh->set_mesh(box);
     add_child(mesh);
+
+    Ref<BoxShape3D> shape = memnew(BoxShape3D);
+    shape->set_size(box->get_size());
+    CollisionShape3D* collision = memnew(CollisionShape3D);
+    collision->set_shape(shape);
+    add_child(collision);
 }
