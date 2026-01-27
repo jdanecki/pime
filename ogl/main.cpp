@@ -96,11 +96,8 @@ void generate_cube_vertices(Vertex * vertices, float tx, float ty, float tz)
 
 GLuint vbo = 0;
 
-void place_cube(float tx, float ty, float tz, GLuint texture, int r, int g, int b)
+void place_thing(GLuint texture, int r, int g, int b, Vertex * vertices, size_t vert_count)
 {
-    Vertex vertices[36];
-    generate_cube_vertices(vertices, tx, ty, tz);
-
     glBindTexture(GL_TEXTURE_2D, texture);
     glColor3f((double)r / 255, (double)g / 255, (double)b / 255);
 
@@ -112,10 +109,30 @@ void place_cube(float tx, float ty, float tz, GLuint texture, int r, int g, int 
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &vertices[0].u);
 
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArrays(GL_TRIANGLES, 0, vert_count);
 
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+void place_plane(float tx, float ty, float tz, GLuint texture, int r, int g, int b)
+{
+    Vertex vertices[6];
+    int idx = 0;
+    vertices[idx++] = (Vertex){tx - 0.5f, ty + 0.5f, tz + 0.5f, 0, 1, 0, 0, 0};
+    vertices[idx++] = (Vertex){tx + 0.5f, ty + 0.5f, tz + 0.5f, 0, 1, 0, 1, 0};
+    vertices[idx++] = (Vertex){tx + 0.5f, ty + 0.5f, tz - 0.5f, 0, 1, 0, 1, 1};
+    vertices[idx++] = (Vertex){tx + 0.5f, ty + 0.5f, tz - 0.5f, 0, 1, 0, 1, 1};
+    vertices[idx++] = (Vertex){tx - 0.5f, ty + 0.5f, tz - 0.5f, 0, 1, 0, 0, 1};
+    vertices[idx++] = (Vertex){tx - 0.5f, ty + 0.5f, tz + 0.5f, 0, 1, 0, 0, 0};
+    place_thing(texture, r, g, b, vertices, 6);
+}
+
+void place_cube(float tx, float ty, float tz, GLuint texture, int r, int g, int b)
+{
+    Vertex vertices[36];
+    generate_cube_vertices(vertices, tx, ty, tz);
+    place_thing(texture, r, g, b, vertices, 36);
 }
 
 void print_status(int, char const *, ...) {};
@@ -402,9 +419,9 @@ int main(void)
         int chunk_z = cam_z / CHUNK_SIZE;
         printf("cam_x=%f cam_x=%f chunk_x=%d chunk_z=%d\n", cam_x, cam_z, chunk_x, chunk_z);
 
-        for (int chi = chunk_x - 1; chi <= chunk_x + 1; chi++)
+        for (int chi = chunk_x - 2; chi <= chunk_x + 2; chi++)
         {
-            for (int chj = chunk_z - 1; chj <= chunk_z + 1; chj++)
+            for (int chj = chunk_z - 2; chj <= chunk_z + 2; chj++)
             {
                 if (chunk * ch = check_chunk(chi, chj))
                 {
@@ -416,7 +433,7 @@ int main(void)
                         for (int j = 0; j < CHUNK_SIZE; j++)
                         {
                             BaseElement * be = get_base_element(ch->table[j][i].tile);
-                            place_cube(base_x + i, 0, base_z + j, ch->table[j][i].tile % 15 + 1, be->color.r, be->color.g, be->color.b);
+                            place_plane(base_x + i, 0, base_z + j, ch->table[j][i].tile % 15 + 1, be->color.r, be->color.g, be->color.b);
                         }
                     }
                 }
