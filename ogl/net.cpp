@@ -43,8 +43,8 @@ void update_item_location(LocationUpdateData data)
     // printf("update_item_location uid=%lu\n", data.id.uid);
     if (data.id.uid == my_id)
     {
-        cam_x = data.new_.get_world_x();
-        cam_z = data.new_.get_world_y();
+        cam.x = data.new_.get_world_x();
+        cam.z = data.new_.get_world_y();
         // printf("FROM SERVER: %f, %f\n", cam_x, cam_z);
         // data.new_.show();
     }

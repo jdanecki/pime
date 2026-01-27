@@ -5,34 +5,17 @@
 #include "../client-common/net.h"
 #include "main.h"
 
-// FIXME: cleanup globals (put into structs?)
 OGL_Chunk * ogl_tiles[WORLD_SIZE][WORLD_SIZE];
 
-float cam_x = 128 * CHUNK_SIZE + 8;
-float cam_y = 8;
-float cam_z = 128 * CHUNK_SIZE + 8;
+OGL_Camera cam;
 
-float cam_x_lt = cam_x;
-float cam_z_lt = cam_z;
+float cam_x_lt = cam.x;
+float cam_z_lt = cam.z;
 
-float pitch = 0.0f;
-float yaw = 0.0f;
 SDL_Window * window;
 SDL_GLContext ctx;
 
 size_t my_id;
-
-static void load_perspective(float fovy_deg, float aspect, float znear, float zfar)
-{
-    float fovy = fovy_deg * (float)M_PI / 180.0f;
-    float f = 1.0f / tanf(fovy * 0.5f);
-    float nf = 1.0f / (znear - zfar);
-
-    // Column-major order for glMultMatrixf (OpenGL expects column-major)
-    float m[16] = {f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (zfar + znear) * nf, -1, 0, 0, (2.0f * zfar * znear) * nf, 0};
-
-    glMultMatrixf(m);
-}
 
 void print_status(int, char const *, ...) {};
 int CONSOLE_LOG(const char * fmt, ...)
@@ -43,6 +26,7 @@ int CONSOLE_LOG(const char * fmt, ...)
     va_end(args);
     return 0;
 };
+
 void update_hotbar() {};
 
 void get_forward_vector(float yaw, float * x, float * z)
@@ -112,12 +96,12 @@ void handle_events()
     {
         if (e.type == SDL_EVENT_MOUSE_MOTION)
         {
-            yaw -= e.motion.xrel * 0.5f;
-            pitch -= e.motion.yrel * 0.5f;
-            if (pitch > 90)
-                pitch = 90;
-            if (pitch < -90)
-                pitch = -90;
+            cam.yaw -= e.motion.xrel * 0.5f;
+            cam.pitch -= e.motion.yrel * 0.5f;
+            if (cam.pitch > 90)
+                cam.pitch = 90;
+            if (cam.pitch < -90)
+                cam.pitch = -90;
         }
         if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.button == 1)
             SDL_SetWindowRelativeMouseMode(window, true);
@@ -146,44 +130,44 @@ void handle_keyboard_state()
     if (keyboard_state[SDL_SCANCODE_LCTRL])
         speed_multi = 1.0f;
 
-    cam_x_lt = cam_x;
-    cam_z_lt = cam_z;
+    cam_x_lt = cam.x;
+    cam_z_lt = cam.z;
 
     if (keyboard_state[SDL_SCANCODE_SPACE])
-        cam_y += speed_multi;
+        cam.y += speed_multi;
     if (keyboard_state[SDL_SCANCODE_LSHIFT])
-        cam_y -= speed_multi;
+        cam.y -= speed_multi;
     if (keyboard_state[SDL_SCANCODE_A])
     {
         float x, z;
-        get_forward_vector(yaw, &x, &z);
-        cam_x += z * speed_multi;
-        cam_z -= x * speed_multi;
+        get_forward_vector(cam.yaw, &x, &z);
+        cam.x += z * speed_multi;
+        cam.z -= x * speed_multi;
     }
     if (keyboard_state[SDL_SCANCODE_D])
     {
         float x, z;
-        get_forward_vector(yaw, &x, &z);
-        cam_x -= z * speed_multi;
-        cam_z += x * speed_multi;
+        get_forward_vector(cam.yaw, &x, &z);
+        cam.x -= z * speed_multi;
+        cam.z += x * speed_multi;
     }
     if (keyboard_state[SDL_SCANCODE_W])
     {
         float x, z;
-        get_forward_vector(yaw, &x, &z);
-        cam_x += x * speed_multi;
-        cam_z += z * speed_multi;
+        get_forward_vector(cam.yaw, &x, &z);
+        cam.x += x * speed_multi;
+        cam.z += z * speed_multi;
     }
     if (keyboard_state[SDL_SCANCODE_S])
     {
         float x, z;
-        get_forward_vector(yaw, &x, &z);
-        cam_x -= x * speed_multi;
-        cam_z -= z * speed_multi;
+        get_forward_vector(cam.yaw, &x, &z);
+        cam.x -= x * speed_multi;
+        cam.z -= z * speed_multi;
     }
 
-    if (abs(cam_x - cam_x_lt) || abs(cam_x - cam_x_lt))
-        send_packet_move(cam_x - cam_x_lt, cam_z - cam_z_lt);
+    if (abs(cam.x - cam_x_lt) || abs(cam.x - cam_x_lt))
+        send_packet_move(cam.x - cam_x_lt, cam.z - cam_z_lt);
 }
 
 void init_ogl()
@@ -239,26 +223,13 @@ void load_textures()
 
 void draw()
 {
-    int w, h;
-    SDL_GetWindowSize(window, &w, &h);
-    glViewport(0, 0, w, (h > 0 ? h : 1));
+    cam.begin_camera(window);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    load_perspective(90.0f, (float)w / (float)(h > 0 ? h : 1), 0.1f, 200.0f);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glRotatef(-pitch, 1.0f, 0.0f, 0.0f);
-    glRotatef(-yaw, 0.0f, 1.0f, 0.0f);
-    glTranslatef(-cam_x, -cam_y, -cam_z);
-
     glEnable(GL_TEXTURE_2D);
 
-    int chunk_x = cam_x / CHUNK_SIZE;
-    int chunk_z = cam_z / CHUNK_SIZE;
+    int chunk_x = cam.x / CHUNK_SIZE;
+    int chunk_z = cam.z / CHUNK_SIZE;
     // printf("cam_x=%f cam_x=%f chunk_x=%d chunk_z=%d\n", cam_x, cam_z, chunk_x, chunk_z);
 
     for (int chi = chunk_x - 2; chi <= chunk_x + 2; chi++)
@@ -313,13 +284,16 @@ void init_sdl()
         CONSOLE_LOG("Problem with SDL window creation\n");
         exit(2);
     }
+    SDL_SetWindowRelativeMouseMode(window, true);
 }
+
 void init_world_table()
 {
     for (int i = 0; i < WORLD_SIZE; i++)
         for (int j = 0; j < WORLD_SIZE; j++)
             world_table[i][j] = NULL;
 }
+
 int main(int argc, char * argv[])
 {
     SDL_Init(SDL_INIT_VIDEO);
