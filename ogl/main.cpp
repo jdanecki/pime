@@ -1,13 +1,7 @@
-#include <GL/gl.h>
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
 #include <cmath>
-#include <cstddef>
 #include <cstdio>
-#include <cstdlib>
 #include <dirent.h>
-#include <math.h>
-#include <stdbool.h>
 #include "../client-common/net.h"
 #include "main.h"
 
