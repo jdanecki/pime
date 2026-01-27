@@ -424,7 +424,14 @@ int main(void)
         {
             for (int chj = chunk_z - 2; chj <= chunk_z + 2; chj++)
             {
-                if (chunk * ch = check_chunk(chi, chj))
+                check_chunk(chi, chj);
+            }
+        }
+        for (int chi = chunk_x - 10; chi <= chunk_x + 10; chi++)
+        {
+            for (int chj = chunk_z - 10; chj <= chunk_z + 10; chj++)
+            {
+                if (chunk * ch = world_table[chj][chi])
                 {
                     int base_x = (chi)*CHUNK_SIZE;
                     int base_z = (chj)*CHUNK_SIZE;
@@ -434,7 +441,10 @@ int main(void)
                         for (int j = 0; j < CHUNK_SIZE; j++)
                         {
                             BaseElement * be = get_base_element(ch->table[j][i].tile);
-                            place_plane(base_x + i, 0, base_z + j, ch->table[j][i].tile % 15 + 1, be->color.r, be->color.g, be->color.b);
+                            if (abs(chi - chunk_x) < 4 && abs(chj - chunk_z) < 4)
+                                place_plane(base_x + i, 0, base_z + j, ch->table[j][i].tile % 15 + 1, be->color.r, be->color.g, be->color.b);
+                            else
+                                place_plane(base_x + i, 0, base_z + j, 0, be->color.r - 100, be->color.g - 100, be->color.b - 100);
                         }
                     }
                 }
