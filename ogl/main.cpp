@@ -14,6 +14,12 @@ PFNGLBINDBUFFERPROC glBindBuffer = NULL;
 PFNGLGENBUFFERSPROC glGenBuffers = NULL;
 PFNGLBUFFERDATAPROC glBufferData = NULL;
 
+float cam_x = 128 * CHUNK_SIZE + 8;
+float cam_y = 8;
+float cam_z = 128 * CHUNK_SIZE + 8;
+
+size_t my_id;
+
 static void load_perspective(float fovy_deg, float aspect, float znear, float zfar)
 {
     float fovy = fovy_deg * (float)M_PI / 180.0f;
@@ -122,7 +128,6 @@ int CONSOLE_LOG(const char * fmt, ...)
     return 0;
 };
 void update_hotbar() {};
-void got_id(unsigned long, long) {};
 
 void get_forward_vector(float yaw, float * x, float * z)
 {
@@ -173,7 +178,7 @@ chunk * check_chunk(int cx, int cy)
         }
         else
         {
-            CONSOLE_LOG("waiting for chunk %d %d\n", cx, cy);
+            // CONSOLE_LOG("waiting for chunk %d %d\n", cx, cy);
             return nullptr;
         }
     }
@@ -189,6 +194,7 @@ int main(void)
     SDL_Init(SDL_INIT_VIDEO);
     port = "1234";
     ip = "127.0.0.1";
+    // ip = "192.168.0.3";
 
     if (!init_networking())
     {
@@ -252,13 +258,6 @@ int main(void)
     bool running = true;
     SDL_Event e;
 
-    float cam_x = -8.0f;
-    float cam_y = 0.0f;
-    float cam_z = -8.0f;
-
-    int servx = 0;
-    int servy = 0;
-
     float cam_x_lt = cam_x;
     float cam_z_lt = cam_z;
 
@@ -281,7 +280,7 @@ int main(void)
     for (int i = 0; i < 100; i++)
         for (int j = 0; j < 100; j++)
         {
-            generate_cube_vertices(&all_vertices[idx], j, -4, i);
+            generate_cube_vertices(&all_vertices[idx], j + 125 * CHUNK_SIZE, -4, i + 125 * CHUNK_SIZE);
             idx += 36;
         }
 
@@ -363,19 +362,8 @@ int main(void)
             cam_z -= z * speed_multi;
         }
 
-        {
-            int camx = std::round(cam_x);
-            int camxlt = std::round(cam_x_lt);
-            int camz = std::round(cam_z);
-            int camzlt = std::round(cam_z_lt);
-            if (camx != camxlt || camz != camzlt)
-            {
-                send_packet_move(camx - camxlt, camz - camzlt);
-                servx += camx - camxlt;
-                servy += camz - camzlt;
-                printf("%f %d %f %d\n", cam_x, servx, cam_z, servy);
-            }
-        }
+        if (abs(cam_x - cam_x_lt) || abs(cam_x - cam_x_lt))
+            send_packet_move(cam_x - cam_x_lt, cam_z - cam_z_lt);
 
         int w, h;
         SDL_GetWindowSize(win, &w, &h);
@@ -410,25 +398,23 @@ int main(void)
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
 
-        // Render chunk tiles
-        int chunk_x = (int)floor(cam_x / CHUNK_SIZE) + 128;
-        int chunk_z = (int)floor(cam_z / CHUNK_SIZE) + 128;
+        int chunk_x = cam_x / CHUNK_SIZE;
+        int chunk_z = cam_z / CHUNK_SIZE;
+        printf("cam_x=%f cam_x=%f chunk_x=%d chunk_z=%d\n", cam_x, cam_z, chunk_x, chunk_z);
 
-        for (int chi = chunk_x - 5; chi < chunk_x + 5; chi++)
+        for (int chi = chunk_x - 1; chi <= chunk_x + 1; chi++)
         {
-            for (int chj = chunk_z - 5; chj < chunk_x + 5; chj++)
+            for (int chj = chunk_z - 1; chj <= chunk_z + 1; chj++)
             {
-                printf("%d, %d\n", chi, chj);
                 if (chunk * ch = check_chunk(chi, chj))
                 {
-                    int base_x = (chi - 128) * CHUNK_SIZE;
-                    int base_z = (chj - 128) * CHUNK_SIZE;
+                    int base_x = (chi)*CHUNK_SIZE;
+                    int base_z = (chj)*CHUNK_SIZE;
 
                     for (int i = 0; i < CHUNK_SIZE; i++)
                     {
                         for (int j = 0; j < CHUNK_SIZE; j++)
                         {
-                            printf("%d, %d\n", base_x + i, base_x + j);
                             BaseElement * be = get_base_element(ch->table[j][i].tile);
                             place_cube(base_x + i, 0, base_z + j, ch->table[j][i].tile % 15 + 1, be->color.r, be->color.g, be->color.b);
                         }
