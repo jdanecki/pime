@@ -3,10 +3,6 @@
 #include <GL/gl.h>
 void place_cube(float tx, float ty, float tz);
 
-extern PFNGLBINDBUFFERPROC glBindBuffer;
-extern PFNGLGENBUFFERSPROC glGenBuffers;
-extern PFNGLBUFFERDATAPROC glBufferData;
-
 typedef struct Vertex
 {
     float x, y, z;
@@ -35,8 +31,6 @@ typedef struct OGL_Plane
     {
         glBindTexture(GL_TEXTURE_2D, texture);
         glColor3f((double)r / 255, (double)g / 255, (double)b / 255);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &vertices[0].x);

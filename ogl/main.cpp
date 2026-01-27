@@ -11,15 +11,20 @@
 #include "../client-common/net.h"
 #include "main.h"
 
-PFNGLBINDBUFFERPROC glBindBuffer = NULL;
-PFNGLGENBUFFERSPROC glGenBuffers = NULL;
-PFNGLBUFFERDATAPROC glBufferData = NULL;
-
+// FIXME: cleanup globals (put into structs?)
 OGL_Chunk * ogl_tiles[WORLD_SIZE][WORLD_SIZE];
 
 float cam_x = 128 * CHUNK_SIZE + 8;
 float cam_y = 8;
 float cam_z = 128 * CHUNK_SIZE + 8;
+
+float cam_x_lt = cam_x;
+float cam_z_lt = cam_z;
+
+float pitch = 0.0f;
+float yaw = 0.0f;
+SDL_Window * window;
+SDL_GLContext ctx;
 
 size_t my_id;
 
@@ -106,49 +111,113 @@ chunk * check_chunk(int cx, int cy)
     return ch;
 }
 
-int main(void)
+void handle_events()
 {
-    SDL_Init(SDL_INIT_VIDEO);
-    port = "1234";
-    ip = "127.0.0.1";
-    // ip = "192.168.0.3";
-
-    if (!init_networking())
+    SDL_Event e;
+    while (SDL_PollEvent(&e))
     {
-        CONSOLE_LOG("Problem with server connection\n");
-        return 1;
+        if (e.type == SDL_EVENT_MOUSE_MOTION)
+        {
+            yaw -= e.motion.xrel * 0.5f;
+            pitch -= e.motion.yrel * 0.5f;
+            if (pitch > 90)
+                pitch = 90;
+            if (pitch < -90)
+                pitch = -90;
+        }
+        if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.button == 1)
+            SDL_SetWindowRelativeMouseMode(window, true);
+        if (e.type == SDL_EVENT_QUIT || e.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
+        {
+            disconnect();
+            exit(0);
+        }
+        if (e.type == SDL_EVENT_WINDOW_RESIZED)
+        {
+            int w = e.window.data1, h = e.window.data2;
+            glViewport(0, 0, w, (h > 0 ? h : 1));
+        }
+        if (e.type == SDL_EVENT_KEY_DOWN)
+        {
+            if (e.key.scancode == SDL_SCANCODE_ESCAPE)
+                SDL_SetWindowRelativeMouseMode(window, false);
+        }
+    }
+}
+
+void handle_keyboard_state()
+{
+    const bool * keyboard_state = SDL_GetKeyboardState(NULL);
+    float speed_multi = 0.1f;
+    if (keyboard_state[SDL_SCANCODE_LCTRL])
+        speed_multi = 1.0f;
+
+    cam_x_lt = cam_x;
+    cam_z_lt = cam_z;
+
+    if (keyboard_state[SDL_SCANCODE_SPACE])
+        cam_y += speed_multi;
+    if (keyboard_state[SDL_SCANCODE_LSHIFT])
+        cam_y -= speed_multi;
+    if (keyboard_state[SDL_SCANCODE_A])
+    {
+        float x, z;
+        get_forward_vector(yaw, &x, &z);
+        cam_x += z * speed_multi;
+        cam_z -= x * speed_multi;
+    }
+    if (keyboard_state[SDL_SCANCODE_D])
+    {
+        float x, z;
+        get_forward_vector(yaw, &x, &z);
+        cam_x -= z * speed_multi;
+        cam_z += x * speed_multi;
+    }
+    if (keyboard_state[SDL_SCANCODE_W])
+    {
+        float x, z;
+        get_forward_vector(yaw, &x, &z);
+        cam_x += x * speed_multi;
+        cam_z += z * speed_multi;
+    }
+    if (keyboard_state[SDL_SCANCODE_S])
+    {
+        float x, z;
+        get_forward_vector(yaw, &x, &z);
+        cam_x -= x * speed_multi;
+        cam_z -= z * speed_multi;
     }
 
-    for (int i = 0; i < WORLD_SIZE; i++)
-        for (int j = 0; j < WORLD_SIZE; j++)
-            world_table[i][j] = NULL;
+    if (abs(cam_x - cam_x_lt) || abs(cam_x - cam_x_lt))
+        send_packet_move(cam_x - cam_x_lt, cam_z - cam_z_lt);
+}
 
-    SDL_Window * win = SDL_CreateWindow("SDL3 OPENGL", 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-    if (!win)
-    {
-        CONSOLE_LOG("Problem with SDL window creation\n");
-        return 2;
-    }
-
+void init_ogl()
+{
     SDL_GL_LoadLibrary(NULL);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-    SDL_GLContext ctx = SDL_GL_CreateContext(win);
-    SDL_GL_MakeCurrent(win, ctx);
+    ctx = SDL_GL_CreateContext(window);
+    SDL_GL_MakeCurrent(window, ctx);
     SDL_GL_SetSwapInterval(-1);
     if (!ctx)
-        return 3;
+        exit(3);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+}
 
+void load_textures()
+{
     DIR * dir = opendir("./textures/game_tiles");
     if (dir == NULL)
     {
         perror("Can't open textures directory");
-        return 4;
+        exit(4);
     }
     closedir(dir);
 
@@ -172,147 +241,84 @@ int main(void)
         }
         free(namelist);
     }
+}
 
-    bool running = true;
-    SDL_Event e;
+void draw()
+{
+    int w, h;
+    SDL_GetWindowSize(window, &w, &h);
+    glViewport(0, 0, w, (h > 0 ? h : 1));
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    float cam_x_lt = cam_x;
-    float cam_z_lt = cam_z;
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    load_perspective(90.0f, (float)w / (float)(h > 0 ? h : 1), 0.1f, 200.0f);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
-    float pitch = 0.0f;
-    float yaw = 0.0f;
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    glRotatef(-pitch, 1.0f, 0.0f, 0.0f);
+    glRotatef(-yaw, 0.0f, 1.0f, 0.0f);
+    glTranslatef(-cam_x, -cam_y, -cam_z);
 
-    glBindBuffer = (PFNGLBINDBUFFERPROC)SDL_GL_GetProcAddress("glBindBuffer");
-    glGenBuffers = (PFNGLGENBUFFERSPROC)SDL_GL_GetProcAddress("glGenBuffers");
-    glBufferData = (PFNGLBUFFERDATAPROC)SDL_GL_GetProcAddress("glBufferData");
-    if (!glBindBuffer || !glGenBuffers || !glBufferData)
+    glEnable(GL_TEXTURE_2D);
+
+    int chunk_x = cam_x / CHUNK_SIZE;
+    int chunk_z = cam_z / CHUNK_SIZE;
+    // printf("cam_x=%f cam_x=%f chunk_x=%d chunk_z=%d\n", cam_x, cam_z, chunk_x, chunk_z);
+
+    for (int chi = chunk_x - 2; chi <= chunk_x + 2; chi++)
     {
-        CONSOLE_LOG("Failed to load OpenGL functions!\n");
-        return 5;
+        for (int chj = chunk_z - 2; chj <= chunk_z + 2; chj++)
+        {
+            check_chunk(chi, chj);
+        }
+    }
+    for (int chi = chunk_x - 10; chi <= chunk_x + 10; chi++)
+    {
+        for (int chj = chunk_z - 10; chj <= chunk_z + 10; chj++)
+        {
+            if (OGL_Chunk * ch = ogl_tiles[chj][chi])
+            {
+                ch->render();
+            }
+        }
     }
 
-    while (running)
+    glDisable(GL_TEXTURE_2D);
+    SDL_GL_SwapWindow(window);
+}
+
+int main(void)
+{
+    SDL_Init(SDL_INIT_VIDEO);
+    port = "1234";
+    ip = "127.0.0.1";
+
+    if (!init_networking())
+    {
+        CONSOLE_LOG("Problem with server connection\n");
+        return 1;
+    }
+
+    for (int i = 0; i < WORLD_SIZE; i++)
+        for (int j = 0; j < WORLD_SIZE; j++)
+            world_table[i][j] = NULL;
+
+    window = SDL_CreateWindow("pime_ogl", 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    if (!window)
+    {
+        CONSOLE_LOG("Problem with SDL window creation\n");
+        return 2;
+    }
+    init_ogl();
+    load_textures();
+
+    for (;;)
     {
         network_tick();
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_EVENT_MOUSE_MOTION)
-            {
-                yaw -= e.motion.xrel * 0.5f;
-                pitch -= e.motion.yrel * 0.5f;
-                if (pitch > 90)
-                    pitch = 90;
-                if (pitch < -90)
-                    pitch = -90;
-            }
-            if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.button == 1)
-                SDL_SetWindowRelativeMouseMode(win, true);
-            if (e.type == SDL_EVENT_QUIT || e.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
-            {
-                running = false;
-            }
-            if (e.type == SDL_EVENT_WINDOW_RESIZED)
-            {
-                int w = e.window.data1, h = e.window.data2;
-                glViewport(0, 0, w, (h > 0 ? h : 1));
-            }
-            if (e.type == SDL_EVENT_KEY_DOWN)
-            {
-                if (e.key.scancode == SDL_SCANCODE_ESCAPE)
-                    SDL_SetWindowRelativeMouseMode(win, false);
-            }
-        }
-
-        const bool * keyboard_state = SDL_GetKeyboardState(NULL);
-        float speed_multi = 0.1f;
-        if (keyboard_state[SDL_SCANCODE_LCTRL])
-            speed_multi = 1.0f;
-
-        cam_x_lt = cam_x;
-        cam_z_lt = cam_z;
-
-        if (keyboard_state[SDL_SCANCODE_SPACE])
-            cam_y += speed_multi;
-        if (keyboard_state[SDL_SCANCODE_LSHIFT])
-            cam_y -= speed_multi;
-        if (keyboard_state[SDL_SCANCODE_A])
-        {
-            float x, z;
-            get_forward_vector(yaw, &x, &z);
-            cam_x += z * speed_multi;
-            cam_z -= x * speed_multi;
-        }
-        if (keyboard_state[SDL_SCANCODE_D])
-        {
-            float x, z;
-            get_forward_vector(yaw, &x, &z);
-            cam_x -= z * speed_multi;
-            cam_z += x * speed_multi;
-        }
-        if (keyboard_state[SDL_SCANCODE_W])
-        {
-            float x, z;
-            get_forward_vector(yaw, &x, &z);
-            cam_x += x * speed_multi;
-            cam_z += z * speed_multi;
-        }
-        if (keyboard_state[SDL_SCANCODE_S])
-        {
-            float x, z;
-            get_forward_vector(yaw, &x, &z);
-            cam_x -= x * speed_multi;
-            cam_z -= z * speed_multi;
-        }
-
-        if (abs(cam_x - cam_x_lt) || abs(cam_x - cam_x_lt))
-            send_packet_move(cam_x - cam_x_lt, cam_z - cam_z_lt);
-
-        int w, h;
-        SDL_GetWindowSize(win, &w, &h);
-        glViewport(0, 0, w, (h > 0 ? h : 1));
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        load_perspective(90.0f, (float)w / (float)(h > 0 ? h : 1), 0.1f, 200.0f);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-
-        glRotatef(-pitch, 1.0f, 0.0f, 0.0f);
-        glRotatef(-yaw, 0.0f, 1.0f, 0.0f);
-        glTranslatef(-cam_x, -cam_y, -cam_z);
-
-        glEnable(GL_TEXTURE_2D);
-
-        int chunk_x = cam_x / CHUNK_SIZE;
-        int chunk_z = cam_z / CHUNK_SIZE;
-        // printf("cam_x=%f cam_x=%f chunk_x=%d chunk_z=%d\n", cam_x, cam_z, chunk_x, chunk_z);
-
-        for (int chi = chunk_x - 2; chi <= chunk_x + 2; chi++)
-        {
-            for (int chj = chunk_z - 2; chj <= chunk_z + 2; chj++)
-            {
-                check_chunk(chi, chj);
-            }
-        }
-        for (int chi = chunk_x - 10; chi <= chunk_x + 10; chi++)
-        {
-            for (int chj = chunk_z - 10; chj <= chunk_z + 10; chj++)
-            {
-                if (OGL_Chunk * ch = ogl_tiles[chj][chi])
-                {
-                    ch->render();
-                }
-            }
-        }
-
-        glDisable(GL_TEXTURE_2D);
-        SDL_GL_SwapWindow(win);
+        handle_events();
+        handle_keyboard_state();
+        draw();
     }
-
-    disconnect();
-    return 0;
 }
