@@ -311,29 +311,32 @@ void handle_arguments(int argc, char * argv[])
     }
 }
 
+void init_sdl()
+{
+    window = SDL_CreateWindow("pime_ogl", 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    if (!window)
+    {
+        CONSOLE_LOG("Problem with SDL window creation\n");
+        exit(2);
+    }
+}
+void init_world_table()
+{
+    for (int i = 0; i < WORLD_SIZE; i++)
+        for (int j = 0; j < WORLD_SIZE; j++)
+            world_table[i][j] = NULL;
+}
 int main(int argc, char * argv[])
 {
     SDL_Init(SDL_INIT_VIDEO);
-    port = "1234";
-    ip = "127.0.0.1";
     handle_arguments(argc, argv);
-
     if (!init_networking())
     {
         CONSOLE_LOG("Problem with server connection\n");
         return 1;
     }
-
-    for (int i = 0; i < WORLD_SIZE; i++)
-        for (int j = 0; j < WORLD_SIZE; j++)
-            world_table[i][j] = NULL;
-
-    window = SDL_CreateWindow("pime_ogl", 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-    if (!window)
-    {
-        CONSOLE_LOG("Problem with SDL window creation\n");
-        return 2;
-    }
+    init_world_table();
+    init_sdl();
     init_ogl();
     load_textures();
 
