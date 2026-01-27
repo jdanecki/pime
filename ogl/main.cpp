@@ -9,6 +9,7 @@ OGL_Chunk * ogl_tiles[WORLD_SIZE][WORLD_SIZE];
 
 OGL_Camera cam;
 
+bool mouse_grabbed = true;
 float cam_x_lt = cam.x;
 float cam_z_lt = cam.z;
 
@@ -99,7 +100,7 @@ void handle_events()
     SDL_Event e;
     while (SDL_PollEvent(&e))
     {
-        if (e.type == SDL_EVENT_MOUSE_MOTION)
+        if (e.type == SDL_EVENT_MOUSE_MOTION && mouse_grabbed)
         {
             cam.yaw -= e.motion.xrel * 0.5f;
             cam.pitch -= e.motion.yrel * 0.5f;
@@ -109,21 +110,22 @@ void handle_events()
                 cam.pitch = -90;
         }
         if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.button == 1)
+        {
             SDL_SetWindowRelativeMouseMode(window, true);
+            mouse_grabbed = true;
+        }
         if (e.type == SDL_EVENT_QUIT || e.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
         {
             disconnect();
             exit(0);
         }
-        if (e.type == SDL_EVENT_WINDOW_RESIZED)
-        {
-            int w = e.window.data1, h = e.window.data2;
-            glViewport(0, 0, w, (h > 0 ? h : 1));
-        }
         if (e.type == SDL_EVENT_KEY_DOWN)
         {
             if (e.key.scancode == SDL_SCANCODE_ESCAPE)
+            {
                 SDL_SetWindowRelativeMouseMode(window, false);
+                mouse_grabbed = false;
+            }
         }
     }
 }
