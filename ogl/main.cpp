@@ -130,7 +130,7 @@ void handle_events()
     }
 }
 
-void handle_keyboard_state()
+void handle_keyboard_state(Uint64 dt)
 {
     const bool * keyboard_state = SDL_GetKeyboardState(NULL);
     float speed_multi = 0.1f;
@@ -139,6 +139,8 @@ void handle_keyboard_state()
 
     cam_x_lt = cam.x;
     cam_z_lt = cam.z;
+    speed_multi *= dt;
+    speed_multi /= 16;
 
     if (keyboard_state[SDL_SCANCODE_SPACE])
         cam.y += speed_multi;
@@ -315,11 +317,15 @@ int main(int argc, char * argv[])
     init_ogl();
     load_textures();
 
+    Uint64 dt;
+    Uint64 t;
     for (;;)
     {
-        network_tick();
+        t = SDL_GetTicks();
         handle_events();
-        handle_keyboard_state();
+        handle_keyboard_state(dt);
+        network_tick();
         draw();
+        dt = SDL_GetTicks() - t;
     }
 }
