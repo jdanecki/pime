@@ -39,7 +39,7 @@ void got_id(size_t id, int64_t seed)
     init_answers();
     CONSOLE_LOG("got id %ld\n", id);
 
-    print_status(1, "player id=%ld %s connected", id, player->get_name());
+    print_status(0, "player id=%ld %s connected", id, player->get_name());
 }
 
 void checked_update(size_t pl_id, size_t el)
