@@ -289,11 +289,34 @@ void draw()
     SDL_GL_SwapWindow(window);
 }
 
-int main(void)
+void handle_arguments(int argc, char * argv[])
+{
+    if (argc < 2)
+    {
+        CONSOLE_LOG("usage: ./pime_ogl <ip> [port]\n");
+        CONSOLE_LOG("using localhost 127.0.0.1:1234\n");
+        ip = "127.0.0.1";
+    }
+    else
+    {
+        ip = argv[1];
+    }
+    if (argc < 3)
+    {
+        port = "1234";
+    }
+    else
+    {
+        port = argv[2];
+    }
+}
+
+int main(int argc, char * argv[])
 {
     SDL_Init(SDL_INIT_VIDEO);
     port = "1234";
     ip = "127.0.0.1";
+    handle_arguments(argc, argv);
 
     if (!init_networking())
     {
