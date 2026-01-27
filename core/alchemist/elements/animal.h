@@ -8,7 +8,6 @@
 class Animal : public InventoryElement
 {
     SerializablePointer<BaseAnimal> base;
-    void init(BaseAnimal * b);
 
   public:
     bool wild;

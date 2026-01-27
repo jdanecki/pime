@@ -2,13 +2,13 @@
 #include "inventory_element.h"
 #include "world.h"
 
-InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : NetworkObject(c_id, uid), location(location)
+InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : NetworkObject(c_id, uid), location(location), dimensions(0.2, 6.0)
 {
 }
-InventoryElement::InventoryElement(Class_id c_id, size_t uid) : NetworkObject(c_id, uid)
+InventoryElement::InventoryElement(Class_id c_id, size_t uid) : NetworkObject(c_id, uid), dimensions(0.2, 6.0)
 {
 }
-InventoryElement::InventoryElement(Class_id c_id) : NetworkObject(c_id)
+InventoryElement::InventoryElement(Class_id c_id) : NetworkObject(c_id), dimensions(0.2, 6.0)
 {
 }
 

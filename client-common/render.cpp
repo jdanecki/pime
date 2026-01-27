@@ -209,7 +209,6 @@ void render_element(InventoryElement * o)
         if (screen_x < CHUNK_SIZE && screen_y < CHUNK_SIZE)
         {
             r->render(screen_x, screen_y, o->dimensions.width.value, o->dimensions.height.value);
-            // CONSOLE_LOG("render %s@[%d,%d] (%d, %d)\n", o->get_name(), screen_x, screen_y, o->dimensions.width.value, o->dimensions.height.value);
         }
     }
     else

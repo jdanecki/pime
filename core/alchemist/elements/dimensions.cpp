@@ -1,6 +1,12 @@
 #include "dimensions.h"
+#include "../random_functions.h"
 
-Dimensions::Dimensions() : length("length", 1, 2), width("width", 1, 2), height("height", 1, 2), volume("volume", length.value * width.value * height.value)
+Dimensions::Dimensions(float min, float max)
+    : max_width(random_float_range(min, max)), max_height(random_float_range(min, max)), max_length(random_float_range(min, max)), length("length", min, max_length), width("width", min, max_width),
+      height("height", min, max_height), volume("volume", length.value * width.value * height.value)
+{
+}
+Dimensions::Dimensions()
 {
 }
 
@@ -17,4 +23,12 @@ void Dimensions::show(bool details)
     {
         CONSOLE_LOG("length=%0.1f width=%0.1f height=%0.1f volume=%0.0f\n", length.value, width.value, height.value, volume.value);
     }
+}
+
+void Dimensions::scale(float by)
+{ // by is 0-1
+    length.value = max_length * by;
+    width.value = max_width * by;
+    height.value = max_height * by;
+    volume.value = length.value * width.value * height.value;
 }

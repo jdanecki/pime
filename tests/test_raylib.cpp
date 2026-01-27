@@ -30,7 +30,7 @@ void test_draw()
     Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{0, 255, 0, 255}, Backend_Color{});
     Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{}, Backend_Color{0, 255, 0, 255});
 
-    el->render(1, 5, 32, 32);
+    el->render(1, 5, 2, 2);
     Backend_Rect rect1(10, 10, 32, 32);
     Backend_Texture_Copy(texture, nullptr, &rect1);
 
@@ -70,7 +70,7 @@ void handle_mouse()
 bool handle_events()
 {
     handle_mouse();
-    printf("events:\n");
+    // printf("events:\n");
     if (IsKeyDown(KEY_ESCAPE))
         return true;
     if (IsKeyDown(KEY_LEFT))
@@ -81,7 +81,7 @@ bool handle_events()
         printf("up\n");
     if (IsKeyDown(KEY_DOWN))
         printf("down\n");
-    printf("--------\n");
+    // printf("--------\n");
 
     return false;
 }
@@ -91,11 +91,9 @@ int main()
     init_window("test_raylib", 1000, 800);
 
     Element e(new BaseElement(Form_solid, 0));
-    e.dimensions.width.value = 100;
-    e.dimensions.height.value = 100;
-
+    e.dimensions.width.value = 2;
+    e.dimensions.height.value = 2;
     el = new Element2d(e);
-
     texture = load_texture("textures/player.png");
 
     while (!finish_program)

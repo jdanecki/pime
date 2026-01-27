@@ -25,9 +25,7 @@ AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
     dst_loc_y = random_range(0, CHUNK_SIZE - 1);
     max_age = new Property("max age", 1000, 2000);
     age = new Property("age", 10, max_age->value);
-    dimensions.width.value = 2.0 * age->value / max_age->value;
-    dimensions.height.value = 2.0 * age->value / max_age->value;
-    dimensions.volume.value = dimensions.width.value * dimensions.height.value * dimensions.length.value;
+    dimensions.scale(age->value / max_age->value);
 }
 
 bool AnimalServer::action(Product_action action, Player * pl)
@@ -90,7 +88,6 @@ bool AnimalServer::grow()
         dimensions.height.value = 2.0 * age->value / max_age->value;
         dimensions.volume.value = dimensions.width.value * dimensions.height.value * dimensions.length.value;
         notify_update(this);
-        //  CONSOLE_LOG("%s:%s growing size=%f %d/%d \n", get_class_name(), get_name(), size, age->value, max_age->value);
     }
     return ret;
 }
@@ -216,9 +213,7 @@ void PlantServer::set_phase(Plant_phase p)
             grown = true;
             break;
     }
-    dimensions.width.value = 2.0 * age->value / max_age->value;
-    dimensions.height.value = 2.0 * age->value / max_age->value;
-    dimensions.volume.value = dimensions.width.value * dimensions.height.value * dimensions.length.value;
+    dimensions.scale(age->value / max_age->value);
     notify_update(this);
 }
 
@@ -239,9 +234,7 @@ bool PlantServer::grow()
     // water--;
 
     age->value++;
-    dimensions.width.value = 2.0 * age->value / max_age->value;
-    dimensions.height.value = 2.0 * age->value / max_age->value;
-    dimensions.volume.value = dimensions.width.value * dimensions.height.value * dimensions.length.value;
+    dimensions.scale(age->value / max_age->value);
     notify_update(this);
     /*CONSOLE_LOG("PlantServer:%s growing %d/%d phase=%s grown=%d times=%d/%d/%d/ size=%f\n", get_name(),
         age->value, max_age->value, plant_phase_name[phase], grown,

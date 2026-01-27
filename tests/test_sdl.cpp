@@ -7,6 +7,9 @@ Backend_Texture texture;
 
 Element2d * el;
 
+float w=1.0;
+float h=1.0;
+
 void test_draw()
 {
     SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
@@ -21,7 +24,7 @@ void test_draw()
     Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{0, 255, 0, 255}, Backend_Color{});
     Backend_Draw_Gradient_Rectangle(300, 300, 200, 150, Backend_Color{}, Backend_Color{0, 255, 0, 255});
 
-    el->render(1, 5, 32, 32);
+    el->render(1, 5, w, h);
 
     Backend_Rect rect1(10, 10, 32, 32);
     Backend_Texture_Copy(texture, nullptr, &rect1);
@@ -29,8 +32,8 @@ void test_draw()
     Backend_Rect rect2(50, 10, 32, 32);
     Backend_Texture_Copy_Flip(texture, nullptr, &rect2);
 
-    Backend_Line(50, 500, 100, 550, {255, 0, 0, 255});
-    Backend_Line(50, 550, 100, 500, {255, 0, 0, 255});
+    Backend_Line(32, 32 * 5, 500, 32 *5, {255, 0, 0, 255});
+    Backend_Line(32, 32 * 5, 32, 500, {255, 0, 0, 255});
 }
 
 bool finish_program = false;
@@ -41,6 +44,20 @@ void key_pressed(int key)
     {
         case SDLK_ESCAPE:
             finish_program = true;
+            break;
+        case SDLK_LEFT:
+            w-=0.1;
+            if (w < 0) w = 0;
+            break;
+        case SDLK_RIGHT:
+            w+=0.1;
+            break;
+        case SDLK_UP:
+            h-=0.1;
+            if (h < 0) h = 0;
+            break;
+        case SDLK_DOWN:
+            h+=0.1;
             break;
         default:
             printf("key=%d\n", key);
@@ -80,8 +97,8 @@ int main()
     init_window("test_sdl", 1000, 800);
 
     Element e(new BaseElement(Form_solid, 0));
-    e.dimensions.width.value = 100;
-    e.dimensions.height.value = 100;
+    e.dimensions.width.value = 2;
+    e.dimensions.height.value = 2;
 
     el = new Element2d(e);
     texture = load_texture("textures/player.png");

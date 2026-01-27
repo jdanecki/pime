@@ -10,7 +10,7 @@ class Property
     SerializableCString name;
     float value;
     Property(const char * n, float v);
-    Property(const char * n, int min, int max);
+    Property(const char * n, float min, float max);
     Property();
     void show();
     float decrease(float by);

@@ -17,7 +17,7 @@ void notify_checked(size_t pl_id, size_t el);
 void destroy(InventoryElement * el);
 
 const int max_delay_move = 100; // 1 sec.
-const int max_delay_grow = 600; // 600=1 min.
+const int max_delay_grow = 100; //600; // 600=1 min.
 
 const unsigned long TICK_DELAY = 100;
 

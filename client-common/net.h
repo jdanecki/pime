@@ -34,7 +34,7 @@ bool init_networking();
 
 uint32_t network_tick();
 
-InventoryElement * get_object_by_id(NetworkObject uid);
+InventoryElement * get_object_by_id(NetworkObject obj);
 
 void register_object(NetworkObject * o);
 

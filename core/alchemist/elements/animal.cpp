@@ -2,16 +2,15 @@
 
 #include "animal.h"
 #include "../el_list.h"
-
-void Animal::init(BaseAnimal * b)
-{
-    c_id = Class_Animal;
-}
+#include "../random_functions.h"
 
 Animal::Animal(BaseAnimal * b) : InventoryElement(Class_Animal), base(b)
 {
-    init(b);
+    c_id = Class_Animal;
+
     wild = true;
+    dimensions.max_width = random_float_range(0.3, 2.0);
+    dimensions.max_height = random_float_range(0.3, 2.0);
 }
 
 Animal::Animal(int id) : base(get_base_animal(id))

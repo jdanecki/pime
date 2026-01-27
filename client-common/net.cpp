@@ -269,9 +269,9 @@ unsigned int network_tick()
     return recv;
 }
 
-InventoryElement * get_object_by_id(NetworkObject uid)
+InventoryElement * get_object_by_id(NetworkObject obj)
 {
-    ListElement * el = objects.find(&uid.uid);
+    ListElement * el = objects.find(&obj.uid);
     return el ? static_cast<InventoryElement *>(el->get_el()) : nullptr;
 }
 

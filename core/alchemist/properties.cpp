@@ -135,7 +135,7 @@ Property::Property(const char * n, float v) : name(n), value(v)
 {
 }
 
-Property::Property(const char * n, int min, int max) : name(n)
+Property::Property(const char * n, float min, float max) : name(n)
 {
     value = random_float_range(min, max);
 }

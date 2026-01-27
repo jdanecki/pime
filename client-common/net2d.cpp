@@ -229,7 +229,7 @@ void update_object(const ObjectData * data)
     }
     if (el && el->c_id == c_id)
     {
-        // CONSOLE_LOG("SDL update_object: %s %s\n", class_name[c_id],  el->get_name());
+       // CONSOLE_LOG("update_object: %s %s\n", class_name[c_id], el->get_name());
         switch (c_id)
         {
             case Class_Element:
@@ -261,7 +261,6 @@ void update_object(const ObjectData * data)
             {
                 Animal * animal = dynamic_cast<Animal *>(el);
                 *animal = data->animal.data;
-                //     CONSOLE_LOG("%s size=%f\n", animal->get_name(), animal->size);
                 break;
             }
             case Class_Player:
@@ -275,7 +274,7 @@ void update_object(const ObjectData * data)
             default:
                 break;
         }
-        // CONSOLE_LOG("%s updated\n", el->get_name());
+      //  CONSOLE_LOG("%s updated\n", el->get_name());
     }
     else
     {

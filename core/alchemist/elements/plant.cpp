@@ -3,22 +3,19 @@
 
 #include "plant.h"
 #include "../el_list.h"
+#include "alchemist/elements/dimensions.h"
 #include "alchemist/random_functions.h"
 
-void Plant::init(BasePlant * b)
+Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)
 {
-    base = b;
     seedling_time = 10 + random_range(10, 30);
     growing_time = random_range(seedling_time, seedling_time + 150);
     flowers_time = random_range(growing_time, growing_time + 30);
     phase = (Plant_phase)(rand() % (Plant_fruits + 1));
     grown = false;
     water = random_range(0, 99);
-}
-
-Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)
-{
-    init(b);
+    dimensions.max_width = random_float_range(0.3, 5.0);
+    dimensions.max_height = random_float_range(0.3, 5.0);
 }
 
 Plant::Plant(int id) : base(get_base_plant(id))

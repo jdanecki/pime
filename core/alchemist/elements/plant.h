@@ -8,7 +8,6 @@
 class Plant : public InventoryElement
 {
     SerializablePointer<BasePlant> base;
-    void init(BasePlant * b);
 
   protected:
     unsigned int seedling_time;
