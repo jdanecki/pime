@@ -8,8 +8,8 @@
 ElementsList objects("objects");
 
 NetClient * client;
-const char * ip;
-const char * port;
+const char * ip = "127.0.0.1";
+const char * port = "1234";
 ENetHost * host;
 extern void print_status(int i, const char * format, ...);
 

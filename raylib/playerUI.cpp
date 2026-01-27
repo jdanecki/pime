@@ -18,7 +18,7 @@ PlayerUI::PlayerUI(Player data) : Player(data)
 
 void PlayerUI::update_item_location(ItemLocation & old_loc, ItemLocation & new_loc)
 {
-    flip = old_loc.chunk.x < new_loc.chunk.x;
+    flip = old_loc.chunk.x > new_loc.chunk.x;
 }
 
 void update_hotbar()
