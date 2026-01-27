@@ -236,6 +236,7 @@ int main(void)
 
     SDL_GLContext ctx = SDL_GL_CreateContext(win);
     SDL_GL_MakeCurrent(win, ctx);
+    SDL_GL_SetSwapInterval(-1);
     if (!ctx)
         return 3;
 
@@ -417,7 +418,7 @@ int main(void)
 
         int chunk_x = cam_x / CHUNK_SIZE;
         int chunk_z = cam_z / CHUNK_SIZE;
-        printf("cam_x=%f cam_x=%f chunk_x=%d chunk_z=%d\n", cam_x, cam_z, chunk_x, chunk_z);
+        // printf("cam_x=%f cam_x=%f chunk_x=%d chunk_z=%d\n", cam_x, cam_z, chunk_x, chunk_z);
 
         for (int chi = chunk_x - 2; chi <= chunk_x + 2; chi++)
         {
@@ -441,9 +442,7 @@ int main(void)
         }
 
         glDisable(GL_TEXTURE_2D);
-
         SDL_GL_SwapWindow(win);
-        SDL_Delay(16);
     }
 
     disconnect();
