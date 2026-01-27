@@ -9,10 +9,13 @@
 #include <math.h>
 #include <stdbool.h>
 #include "../client-common/net.h"
+#include "main.h"
 
 PFNGLBINDBUFFERPROC glBindBuffer = NULL;
 PFNGLGENBUFFERSPROC glGenBuffers = NULL;
 PFNGLBUFFERDATAPROC glBufferData = NULL;
+
+OGL_Chunk * ogl_tiles[WORLD_SIZE][WORLD_SIZE];
 
 float cam_x = 128 * CHUNK_SIZE + 8;
 float cam_y = 8;
@@ -30,109 +33,6 @@ static void load_perspective(float fovy_deg, float aspect, float znear, float zf
     float m[16] = {f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (zfar + znear) * nf, -1, 0, 0, (2.0f * zfar * znear) * nf, 0};
 
     glMultMatrixf(m);
-}
-
-// Vertex structure
-typedef struct
-{
-    float x, y, z;    // position
-    float nx, ny, nz; // normal
-    float u, v;       // texture coordinates
-} Vertex;
-
-void generate_cube_vertices(Vertex * vertices, float tx, float ty, float tz)
-{
-    int idx = 0;
-    const float half = 0.5f; // Half the cube size
-
-    // Top face - y = +half
-    vertices[idx++] = (Vertex){tx - half, ty + half, tz + half, 0, 1, 0, 0, 0};
-    vertices[idx++] = (Vertex){tx + half, ty + half, tz + half, 0, 1, 0, 1, 0};
-    vertices[idx++] = (Vertex){tx + half, ty + half, tz - half, 0, 1, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx + half, ty + half, tz - half, 0, 1, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx - half, ty + half, tz - half, 0, 1, 0, 0, 1};
-    vertices[idx++] = (Vertex){tx - half, ty + half, tz + half, 0, 1, 0, 0, 0};
-
-    // Bottom face - y = -half
-    vertices[idx++] = (Vertex){tx - half, ty - half, tz - half, 0, -1, 0, 0, 0};
-    vertices[idx++] = (Vertex){tx + half, ty - half, tz - half, 0, -1, 0, 1, 0};
-    vertices[idx++] = (Vertex){tx + half, ty - half, tz + half, 0, -1, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx + half, ty - half, tz + half, 0, -1, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx - half, ty - half, tz + half, 0, -1, 0, 0, 1};
-    vertices[idx++] = (Vertex){tx - half, ty - half, tz - half, 0, -1, 0, 0, 0};
-
-    // Front face - z = +half
-    vertices[idx++] = (Vertex){tx - half, ty - half, tz + half, 0, 0, 1, 0, 0};
-    vertices[idx++] = (Vertex){tx + half, ty - half, tz + half, 0, 0, 1, 1, 0};
-    vertices[idx++] = (Vertex){tx + half, ty + half, tz + half, 0, 0, 1, 1, 1};
-    vertices[idx++] = (Vertex){tx + half, ty + half, tz + half, 0, 0, 1, 1, 1};
-    vertices[idx++] = (Vertex){tx - half, ty + half, tz + half, 0, 0, 1, 0, 1};
-    vertices[idx++] = (Vertex){tx - half, ty - half, tz + half, 0, 0, 1, 0, 0};
-
-    // Back face - z = -half
-    vertices[idx++] = (Vertex){tx + half, ty - half, tz - half, 0, 0, -1, 0, 0};
-    vertices[idx++] = (Vertex){tx - half, ty - half, tz - half, 0, 0, -1, 1, 0};
-    vertices[idx++] = (Vertex){tx - half, ty + half, tz - half, 0, 0, -1, 1, 1};
-    vertices[idx++] = (Vertex){tx - half, ty + half, tz - half, 0, 0, -1, 1, 1};
-    vertices[idx++] = (Vertex){tx + half, ty + half, tz - half, 0, 0, -1, 0, 1};
-    vertices[idx++] = (Vertex){tx + half, ty - half, tz - half, 0, 0, -1, 0, 0};
-
-    // Right face - x = +half
-    vertices[idx++] = (Vertex){tx + half, ty - half, tz + half, 1, 0, 0, 0, 0};
-    vertices[idx++] = (Vertex){tx + half, ty - half, tz - half, 1, 0, 0, 1, 0};
-    vertices[idx++] = (Vertex){tx + half, ty + half, tz - half, 1, 0, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx + half, ty + half, tz - half, 1, 0, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx + half, ty + half, tz + half, 1, 0, 0, 0, 1};
-    vertices[idx++] = (Vertex){tx + half, ty - half, tz + half, 1, 0, 0, 0, 0};
-
-    // Left face - x = -half
-    vertices[idx++] = (Vertex){tx - half, ty - half, tz - half, -1, 0, 0, 0, 0};
-    vertices[idx++] = (Vertex){tx - half, ty - half, tz + half, -1, 0, 0, 1, 0};
-    vertices[idx++] = (Vertex){tx - half, ty + half, tz + half, -1, 0, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx - half, ty + half, tz + half, -1, 0, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx - half, ty + half, tz - half, -1, 0, 0, 0, 1};
-    vertices[idx++] = (Vertex){tx - half, ty - half, tz - half, -1, 0, 0, 0, 0};
-}
-
-GLuint vbo = 0;
-
-void place_thing(GLuint texture, int r, int g, int b, Vertex * vertices, size_t vert_count)
-{
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glColor3f((double)r / 255, (double)g / 255, (double)b / 255);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0); // Unbind VBO to use client-side memory
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &vertices[0].x);
-
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &vertices[0].u);
-
-    glDrawArrays(GL_TRIANGLES, 0, vert_count);
-
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
-}
-
-void place_plane(float tx, float ty, float tz, GLuint texture, int r, int g, int b)
-{
-    Vertex vertices[6];
-    int idx = 0;
-    vertices[idx++] = (Vertex){tx - 0.5f, ty + 0.5f, tz + 0.5f, 0, 1, 0, 0, 0};
-    vertices[idx++] = (Vertex){tx + 0.5f, ty + 0.5f, tz + 0.5f, 0, 1, 0, 1, 0};
-    vertices[idx++] = (Vertex){tx + 0.5f, ty + 0.5f, tz - 0.5f, 0, 1, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx + 0.5f, ty + 0.5f, tz - 0.5f, 0, 1, 0, 1, 1};
-    vertices[idx++] = (Vertex){tx - 0.5f, ty + 0.5f, tz - 0.5f, 0, 1, 0, 0, 1};
-    vertices[idx++] = (Vertex){tx - 0.5f, ty + 0.5f, tz + 0.5f, 0, 1, 0, 0, 0};
-    place_thing(texture, r, g, b, vertices, 6);
-}
-
-void place_cube(float tx, float ty, float tz, GLuint texture, int r, int g, int b)
-{
-    Vertex vertices[36];
-    generate_cube_vertices(vertices, tx, ty, tz);
-    place_thing(texture, r, g, b, vertices, 36);
 }
 
 void print_status(int, char const *, ...) {};
@@ -293,20 +193,6 @@ int main(void)
         return 5;
     }
 
-    Vertex * all_vertices = (Vertex *)malloc(100 * 100 * 36 * sizeof(Vertex));
-    int idx = 0;
-    for (int i = 0; i < 100; i++)
-        for (int j = 0; j < 100; j++)
-        {
-            generate_cube_vertices(&all_vertices[idx], j + 125 * CHUNK_SIZE, -4, i + 125 * CHUNK_SIZE);
-            idx += 36;
-        }
-
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, 100 * 100 * 36 * sizeof(Vertex), all_vertices, GL_STATIC_DRAW);
-    free(all_vertices);
-
     while (running)
     {
         network_tick();
@@ -391,7 +277,7 @@ int main(void)
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        load_perspective(60.0f, (float)w / (float)(h > 0 ? h : 1), 0.1f, 100.0f);
+        load_perspective(90.0f, (float)w / (float)(h > 0 ? h : 1), 0.1f, 200.0f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
@@ -400,21 +286,6 @@ int main(void)
         glTranslatef(-cam_x, -cam_y, -cam_z);
 
         glEnable(GL_TEXTURE_2D);
-
-        glColor3f(1, 1, 1);
-        glBindTexture(GL_TEXTURE_2D, 1);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (void *)0);
-
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void *)(6 * sizeof(float)));
-
-        glDrawArrays(GL_TRIANGLES, 0, 100 * 100 * 36);
-
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
 
         int chunk_x = cam_x / CHUNK_SIZE;
         int chunk_z = cam_z / CHUNK_SIZE;
@@ -431,22 +302,9 @@ int main(void)
         {
             for (int chj = chunk_z - 10; chj <= chunk_z + 10; chj++)
             {
-                if (chunk * ch = world_table[chj][chi])
+                if (OGL_Chunk * ch = ogl_tiles[chj][chi])
                 {
-                    int base_x = (chi)*CHUNK_SIZE;
-                    int base_z = (chj)*CHUNK_SIZE;
-
-                    for (int i = 0; i < CHUNK_SIZE; i++)
-                    {
-                        for (int j = 0; j < CHUNK_SIZE; j++)
-                        {
-                            BaseElement * be = get_base_element(ch->table[j][i].tile);
-                            if (abs(chi - chunk_x) < 4 && abs(chj - chunk_z) < 4)
-                                place_plane(base_x + i, 0, base_z + j, ch->table[j][i].tile % 15 + 1, be->color.r, be->color.g, be->color.b);
-                            else
-                                place_plane(base_x + i, 0, base_z + j, 0, be->color.r - 100, be->color.g - 100, be->color.b - 100);
-                        }
-                    }
+                    ch->render();
                 }
             }
         }
