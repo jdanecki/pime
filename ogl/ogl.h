@@ -95,14 +95,78 @@ typedef struct OGL_Plane
 typedef struct OGL_Chunk
 {
     OGL_Plane * planes[CHUNK_SIZE * CHUNK_SIZE];
+    GLuint display_list;
+
     void render()
     {
+        glCallList(display_list);
+    }
+
+    void create_display_list()
+    {
+        display_list = glGenLists(1);
+        glNewList(display_list, GL_COMPILE);
         for (int i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++)
         {
             planes[i]->render();
         }
+        glEndList();
     }
+
     OGL_Chunk()
     {
     }
 } OGL_Chunk;
+
+typedef struct OGL_World
+{
+    OGL_Chunk * ogl_tiles[WORLD_SIZE][WORLD_SIZE];
+    GLuint display_list = 0;
+
+    void render(size_t from_x, size_t from_z, size_t to_x, size_t to_z)
+    {
+        for (int chi = from_x; chi < to_x; chi++)
+        {
+            for (int chj = from_z; chj < to_z; chj++)
+            {
+                if (OGL_Chunk * ch = ogl_tiles[chj][chi])
+                {
+                    ch->render();
+                }
+            }
+        }
+    }
+    // void render()
+    // {
+    //     glCallList(display_list);
+    // }
+    //
+    // void create_display_list()
+    // {
+    //     if (display_list != 0)
+    //         glDeleteLists(display_list, 1);
+    //     display_list = glGenLists(1);
+    //     glNewList(display_list, GL_COMPILE);
+    //     for (int chi = 0; chi < WORLD_SIZE; chi++)
+    //     {
+    //         for (int chj = 0; chj < WORLD_SIZE; chj++)
+    //         {
+    //             if (OGL_Chunk * ch = ogl_tiles[chj][chi])
+    //             {
+    //                 ch->render();
+    //             }
+    //         }
+    //     }
+    //     glEndList();
+    // }
+    OGL_World()
+    {
+        for (int i = 0; i < WORLD_SIZE; i++)
+        {
+            for (int j = 0; j < WORLD_SIZE; j++)
+            {
+                ogl_tiles[j][i] = NULL;
+            }
+        }
+    }
+} OGL_World;

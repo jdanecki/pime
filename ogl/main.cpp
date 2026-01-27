@@ -3,9 +3,10 @@
 #include <cstdio>
 #include <dirent.h>
 #include "../client-common/net.h"
+#include "ogl.h"
 #include "main.h"
 
-OGL_Chunk * ogl_tiles[WORLD_SIZE][WORLD_SIZE];
+OGL_World * ogl_world;
 
 OGL_Camera cam;
 
@@ -248,16 +249,7 @@ void draw()
             check_chunk(chi, chj);
         }
     }
-    for (int chi = chunk_x - 10; chi <= chunk_x + 10; chi++)
-    {
-        for (int chj = chunk_z - 10; chj <= chunk_z + 10; chj++)
-        {
-            if (OGL_Chunk * ch = ogl_tiles[chj][chi])
-            {
-                ch->render();
-            }
-        }
-    }
+    ogl_world->render(chunk_x - 5, chunk_z - 5, chunk_x + 5, chunk_z + 5);
 
     glDisable(GL_TEXTURE_2D);
     SDL_GL_SwapWindow(window);
@@ -296,8 +288,9 @@ void init_sdl()
     SDL_SetWindowRelativeMouseMode(window, true);
 }
 
-void init_world_table()
+void init_world()
 {
+    ogl_world = new OGL_World;
     for (int i = 0; i < WORLD_SIZE; i++)
         for (int j = 0; j < WORLD_SIZE; j++)
             world_table[i][j] = NULL;
@@ -312,7 +305,7 @@ int main(int argc, char * argv[])
         CONSOLE_LOG("Problem with server connection\n");
         return 1;
     }
-    init_world_table();
+    init_world();
     init_sdl();
     init_ogl();
     load_textures();

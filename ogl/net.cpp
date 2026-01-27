@@ -20,9 +20,9 @@ void update_chunk(int32_t x, int32_t y, const chunk_table * data)
     {
         world_table[y][x] = new chunk(x, y);
         memcpy(world_table[y][x]->table, &data[0], CHUNK_SIZE * CHUNK_SIZE * sizeof(int));
-        ogl_tiles[y][x] = new OGL_Chunk();
+        ogl_world->ogl_tiles[y][x] = new OGL_Chunk();
         chunk * ch = world_table[y][x];
-        OGL_Chunk * ogl_ch = ogl_tiles[y][x];
+        OGL_Chunk * ogl_ch = ogl_world->ogl_tiles[y][x];
         for (int i = 0; i < CHUNK_SIZE; i++)
         {
             for (int j = 0; j < CHUNK_SIZE; j++)
@@ -31,6 +31,8 @@ void update_chunk(int32_t x, int32_t y, const chunk_table * data)
                 ogl_ch->planes[i * CHUNK_SIZE + j] = new OGL_Plane(i + x * CHUNK_SIZE, 0, j + y * CHUNK_SIZE, ch->table[j][i].tile % 15 + 1, be->color.r, be->color.g, be->color.b);
             }
         }
+        ogl_ch->create_display_list();
+        // ogl_world->create_display_list();
     }
 }
 
