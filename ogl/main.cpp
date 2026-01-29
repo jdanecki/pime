@@ -246,9 +246,9 @@ void draw()
     int chunk_x = cam.x / CHUNK_SIZE;
     int chunk_z = cam.z / CHUNK_SIZE;
 
-    for (int chi = chunk_x - 2; chi <= chunk_x + 2; chi++)
+    for (int chi = chunk_x - 4; chi <= chunk_x + 4; chi++)
     {
-        for (int chj = chunk_z - 2; chj <= chunk_z + 2; chj++)
+        for (int chj = chunk_z - 4; chj <= chunk_z + 4; chj++)
         {
             check_chunk(chi, chj);
         }
@@ -256,7 +256,7 @@ void draw()
     if (show_all_chunks)
         ogl_world->render(0, 0, WORLD_SIZE, WORLD_SIZE);
     else
-        ogl_world->render(chunk_x - 5, chunk_z - 5, chunk_x + 5, chunk_z + 5);
+        ogl_world->render(chunk_x - 4, chunk_z - 4, chunk_x + 4, chunk_z + 4);
 
     glColor4f(1, 1, 1, 1);
     char buf[256] = {
