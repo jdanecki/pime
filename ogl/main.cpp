@@ -7,6 +7,7 @@
 #include "main.h"
 
 OGL_World * ogl_world;
+OGL_Text * ogl_text;
 
 OGL_Camera cam;
 
@@ -16,6 +17,10 @@ float cam_z_lt = cam.z;
 
 SDL_Window * window;
 SDL_GLContext ctx;
+int window_width;
+int window_height;
+
+bool show_all_chunks = false;
 
 size_t my_id;
 
@@ -77,17 +82,9 @@ chunk * check_chunk(int cx, int cy)
     chunk * ch = world_table[cy][cx];
     if (!ch)
     {
-        if (loaded_chunks[cy][cx] == CHUNK_NOT_LOADED)
-        {
-            send_packet_request_chunk(cx, cy);
-            loaded_chunks[cy][cx] = CHUNK_LOADING;
-            return nullptr;
-        }
-        else
-        {
-            // CONSOLE_LOG("waiting for chunk %d %d\n", cx, cy);
-            return nullptr;
-        }
+        send_packet_request_chunk(cx, cy);
+        loaded_chunks[cy][cx] = CHUNK_LOADING;
+        return nullptr;
     }
     else
     {
@@ -115,6 +112,10 @@ void handle_events()
             SDL_SetWindowRelativeMouseMode(window, true);
             mouse_grabbed = true;
         }
+        if (e.type == SDL_EVENT_WINDOW_RESIZED)
+        {
+            SDL_GetWindowSize(window, &window_width, &window_height);
+        }
         if (e.type == SDL_EVENT_QUIT || e.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
         {
             disconnect();
@@ -122,10 +123,14 @@ void handle_events()
         }
         if (e.type == SDL_EVENT_KEY_DOWN)
         {
-            if (e.key.scancode == SDL_SCANCODE_ESCAPE)
+            switch (e.key.scancode)
             {
-                SDL_SetWindowRelativeMouseMode(window, false);
-                mouse_grabbed = false;
+                case SDL_SCANCODE_ESCAPE:
+                    SDL_SetWindowRelativeMouseMode(window, false);
+                    mouse_grabbed = false;
+                    break;
+                case SDL_SCANCODE_F1:
+                    show_all_chunks ^= 1;
             }
         }
     }
@@ -240,7 +245,6 @@ void draw()
 
     int chunk_x = cam.x / CHUNK_SIZE;
     int chunk_z = cam.z / CHUNK_SIZE;
-    // printf("cam_x=%f cam_x=%f chunk_x=%d chunk_z=%d\n", cam_x, cam_z, chunk_x, chunk_z);
 
     for (int chi = chunk_x - 2; chi <= chunk_x + 2; chi++)
     {
@@ -249,8 +253,17 @@ void draw()
             check_chunk(chi, chj);
         }
     }
-    ogl_world->render(chunk_x - 5, chunk_z - 5, chunk_x + 5, chunk_z + 5);
+    if (show_all_chunks)
+        ogl_world->render(0, 0, WORLD_SIZE, WORLD_SIZE);
+    else
+        ogl_world->render(chunk_x - 5, chunk_z - 5, chunk_x + 5, chunk_z + 5);
 
+    glColor4f(1, 1, 1, 1);
+    char buf[256] = {
+        0,
+    };
+    snprintf(buf, 256, "%.2f %.2f %.2f (%d, %d)", cam.x, cam.y, cam.z, (int)(cam.x / CHUNK_SIZE), (int)(cam.z / CHUNK_SIZE));
+    ogl_text->draw_text(buf, 0, 0, 2, window_width, window_height);
     glDisable(GL_TEXTURE_2D);
     SDL_GL_SwapWindow(window);
 }
@@ -309,6 +322,7 @@ int main(int argc, char * argv[])
     init_sdl();
     init_ogl();
     load_textures();
+    ogl_text = new OGL_Text("font.png", 8, 12, 16, 32);
 
     Uint64 dt;
     Uint64 t;
