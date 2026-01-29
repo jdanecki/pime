@@ -1,3 +1,5 @@
+sdl_ttf_dep = dependency('SDL2_ttf', method: 'pkg-config', required: true)
+
 test_sdl_sources = [
     'test_sdl.cpp',
     '../SDL/window.cpp',
@@ -59,7 +61,7 @@ test_generator_sdl_sources = [
 
 executable('test_sdl', 
   sources: test_sdl_sources,
-  dependencies: [sdl_deps],
+  dependencies: [sdl_deps, sdl_ttf_dep],
   include_directories :  include_directories('../SDL'),
   link_args: shared_link_args,
   link_with: [core],

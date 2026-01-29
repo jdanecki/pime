@@ -1,35 +1,20 @@
-#include <time.h>
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL2_gfxPrimitives.h>
-#include <sys/stat.h>
+
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include "../core/time_core.h"
 
 #include "../client-common/text.h"
 #include "../client-common/window.h"
 #include "../client-common/texture.h"
-#include "../dialog/d_hotbar.h"
 
 SDL_Renderer * renderer;
 SDL_Window * main_window;
 
-void set_tile_size(int width, int height)
-{
-    int h = height - STATUS_LINES - HOTBAR_HEIGHT;
-    if (width < h)
-    {
-        tile_size = width / CHUNK_SIZE;
-    }
-    else
-    {
-        tile_size = h / CHUNK_SIZE;
-    }
-    if (tile_size < 10)
-        tile_size = 10;
-    CONSOLE_LOG("tile_size=%d\n", tile_size);
-}
+
 int init_window(const char * title, int wx, int wy)
 {
     Uint32 flags;
@@ -66,6 +51,8 @@ int init_window(const char * title, int wx, int wy)
         return 1;
     }
 
+//FIXME move to load_textures
+/* 
     SDL_Surface * icon = IMG_Load("textures/pime.png");
     if (icon == NULL)
     {
@@ -74,22 +61,9 @@ int init_window(const char * title, int wx, int wy)
     }
     SDL_SetWindowIcon(main_window, icon);
     SDL_FreeSurface(icon);
-
+*/
     if (load_font())
         return 1;
-
-    struct stat statbuf;
-    int ret = stat("textures", &statbuf);
-    if (ret)
-    {
-        chdir("..");
-        ret = stat("textures", &statbuf);
-        if (ret)
-        {
-            CONSOLE_LOG("missing directory with textures\n");
-            return 2;
-        }
-    }
 
     load_textures();
 

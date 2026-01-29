@@ -11,8 +11,10 @@ int init_window(const char * title, int wx, int wy)
 
     window_width = GetScreenWidth();
     window_height = GetScreenHeight();
-    SetTargetFPS(60);
-    tile_size = 32;
+    CONSOLE_LOG("window_width=%d window_height=%d\n", window_width, window_height);
+    
+    SetTargetFPS(60);    
+    set_tile_size(window_width, window_height);
     SetExitKey(KEY_NULL);
     SetTraceLogLevel(LOG_WARNING);
     //    SetTraceLogLevel(LOG_NONE);

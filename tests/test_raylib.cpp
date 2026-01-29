@@ -3,6 +3,7 @@
 #include "../../client-common/window.h"
 #include "../../client-common/texture.h"
 #include "../../client-common/alchemist2d.h"
+#include "../../client-common/text.h"
 
 bool handle_events();
 
@@ -37,6 +38,9 @@ void test_draw()
     Backend_Rect rect2(50, 10, 32, 32);
     Backend_Texture_Copy_Flip(texture, nullptr, &rect2);
 
+    write_text(10, 620, "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz", {255, 255, 255, 255}, 13, 25);
+    write_text(10, 670, "1234567890 !@#$%^&*()_+=-`~", {255, 255, 255, 255}, 13, 25);
+     
     Backend_Update_Screen();
     Backend_End_Drawing();
 }

@@ -15,4 +15,5 @@ void update_window_size();
 extern int tile_size;
 extern float left_top_world_x;
 extern float left_top_world_y;
+void set_tile_size(int width, int height);
 #endif // WINDOW_H

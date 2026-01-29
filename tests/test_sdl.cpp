@@ -1,7 +1,10 @@
+#include <SDL_ttf.h>
+#include <errno.h>
+#include <sys/stat.h>
 #include "../client-common/window.h"
 #include "../client-common/alchemist2d.h"
 #include "../client-common/texture.h"
-
+#include "../client-common/text.h"
 bool handle_events();
 Backend_Texture texture;
 
@@ -9,6 +12,59 @@ Element2d * el;
 
 float w=1.0;
 float h=1.0;
+TTF_Font * ttf_font;
+
+#define TTF_FONT_NAME "nerdfont.otf"
+#define TTF_FONT_SIZE 128
+
+int load_ttf_font()
+ {
+    TTF_Init();
+     struct stat statbuf;
+     int ret;
+     ret = stat(TTF_FONT_NAME, &statbuf);
+     if (ret)
+     {
+         CONSOLE_LOG("load_font(%s): %s\n", TTF_FONT_NAME, strerror(errno));
+         return 1;
+     }
+    ttf_font = TTF_OpenFont(TTF_FONT_NAME, TTF_FONT_SIZE);
+     if (!(ttf_font))
+     {
+        CONSOLE_LOG("load_font(%s): %s\n", TTF_FONT_NAME, TTF_GetError());
+        return 1;
+     }
+     else
+         return 0;
+ }
+ 
+void write_ttf_text(int x, int y, const char * text, SDL_Color color, int scale_x, int scale_y, bool clear_bg=false)
+{
+    SDL_Surface * surface;
+    surface = TTF_RenderText_Solid(ttf_font, text, color);
+    SDL_Texture * text_sdl = SDL_CreateTextureFromSurface(renderer, surface);
+
+
+    // window_w=texture_size * CHUNK_SIZE + PANEL_WINDOW = 1084
+    // window_h=texture_size * CHUNK_SIZE + STATUS_LINES = 608
+    int game_size_x = 24;
+    int game_size_y = 60;
+    int x_size, y_size;
+    x_size = strlen(text) * (scale_x ? scale_x : game_size_x);
+    y_size = scale_y ? scale_y : game_size_y;
+
+    SDL_Rect rect = {x, y, x_size, y_size};
+
+    if (clear_bg)
+    {
+        SDL_SetRenderDrawColor(renderer, 10, 10, 50, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
+
+    SDL_RenderCopy(renderer, text_sdl, NULL, &rect);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(text_sdl);
+ }
 
 void test_draw()
 {
@@ -103,6 +159,7 @@ bool handle_events()
 
 int main()
 {
+    int ret=0;
     init_window("test_sdl", 1000, 800);
 
     Element e(new BaseElement(Form_solid, 0));
@@ -111,6 +168,10 @@ int main()
 
     el = new Element2d(e);
     texture = load_texture("textures/player.png");
+    if (load_ttf_font()) {
+        ret=1;
+        goto end;
+    }
 
     while (!finish_program)
     {
@@ -118,9 +179,14 @@ int main()
             return 0;
 
         test_draw();
+        write_ttf_text(10, 520, "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz", {255, 255, 255, 255}, 13, 25);
+        write_ttf_text(10, 570, "1234567890 !@#$%^&*()_+=-`~", {255, 255, 255, 255}, 13, 25);
+        write_text(10, 620, "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz", {255, 255, 255, 255}, 13, 25);
+        write_text(10, 670, "1234567890 !@#$%^&*()_+=-`~", {255, 255, 255, 255}, 13, 25);
+        
         Backend_Update_Screen();
     }
-
+end:
     close_graphics();
     return 0;
 }
