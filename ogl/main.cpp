@@ -256,7 +256,7 @@ void draw()
     if (show_all_chunks)
         ogl_world->render(0, 0, WORLD_SIZE, WORLD_SIZE);
     else
-        ogl_world->render(chunk_x - 5, chunk_z - 5, chunk_x + 5, chunk_z + 5);
+        ogl_world->render(chunk_x - 4, chunk_z - 4, chunk_x + 4, chunk_z + 4);
 
     glColor4f(1, 1, 1, 1);
     char buf[256] = {
