@@ -6,6 +6,8 @@
 #include "backend.inl"
 #include "window.h"
 #include "texture.h"
+#include "../dialog/d_hotbar.h"
+
 int tile_size;
 
 extern Backend_Texture * add_texture_color(Backend_Surface * s, ColorRGB c);
@@ -186,8 +188,11 @@ void Renderable::render(float el_x, float el_y, float w, float h)
         texture = get_texture();
     }
 
-    Backend_Rect img_rect((Backend_Rect_Field)x, (Backend_Rect_Field)y, (Backend_Rect_Field)(pix_w), (Backend_Rect_Field)(pix_h));
-
+    Backend_Rect img_rect((Backend_Rect_Field)x, (Backend_Rect_Field)(HOTBAR_HEIGHT + y), (Backend_Rect_Field)(pix_w), (Backend_Rect_Field)(pix_h));
+    if (img_rect.get_h() > window_height - STATUS_LINES - HOTBAR_HEIGHT)
+    {
+        return;
+    }
     if (flip)
     {
         Backend_Texture_Copy_Flip(texture, nullptr, &img_rect);

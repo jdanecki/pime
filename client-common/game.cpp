@@ -119,7 +119,7 @@ void loop()
 int init_graphics()
 {
     int texture_size = 32;
-    if (init_window(game_name, texture_size * CHUNK_SIZE + PANEL_WINDOW, texture_size * CHUNK_SIZE + STATUS_LINES))
+    if (init_window(game_name, texture_size * CHUNK_SIZE, texture_size * CHUNK_SIZE + STATUS_LINES))
     {
         return 1;
     }

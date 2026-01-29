@@ -66,7 +66,12 @@ void key_pressed(int key)
 }
 void mouse_pressed(SDL_MouseButtonEvent * event)
 {
-    printf("mouse %d,%d %d \n", event->x, event->y, event->button);
+    printf("mouse pressed: %d,%d button: %d \n", event->x, event->y, event->button);
+}
+
+void mouse_wheel(SDL_MouseWheelEvent * event)
+{
+    printf("mouse wheel: %d, %d \n", event->x, event->y);
 }
 
 bool handle_events()
@@ -87,6 +92,10 @@ bool handle_events()
         if (event.type == SDL_MOUSEBUTTONDOWN)
         {
             mouse_pressed(&event.button);
+        }
+        if (event.type == SDL_MOUSEWHEEL)
+        {
+            mouse_wheel(&event.wheel);
         }
     }
     return false;

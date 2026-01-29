@@ -2,7 +2,7 @@
 #include "playerUI.h"
 
 extern int active_hotbar;
-int hotbar_x = 550, hotbar_y = 420;
+int hotbar_x = 0, hotbar_y = 0;
 
 void change_active_hotbar(DialogButton * button)
 {
@@ -14,7 +14,7 @@ void change_craftbar(DialogButton * button)
     player->craftbar[button->id] ^= 1;
 }
 
-DHotbar::DHotbar() : Dialog({(Backend_Rect_Field)hotbar_x, (Backend_Rect_Field)hotbar_y, 500, 50}, {10, 10, 10, 255})
+DHotbar::DHotbar() : Dialog({(Backend_Rect_Field)hotbar_x, (Backend_Rect_Field)hotbar_y, 500, HOTBAR_HEIGHT}, {10, 10, 10, 255})
 {
     for (int i = 0; i < 10; i++)
     {

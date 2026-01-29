@@ -36,6 +36,8 @@ char text[300];
 
 // TODO remove that when not necessary
 extern NetClient * client;
+
+/*
 void draw_texts()
 {
     int tx = window_width - PANEL_WINDOW + 10;
@@ -45,39 +47,12 @@ void draw_texts()
 
     sprintf(text, "Hunger=%d Thirst=%d", player->hunger, player->thirst);
     write_text(tx, ty, text, (player->hunger < 100 || player->thirst < 100) ? Red : White, 15, 30);
-    int32_t pl_ch_x = player->location.chunk.map_x;
-    int32_t pl_ch_y = player->location.chunk.map_y;
-    float px = player->location.chunk.x;
-    float py = player->location.chunk.y;
-    chunk * ch = world_table[pl_ch_y][pl_ch_x];
-    int tile_x = (int)(px);
-    int tile_y = (int)(py);
 
-    if (tile_x < 0 || tile_y < 0 || tile_x >= CHUNK_SIZE || tile_y >= CHUNK_SIZE)
-    {
-        CONSOLE_LOG("tile_x=%d tile_y=%d\n", tile_x, tile_y);
-        return;
-    }
-    int tile = ch->table[tile_y][tile_x].tile;
-    BaseElement * base = get_base_element(tile % tiles_textures_count);
 
-    sprintf(text, "%s[%d,%d][%0.1f,%0.1f] id=%ld f=%c", player->get_name(), pl_ch_x, pl_ch_y, px, py, base->uid, (Form_name[base->form])[0]);
-    write_text(tx, window_height - 100, text, White, 15, 30);
 
     InventoryElement * item = get_item_at_ppos(player);
     if (item)
     {
-        Class_id el_cid = item->get_cid();
-        char * t = player->get_el_description(item);
-        if (!t)
-        {
-            t = new char[256];
-            sprintf(t, "It looks like %s %s ", el_cid == Class_Element ? item->get_form_name() : " ", item->get_class_name());
-        }
-        print_status(0, t);
-        delete[] t;
-        // item->location.show();
-
         // if (player->checked_element == item->uid)
         {
             ty += 30;
@@ -115,6 +90,7 @@ void draw_texts()
         write_text(window_width - PANEL_WINDOW + 10, hotbar.rect.r.y + hotbar.rect.get_h(), text, Cyan, 13, 25);
     }
 }
+*/
 
 #if 0
 int wait_for_chunk;
@@ -206,10 +182,7 @@ void render_element(InventoryElement * o)
         float screen_x, screen_y;
         get_screen_pos(o, &screen_x, &screen_y);
 
-        if (screen_x < CHUNK_SIZE && screen_y < CHUNK_SIZE)
-        {
-            r->render(screen_x, screen_y, o->dimensions.width.value, o->dimensions.height.value);
-        }
+        r->render(screen_x, screen_y, o->dimensions.width.value, o->dimensions.height.value);
     }
     else
     {
@@ -221,20 +194,22 @@ bool draw_terrain()
 {
     float player_world_x = player->location.get_world_x();
     float player_world_y = player->location.get_world_y();
+    int tiles_on_screen_x = 1 + window_width / tile_size;
+    int tiles_on_screen_y = 1 + (window_height - STATUS_LINES - HOTBAR_HEIGHT) / tile_size;
 
-    left_top_world_x = player_world_x - 8.5;
-    left_top_world_y = player_world_y - 8.5;
+    left_top_world_x = player_world_x - tiles_on_screen_x / 2.0;
+    left_top_world_y = player_world_y - tiles_on_screen_y / 2.0;
 
     int first_tile_x = left_top_world_x;
     int first_tile_y = left_top_world_y;
-    int last_tile_x = left_top_world_x + CHUNK_SIZE + 1;
-    int last_tile_y = left_top_world_y + CHUNK_SIZE + 1;
+    int last_tile_x = left_top_world_x + tiles_on_screen_x;
+    int last_tile_y = left_top_world_y + tiles_on_screen_y;
 
-    Backend_Set_Clip(0, 0, tile_size * CHUNK_SIZE, tile_size * CHUNK_SIZE);
+    Backend_Set_Clip(0, HOTBAR_HEIGHT, window_width, window_height - STATUS_LINES);
 
-    for (int ty = first_tile_y; ty < last_tile_y; ++ty)
+    for (int ty = first_tile_y; ty <= last_tile_y; ++ty)
     {
-        for (int tx = first_tile_x; tx < last_tile_x; ++tx)
+        for (int tx = first_tile_x; tx <= last_tile_x; ++tx)
         {
             int chunk_x = tx / CHUNK_SIZE;
             int chunk_y = ty / CHUNK_SIZE;
@@ -250,7 +225,8 @@ bool draw_terrain()
             int tile_y = ty - chunk_y * CHUNK_SIZE;
 
             int tile = chunk->table[tile_y][tile_x].tile;
-            Backend_Rect img_rect(tile_size * (tx - left_top_world_x), tile_size * (ty - left_top_world_y), tile_size, tile_size);
+            Backend_Rect img_rect(tile_size * (tx - left_top_world_x), HOTBAR_HEIGHT + tile_size * (ty - left_top_world_y), tile_size, tile_size);
+
             Backend_Texture texture = tiles_textures[tile % tiles_textures_count];
             BaseElement * base = get_base_element(tile % tiles_textures_count);
             if (base)
@@ -283,8 +259,8 @@ bool draw_terrain()
   */
     int first_chunk_x = first_tile_x / CHUNK_SIZE;
     int first_chunk_y = first_tile_y / CHUNK_SIZE;
-    int last_chunk_x = (first_tile_x + CHUNK_SIZE - 1) / CHUNK_SIZE;
-    int last_chunk_y = (first_tile_y + CHUNK_SIZE - 1) / CHUNK_SIZE;
+    int last_chunk_x = last_tile_x / CHUNK_SIZE;
+    int last_chunk_y = last_tile_y / CHUNK_SIZE;
 
     // CONSOLE_LOG("%d,%d -> %d,%d\n", first_chunk_x, first_chunk_y, last_chunk_x, last_chunk_y);
     for (unsigned int cy = first_chunk_y; cy <= last_chunk_y; ++cy)
@@ -336,19 +312,16 @@ bool draw_terrain()
 
 void draw_run_icons()
 {
-    int w = window_width - PANEL_WINDOW;
+    int w = window_width;
     int icon_size = w / 10;
-    int x = (int)(w - (icon_size * 1.1));
-
+    Backend_Rect rect(window_width - icon_size, window_height - icon_size, icon_size, icon_size);
     if (player->running)
     {
-        Backend_Rect running_icon_rect(x, 0, icon_size, icon_size);
-        Backend_Texture_Copy(Player_textures.run_icon, NULL, &running_icon_rect);
+        Backend_Texture_Copy(Player_textures.run_icon, NULL, &rect);
     }
     if (player->sneaking)
     {
-        Backend_Rect sneaking_icon_rect(x, 0, icon_size, icon_size);
-        Backend_Texture_Copy(Player_textures.sneak_icon, NULL, &sneaking_icon_rect);
+        Backend_Texture_Copy(Player_textures.sneak_icon, NULL, &rect);
     }
 }
 
@@ -365,10 +338,41 @@ void draw_dialogs()
 
 void draw_status()
 {
-    Backend_Rect r0(0, window_height - 64, window_width, 32);
-    Backend_Draw_Fill_Rectangle(r0, Backend_Color{10, 100, 10, 255});
-    Backend_Rect r1(0, window_height - 32, window_width, 32);
-    Backend_Draw_Fill_Rectangle(r1, Backend_Color{10, 100, 10, 255});
+    InventoryElement * item = get_item_at_ppos(player);
+    if (item)
+    {
+        Class_id el_cid = item->get_cid();
+        char * t = player->get_el_description(item);
+        if (!t)
+        {
+            t = new char[256];
+            sprintf(t, "It looks like %s %s ", el_cid == Class_Element ? item->get_form_name() : " ", item->get_class_name());
+        }
+        print_status(0, t);
+        delete[] t;
+    }
+
+    Backend_Rect r(0, window_height - STATUS_LINES, window_width, STATUS_LINES);
+    Backend_Draw_Fill_Rectangle(r, Backend_Color{10, 100, 10, 255});
+
+    int pl_ch_x = player->location.chunk.map_x;
+    int pl_ch_y = player->location.chunk.map_y;
+    float px = player->location.chunk.x;
+    float py = player->location.chunk.y;
+    chunk * ch = world_table[pl_ch_y][pl_ch_x];
+    int tile_x = (int)(px);
+    int tile_y = (int)(py);
+
+    if (tile_x < 0 || tile_y < 0 || tile_x >= CHUNK_SIZE || tile_y >= CHUNK_SIZE)
+    {
+        CONSOLE_LOG("tile_x=%d tile_y=%d\n", tile_x, tile_y);
+        return;
+    }
+    int tile = ch->table[tile_y][tile_x].tile;
+    BaseElement * base = get_base_element(tile % tiles_textures_count);
+
+    sprintf(text, "%s[%d,%d][%0.1f,%0.1f] id=%ld f=%c", player->get_name(), pl_ch_x, pl_ch_y, px, py, base->uid, (Form_name[base->form])[0]);
+    write_text(5, window_height - 96, text, White, 15, 30);
 
     if (status_line[0] != ' ')
     {
@@ -387,16 +391,17 @@ void draw()
     Backend_Begin_Drawing();
     ui_updates++;
     bool ret = draw_terrain();
-    if (ret && ui_updates > 3)
+    //  if (ret && ui_updates > 3)
     {
-        if (!current_menu)
-        {
-            draw_run_icons();
-            draw_texts();
-        }
 
         // draw_maps();
         draw_status();
+        if (!current_menu)
+        {
+            draw_run_icons();
+            //            draw_texts();
+        }
+
         ui_updates = 0;
     }
 

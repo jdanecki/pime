@@ -10,8 +10,7 @@ void clear_window();
 unsigned int color(int r, int g, int b, int a);
 void update_window_size();
 
-#define PANEL_WINDOW 540
-#define STATUS_LINES (2 * 32)
+#define STATUS_LINES (3 * 32)
 
 extern int tile_size;
 extern float left_top_world_x;

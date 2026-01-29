@@ -89,6 +89,17 @@ void mouse_pressed(SDL_MouseButtonEvent * event)
     }
 }
 
+extern int tile_size;
+
+void mouse_wheel(SDL_MouseWheelEvent * event)
+{
+    printf("mouse wheel: %d, %d \n", event->x, event->y);
+    tile_size += event->y;
+    if (tile_size < 10)
+        tile_size = 10;
+    CONSOLE_LOG("tile_size=%d\n", tile_size);
+}
+
 void handle_keyboard_state(const Uint8 * keys)
 {
     float speed = 0.2;
@@ -167,6 +178,10 @@ bool handle_events()
         if (event.type == SDL_MOUSEBUTTONDOWN)
         {
             mouse_pressed(&event.button);
+        }
+        if (event.type == SDL_MOUSEWHEEL)
+        {
+            mouse_wheel(&event.wheel);
         }
     }
     if (!current_menu)

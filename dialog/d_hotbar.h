@@ -10,4 +10,5 @@ class DHotbar : public Dialog
 };
 
 extern int hotbar_x, hotbar_y;
+#define HOTBAR_HEIGHT 50
 #endif

@@ -94,7 +94,7 @@ try_again:
                 ch->table[y][x].tile = closest_el->get_id() % TILE_TEXTURES;
             }
 
-            //            ch->table[y][x].tile = (x + y) % TILE_TEXTURES;
+             // ch->table[y][x].tile = (x + y) % TILE_TEXTURES;
         }
 
     for (int i = 0; i < r->animals_count; i++)
@@ -126,10 +126,11 @@ void show_loaded_chunks();
 
 void load_chunks()
 {
-    CONSOLE_LOG("Loading chunks\n");
     int size = 10;
-    for (int cy = 128 - size; cy < 128 + size; cy++)
-        for (int cx = 128 - size; cx < 128 + size; cx++)
+    CONSOLE_LOG("Loading chunks: %d - %d \n", 128 - size, 128 + size);
+
+    for (int cy = 128 - size; cy <= 128 + size; cy++)
+        for (int cx = 128 - size; cx <= 128 + size; cx++)
             load_chunk(cy, cx);
     CONSOLE_LOG("Chunks loaded\n");
     show_loaded_chunks();

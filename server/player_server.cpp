@@ -26,7 +26,7 @@ void create_players()
 
 bool check_and_load_chunk(int new_map_x, int new_map_y)
 {
-    int size = 2;
+    int size = 5;
     for (int cy = new_map_y - size; cy <= new_map_y + size; cy++)
     {
         if (cy >= 0 && cy < WORLD_SIZE)

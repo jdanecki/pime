@@ -10,15 +10,31 @@
 #include "../client-common/text.h"
 #include "../client-common/window.h"
 #include "../client-common/texture.h"
+#include "../dialog/d_hotbar.h"
 
 SDL_Renderer * renderer;
 SDL_Window * main_window;
 
+void set_tile_size(int width, int height)
+{
+    int h = height - STATUS_LINES - HOTBAR_HEIGHT;
+    if (width < h)
+    {
+        tile_size = width / CHUNK_SIZE;
+    }
+    else
+    {
+        tile_size = h / CHUNK_SIZE;
+    }
+    if (tile_size < 10)
+        tile_size = 10;
+    CONSOLE_LOG("tile_size=%d\n", tile_size);
+}
 int init_window(const char * title, int wx, int wy)
 {
     Uint32 flags;
-    // flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
-    flags = SDL_WINDOW_HIDDEN;
+    flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
+    // flags = SDL_WINDOW_HIDDEN;
     unsigned long t1 = get_time_usec();
     //    if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) < 0)
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -35,13 +51,13 @@ int init_window(const char * title, int wx, int wy)
         return 1;
     }
     SDL_SetWindowTitle(main_window, title);
-    SDL_SetWindowPosition(main_window, 150, 10);
+    SDL_SetWindowPosition(main_window, 0, 0);
     SDL_SetWindowSize(main_window, wx, wy);
     SDL_GetWindowSize(main_window, &window_width, &window_height);
     CONSOLE_LOG("window_width=%d window_height=%d\n", window_width, window_height);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_ShowWindow(main_window);
-    tile_size = 32;
+    set_tile_size(window_width, window_height);
 
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags))
@@ -101,22 +117,14 @@ unsigned int color(int r, int g, int b, int a)
 
 void update_window_size()
 {
-    int width;
+    int width, height;
     SDL_GetWindowSize(main_window, &window_width, &window_height);
 
-    width = window_width - PANEL_WINDOW;
+    width = window_width;
+    height = window_height;
 
-    if (width < window_height)
-    {
-        tile_size = width / CHUNK_SIZE;
-    }
-    else
-    {
-        tile_size = window_height / CHUNK_SIZE;
-    }
-    if (tile_size < 32)
-        tile_size = 32;
+    set_tile_size(width, height);
 
-    SDL_SetWindowSize(main_window, (tile_size * CHUNK_SIZE) + PANEL_WINDOW, tile_size * CHUNK_SIZE + STATUS_LINES);
-    SDL_GetWindowSize(main_window, &window_width, &window_height);
+    //  SDL_SetWindowSize(main_window, (tile_size * CHUNK_SIZE), tile_size * CHUNK_SIZE + STATUS_LINES);
+    //  SDL_GetWindowSize(main_window, &window_width, &window_height);
 }
