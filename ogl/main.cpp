@@ -19,6 +19,8 @@ SDL_Window * window;
 SDL_GLContext ctx;
 int window_width;
 int window_height;
+float fps;
+int render_distance = 4;
 
 bool show_all_chunks = false;
 
@@ -38,7 +40,7 @@ void update_hotbar() {};
 
 void get_forward_vector(float yaw, float * x, float * z)
 {
-    float yaw_rad = yaw * M_PI / 180.0f;
+    float yaw_rad = -yaw * M_PI / 180.0f;
     *x = -sinf(yaw_rad);
     *z = -cosf(yaw_rad);
 }
@@ -100,12 +102,17 @@ void handle_events()
     {
         if (e.type == SDL_EVENT_MOUSE_MOTION && mouse_grabbed)
         {
-            cam.yaw -= e.motion.xrel * 0.5f;
+            cam.yaw += e.motion.xrel * 0.5f;
             cam.pitch -= e.motion.yrel * 0.5f;
             if (cam.pitch > 90)
                 cam.pitch = 90;
             if (cam.pitch < -90)
                 cam.pitch = -90;
+
+            if (cam.yaw < 0)
+                cam.yaw += 360;
+            if (cam.yaw >= 360)
+                cam.yaw -= 360;
         }
         if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.button == 1)
         {
@@ -131,6 +138,15 @@ void handle_events()
                     break;
                 case SDL_SCANCODE_F1:
                     show_all_chunks ^= 1;
+                    break;
+                case SDL_SCANCODE_EQUALS:
+                    render_distance += 1;
+                    break;
+                case SDL_SCANCODE_MINUS:
+                    render_distance -= 1;
+                    if (render_distance < 1)
+                        render_distance = 1;
+                    break;
             }
         }
     }
@@ -246,9 +262,9 @@ void draw()
     int chunk_x = cam.x / CHUNK_SIZE;
     int chunk_z = cam.z / CHUNK_SIZE;
 
-    for (int chi = chunk_x - 4; chi <= chunk_x + 4; chi++)
+    for (int chi = chunk_x - render_distance; chi <= chunk_x + render_distance; chi++)
     {
-        for (int chj = chunk_z - 4; chj <= chunk_z + 4; chj++)
+        for (int chj = chunk_z - render_distance; chj <= chunk_z + render_distance; chj++)
         {
             check_chunk(chi, chj);
         }
@@ -256,13 +272,14 @@ void draw()
     if (show_all_chunks)
         ogl_world->render(0, 0, WORLD_SIZE, WORLD_SIZE);
     else
-        ogl_world->render(chunk_x - 4, chunk_z - 4, chunk_x + 4, chunk_z + 4);
+        ogl_world->render(chunk_x - render_distance, chunk_z - render_distance, chunk_x + render_distance, chunk_z + render_distance);
 
     glColor4f(1, 1, 1, 1);
-    char buf[256] = {
+    char buf[512] = {
         0,
     };
-    snprintf(buf, 256, "%.2f %.2f %.2f (%d, %d)", cam.x, cam.y, cam.z, (int)(cam.x / CHUNK_SIZE), (int)(cam.z / CHUNK_SIZE));
+    snprintf(buf, 256, "x: %.2f y: %.2f z: %.2f\nmap_x: %d, map_y: %d\nyaw: %.4f pitch: %.4f\nFacing %s\nRender_distance: %d\nfps: %.2f", cam.x, cam.y, cam.z, (int)(cam.x / CHUNK_SIZE),
+        (int)(cam.z / CHUNK_SIZE), cam.yaw, cam.pitch, cam.get_direction_string(), render_distance, fps);
     ogl_text->draw_text(buf, 0, 0, 2, window_width, window_height);
     glDisable(GL_TEXTURE_2D);
     SDL_GL_SwapWindow(window);
@@ -334,5 +351,6 @@ int main(int argc, char * argv[])
         network_tick();
         draw();
         dt = SDL_GetTicks() - t;
+        fps = 1000.0 / dt;
     }
 }

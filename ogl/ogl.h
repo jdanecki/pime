@@ -49,8 +49,25 @@ typedef struct OGL_Camera
         glLoadIdentity();
 
         glRotatef(-pitch, 1.0f, 0.0f, 0.0f);
-        glRotatef(-yaw, 0.0f, 1.0f, 0.0f);
+        glRotatef(yaw, 0.0f, 1.0f, 0.0f);
         glTranslatef(-x, -y, -z);
+    }
+
+    const char * get_direction_string()
+    {
+        int dir = int(round((yaw) / 90.0)) % 4;
+        switch (dir)
+        {
+            case 0:
+                return "North (-Z)";
+            case 1:
+                return "East (+X)";
+            case 2:
+                return "South (+Z)";
+            case 3:
+                return "West (-X)";
+        }
+        return "Unknown?";
     }
 } OGL_Camera;
 
@@ -169,9 +186,9 @@ typedef struct OGL_World
 
     void render(size_t from_x, size_t from_z, size_t to_x, size_t to_z)
     {
-        for (int chi = from_x; chi < to_x; chi++)
+        for (int chi = from_x; chi <= to_x; chi++)
         {
-            for (int chj = from_z; chj < to_z; chj++)
+            for (int chj = from_z; chj <= to_z; chj++)
             {
                 if (OGL_Chunk * ch = ogl_chunks[chj][chi])
                 {
