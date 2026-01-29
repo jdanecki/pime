@@ -144,8 +144,8 @@ void handle_events()
                     break;
                 case SDL_SCANCODE_MINUS:
                     render_distance -= 1;
-                    if (render_distance < 1)
-                        render_distance = 1;
+                    if (render_distance < 0)
+                        render_distance = 0;
                     break;
             }
         }
