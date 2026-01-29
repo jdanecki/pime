@@ -246,9 +246,9 @@ void draw()
     int chunk_x = cam.x / CHUNK_SIZE;
     int chunk_z = cam.z / CHUNK_SIZE;
 
-    for (int chi = chunk_x - 2; chi <= chunk_x + 2; chi++)
+    for (int chi = chunk_x - 4; chi <= chunk_x + 4; chi++)
     {
-        for (int chj = chunk_z - 2; chj <= chunk_z + 2; chj++)
+        for (int chj = chunk_z - 4; chj <= chunk_z + 4; chj++)
         {
             check_chunk(chi, chj);
         }
