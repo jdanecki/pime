@@ -2,14 +2,12 @@
 #include <sys/types.h>
 #include <SDL2/SDL_image.h>
 #include <errno.h>
-#include <stdio.h>
 
 #include "../client-common/text.h"
-#include "../client-common/window.h"
 #include "backend.inl"
 
-#define FONT_WIDTH 8
-#define FONT_HEIGHT 12
+#define FONT_WIDTH 85
+#define FONT_HEIGHT 128
 SDL_Texture * font;
 
 SDL_Color White = {255, 255, 255};
