@@ -126,7 +126,7 @@ custom_target(
 custom_target(
   'font_png_link',
   output: 'font.png',
-  command: ['ln', '-sf', meson.project_source_root() + '/assets/font.png', '@OUTPUT@'],
+  command: ['ln', '-sf', meson.project_source_root() + '/assets/font-special.png', '@OUTPUT@'],
   build_by_default: true,
 )
 subdir('dialog')
