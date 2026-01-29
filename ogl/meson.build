@@ -18,7 +18,7 @@ custom_target(
 
 custom_target(
   'font_link',
-  output: 'nerdfont.otf',
-  command: ['ln', '-sf', meson.project_source_root() + '/assets/nerdfont.otf', '@OUTPUT@'],
+  output: 'font.png',
+  command: ['ln', '-sf', meson.project_source_root() + '/assets/font.png', '@OUTPUT@'],
   build_by_default: true,
 )
