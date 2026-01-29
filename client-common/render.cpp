@@ -74,7 +74,7 @@ void draw_texts()
             t = new char[256];
             sprintf(t, "It looks like %s %s ", el_cid == Class_Element ? item->get_form_name() : " ", item->get_class_name());
         }
-        print_status(1, t);
+        print_status(0, t);
         delete[] t;
         // item->location.show();
 
@@ -83,7 +83,7 @@ void draw_texts()
             ty += 30;
             int count = 0;
             Property ** props = item->get_properties(&count);
-            char buf[64];
+            char buf[128];
             if (props)
             {
                 for (int i = 0; i < count; i++)

@@ -155,7 +155,7 @@ Sentence * Player::get_answer(Sentence * s)
     switch (s->id)
     {
         default:
-            print_status(0, "%s answers: %s", n, a->text);
+            print_status(1, "%s answers: %s", n, a->text);
             break;
     }
     return a;
