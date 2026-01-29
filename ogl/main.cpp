@@ -20,6 +20,8 @@ SDL_GLContext ctx;
 int window_width;
 int window_height;
 
+bool show_all_chunks = false;
+
 size_t my_id;
 
 void print_status(int, char const *, ...) {};
@@ -80,17 +82,9 @@ chunk * check_chunk(int cx, int cy)
     chunk * ch = world_table[cy][cx];
     if (!ch)
     {
-        if (loaded_chunks[cy][cx] == CHUNK_NOT_LOADED)
-        {
-            send_packet_request_chunk(cx, cy);
-            loaded_chunks[cy][cx] = CHUNK_LOADING;
-            return nullptr;
-        }
-        else
-        {
-            // CONSOLE_LOG("waiting for chunk %d %d\n", cx, cy);
-            return nullptr;
-        }
+        send_packet_request_chunk(cx, cy);
+        loaded_chunks[cy][cx] = CHUNK_LOADING;
+        return nullptr;
     }
     else
     {
@@ -129,10 +123,14 @@ void handle_events()
         }
         if (e.type == SDL_EVENT_KEY_DOWN)
         {
-            if (e.key.scancode == SDL_SCANCODE_ESCAPE)
+            switch (e.key.scancode)
             {
-                SDL_SetWindowRelativeMouseMode(window, false);
-                mouse_grabbed = false;
+                case SDL_SCANCODE_ESCAPE:
+                    SDL_SetWindowRelativeMouseMode(window, false);
+                    mouse_grabbed = false;
+                    break;
+                case SDL_SCANCODE_F1:
+                    show_all_chunks ^= 1;
             }
         }
     }
@@ -255,7 +253,10 @@ void draw()
             check_chunk(chi, chj);
         }
     }
-    ogl_world->render(chunk_x - 5, chunk_z - 5, chunk_x + 5, chunk_z + 5);
+    if (show_all_chunks)
+        ogl_world->render(0, 0, WORLD_SIZE, WORLD_SIZE);
+    else
+        ogl_world->render(chunk_x - 5, chunk_z - 5, chunk_x + 5, chunk_z + 5);
 
     glColor4f(1, 1, 1, 1);
     char buf[256] = {
