@@ -1,8 +1,11 @@
 #pragma once
 #include "../core/world_params.h"
+#include "../core/alchemist/elements/element.h"
 #include <GL/gl.h>
 #include <SDL3/SDL.h>
 #include <cmath>
+#include <cstdio>
+#include <unordered_map>
 
 typedef struct OGL_Camera
 {
@@ -60,20 +63,24 @@ typedef struct OGL_Vertex
 
 typedef struct OGL_Plane
 {
-    float x, y, z;
     GLuint texture;
     int r, g, b;
     OGL_Vertex vertices[6];
-    OGL_Plane(float x, float y, float z, GLuint texture, int r, int g, int b) : x(x), y(y), z(z), texture(texture), r(r), g(g), b(b)
+    OGL_Plane(float x, float y, float z, GLuint texture, int r, int g, int b) : texture(texture), r(r), g(g), b(b)
+    {
+        update_vertices(x, y, z);
+    };
+
+    void update_vertices(float _x, float _y, float _z)
     {
         int idx = 0;
-        vertices[idx++] = (OGL_Vertex){x - 0.5f, y + 0.5f, z + 0.5f, 0, 1, 0, 0, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x + 0.5f, y + 0.5f, z + 0.5f, 0, 1, 0, 1, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x + 0.5f, y + 0.5f, z - 0.5f, 0, 1, 0, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + 0.5f, y + 0.5f, z - 0.5f, 0, 1, 0, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x - 0.5f, y + 0.5f, z - 0.5f, 0, 1, 0, 0, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x - 0.5f, y + 0.5f, z + 0.5f, 0, 1, 0, 0, 0, texture};
-    };
+        vertices[idx++] = (OGL_Vertex){_x - 0.5f, _y + 0.5f, _z + 0.5f, 0, 1, 0, 0, 0, texture};
+        vertices[idx++] = (OGL_Vertex){_x + 0.5f, _y + 0.5f, _z + 0.5f, 0, 1, 0, 1, 0, texture};
+        vertices[idx++] = (OGL_Vertex){_x + 0.5f, _y + 0.5f, _z - 0.5f, 0, 1, 0, 1, 1, texture};
+        vertices[idx++] = (OGL_Vertex){_x + 0.5f, _y + 0.5f, _z - 0.5f, 0, 1, 0, 1, 1, texture};
+        vertices[idx++] = (OGL_Vertex){_x - 0.5f, _y + 0.5f, _z - 0.5f, 0, 1, 0, 0, 1, texture};
+        vertices[idx++] = (OGL_Vertex){_x - 0.5f, _y + 0.5f, _z + 0.5f, 0, 1, 0, 0, 0, texture};
+    }
     void render()
     {
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -92,24 +99,60 @@ typedef struct OGL_Plane
     }
 } OGL_Plane;
 
+typedef struct OGL_Element : public Element, public OGL_Plane
+{
+    ColorRGB color;
+    OGL_Element(Element element) : Element(element), OGL_Plane(0, 0, 0, 0, get_base()->color.r, get_base()->color.g, get_base()->color.b), color(get_base()->color)
+    {
+    }
+    void set_position(float x, float y)
+    {
+        update_vertices(x, 0.1, y);
+    }
+} OGL_Element;
+
 typedef struct OGL_Chunk
 {
-    OGL_Plane * planes[CHUNK_SIZE * CHUNK_SIZE];
-    GLuint display_list;
+    OGL_Plane * tiles[CHUNK_SIZE * CHUNK_SIZE];
+    std::unordered_map<size_t, OGL_Element *> elements;
+    GLuint tiles_display_list = 0;
+    GLuint element_display_list = 0;
 
     void render()
     {
-        glCallList(display_list);
+        if (tiles_display_list != 0)
+            glCallList(tiles_display_list);
+        if (element_display_list != 0)
+            glCallList(element_display_list);
     }
 
-    void create_display_list()
+    void add_element(OGL_Element * el)
     {
-        display_list = glGenLists(1);
-        glNewList(display_list, GL_COMPILE);
+        elements[el->uid] = el;
+        update_element_display_list();
+    }
+
+    void update_tiles_display_list()
+    {
+        if (tiles_display_list != 0)
+            glDeleteLists(tiles_display_list, 1);
+        tiles_display_list = glGenLists(1);
+        glNewList(tiles_display_list, GL_COMPILE);
         for (int i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++)
         {
-            planes[i]->render();
+            tiles[i]->render();
         }
+        glEndList();
+    }
+
+    void update_element_display_list()
+    {
+        if (element_display_list != 0)
+            glDeleteLists(element_display_list, 0);
+        element_display_list = glGenLists(1);
+        glNewList(element_display_list, GL_COMPILE);
+        for (auto [_, ogl_element] : elements)
+            ogl_element->render();
         glEndList();
     }
 
@@ -120,7 +163,7 @@ typedef struct OGL_Chunk
 
 typedef struct OGL_World
 {
-    OGL_Chunk * ogl_tiles[WORLD_SIZE][WORLD_SIZE];
+    OGL_Chunk * ogl_chunks[WORLD_SIZE][WORLD_SIZE];
     GLuint display_list = 0;
 
     void render(size_t from_x, size_t from_z, size_t to_x, size_t to_z)
@@ -129,43 +172,21 @@ typedef struct OGL_World
         {
             for (int chj = from_z; chj < to_z; chj++)
             {
-                if (OGL_Chunk * ch = ogl_tiles[chj][chi])
+                if (OGL_Chunk * ch = ogl_chunks[chj][chi])
                 {
                     ch->render();
                 }
             }
         }
     }
-    // void render()
-    // {
-    //     glCallList(display_list);
-    // }
-    //
-    // void create_display_list()
-    // {
-    //     if (display_list != 0)
-    //         glDeleteLists(display_list, 1);
-    //     display_list = glGenLists(1);
-    //     glNewList(display_list, GL_COMPILE);
-    //     for (int chi = 0; chi < WORLD_SIZE; chi++)
-    //     {
-    //         for (int chj = 0; chj < WORLD_SIZE; chj++)
-    //         {
-    //             if (OGL_Chunk * ch = ogl_tiles[chj][chi])
-    //             {
-    //                 ch->render();
-    //             }
-    //         }
-    //     }
-    //     glEndList();
-    // }
+
     OGL_World()
     {
         for (int i = 0; i < WORLD_SIZE; i++)
         {
             for (int j = 0; j < WORLD_SIZE; j++)
             {
-                ogl_tiles[j][i] = NULL;
+                ogl_chunks[j][i] = NULL;
             }
         }
     }
