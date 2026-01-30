@@ -28,10 +28,11 @@ client_common_sdl = static_library('client_common_sdl',
 )
 
 executable('pime_SDL', 
-  sources: sdl_sources,
+  sources: [sdl_sources, client_net],
   dependencies: [sdl_deps],
   link_args: shared_link_args,
   link_with: [core, client_common_sdl ],
+  #cpp_args : ['-DUSE_TEXTURES'],
   install: false,
 )
 

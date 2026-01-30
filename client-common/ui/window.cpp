@@ -1,9 +1,8 @@
-#include "window.h"
 #include "../core/world_params.h"
-#include "../dialog/d_hotbar.h"
+#include "dialog/d_hotbar.h"
 
-int window_width;
-int window_height;
+#include "window.h"
+#include "../2d/texture.h"
 
 void set_tile_size(int width, int height)
 {

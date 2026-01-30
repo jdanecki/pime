@@ -2,7 +2,7 @@
 #include <SDL_mixer.h>
 #include <stdlib.h>
 
-#include "../client-common/music.h"
+#include "../client-common/2d/music.h"
 
 struct Musics
 {

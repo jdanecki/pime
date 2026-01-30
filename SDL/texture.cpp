@@ -1,14 +1,14 @@
-#include <SDL_surface.h>
-#include <SDL_image.h>
-#include <SDL_blendmode.h>
-#include <SDL_image.h>
+#include <SDL2/SDL_surface.h>
+#include <SDL2/SDL_blendmode.h>
+
 #include <dirent.h>
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
 
-#include "../client-common/window.h"
-#include "../client-common/texture.h"
+#include "backend.inl"
+
+#include "../core/alchemist/elements/types.h"
 
 SDL_Texture * add_texture_color(SDL_Surface * source, ColorRGB c)
 {

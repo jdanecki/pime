@@ -1,7 +1,7 @@
 #ifndef INPUTS_H
 #define INPUTS_H
 
-#include "../dialog/d_hotbar.h"
+#include "../ui/dialog/d_hotbar.h"
 
 extern int active_hotbar;
 extern int auto_explore;

@@ -1,5 +1,5 @@
 #include <raylib.h>
-#include "../../menu/menu.h"
+#include "../../client-common/ui/menu/menu.h"
 #include "../../core/key_handler.h"
 
 extern bool show_craft;

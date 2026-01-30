@@ -1,4 +1,4 @@
-#include "../client-common/net.h"
+#include "../net/net.h"
 #include "../core/tiles.h"
 #include "main.h"
 #include "ogl.h"

@@ -2,7 +2,7 @@
 
 #include "../core/world.h"
 #include "playerUI.h"
-#include "../client-common/net.h"
+#include "../../net/net.h"
 
 extern PlayerUI * player;
 extern int active_hotbar;

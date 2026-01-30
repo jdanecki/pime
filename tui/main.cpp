@@ -8,8 +8,8 @@
 #include "../core/world.h"
 #include "../core/alchemist/el_list.h"
 
+#include "../net/net.h"
 #include "../client-common/game.h"
-#include "../client-common/net.h"
 #include "../client-common/players.h"
 
 #include "playerUI.h"
@@ -18,11 +18,11 @@ extern int trace_network;
 
 struct termios old_stdin, stdin_tty;
 
-void create_menus()
+void create_game_menus()
 {
 }
 
-int init_window(const char * title, int wx, int wy)
+int init_window(const char * title, int wx, int wy, bool resizable)
 {
     setbuf(stdout, nullptr);
     tcgetattr(0, &old_stdin);

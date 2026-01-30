@@ -2,10 +2,10 @@
 
 #include "../../core/alchemist/elements.h"
 
-#include "../../client-common/window.h"
-#include "../../client-common/text.h"
+#include "../../client-common/ui/window.h"
+#include "../../client-common/ui/text.h"
 
-#include "../../menu/menu.h"
+#include "../../client-common/ui/menu/menu.h"
 
 int tile_size = 32;
 bool finish_program;
@@ -64,7 +64,7 @@ int main()
         return 1;
     if (load_font())
         return 1;
-    create_menus();
+    create_game_menus();
     for (;;)
     {
         if (handle_events())

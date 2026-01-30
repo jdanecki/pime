@@ -1,9 +1,9 @@
 #include <stdio.h>
 
-#include "../../client-common/window.h"
-#include "../../client-common/texture.h"
-#include "../../client-common/alchemist2d.h"
-#include "../../client-common/text.h"
+#include "../../client-common/ui/window.h"
+#include "../../client-common/2d/texture.h"
+#include "../../client-common/2d/alchemist2d.h"
+#include "../../client-common/ui/text.h"
 
 bool handle_events();
 

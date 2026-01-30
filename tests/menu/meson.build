@@ -5,11 +5,11 @@ test_menu_sdl_sources = [
     '../../SDL/backend.cpp',
     '../../SDL/text.cpp',
     '../../client-common/players.cpp',
-    '../../client-common/player_actions.cpp',
-    '../../client-common/texture.cpp',
-    '../../client-common/text.cpp',
-    '../../client-common/window.cpp',
-    '../../menu/menu.cpp',
+    '../../client-common/2d/player_actions.cpp',
+    '../../client-common/2d/texture.cpp',
+    '../../client-common/ui/console.cpp',
+    '../../client-common/ui/window.cpp',
+    '../../client-common/ui/menu/menu.cpp',
 ]
 
 test_menu_raylib_sources = [
@@ -19,11 +19,11 @@ test_menu_raylib_sources = [
     '../../raylib/backend.cpp',
     '../../raylib/text.cpp',
     '../../client-common/players.cpp',
-    '../../client-common/player_actions.cpp',
-    '../../client-common/texture.cpp',
-    '../../client-common/text.cpp',
-    '../../client-common/window.cpp',
-    '../../menu/menu.cpp'
+    '../../client-common/2d/player_actions.cpp',
+    '../../client-common/2d/texture.cpp',
+    '../../client-common/ui/console.cpp',
+    '../../client-common/ui/window.cpp',
+    '../../client-common/ui/menu/menu.cpp'
 ]
 
 executable('test_menu_sdl', 
@@ -61,6 +61,6 @@ custom_target(
 custom_target(
   'font_png_link',
   output: 'font.png',
-  command: ['ln', '-sf', meson.project_source_root() + '/assets/font.png', '@OUTPUT@'],
+  command: ['ln', '-sf', meson.project_source_root() + '/assets/font-special.png', '@OUTPUT@'],
   build_by_default: true,
 )

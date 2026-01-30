@@ -21,8 +21,7 @@ shared_link_args = ['-lm']
 
 subdir('core')
 subdir('client-common')
-subdir('dialog')
-subdir('menu')
+subdir('net')
 
 client_common_2d= []
 foreach s : client_common_sources
@@ -33,12 +32,9 @@ foreach s : client_common_2d_sources
   client_common_2d += ['../client-common/' + s]
 endforeach
 
-foreach s : menu_sources
-  client_common_2d += ['../menu/' + s]
-endforeach
-
-foreach s : dialog_sources
-  client_common_2d += ['../dialog/' + s]
+client_net= []
+foreach s : client_net_sources
+  client_net += ['../net/' + s]
 endforeach
 
 subdir('ogl')

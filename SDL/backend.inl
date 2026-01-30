@@ -1,12 +1,13 @@
 #ifndef __BACKEND_INL__
 #define __BACKEND_INL__
 
-#include "SDL2_gfxPrimitives.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_render.h>
 #include <SDL_mixer.h>
+
+#define USE_TEXTURES 1
 
 typedef SDL_Texture * Backend_Texture;
 typedef SDL_TimerID timer_id;

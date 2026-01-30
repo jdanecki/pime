@@ -24,11 +24,12 @@ client_common_raylib = static_library('client_common_raylib',
 )
 
 executable('pime_raylib', 
-  sources: raylib_sources,
+  sources: [raylib_sources, client_net],
   dependencies: [raylib_deps],
   link_args: shared_link_args,
   link_with: [core, client_common_raylib ],
   install: false,
+ # cpp_args : ['-DUSE_TEXTURES'],
 )
 
 custom_target(

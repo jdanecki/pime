@@ -5,10 +5,10 @@ test_sdl_sources = [
     '../SDL/window.cpp',
     '../SDL/backend.cpp',
     '../SDL/text.cpp',
-    '../client-common/alchemist2d.cpp',
-    '../client-common/texture.cpp',
-    '../client-common/text.cpp',
-    '../client-common/window.cpp'
+    '../client-common/2d/alchemist2d.cpp',
+    '../client-common/2d/texture.cpp',
+    '../client-common/ui/console.cpp',
+    '../client-common/ui/window.cpp'
 ]
 
 test_raylib_sources = [
@@ -16,10 +16,10 @@ test_raylib_sources = [
     '../raylib/window.cpp',
     '../raylib/backend.cpp',
     '../raylib/text.cpp',
-    '../client-common/alchemist2d.cpp',
-    '../client-common/texture.cpp',
-    '../client-common/text.cpp',
-    '../client-common/window.cpp'
+    '../client-common/2d/alchemist2d.cpp',
+    '../client-common/2d/texture.cpp',
+    '../client-common/ui/console.cpp',
+    '../client-common/ui/window.cpp'
 ]
 
 
@@ -28,9 +28,9 @@ test_sdl_textures_sources = [
     '../SDL/window.cpp',
     '../SDL/text.cpp',
     '../SDL/backend.cpp',
-    '../client-common/texture.cpp',
-    '../client-common/text.cpp',
-    '../client-common/window.cpp'
+    '../client-common/2d/texture.cpp',
+    '../client-common/ui/console.cpp',
+    '../client-common/ui/window.cpp'
 ]    
 
 test_sdl_textures1_sources = [
@@ -38,15 +38,15 @@ test_sdl_textures1_sources = [
     '../SDL/window.cpp',
     '../SDL/text.cpp',
     '../SDL/backend.cpp',
-    '../client-common/texture.cpp',
-    '../client-common/text.cpp',
-    '../client-common/window.cpp'
+    '../client-common/2d/texture.cpp',
+    '../client-common/ui/console.cpp',
+    '../client-common/ui/window.cpp'
 ]    
 
 
 test_lists_sources = [
     'test_lists.cpp',
-    '../client-common/text.cpp'
+    '../client-common/ui/console.cpp'
 ]
 
 test_generator_sdl_sources = [
@@ -55,7 +55,7 @@ test_generator_sdl_sources = [
   '../core/alchemist/random_functions.cpp',
   '../SDL/text.cpp',
   '../SDL/palette.cpp',
-  '../client-common/text.cpp'
+  '../client-common/ui/console.cpp'
 ]
 
 
@@ -132,3 +132,4 @@ custom_target(
 subdir('dialog')
 subdir('menu')
 subdir('server')
+

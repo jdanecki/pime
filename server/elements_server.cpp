@@ -12,9 +12,13 @@ void destroy(InventoryElement * el)
 {
     if (el->location.tag == ItemLocation::Tag::Chunk)
     {
-        world_table[(int)el->location.chunk.map_y][(int)el->location.chunk.map_x]->remove_object(el);
+        chunk *ch = world_table[(int)el->location.chunk.map_y][(int)el->location.chunk.map_x];
+        if (ch) {
+            ch->remove_object(el);
+            notify_destroy(el);
+        }
     }
-    notify_destroy(el);
+    
 }
 
 AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)

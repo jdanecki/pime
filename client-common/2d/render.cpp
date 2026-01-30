@@ -4,18 +4,17 @@
 
 #include "render.h"
 #include "backend.inl"
-#include "text.h"
-
-#include "../dialog/d_craft.h"
-#include "../dialog/d_hotbar.h"
-
 #include "playerUI.h"
-#include "net.h"
+#include "../../net/net.h"
 #include "texture.h"
-#include "window.h"
 #include "alchemist2d.h"
 
-#include "../menu/menu.h"
+#include "../ui/text.h"
+#include "../ui/dialog/d_craft.h"
+#include "../ui/dialog/d_hotbar.h"
+#include "../ui/window.h"
+#include "../ui/menu/menu.h"
+#include "../ui/console.h"
 
 extern Backend_Texture map;
 
@@ -206,7 +205,7 @@ bool draw_terrain()
     int last_tile_y = left_top_world_y + tiles_on_screen_y;
 
     Backend_Set_Clip(0, HOTBAR_HEIGHT, window_width, window_height - STATUS_LINES);
- //   CONSOLE_LOG("draw_terrain %d-%d %d-%d\n", first_tile_x, last_tile_x, first_tile_y, last_tile_y);
+    //   CONSOLE_LOG("draw_terrain %d-%d %d-%d\n", first_tile_x, last_tile_x, first_tile_y, last_tile_y);
     for (int ty = first_tile_y; ty <= last_tile_y; ++ty)
     {
         for (int tx = first_tile_x; tx <= last_tile_x; ++tx)

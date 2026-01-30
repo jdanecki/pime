@@ -1,4 +1,4 @@
-#include "../client-common/net.h"
+#include "../net/net.h"
 #include "../client-common/players.h"
 
 #include "playerUI.h"

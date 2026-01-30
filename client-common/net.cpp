@@ -1,406 +1,325 @@
+#include "../net/net.h"
+#include "playerUI.h"
+#include "players.h"
 #include <cstdio>
-#include <stdint.h>
 #include <cstring>
 
-#include "../core/packets.h"
-#include "net.h"
-
-ElementsList objects("objects");
-
-NetClient * client;
-const char * ip = "127.0.0.1";
-const char * port = "1234";
-ENetHost * host;
+extern void update_hotbar();
 extern void print_status(int i, const char * format, ...);
 
-class ObjectElement : public ListElement
+void knowledge_update(size_t pl_id, Class_id cid, int id)
 {
-  public:
-    ObjectElement(InventoryElement * el) : ListElement(el)
-    {
-    }
-    bool check(void * what)
-    {
-        uintptr_t * uid = (uintptr_t *)what;
-        return *uid == get_el()->uid;
-    }
-};
+    if (pl_id != player->get_id())
+        return;
 
-void add_base_elements(PacketElementsList * list, int i)
-{
-    switch (list->get_c_id())
-    {
-        case Class_BaseElement:
-        {
-            BaseElement * base_el = &((BaseElement *)list->get_data())[i];
-            base_elements.add(new BaseListElement(new BaseElement(*base_el)));
-            break;
-        }
-        case Class_BasePlant:
-        {
-            BasePlant * base_el = &((BasePlant *)list->get_data())[i];
-            base_plants.add(new BaseListElement(new BasePlant(*base_el)));
-            break;
-        }
-        case Class_BaseAnimal:
-        {
-            BaseAnimal * base_el = &((BaseAnimal *)list->get_data())[i];
-            base_animals.add(new BaseListElement(new BaseAnimal(*base_el)));
-            break;
-        }
-    }
-}
-
-extern void update_hotbar();
-void add_elements_to_inventory(PacketElementsList * list, int i)
-{
-    size_t uid = ((size_t *)list->get_data())[i];
-    Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, list->get_pl_id()));
-    if (p)
-    {
-        InventoryElement * el = get_object_by_id(NetworkObject(Class_Element, uid));
-        if (el)
-            p->pickup(el);
-        //  printf("player=%s [%d]=%lx inv.elements=%d\n", p->get_name(), i, uid, p->inventory.nr_elements);
-    }
-    update_hotbar();
-}
-
-void send_packet_request_item(size_t id)
-{
-    Packet * p = new PacketRequestItem(id);
-    p->send(client->peer);
-}
-
-bool handle_packet(ENetPacket * packet)
-{
-    bool ret = false;
-    unsigned char * data = packet->data;
-    //  printf("Received length=%lu: %d\n", packet->dataLength, *data);
-
-    Packet * p = check_client_packet('R', data, packet->dataLength);
+    CONSOLE_LOG("knowledge update for player %ld cid=%s id=%d\n", pl_id, class_name[cid], id);
+    Player * p = players[pl_id];
     if (!p)
-        return ret;
-
-    switch (p->get_type())
-    {
-        case PACKET_ACTION_FAILED:
-        {
-            printf("action failed\n");
-            ret = true;
-            break;
-        }
-        case PACKET_PLAYER_ID:
-        {
-            PacketPlayerId * id = static_cast<PacketPlayerId *>(p);
-            got_id(id->get_id(), 0);
-            ret = true;
-            break;
-        }
-        case PACKET_CHUNK_UPDATE:
-        {
-            PacketChunkUpdate * up = static_cast<PacketChunkUpdate *>(p);
-            update_chunk(up->get_x(), up->get_y(), up->get_table());
-            ret = true;
-            break;
-        }
-        case PACKET_OBJECT_CREATE:
-        {
-            PacketObjectCreate * obj = static_cast<PacketObjectCreate *>(p);
-
-            create_object(obj->obj);
-            ret = true;
-            break;
-        }
-        case PACKET_OBJECT_UPDATE:
-        {
-            PacketObjectUpdate * obj = static_cast<PacketObjectUpdate *>(p);
-
-            update_object(obj->obj);
-            ret = true;
-            break;
-        }
-        case PACKET_OBJECT_DESTROY:
-        {
-            PacketObjectDestroy * obj = static_cast<PacketObjectDestroy *>(p);
-
-            destroy_object(NetworkObject(Class_Unknown, obj->get_id()), obj->get_location());
-            ret = true;
-            break;
-        }
-        case PACKET_LOCATION_UPDATE:
-        {
-            PacketLocationUpdate * loc = static_cast<PacketLocationUpdate *>(p);
-            update_item_location(loc->get_location());
-            ret = true;
-            break;
-        }
-        case PACKET_KNOWLEDGE_UPDATE:
-        {
-            PacketKnowledgeUpdate * upd = static_cast<PacketKnowledgeUpdate *>(p);
-            knowledge_update(upd->get_pl_id(), upd->get_cid(), upd->get_id());
-            ret = true;
-            break;
-        }
-        case PACKET_CHECKED_UPDATE:
-        {
-            PacketCheckedUpdate * upd = static_cast<PacketCheckedUpdate *>(p);
-            checked_update(upd->get_pl_id(), upd->get_id());
-            ret = true;
-            break;
-        }
-        case PACKET_ELEMENTS_LIST:
-        {
-            PacketElementsList * list = static_cast<PacketElementsList *>(p);
-            for (int i = 0; i < list->get_nr_elements(); i++)
-            {
-                switch (list->get_list_c_id())
-                {
-                    case Class_BaseListElement:
-                        add_base_elements(list, i);
-                        break;
-                    case Class_ListElement:
-                        add_elements_to_inventory(list, i);
-                        break;
-                }
-            }
-            ret = true;
-            break;
-        }
-    }
-    delete p;
-    return ret;
+        return;
+    p->set_known(cid, id);
 }
 
-bool init_networking()
+void got_id(size_t id, int64_t seed)
 {
-    // trace_network = 1;
+    my_id = id;
 
-    if (enet_initialize() != 0)
+    ItemLocation loc;
+    loc.tag = ItemLocation::Tag::Chunk;
+    loc.chunk.map_x = 128;
+    loc.chunk.map_y = 128;
+    loc.chunk.x = 8;
+    loc.chunk.y = 8;
+
+    Player p(id, SerializableCString("player"), loc, 0, 0, 0);
+    player = new PlayerUI(p);
+    CONSOLE_LOG("seed: %ld\n", seed);
+    srand(seed);
+    init_sentences();
+    init_questions();
+    init_answers();
+    CONSOLE_LOG("got id %ld\n", id);
+
+    print_status(0, "player id=%ld %s connected", id, player->get_name());
+}
+
+void checked_update(size_t pl_id, size_t el)
+{
+    if (pl_id != player->get_id())
+        return;
+
+    CONSOLE_LOG("checked update for player %ld el=%lx\n", pl_id, el);
+    Player * p = players[pl_id];
+    if (!p)
+        return;
+    p->set_checked(el);
+}
+
+InventoryElement * remove_from_location(ItemLocation location, NetworkObject id)
+{
+    InventoryElement * el = (InventoryElement *)get_object_by_id(id);
+    if (!el)
+        return nullptr;
+    switch (location.tag)
     {
-        fprintf(stderr, "Enet initialization failed\n");
-        return false;
-    }
-    atexit(enet_deinitialize);
-
-    host = enet_host_create(NULL, 1, 2, 0, 0);
-    if (!host)
-    {
-        fprintf(stderr, "Can't create client\n");
-        return false;
-    }
-
-    ENetAddress address;
-    enet_address_set_host(&address, ip);
-    address.port = atoi(port);
-
-    ENetPeer * peer = enet_host_connect(host, &address, 2, 0);
-    if (!peer)
-    {
-        fprintf(stderr, "Can't connect to server\n");
-        return false;
-    }
-
-    ENetEvent event;
-
-    if (enet_host_service(host, &event, 5000) > 0 // 5000 ms
-        && event.type == ENET_EVENT_TYPE_CONNECT)
-    {
-
-        char hostname[256];
-        enet_address_get_host_ip(&event.peer->address, hostname, 256);
-        printf("Connected to %s:%d\n", hostname, event.peer->address.port);
-    }
-    else
-    {
-        enet_peer_reset(peer);
-        printf("Can't connect to server\n");
-        return false;
-    }
-
-    Packet * p = new PacketJoinRequest();
-    p->send(peer);
-
-    if (enet_host_service(host, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_RECEIVE)
-    {
-        handle_packet(event.packet);
-        enet_packet_destroy(event.packet);
-        client = new NetClient(host, peer);
-        return true;
-    }
-    else
-    {
-        printf("Server did not answer\n");
-
-        enet_peer_disconnect(peer, 0);
-
-        while (enet_host_service(host, &event, 3000) > 0)
+        case ItemLocation::Tag::Chunk:
         {
-            if (event.type == ENET_EVENT_TYPE_DISCONNECT)
+            remove_from_chunks(el);
+            break;
+        }
+        case ItemLocation::Tag::Player:
+        {
+            Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, location.player.id));
+            if (p)
+                p->drop(el);
+            if (location.player.id == player->get_id())
             {
-                printf("Disconnected from server\n");
-                break;
+                update_hotbar();
             }
         }
-        return false;
     }
+    return el;
 }
 
-unsigned int network_tick()
+void destroy_object(NetworkObject id, ItemLocation location)
 {
-    ENetEvent event;
-    unsigned int recv = 0;
-    while (enet_host_service(client->host, &event, 10) > 0)
+    InventoryElement * el = (InventoryElement *)get_object_by_id(id);
+    if (el)
     {
-        switch (event.type)
+        InventoryElement * removed = remove_from_location(location, id);
+        if (removed == nullptr)
         {
-            case ENET_EVENT_TYPE_RECEIVE:
-            {
-                recv += event.packet->dataLength;
-                handle_packet(event.packet);
-                enet_packet_destroy(event.packet);
-                break;
-            }
-            default:
-                break;
+            abort();
         }
+        //     CONSOLE_LOG("Client: destroy_object %ld\n", id.uid);
+        deregister_object(el);
+        delete el;
     }
-
-    return recv;
+    // else
+    //  item on not loaded chunk
+    //    CONSOLE_LOG("Client: deleting inexisting item %ld\n", id);
 }
 
-InventoryElement * get_object_by_id(NetworkObject obj)
+void update_item_location(LocationUpdateData data)
 {
-    ListElement * el = objects.find(&obj.uid);
-    return el ? static_cast<InventoryElement *>(el->get_el()) : nullptr;
-}
+    NetworkObject id = data.id;
+    ItemLocation & old_loc = data.old;
+    ItemLocation & new_loc = data.new_;
 
-void register_object(NetworkObject * o)
-{
-    ObjectElement * obj = new ObjectElement((InventoryElement *)o);
-    // printf("register_object: uid=%lx\n", o->uid);
-    objects.add(obj);
-}
+    /*  CONSOLE_LOG("update item location uid=%lx old_tag=%d new_tag=%d\n", id.uid, (int)old_loc.tag, (int)new_loc.tag);
+      old_loc.show();
+      new_loc.show();
+  */
+    InventoryElement * el = remove_from_location(old_loc, id);
+    if (!el)
+    { // FIXME
+        // CONSOLE_LOG("Client: not found item %lu to remove on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
+        //      id,
+        //      old_loc.chunk.map_x, old_loc.chunk.map_y,
+        //      old_loc.chunk.x, old_loc.chunk.y,
+        //      new_loc.chunk.map_x, new_loc.chunk.map_y,
+        //      new_loc.chunk.x, new_loc.chunk.y);
+        if (new_loc.tag == ItemLocation::Tag::Chunk && new_loc.chunk.map_x == player->location.chunk.map_x && new_loc.chunk.map_y == player->location.chunk.map_y)
+            send_packet_request_item(id.uid);
 
-void deregister_object(NetworkObject * o)
-{
-    ListElement * obj = objects.find(&o->uid);
-    objects.remove(obj);
-}
-
-Base * get_base(uint32_t c_id, int32_t id)
-{
-    return nullptr;
-    // return base.find(&id);
-}
-
-void send_packet_move(float x, float y)
-{
-    Packet * p = new PacketPlayerMove(x, y);
-    p->send(client->peer);
-}
-
-void send_packet_pickup(uintptr_t id)
-{
-    Packet * p = new PacketPlayerActionPickup(id);
-    p->send(client->peer);
-}
-
-void send_packet_drop(uintptr_t id)
-{
-    Packet * p = new PacketPlayerActionDrop(id);
-    p->send(client->peer);
-}
-
-void send_packet_item_used_on_object(uintptr_t iid, uintptr_t oid)
-{
-    Packet * p = new PacketPlayerActionUseItemOnObject(iid, oid);
-    p->send(client->peer);
-}
-
-void send_packet_action_on_object(int32_t a, uintptr_t oid)
-{
-    Packet * p = new PacketPlayerActionOnObject((Player_action)a, oid);
-    p->send(client->peer);
-}
-
-void send_packet_server_action_on_object(int32_t a, uintptr_t oid)
-{
-    Packet * p = new PacketServerActionOnObject((Server_action)a, oid);
-    p->send(client->peer);
-}
-
-void send_packet_item_used_on_tile(uintptr_t iid, ItemLocation location)
-{
-    if (location.tag == ItemLocation::Tag::Chunk)
-    {
-        Packet * p = new PacketPlayerActionUseItemOnTile(iid, location.chunk.map_x, location.chunk.map_y, location.chunk.x, location.chunk.y);
-        p->send(client->peer);
-    }
-}
-
-void send_packet_craft(uintptr_t prod_id, uintptr_t ingredients_num, const uintptr_t * iid)
-{
-    Packet * p = new PacketPlayerActionCraft(prod_id, ingredients_num, iid);
-    p->send(client->peer);
-}
-
-void send_packet_request_chunk(int32_t cx, int32_t cy)
-{
-    Packet * p = new PacketRequestChunk(cx, cy);
-    p->send(client->peer);
-}
-
-void disconnect()
-{
-    ENetEvent event;
-
-    enet_peer_disconnect(client->peer, 0);
-    while (enet_host_service(host, &event, 3000) > 0)
-    {
-        if (event.type == ENET_EVENT_TYPE_DISCONNECT)
-        {
-            CONSOLE_LOG("Disconnected from server\n");
-            break;
-        }
-    }
-}
-
-NetClient::NetClient(ENetHost * host, ENetPeer * peer) : host(host), peer(peer)
-{
-}
-
-void action_tile(Player_action a, InventoryElement * object)
-{
-    if (!object)
-    {
-        CONSOLE_LOG("action_tile: nothing on tile\n");
         return;
     }
+    switch (new_loc.tag)
+    {
+        case ItemLocation::Tag::Chunk:
+        {
+            /*CONSOLE_LOG("Client: update item location %s:%s on chunk [%d,%d][%d,%d]->[%d,%d][%d,%d]\n",
+                el->get_class_name(), el->get_name(),
+                old_loc.chunk.map_x, old_loc.chunk.map_y,
+                old_loc.chunk.x, old_loc.chunk.y,
+                new_loc.chunk.map_x, new_loc.chunk.map_y,
+                new_loc.chunk.x, new_loc.chunk.y);
+            */
 
-    CONSOLE_LOG("action_tile: action %s on %s\n", player_action_name[a], object->get_name());
-    send_packet_action_on_object(a, object->uid);
+            if (el->get_cid() == Class_Player)
+            {
+                //                printf("my_id=%lx id=%lx\n", my_id, el->get_id());
+                if (my_id == el->get_id())
+                {
+                    print_status(0, " ");
+                    print_status(1, " ");
+                }
+            }
+
+            /*ItemLocation old_l;
+            ItemLocation new_l;
+            old_l.chunk.x = old_loc.chunk.x;
+            old_l.chunk.y = old_loc.chunk.y;
+            new_l.chunk.x = new_loc.chunk.x;
+            new_l.chunk.y = new_loc.chunk.y;*/
+            // el->update_item_location(old_l, new_l);
+            el->update_item_location(old_loc, new_loc);
+            add_object_to_world(el, new_loc);
+            break;
+        }
+        case ItemLocation::Tag::Player:
+        {
+            Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, new_loc.player.id));
+            if (p)
+                p->pickup(el);
+            if (new_loc.player.id == player->get_id())
+            {
+                update_hotbar(); // FIXME - remove only one element
+            }
+        }
+    }
 }
 
-void server_action_tile(Server_action a, InventoryElement * object)
+chunk * check_chunk(int cx, int cy)
 {
-    if (object)
+    if (cx < 0 || cy < 0 || cx >= WORLD_SIZE || cy >= WORLD_SIZE)
+        return nullptr;
+
+    chunk * ch = world_table[cy][cx];
+    if (!ch)
     {
-        CONSOLE_LOG("Client: server action %s on %s\n", server_action_name[a], object->get_name());
-        send_packet_server_action_on_object(a, object->uid);
+        if (loaded_chunks[cy][cx] == CHUNK_NOT_LOADED)
+        {
+            send_packet_request_chunk(cx, cy);
+            loaded_chunks[cy][cx] = CHUNK_LOADING;
+            return nullptr;
+        }
+        else
+        {
+            CONSOLE_LOG("waiting for chunk %d %d\n", cx, cy);
+            return nullptr;
+        }
     }
     else
     {
-        switch (a)
+        loaded_chunks[cy][cx] = CHUNK_LOADED;
+    }
+    return ch;
+}
+
+void update_chunk(int32_t x, int32_t y, const chunk_table * data)
+{
+    data = (chunk_table *)((char *)(data));
+    if (!world_table[y][x])
+    {
+        CONSOLE_LOG("SDL: update_chunk new x=%d y=%d\n", x, y);
+        // world_table[y][x] = (chunk*)calloc(1, sizeof(chunk));
+        // world_table[y][x]->objects = InvList();
+        world_table[y][x] = new chunk(x, y);
+        memcpy(world_table[y][x]->table, &data[0], CHUNK_SIZE * CHUNK_SIZE * sizeof(int));
+        /*CONSOLE_LOG("got %d items\n[", item_num);
+        for (int i = 0; i < 1027 + item_num*20; i++)
         {
-            case SERVER_SHOW_CHUNK:
-            case SERVER_TRACE_NETWORK:
-                CONSOLE_LOG("Client: server action %s\n", server_action_name[a]);
-                send_packet_server_action_on_object(a, 0);
+           CONSOLE_LOG("%d, ", data[i]);
+        }
+       CONSOLE_LOG("\n");*/
+    }
+}
+
+void update_object(const ObjectData * data)
+{
+    //        size_t uid = data.inv_element.data.uid;
+    Class_id c_id = data->inv_element.data.c_id;
+
+    InventoryElement * el = get_object_by_id(data->inv_element.data);
+    // FIXME why we get el=NULL? -> change this to get_object_by_uid
+    //   CONSOLE_LOG("update_object: el=%p chunk[%d,%d]\n", el, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
+    if (el)
+    {
+        // CONSOLE_LOG("update_object: el->cid=%x c_id=%x\n", el->c_id, c_id);
+    }
+    if (el && el->c_id == c_id)
+    {
+        // CONSOLE_LOG("update_object: %s %s\n", class_name[c_id], el->get_name());
+        switch (c_id)
+        {
+            case Class_Element:
+            {
+                Element * element = dynamic_cast<Element *>(el);
+                *element = data->element.data;
                 break;
+            }
+            case Class_Ingredient:
+            {
+                Ingredient * ing = dynamic_cast<Ingredient *>(el);
+                *ing = data->ingredient.data;
+                break;
+            }
+            case Class_Product:
+            {
+                Product * prod = dynamic_cast<Product *>(el);
+                *prod = data->product.data;
+                break;
+            }
+            case Class_Plant:
+            {
+                Plant * plant = dynamic_cast<Plant *>(el);
+                *plant = data->plant.data;
+                // CONSOLE_LOG("%s size=%f\n", plant->get_name(), plant->size);
+                break;
+            }
+            case Class_Animal:
+            {
+                Animal * animal = dynamic_cast<Animal *>(el);
+                *animal = data->animal.data;
+                break;
+            }
+            case Class_Player:
+            {
+                Player * player = dynamic_cast<Player *>(el);
+                //                CONSOLE_LOG("update_object: player=%s inv.elements=%d\n", player->get_name(), player->inventory.nr_elements);
+                *player = data->player.data;
+                //              CONSOLE_LOG("update_object: -> update: inv.elements=%d\n", player->inventory.nr_elements);
+                break;
+            }
             default:
-                CONSOLE_LOG("Client: nothing to show\n");
                 break;
         }
+        //  CONSOLE_LOG("%s updated\n", el->get_name());
+    }
+    else
+    {
+        /*if (el)
+            print_status(1, "bad data for update object %ld %d real %d", uid, c_id, el->c_id);
+        else
+            print_status(1, "non existing object for update object %ld %d", uid, c_id);*/
+    }
+}
+
+void create_object(const ObjectData * data)
+{
+    NetworkObject * object = el_from_data(data);
+    if (object)
+    {
+        register_object(object);
+        if (object->c_id != Class_Clan)
+        {
+            InventoryElement * el = (InventoryElement *)object;
+            add_object_to_world(el, el->location);
+        }
+    }
+    else
+    {
+        CONSOLE_LOG("SDL: inexisting chunk\n");
+    }
+}
+
+void failed_craft()
+{
+    CONSOLE_LOG("craft FAILED\n");
+    print_status(1, "failed craft");
+}
+
+void action_failed()
+{
+    CONSOLE_LOG("action FAILED\n");
+    print_status(1, "action failed");
+}
+
+void put_item()
+{
+    InventoryElement * el = player->hotbar[active_hotbar];
+    if (el)
+    {
+        send_packet_drop(el->uid);
     }
 }

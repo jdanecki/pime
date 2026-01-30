@@ -1,18 +1,22 @@
 client_common_sources=[
     'net.cpp',
-    'net2d.cpp',
     'game.cpp',
     'players.cpp',
-    'text.cpp',
-    'packets.cpp'
+    'ui/console.cpp',
 ]
 client_common_2d_sources=[
-    'player_actions.cpp',
-    'npc.cpp',
-    'texture.cpp',
-    'render.cpp',
-    'alchemist2d.cpp',
-    'being2d.cpp',
-    'inputs.cpp',
-    'window.cpp'
+    '2d/alchemist2d.cpp',
+    '2d/being2d.cpp',
+    '2d/inputs.cpp',
+    '2d/npc.cpp',
+    '2d/player_actions.cpp',
+    '2d/render.cpp',
+    '2d/texture.cpp',
+    'ui/window.cpp',
+    #'ui/dialog/d_action.cpp'
+    'ui/dialog/d_craft.cpp',
+    'ui/dialog/d_hotbar.cpp',
+    'ui/dialog/dialog.cpp',
+    'ui/menu/menu.cpp'
 ]
+

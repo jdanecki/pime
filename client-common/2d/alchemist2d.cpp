@@ -4,9 +4,9 @@
 #include "../core/alchemist/random_functions.h"
 #include "alchemist2d.h"
 #include "backend.inl"
-#include "window.h"
 #include "texture.h"
-#include "../dialog/d_hotbar.h"
+#include "../ui/window.h"
+#include "../ui/dialog/d_hotbar.h"
 
 int tile_size;
 

@@ -6,10 +6,10 @@
 
 #include "playerUI.h"
 #include "player_actions.h"
-#include "net.h"
+#include "../../net/net.h"
 
-#include "../menu/menu.h"
-#include "../dialog/d_craft.h"
+#include "../ui/menu/menu.h"
+#include "../ui/dialog/d_craft.h"
 
 bool finish_program;
 

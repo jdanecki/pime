@@ -9,10 +9,10 @@
 #include "menu.h"
 #include "../core/alchemist/elements.h"
 
-#include "../client-common/npc.h"
+#include "../../2d/npc.h"
 
-#include "../client-common/text.h"
-#include "../client-common/net.h"
+#include "../text.h"
+#include "../../net/net.h"
 
 extern int active_hotbar;
 extern bool finish_program;
@@ -111,7 +111,7 @@ void Menu::show()
     int window_height;
     int i;
     int game_size;
-
+    // FIXME use window_width and window_height from  window.h once raylib supports window resizing
     Backend_Window_Size(&window_width, &window_height);
 
     if (window_width < window_height)
@@ -246,7 +246,7 @@ Menu_entry::~Menu_entry()
         delete entry;
 }
 
-void create_menus()
+void create_game_menus()
 {
     menu_main = new Menu("Main");
     menu_main->add("Exit", MENU_EXIT);

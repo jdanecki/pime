@@ -109,7 +109,7 @@ void show_menu_inventory_categories();
 void show_menu_action();
 void show_menu_knowledge();
 void show_menu_npc();
-void create_menus();
+void create_game_menus();
 void menu_handle_escape();
 void menu_handle_enter();
 void menu_go_down();

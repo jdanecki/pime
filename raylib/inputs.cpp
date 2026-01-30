@@ -1,11 +1,11 @@
 #include <raylib.h>
 
 #include "../core/key_handler.h"
-#include "../client-common/inputs.h"
-#include "../client-common/net.h"
+#include "../client-common/2d/inputs.h"
+#include "../client-common/ui/menu/menu.h"
+#include "../client-common/ui/dialog/d_craft.h"
+#include "../net/net.h"
 
-#include "../menu/menu.h"
-#include "../dialog/d_craft.h"
 #include "playerUI.h"
 
 KeyHandler menu_key_handlers[] = {

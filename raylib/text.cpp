@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "../client-common/text.h"
+#include "../client-common/ui/text.h"
 
 Color White = {255, 255, 255, 255};
 Color Gray = {200, 200, 200, 255};

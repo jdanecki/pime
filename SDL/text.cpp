@@ -3,7 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include <errno.h>
 
-#include "../client-common/text.h"
+#include "../client-common/ui/text.h"
 #include "backend.inl"
 
 #define FONT_WIDTH 85
@@ -51,4 +51,9 @@ void write_text(int x, int y, const char * text, SDL_Color color, int scale_x, i
         cx += scale_x;
     }
     SDL_SetTextureColorMod(font, 255, 255, 255);
+}
+
+void write_text(int x, int y, const char * text, Backend_Color color)
+{
+    write_text(x, y, text, color, 13, 25, false);
 }

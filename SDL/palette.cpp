@@ -108,9 +108,21 @@ void hsv2rgb(int h, int s, int v, int * r, int * g, int * b)
         360° = 0° – znowu czerwony
     */
     float r1 = 0, g1 = 0, b1 = 0, i, f, p, q, t, h1, s1, v1;
+    if (s > 100)
+        s = 100;
+    if (v > 100)
+        v = 100;
+    if (s < 0)
+        s = 0;
+    if (v < 0)
+        v = 0;
+
     s1 = s / 100.0;
     v1 = v / 100.0;
 
+    if (h < 0)
+        h += 360;
+    h %= 360;
     if (!s && !h)
     {
         *r = 255 * v1;
@@ -165,6 +177,8 @@ void hsv2rgb(int h, int s, int v, int * r, int * g, int * b)
 }
 
 #ifdef SHOW_PALETTE
+extern SDL_Texture * palette_texture;
+
 void show_hsv_palette()
 {
     int r, g, b;
@@ -177,6 +191,10 @@ void show_hsv_palette()
 
             hsv2rgb(h, 100, s, &r, &g, &b);
             pixelRGBA(renderer, h + 370, s, r, g, b, 255);
+            hsv2rgb(h - 360, 100, 100, &r, &g, &b);
+            pixelRGBA(renderer, h, 300 + s, r, g, b, 255);
+            hsv2rgb(h, 100, 100, &r, &g, &b);
+            pixelRGBA(renderer, h + 360, 300 + s, r, g, b, 255);
         }
         if (mx < 360)
         {
@@ -189,20 +207,20 @@ void show_hsv_palette()
     }
 }
 
-void show_rgb_palette(SDL_Texture * texture)
+void show_rgb_palette1()
 {
     unsigned char * pixels;
     int pitch, x, y;
     int nx, ny;
 
     SDL_Rect window_rec;
-    SDL_LockTexture(texture, NULL, (void **)&pixels, &pitch);
+    SDL_LockTexture(palette_texture, NULL, (void **)&pixels, &pitch);
 
     window_rec.w = window_width;
     window_rec.h = window_height;
     window_rec.x = 0;
     window_rec.y = 0;
-    memset(pixels, 0, pitch * window_width);
+    memset(pixels, 0, pitch * window_height);
     for (y = -255; y < 256; y++)
     {
         for (x = -255; x < 256; x++)
@@ -228,7 +246,72 @@ void show_rgb_palette(SDL_Texture * texture)
             }
         }
     }
-    SDL_UnlockTexture(texture);
-    SDL_RenderCopy(renderer, texture, NULL, &window_rec);
+    SDL_UnlockTexture(palette_texture);
+    SDL_RenderCopy(renderer, palette_texture, NULL, &window_rec);
 }
+
+void show_rgb_palette2()
+{
+    unsigned char * pixels;
+    int pitch, x, y;
+    int nx, ny;
+
+    SDL_Rect window_rec;
+    SDL_LockTexture(palette_texture, NULL, (void **)&pixels, &pitch);
+
+    window_rec.w = window_width;
+    window_rec.h = window_height;
+    window_rec.x = 0;
+    window_rec.y = 0;
+    memset(pixels, 0, pitch * window_height);
+    for (y = -255; y < 256; y++)
+    {
+        for (x = -255; x < 256; x++)
+        {
+            unsigned int r = sqrt(x * x + y * y);
+            if (r < 256)
+            {
+                float cf;
+                r = 255 - r;
+                cf = 1.0 * r / 255.0;
+                r = 255 * (c1[2] + c2[2] * cos(6.2830 * (c3[2] * cf + c4[2])));
+                nx = (256 + x) << 2;
+                ny = pitch * (256 + y);
+                pixels[ny + nx + 2] |= r;
+                pixels[ny + nx + 3] = 255;
+
+                r = 255 * (c1[1] + c2[1] * cos(6.2830 * (c3[1] * cf + c4[1])));
+                nx = (384 + x) << 2;
+                ny = pitch * (256 + y);
+                pixels[ny + nx + 1] |= r;
+                pixels[ny + nx + 3] = 255;
+
+                r = 255 * (c1[0] + c2[0] * cos(6.2830 * (c3[0] * cf + c4[0])));
+                nx = (320 + x) << 2;
+                ny = pitch * (384 + y);
+                pixels[ny + nx] |= r;
+                pixels[ny + nx + 3] = 255;
+            }
+        }
+    }
+    SDL_UnlockTexture(palette_texture);
+    SDL_RenderCopy(renderer, palette_texture, NULL, &window_rec);
+}
+
+void show_palette(int pal)
+{
+    switch (pal)
+    {
+        case 1: // HSV
+            show_hsv_palette();
+            break;
+        case 2: // RGB
+            show_rgb_palette1();
+            break;
+        case 3: // RGB
+            show_rgb_palette2();
+            break;
+    }
+}
+
 #endif

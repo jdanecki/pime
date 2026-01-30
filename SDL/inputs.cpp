@@ -5,12 +5,15 @@
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_timer.h>
 
-#include "../client-common/inputs.h"
-#include "../client-common/net.h"
-#include "../client-common/window.h"
 #include "../core/key_handler.h"
-#include "../menu/menu.h"
-#include "../dialog/d_craft.h"
+
+#include "../net/net.h"
+
+#include "../client-common/2d/inputs.h"
+#include "../client-common/ui/window.h"
+#include "../client-common/ui/menu/menu.h"
+#include "../client-common/ui/dialog/d_craft.h"
+
 #include "playerUI.h"
 
 KeyHandler menu_key_handlers[] = {
@@ -170,6 +173,7 @@ bool handle_events()
             {
                 CONSOLE_LOG("window event: resizing to %d, %d\n", event.window.data1, event.window.data2);
                 update_window_size();
+                set_tile_size(window_width, window_height);
                 ww = event.window.data1;
                 wh = event.window.data2;
             }

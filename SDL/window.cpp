@@ -7,18 +7,18 @@
 
 #include "../core/time_core.h"
 
-#include "../client-common/text.h"
-#include "../client-common/window.h"
-#include "../client-common/texture.h"
+#include "../client-common/ui/text.h"
+#include "../client-common/ui/window.h"
 
 SDL_Renderer * renderer;
 SDL_Window * main_window;
+int window_width;
+int window_height;
 
-
-int init_window(const char * title, int wx, int wy)
+int init_window(const char * title, int wx, int wy, bool resizable)
 {
     Uint32 flags;
-    flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
+    flags = resizable ? SDL_WINDOW_RESIZABLE : 0 | SDL_WINDOW_HIDDEN;
     // flags = SDL_WINDOW_HIDDEN;
     unsigned long t1 = get_time_usec();
     //    if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) < 0)
@@ -42,7 +42,6 @@ int init_window(const char * title, int wx, int wy)
     CONSOLE_LOG("window_width=%d window_height=%d\n", window_width, window_height);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_ShowWindow(main_window);
-    set_tile_size(window_width, window_height);
 
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags))
@@ -51,21 +50,19 @@ int init_window(const char * title, int wx, int wy)
         return 1;
     }
 
-//FIXME move to load_textures
-/* 
-    SDL_Surface * icon = IMG_Load("textures/pime.png");
-    if (icon == NULL)
-    {
-        CONSOLE_LOG("\nUnable to load image %s! SDL_image Error: %s\n", "textures/pime.png", IMG_GetError());
-        return 1;
-    }
-    SDL_SetWindowIcon(main_window, icon);
-    SDL_FreeSurface(icon);
-*/
+    // FIXME move to load_textures
+    /*
+        SDL_Surface * icon = IMG_Load("textures/pime.png");
+        if (icon == NULL)
+        {
+            CONSOLE_LOG("\nUnable to load image %s! SDL_image Error: %s\n", "textures/pime.png", IMG_GetError());
+            return 1;
+        }
+        SDL_SetWindowIcon(main_window, icon);
+        SDL_FreeSurface(icon);
+    */
     if (load_font())
         return 1;
-
-    load_textures();
 
     unsigned long t3 = get_time_usec();
     CONSOLE_LOG("Time it took to initialize SDL2 modules (img, window, renderer): %ldms\n ", (t3 - t1) / 1000);
@@ -75,6 +72,8 @@ int init_window(const char * title, int wx, int wy)
 
 void close_graphics()
 {
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(main_window);
     SDL_Quit();
 }
 
@@ -96,8 +95,6 @@ void update_window_size()
 
     width = window_width;
     height = window_height;
-
-    set_tile_size(width, height);
 
     //  SDL_SetWindowSize(main_window, (tile_size * CHUNK_SIZE), tile_size * CHUNK_SIZE + STATUS_LINES);
     //  SDL_GetWindowSize(main_window, &window_width, &window_height);

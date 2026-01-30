@@ -5,13 +5,13 @@ test_dialog_sdl_sources = [
     '../../SDL/window.cpp',
     '../../SDL/backend.cpp',
     '../../SDL/text.cpp',
-    '../../client-common/alchemist2d.cpp',
-    '../../client-common/texture.cpp',
-    '../../client-common/text.cpp',
-    '../../client-common/window.cpp',
-    '../../dialog/dialog.cpp',
-    '../../dialog/d_craft.cpp',
-    '../../dialog/d_action.cpp'
+    '../../client-common/2d/alchemist2d.cpp',
+    '../../client-common/2d/texture.cpp',
+    '../../client-common/ui/console.cpp',
+    '../../client-common/ui/window.cpp',
+    '../../client-common/ui/dialog/dialog.cpp',
+    '../../client-common/ui/dialog/d_craft.cpp',
+    '../../client-common/ui/dialog/d_action.cpp'
 ]
 
 test_dialog_raylib_sources = [
@@ -20,13 +20,13 @@ test_dialog_raylib_sources = [
     '../../raylib/window.cpp',
     '../../raylib/backend.cpp',
     '../../raylib/text.cpp',
-    '../../client-common/alchemist2d.cpp',
-    '../../client-common/texture.cpp',
-    '../../client-common/text.cpp',
-    '../../client-common/window.cpp',
-    '../../dialog/dialog.cpp',
-    '../../dialog/d_craft.cpp',
-    '../../dialog/d_action.cpp'
+    '../../client-common/2d/alchemist2d.cpp',
+    '../../client-common/2d/texture.cpp',
+    '../../client-common/ui/console.cpp',
+    '../../client-common/ui/window.cpp',
+    '../../client-common/ui/dialog/dialog.cpp',
+    '../../client-common/ui/dialog/d_craft.cpp',
+    '../../client-common/ui/dialog/d_action.cpp'
 ]
 
 executable('test_dialog_sdl', 
@@ -63,6 +63,6 @@ custom_target(
 custom_target(
   'font_png_link',
   output: 'font.png',
-  command: ['ln', '-sf', meson.project_source_root() + '/assets/font.png', '@OUTPUT@'],
+  command: ['ln', '-sf', meson.project_source_root() + '/assets/font-special.png', '@OUTPUT@'],
   build_by_default: true,
 )

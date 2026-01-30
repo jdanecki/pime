@@ -1,20 +1,22 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "../client-common/window.h"
-#include "../client-common/text.h"
-#include "../client-common/texture.h"
+#include "../client-common/ui/window.h"
+#include "../client-common/ui/text.h"
 
-int init_window(const char * title, int wx, int wy)
+int window_width;
+int window_height;
+
+int init_window(const char * title, int wx, int wy, bool resizable)
 {
     InitWindow(wx, wy, title);
 
     window_width = GetScreenWidth();
     window_height = GetScreenHeight();
     CONSOLE_LOG("window_width=%d window_height=%d\n", window_width, window_height);
-    
-    SetTargetFPS(60);    
-    set_tile_size(window_width, window_height);
+
+    SetTargetFPS(60);
+
     SetExitKey(KEY_NULL);
     SetTraceLogLevel(LOG_WARNING);
     //    SetTraceLogLevel(LOG_NONE);
@@ -33,8 +35,6 @@ int init_window(const char * title, int wx, int wy)
             return 2;
         }
     }
-
-    load_textures();
 
     return 0;
 }

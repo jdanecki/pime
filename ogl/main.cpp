@@ -2,7 +2,7 @@
 #include <cmath>
 #include <cstdio>
 #include <dirent.h>
-#include "../client-common/net.h"
+#include "../net/net.h"
 #include "ogl.h"
 #include "main.h"
 

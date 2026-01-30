@@ -5,8 +5,8 @@
 #include "../core/tiles.h"
 #include "../core/alchemist/random_functions.h"
 
-#include "../client-common/window.h"
-#include "../client-common/texture.h"
+#include "../client-common/ui/window.h"
+#include "../client-common/2d/texture.h"
 
 int tile_size = 32;
 bool redraw = true;

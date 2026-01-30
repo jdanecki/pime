@@ -4,6 +4,7 @@
 
 #include "texture.h"
 #include "../core/world_params.h"
+#include "../ui/window.h"
 
 struct player_textures Player_textures;
 
@@ -158,4 +159,5 @@ Field:     A          B          G        R
 
     places_textures[PLACE_FIELD] = load_texture("textures/objects/field.png");
     places_textures[PLACE_BARN] = load_texture("textures/objects/barn.png");
+    set_tile_size(window_width, window_height);
 }

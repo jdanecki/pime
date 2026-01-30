@@ -62,5 +62,6 @@ void checked_update(size_t pl_id, uintptr_t el);
 NetworkObject * el_from_data(const ObjectData * data);
 void connect();
 void disconnect();
+void put_item();
 
 #endif // NET_H

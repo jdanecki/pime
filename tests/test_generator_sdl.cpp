@@ -1,5 +1,6 @@
 #include "backend.inl"
-#include "../client-common/text.h"
+#include "../client-common/ui/text.h"
+#include "../client-common/ui/console.h"
 #include "../server/generator/generator.h"
 #include "../core/world_params.h"
 #include <ctime>
@@ -22,6 +23,7 @@ unsigned long get_time_usec()
 }
 
 SDL_Texture *map1, *map2, *map3;
+SDL_Texture * palette_texture;
 
 void hsv2rgb(int h, int s, int v, int * r, int * g, int * b);
 
@@ -216,6 +218,7 @@ int main()
     map2 = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, WORLD_SIZE, WORLD_SIZE);
     map3 = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, CHUNK_SIZE * 16, CHUNK_SIZE * 16);
     draw_maps();
+    palette_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, window_width, window_height);
 
     char mode = 'm';
     bool redraw = true;

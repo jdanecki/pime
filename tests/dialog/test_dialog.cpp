@@ -1,11 +1,11 @@
-#include "../../dialog/dialog.h"
-#include "../../dialog/d_craft.h"
-#include "../../dialog/d_action.h"
+#include "../../client-common/ui/dialog/dialog.h"
+#include "../../client-common/ui/dialog/d_craft.h"
+#include "../../client-common/ui/dialog/d_action.h"
 
-#include "../../client-common/window.h"
-#include "../../client-common/text.h"
-#include "../../client-common/alchemist2d.h"
-#include "../../client-common/texture.h"
+#include "../../client-common/ui/window.h"
+#include "../../client-common/ui/text.h"
+#include "../../client-common/2d/alchemist2d.h"
+#include "../../client-common/2d/texture.h"
 #include "playerUI.h"
 
 Dialog * dialog;

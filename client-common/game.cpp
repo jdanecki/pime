@@ -2,15 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "backend.inl"
-
-#include "game.h"
-#include "players.h"
-#include "playerUI.h"
 #include "../core/world.h"
 #include "../core/time_core.h"
 #include "../core/alchemist/random_functions.h"
-#include "net.h"
+
+#include "backend.inl"
+
+#include "game.h"
+#include "playerUI.h"
+#include "2d/texture.h"
+
+#include "../net/net.h"
 
 char game_name[30];
 
@@ -33,19 +35,10 @@ int auto_explore;
 #define STATUS_LINES (2 * 32)
 
 extern int load_font();
-extern void create_menus();
+extern void create_game_menus();
 extern void close_graphics();
-extern int init_window(const char * title, int wx, int wy);
+extern int init_window(const char * title, int wx, int wy, bool resizable = true);
 extern void load_textures();
-
-void put_item()
-{
-    InventoryElement * el = player->hotbar[active_hotbar];
-    if (el)
-    {
-        send_packet_drop(el->uid);
-    }
-}
 
 void handle_network()
 {
@@ -119,12 +112,14 @@ void loop()
 int init_graphics()
 {
     int texture_size = 32;
-    if (init_window(game_name, texture_size * CHUNK_SIZE, texture_size * CHUNK_SIZE + STATUS_LINES))
+    if (init_window(game_name, texture_size * CHUNK_SIZE, texture_size * CHUNK_SIZE + STATUS_LINES, true))
     {
         return 1;
     }
-
-    create_menus();
+#ifdef USE_TEXTURES
+    load_textures();
+#endif
+    create_game_menus();
 
     return 0;
 }

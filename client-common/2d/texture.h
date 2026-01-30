@@ -5,6 +5,7 @@
 #include "../core/world_params.h"
 #include "backend.inl"
 
+#ifdef USE_TEXTURES
 struct player_textures
 {
     Backend_Texture player;
@@ -26,8 +27,11 @@ extern Backend_Texture places_textures[PLACES_COUNT];
 extern Backend_Texture up_mask;
 extern Backend_Texture down_mask;
 extern struct player_textures Player_textures;
+extern int tile_size;
 
 void load_textures();
 Backend_Texture load_texture(const char * texture_name);
 int add_textures_from_dir(Backend_Texture * to, int i, const char * dir_path);
+#endif
+
 #endif

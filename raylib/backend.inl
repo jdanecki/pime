@@ -3,6 +3,8 @@
 
 #include <raylib.h>
 
+#define USE_TEXTURES 1
+
 typedef Texture2D Backend_Texture;
 typedef unsigned int timer_id;
 typedef unsigned int (*timer_callback)(unsigned int interval, void * param);

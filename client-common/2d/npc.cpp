@@ -1,8 +1,11 @@
 #include "playerUI.h"
 #include "../core/world.h"
-#include "../client-common/npc.h"
-#include "../menu/menu.h"
-#include "../client-common/texture.h"
+
+#include "npc.h"
+#include "texture.h"
+
+#include "../ui/menu/menu.h"
+
 
 Npc2d * current_npc;
 extern int active_hotbar;

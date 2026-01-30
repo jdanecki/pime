@@ -1,6 +1,6 @@
 #include "dialog.h"
-#include "../client-common/text.h"
-#include "../client-common/texture.h"
+#include "../../2d/texture.h"
+#include "../text.h"
 
 DialogElement::DialogElement(int id, Backend_Rect rect, enum DialogElementType c_id) : rect(rect), id(id), c_id(c_id)
 {
