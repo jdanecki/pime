@@ -36,6 +36,7 @@ int init_window(const char * title, int wx, int wy, bool resizable)
         return 1;
     }
     SDL_SetWindowTitle(main_window, title);
+    SDL_SetWindowMinimumSize(main_window, 640, 480);
     SDL_SetWindowPosition(main_window, 0, 0);
     SDL_SetWindowSize(main_window, wx, wy);
     SDL_GetWindowSize(main_window, &window_width, &window_height);
