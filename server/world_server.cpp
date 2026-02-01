@@ -5,19 +5,6 @@
 #include "player_server.h"
 #include "networking.h"
 
-unsigned long get_time_usec()
-{
-    struct timespec t;
-
-    clock_gettime(CLOCK_MONOTONIC_RAW, &t);
-    return (t.tv_sec * 1000000 + t.tv_nsec / 1000);
-}
-
-unsigned long get_time_ms()
-{
-    return get_time_usec() / 1000;
-}
-
 void update()
 {
     if (!players->nr_elements)

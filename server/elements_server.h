@@ -2,7 +2,6 @@
 #define ELEMENTS_SERVER_H
 
 #include "../core/alchemist/elements.h"
-#include "../core/player.h"
 
 void to_bytes_binding(InventoryElement * el, unsigned char * buf);
 unsigned int get_packet_size_binding(InventoryElement * el);
@@ -16,114 +15,14 @@ void notify_checked(size_t pl_id, size_t el);
 
 void destroy(InventoryElement * el);
 
-const int max_delay_move = 100; // 1 sec.
-const int max_delay_grow = 100; //600; // 600=1 min.
-
 const unsigned long TICK_DELAY = 100;
 
-class ElementServer : public Element
-{
-  public:
-    ElementServer(BaseElement * b);
-    bool action(Product_action action, Player * pl) override;
-    bool action_cut();
-    bool action_hit();
-
-    bool player_action(Player_action action, Player * pl) override;
-    bool action_drink();
-    bool action_eat();
-    void show(bool details = true) override;
-    bool can_pickup() override;
-};
-
-class ScrollServer : public Scroll
-{
-  public:
-    ScrollServer(Base * base);
-    bool can_pickup() override;
-    bool player_action(Player_action action, Player * pl) override;
-};
-
-class BeingServer
-{
-  public:
-    Property * age;
-    Property * max_age;
-    bool alive;
-    int padding;
-    BeingServer();
-    void show(bool details = true);
-    Property ** get_properties(int * count);
-    ~BeingServer();
-    virtual bool grow();
-    virtual bool tick();
-};
-
-class AnimalServer : public Animal, public BeingServer
-{
-    int delay_for_move;
-    int delay_for_grow;
-    int dst_loc_x, dst_loc_y;
-
-  public:
-    void move();
-    bool tick() override;
-
-    AnimalServer(BaseAnimal * base);
-    bool action(Product_action action, Player * pl) override;
-    void show(bool details = true) override;
-    bool grow() override;
-    bool can_pickup() override;
-    bool feed();
-};
-
-class PlantServer : public Plant, public BeingServer
-{
-    int delay_for_grow;
-
-  public:
-    bool grow() override;
-
-    PlantServer(BasePlant * base);
-
-    void sow();
-    void change_phase(Plant_phase p);
-    bool action(Product_action action, Player * pl) override;
-    void show(bool details = true) override;
-    bool can_pickup() override;
-    bool player_action(Player_action action, Player * pl) override;
-    void set_phase(Plant_phase p);
-};
-
-class IngredientServer : public Ingredient
-{
-  public:
-    size_t el;
-    IngredientServer(InventoryElement * from, Ingredient_id id, Form f);
-    bool action(Product_action action, Player * pl) override;
-    bool can_pickup() override;
-    void show(bool details = true) override;
-};
-
-class ProductServer : public Product
-{
-  public:
-    void * padding;
-    int ing_count;
-    size_t ings[2];
-
-    void init(int c, Form f);
-    ProductServer(InventoryElement * el1, InventoryElement * el2, Product_id id, Form f, int act_cnt);
-    // ProductServer(InventoryElement ** from, int count, Product_id id, Form f, int act_cnt);
-    void show(bool details = true) override;
-    virtual bool use_on(InventoryElement * object, Player * pl);
-    virtual bool use_tile(int map_x, int map_y, int x, int y, Player * pl);
-    bool can_pickup() override;
-};
-
-AnimalServer * create_animal(BaseAnimal * base);
-PlantServer * create_plant(BasePlant * base);
-ElementServer * create_element(BaseElement * base);
-ScrollServer * create_scroll(Base * base);
+#include "elements/animal_server.h"     // IWYU pragma: export
+#include "elements/being_server.h"      // IWYU pragma: export
+#include "elements/element_server.h"    // IWYU pragma: export
+#include "elements/ingredient_server.h" // IWYU pragma: export
+#include "elements/plant_server.h"      // IWYU pragma: export
+#include "elements/product_server.h"    // IWYU pragma: export
+#include "elements/scroll_server.h"     // IWYU pragma: export
 
 #endif

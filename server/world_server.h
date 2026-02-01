@@ -9,5 +9,5 @@ int height_at(int chunk_x, int chunk_y, int x, int y);
 void update();
 extern void print_status(int l, const char * format, ...);
 void load_chunk(int x, int y);
-unsigned long get_time_ms();
+
 #endif

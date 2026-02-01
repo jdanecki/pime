@@ -7,6 +7,13 @@ server_ncurses_sources = [
 
 tests_server_sources =[
   'elements_server.cpp', 
+  'elements/animal_server.cpp',
+  'elements/being_server.cpp',
+  'elements/element_server.cpp',
+  'elements/ingredient_server.cpp',
+  'elements/plant_server.cpp',
+  'elements/product_server.cpp',
+  'elements/scroll_server.cpp',
   'craft_ing.cpp',
   'craft_prod.cpp',
 

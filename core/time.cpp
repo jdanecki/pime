@@ -9,3 +9,7 @@ unsigned long get_time_usec()
     clock_gettime(CLOCK_MONOTONIC_RAW, &t);
     return (t.tv_sec * 1000000 + t.tv_nsec / 1000);
 }
+unsigned long get_time_ms()
+{
+    return get_time_usec() / 1000;
+}
