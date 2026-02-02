@@ -156,8 +156,8 @@ void test1()
     for (int i = 0; i < max_moves; i++)
     {
         printf("move %d/%d\n", i, max_moves);
-        move_by(move1, random_range(-CHUNK_SIZE, CHUNK_SIZE), random_range(-CHUNK_SIZE, CHUNK_SIZE));
-        move_by(move2, random_range(-CHUNK_SIZE, CHUNK_SIZE), random_range(-CHUNK_SIZE, CHUNK_SIZE));
+        move_by(move1, random_range(-CHUNK_SIZE, CHUNK_SIZE + 1), random_range(-CHUNK_SIZE, CHUNK_SIZE + 1));
+        move_by(move2, random_range(-CHUNK_SIZE, CHUNK_SIZE + 1), random_range(-CHUNK_SIZE, CHUNK_SIZE + 1));
     }
     printf("move %d/%d\n", max_moves, max_moves);
 }

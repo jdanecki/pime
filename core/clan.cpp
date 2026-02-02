@@ -79,6 +79,6 @@ Clan * get_clan_by_id(ClanId id)
 }
 Clan * get_random_clan()
 {
-    int c = random_range(0, 4);
+    int c = random_range(1, 5);
     return get_clan_by_id((ClanId)c);
 }

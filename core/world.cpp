@@ -17,6 +17,7 @@ void remove_from_chunks(InventoryElement * object)
 void add_object_to_world(InventoryElement * object, ItemLocation location)
 {
     object->location = location;
+    CONSOLE_LOG("add_object_to_world: %s %ld @ (%f,%f)\n", object->get_name(), object->get_id(), (int)location.tag, location.chunk.x, location.chunk.y);
     switch (location.tag)
     {
         case ItemLocation::Tag::Chunk:
@@ -140,4 +141,18 @@ float ItemLocation::get_tile_y()
 float ItemLocation::get_world_pos(int chunk, float pos)
 {
     return chunk * CHUNK_SIZE + pos;
+}
+
+bool ItemLocation::operator!=(const ItemLocation & other)
+{
+    if (tag != other.tag)
+        return true;
+    switch (tag)
+    {
+        case Tag::Chunk:
+            return chunk.map_x != other.chunk.map_x || chunk.map_y != other.chunk.map_y || chunk.x != other.chunk.x || chunk.y != other.chunk.y;
+        case Tag::Player:
+            return player.id != other.player.id;
+    }
+    return false;
 }

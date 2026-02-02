@@ -40,7 +40,7 @@ class chunk
         {
             for (int tx = 0; tx < CHUNK_SIZE; ++tx)
             {
-                table[ty][tx].tile = random_range(0, TILE_TEXTURES - 1);
+                table[ty][tx].tile = random_range(0, TILE_TEXTURES);
             }
         }
     }

@@ -296,7 +296,12 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
 void send_updates()
 {
     if (!players->nr_elements)
+    {
+        objects_to_create.remove_all();
+        packets_to_send->remove_all();
+        packets_to_send1->remove_all();
         return;
+    }
     // CONSOLE_LOG("send_updates: time=%ld\n", get_time_ms());
     if (objects_to_create.nr_elements)
     {
@@ -364,10 +369,9 @@ void notify_create(const InventoryElement * el)
 
 void update_location(NetworkObject id, ItemLocation old_loc, ItemLocation new_loc)
 {
-    /*CONSOLE_LOG("update location uid=%lx old_tag=%d new_tag=%d\n", id, (int)old_loc.tag, (int)new_loc.tag);
-     old_loc.show();
-     new_loc.show();
- */
+  //  CONSOLE_LOG("update location uid=%lx old_tag=%d new_tag=%d\n", id.get_uid(), (int)old_loc.tag, (int)new_loc.tag);
+  //   old_loc.show();
+  //   new_loc.show();
     add_packet_to_send(new PacketLocationUpdate(id.uid, old_loc, new_loc));
 }
 void notify_destroy(InventoryElement * el)

@@ -58,6 +58,17 @@ test_generator_sdl_sources = [
   '../client-common/ui/console.cpp'
 ]
 
+test_random_sources = [
+    'test_random.cpp',
+    '../core/alchemist/random_functions.cpp',
+    '../client-common/ui/console.cpp'
+]
+
+executable('test_random', 
+  sources: test_random_sources,
+  link_with: [core],
+  install: false,
+)
 
 executable('test_sdl', 
   sources: test_sdl_sources,

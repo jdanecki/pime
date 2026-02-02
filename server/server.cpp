@@ -23,7 +23,7 @@ void generate()
         }
         else
         {
-            f = (Form)(random_range(1, 3));
+            f = (Form)(random_range(1, 4));
             id = i;
         }
         ListElement * entry = new BaseListElement(new BaseElement(f, id));

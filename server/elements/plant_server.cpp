@@ -5,9 +5,8 @@
 
 PlantServer::PlantServer(BasePlant * base) : Plant(base)
 {
-    delay_for_grow = max_delay_grow;
-    max_age->value = flowers_time + 50;
-
+    max_age = new Property("max age", flowers_time + 50);
+    age = new Property("age", 1);
     set_phase(phase);
 }
 

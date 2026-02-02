@@ -65,8 +65,8 @@ void do_auto_explore()
 {
     if ((dst_map_x == player->location.chunk.map_x) && (dst_map_y == player->location.chunk.map_y))
     {
-        int dx = random_range(-5, 5);
-        int dy = random_range(-5, 5);
+        int dx = random_range(-5, 6);
+        int dy = random_range(-5, 6);
 
         if (player->location.chunk.map_y + dy >= 0 && player->location.chunk.map_y + dy < WORLD_SIZE && player->location.chunk.map_x + dx >= 0 && player->location.chunk.map_x + dx < WORLD_SIZE)
         {

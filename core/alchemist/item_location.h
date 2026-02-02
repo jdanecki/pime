@@ -43,5 +43,6 @@ struct ItemLocation
     float get_tile_x();
     float get_tile_y();
     float get_world_pos(int, float); // position in tiles
+    bool operator!=(const ItemLocation & other);
 };
 #endif

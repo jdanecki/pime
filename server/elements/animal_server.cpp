@@ -8,10 +8,6 @@
 
 AnimalServer::AnimalServer(BaseAnimal * base) : Animal(base)
 {
-    delay_for_move = max_delay_move;
-    delay_for_grow = max_delay_grow;
-    dst_loc_x = random_range(0, CHUNK_SIZE - 1);
-    dst_loc_y = random_range(0, CHUNK_SIZE - 1);
     max_age = new Property("max age", 1000, 2000);
     age = new Property("age", 10, max_age->value);
     dimensions.scale(age->value / max_age->value);
@@ -81,62 +77,20 @@ bool AnimalServer::grow()
     return ret;
 }
 
-void AnimalServer::move()
-{
-    delay_for_move--;
-    if (delay_for_move)
-        return;
-    delay_for_move = max_delay_move;
-
-    ItemLocation l = location;
-    int _x = location.chunk.x;
-    int _y = location.chunk.y;
-
-    if ((_x == dst_loc_x && _y == dst_loc_y) || (random_range(0, 5) == 1))
-    {
-        dst_loc_x = random_range(0, CHUNK_SIZE - 1);
-        dst_loc_y = random_range(0, CHUNK_SIZE - 1);
-    }
-    else
-    {
-        if (random_range(0, 1))
-        {
-            if (_x < dst_loc_x)
-                _x++;
-            else
-                _x--;
-        }
-        if (random_range(0, 1))
-        {
-            if (_y < dst_loc_y)
-                _y++;
-            else
-                _y--;
-        }
-    }
-    // CONSOLE_LOG("%d, %d -> dst[%d, %d]\n", _x, _y, dst_loc_x, dst_loc_y);
-
-    if (_x >= CHUNK_SIZE)
-        _x = CHUNK_SIZE - 1;
-    if (_y >= CHUNK_SIZE)
-        _y = CHUNK_SIZE - 1;
-    if (_y < 0)
-        _y = 0;
-    if (_y < 0)
-        _y = 0;
-    if (_x < 0)
-        _x = 0;
-
-    location.chunk.x = _x;
-    location.chunk.y = _y;
-
-    update_location(NetworkObject(c_id, uid), l, location);
-}
-
 bool AnimalServer::tick()
-{
-    move();
-    return BeingServer::tick();
+{ 
+    if (check_move())
+    {
+        ItemLocation old_location = location;
+     //   CONSOLE_LOG("AnimalServer::tick: %s\n", get_name());
+        being_move(this, &location);
+        if (old_location != location)
+        {
+            update_location(NetworkObject(get_cid(), get_uid()), old_location, location);
+        }
+        return BeingServer::tick();
+    }
+    return true;
 }
 
 AnimalServer * create_animal(BaseAnimal * base)

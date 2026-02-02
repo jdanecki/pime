@@ -371,7 +371,7 @@ ListElement * ElementsList::get_random()
 {
     if (!nr_elements)
         return nullptr;
-    int i = random_range(0, nr_elements - 1);
+    int i = random_range(0, nr_elements);
     int cnt = 0;
     ListElement * el = head;
     while (el)

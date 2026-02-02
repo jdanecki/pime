@@ -158,7 +158,7 @@ float Property::decrease(float by)
 }
 void Edible::set_random()
 {
-    eating_by = random_range(0, 15);
+    eating_by = random_range(0, 16);
 }
 void Edible::set_no_edible()
 {

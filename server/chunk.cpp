@@ -39,6 +39,10 @@ void add_animal(chunk * ch, size_t id)
     BaseListElement * base_el = (BaseListElement *)base_animals.find(&id);
     ch->add_object(create_animal((BaseAnimal *)(base_el->get_el())));
 }
+#define ADD_ROCKS
+#define ADD_PLANTS
+#define ADD_ANIMALS
+//#define CHECK_EMPTY_CHUNK
 
 void load_chunk(int cx, int cy)
 {
@@ -47,20 +51,32 @@ void load_chunk(int cx, int cy)
     Region * r = find_region(cx, cy);
 
 try_again:
+#ifdef ADD_ROCKS
     for (int i = 0; i < r->rocks_count; i++)
     {
         do_times(r->rocks_types[i]->value, add_element, ch, r->rocks_types[i]->terrain->id);
     }
+#endif
+#ifdef ADD_PLANTS
     for (int i = 0; i < r->plants_count; i++)
     {
         do_times(r->plants_types[i]->value, add_plant, ch, r->plants_types[i]->plant->id);
     }
-
+#endif
+#ifdef ADD_ANIMALS
+    for (int i = 0; i < r->animals_count; i++)
+    {
+        do_times(r->animals_types[i]->value, add_animal, ch, r->animals_types[i]->animal->id);
+    }
+#endif
+    // ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
+#ifdef CHECK_EMPTY_CHUNK
     if (!ch->objects.nr_elements)
     {
         CONSOLE_LOG("empty chunk, trying again %d\n", r->rocks_count);
         goto try_again;
     }
+#endif
     /*size_t id1=0;
     BaseListElement * base_el1 = (BaseListElement *)base_elements.find(&id1);
     ch->add_object(create_element((BaseElement *)(base_el1->get_el())), 10, 9);
@@ -97,12 +113,6 @@ try_again:
              // ch->table[y][x].tile = (x + y) % TILE_TEXTURES;
         }
 
-    for (int i = 0; i < r->animals_count; i++)
-    {
-        do_times(r->animals_types[i]->value, add_animal, ch, r->animals_types[i]->animal->id);
-    }
-
-    // ch->add_object(create_scroll(new Base(rand() % 10, Class_Scroll,"scroll")));
 
     world_table[cy][cx] = ch;
 }

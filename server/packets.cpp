@@ -559,7 +559,7 @@ Packet * check_server_packet(char dir, unsigned char * data, size_t s)
 ObjectData * convert_to_data(NetworkObject * el)
 {
     ObjectData * obj = nullptr;
-    //  CONSOLE_LOG("convert_to_data: c_id=%d uid=%lx\n", el->c_id, el->get_uid());
+    //   CONSOLE_LOG("convert_to_data: c_id=%d uid=%lx\n", el->c_id, el->get_uid());
     switch (el->c_id)
     {
         case Class_Element:

@@ -2,6 +2,7 @@
 #include "world_server.h"
 #include "elements_server.h"
 #include "../core/world.h"
+#include "../core/time_core.h"
 #include "player_server.h"
 #include "networking.h"
 
@@ -9,7 +10,7 @@ void update()
 {
     if (!players->nr_elements)
         return;
-        // CONSOLE_LOG("update: time=%ld\n", get_time_ms());
+//  CONSOLE_LOG("update: time=%ld\n", get_time_ms());
 #if 0
     // TODO maybe in the future make it smarter
     for (int y = 0; y < WORLD_SIZE; y++)

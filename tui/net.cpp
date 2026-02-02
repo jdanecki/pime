@@ -5,7 +5,7 @@
 
 NetworkObject * el_from_data(const ObjectData * data)
 {
-    // CONSOLE_LOG("CREATING OBJECT for tag: %d\n", (int)data->tag);
+    CONSOLE_LOG("CREATING OBJECT for tag: %d\n", (int)data->tag);
     NetworkObject * el = nullptr;
     switch (data->tag)
     {
@@ -55,7 +55,7 @@ NetworkObject * el_from_data(const ObjectData * data)
         case ObjectData::Tag::Npc:
             el = new Npc(data->npc.data);
             el->c_id = Class_Npc;
-            CONSOLE_LOG("creating NPC");
+            CONSOLE_LOG("creating NPC\n");
             break;
 
         case ObjectData::Tag::Clan:

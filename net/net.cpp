@@ -356,7 +356,7 @@ void disconnect()
     ENetEvent event;
 
     enet_peer_disconnect(client->peer, 0);
-    while (enet_host_service(host, &event, 3000) > 0)
+    while (enet_host_service(host, &event, 1000) > 0)
     {
         if (event.type == ENET_EVENT_TYPE_DISCONNECT)
         {

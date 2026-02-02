@@ -25,7 +25,7 @@ void choose_multiple(int total, int n, int * out_indices)
 
     for (int i = total - 1; i > 0; i--)
     {
-        int j = random_range(0, i);
+        int j = random_range(0, i + 1);
         int tmp = indices[i];
         indices[i] = indices[j];
         indices[j] = tmp;
@@ -55,7 +55,7 @@ Region::Region(TerrainType * terrain_type, int x, int y, unsigned int size) : te
     rocks_count = n;
     delete[] chosen_indices;
 
-    n = random_range(1, all_plants_count);
+    n = random_range(1, all_plants_count + 1);
 
     plants_types = new PlantEntry *[n];
     chosen_indices = new int[n];
@@ -73,7 +73,7 @@ Region::Region(TerrainType * terrain_type, int x, int y, unsigned int size) : te
     plants_count = p;
     delete[] chosen_indices;
 
-    n = random_range(1, all_animals_count);
+    n = random_range(1, all_animals_count + 1);
 
     animals_types = new AnimalEntry *[n];
     chosen_indices = new int[n];
@@ -173,7 +173,7 @@ Region * find_region(int x, int y)
 
 PlantType::PlantType(int id) : id(id)
 {
-    int n = random_range(3, terrains_count);
+    int n = random_range(3, terrains_count + 1);
 
     possible_ground = new TerrainType *[n];
     int * chosen_indices = new int[n];
@@ -190,7 +190,7 @@ PlantType::PlantType(int id) : id(id)
 
 AnimalType::AnimalType(int id) : id(id)
 {
-    int n = random_range(3, terrains_count);
+    int n = random_range(3, terrains_count + 1);
 
     possible_ground = new TerrainType *[n];
     int * chosen_indices = new int[n];
@@ -233,8 +233,8 @@ Coords::Coords(int x, int y) : x(x), y(y)
 }
 Coords::Coords()
 {
-    x = random_range(0, WORLD_SIZE - 1);
-    y = random_range(0, WORLD_SIZE - 1);
+    x = random_range(0, WORLD_SIZE);
+    y = random_range(0, WORLD_SIZE);
 }
 int Coords::distance_squared(Coords * other)
 {

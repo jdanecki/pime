@@ -7,9 +7,9 @@
 
 BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(7))
 {
-    carnivorous = random_range(0, 1);
-    swimming = random_range(0, 1);
-    flying = random_range(0, 1);
+    carnivorous = random_range(0, 2);
+    swimming = random_range(0, 2);
+    flying = random_range(0, 2);
     edible.set_random();
 }
 

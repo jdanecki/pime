@@ -58,7 +58,7 @@ NetworkObject * el_from_data(const ObjectData * data)
         case ObjectData::Tag::Npc:
             el = new Npc2d(data->npc.data);
             el->c_id = Class_Npc;
-            CONSOLE_LOG("creating NPC");
+            CONSOLE_LOG("creating NPC\n");
             break;
 
         case ObjectData::Tag::Clan:

@@ -12,23 +12,23 @@ BaseElement::BaseElement(Form f, int index) : Base(index, Class_BaseElement, cre
     {
         case Form_solid:
             density = Property("density", 50, 2000);
-            color.r = random_range(0, 255);
-            color.g = random_range(0, 255);
-            color.b = random_range(0, 255);
+            color.r = random_range(0, 256);
+            color.g = random_range(0, 256);
+            color.b = random_range(0, 256);
             break;
         case Form_liquid:
             density = Property("density", 500, 2000);
-            color.r = random_range(0, 63);
-            color.g = random_range(0, 255);
+            color.r = random_range(0, 64);
+            color.g = random_range(0, 256);
             color.b = 255;
             break;
         case Form_gas:
             density = Property("density", 1);
             edible.set_no_edible();
-            int r = random_range(0, 199);
-            color.r = random_range(r, r + 55);
-            color.g = random_range(r, r + 55);
-            color.b = random_range(r, r + 55);
+            int r = random_range(0, 200);
+            color.r = random_range(r, r + 56);
+            color.g = random_range(r, r + 56);
+            color.b = random_range(r, r + 56);
             break;
     }
 }

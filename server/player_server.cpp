@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "player_server.h"
+#include "elements/being_server.h"
 #include "elements_server.h"
 #include "../core/alchemist/random_functions.h"
 #include "networking.h"
@@ -306,11 +307,28 @@ PlayerServer * create_player(size_t id)
 
 NPCServer::NPCServer(size_t uid) : Npc(uid, ItemLocation::center())
 {
-    CONSOLE_LOG("NPCServer: uid=%ld\n", uid);
-    location.chunk.x = random_range(0, CHUNK_SIZE - 1);
-    location.chunk.y = random_range(0, CHUNK_SIZE - 1);
+   // CONSOLE_LOG("NPCServer: uid=%ld\n", uid);
+    location.chunk.x = random_range(0, CHUNK_SIZE);
+    location.chunk.y = random_range(0, CHUNK_SIZE);
 
     notify_create(this);
+}
+
+bool NPCServer::tick()
+{
+    if (check_move())
+    {
+        ItemLocation old_location = location;
+     //   CONSOLE_LOG("NPCServer::tick: %s\n", get_name());
+        being_move(this, &location);
+
+        if (old_location != location)
+        {
+            update_location(NetworkObject(get_cid(), get_uid()), old_location, location);
+        }
+    }
+    Player::tick();
+    return true;
 }
 
 void show_players()

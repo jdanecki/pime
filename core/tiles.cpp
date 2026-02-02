@@ -1,4 +1,5 @@
 #include "tiles.h"
+#include "alchemist/object.h"
 #include "alchemist/random_functions.h"
 
 void chunk::add_object(InventoryElement * object, float x, float y, bool front)
@@ -9,7 +10,7 @@ void chunk::add_object(InventoryElement * object, float x, float y, bool front)
         objects.add(object);
 
     Class_id cid = object->c_id;
-    if (cid == Class_Animal || cid == Class_Plant || cid == Class_Player)
+    if (cid == Class_Animal || cid == Class_Plant || cid == Class_Player || cid == Class_Npc)
     {
         beings.add(object);
     }

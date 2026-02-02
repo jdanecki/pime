@@ -6,10 +6,7 @@
 
 class AnimalServer : public Animal, public BeingServer
 {
-    int delay_for_move;
-    int delay_for_grow;
-    int dst_loc_x, dst_loc_y;
-
+    
   public:
     void move();
     bool tick() override;

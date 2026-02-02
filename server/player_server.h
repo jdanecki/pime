@@ -29,6 +29,7 @@ class NPCServer : public Npc, public BeingServer
   public:
     NPCServer(size_t uid);
     void show(bool details = true) override;
+    bool tick() override;
 };
 PlayerServer * create_player(size_t id);
 extern ElementsList * players;

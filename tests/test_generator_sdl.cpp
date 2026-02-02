@@ -175,8 +175,8 @@ typedef void (*callback_fn_test)(int r);
 
 void add_element(int r)
 {
-    int x = random_range(0, CHUNK_SIZE - 1);
-    int y = random_range(0, CHUNK_SIZE - 1);
+    int x = random_range(0, CHUNK_SIZE);
+    int y = random_range(0, CHUNK_SIZE);
 
     chunk[r].tile = current_region->rocks_types[r]->terrain->id + 1;
     chunk[r].form = current_region->rocks_types[r]->terrain->form;
