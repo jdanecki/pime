@@ -9,6 +9,7 @@
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
 #include "godot_cpp/variant/vector3.hpp"
+#include "main_player.h"
 #include "player_godot.h"
 
 using namespace godot;
@@ -32,8 +33,10 @@ void NetManager::_ready()
     net_manager = this;
     if (!Engine::get_singleton()->is_editor_hint())
     {
-        client = init("127.0.0.1", "1234");
-        if (client)
+        // FIXME when init_networking is fixed
+        ip = "192.168.0.3";
+        port = "1234";
+        if (init_networking(/*"127.0.0.1", "1234"*/))
         {
             UtilityFunctions::print("Connected to server");
         }
@@ -48,7 +51,7 @@ void NetManager::_process(double delta)
 {
     if (!Engine::get_singleton()->is_editor_hint())
     {
-        network_tick(client);
+        network_tick();
     }
 }
 
@@ -66,31 +69,44 @@ void NetManager::update_chunk(int x, int y, const chunk_table * data)
     chunk->update(data);
 }
 
-void NetManager::create_object(const ObjectData * data_c)
+size_t my_id;
+
+void NetManager::create_object(const ObjectData* data_c)
 {
     ObjectData * data = (ObjectData *)data_c;
     switch (data->tag)
     {
         case ObjectData::Tag::Element:
         {
+            UtilityFunctions::print(data->element.data.location.chunk.map_x );
+            UtilityFunctions::print(data->element.data.location.chunk.map_y );
+            UtilityFunctions::print(data->element.data.location.chunk.x );
+            UtilityFunctions::print(data->element.data.location.chunk.y );
             ElementGodot * el = memnew(ElementGodot(data->element.data));
             add_child(el);
-            el->set_position(Vector3(data->element.data.location.get_world_x(), 1, data->element.data.location.get_world_y()));
+            el->set_position(Vector3(data->element.data.location.get_world_x() / 32, 1, data->element.data.location.get_world_y() / 32));
             register_object(el);
             break;
         }
         case ObjectData::Tag::Player:
-        {
-            PlayerGodot * player = memnew(PlayerGodot(data->player.data));
+            {
+            PlayerGodot* player = nullptr; 
+            if (data->player.data.uid == my_id) {
+                player = memnew(MainPlayer(data->player.data));
+            } else {
+                player = memnew(PlayerGodot(data->player.data));
+            }
             add_child(player);
-            player->set_position(Vector3(data->player.data.location.get_world_x(), 1, data->player.data.location.get_world_y()));
+            player->set_position(Vector3(data->player.data.location.get_world_x() / 32, 1, data->player.data.location.get_world_y() / 32));
             register_object(player);
             break;
         }
+        default:
+        {
+            UtilityFunctions::print("INVALID TAG", (int)data->tag);
+        }
     }
 }
-
-size_t my_id;
 
 // FIXME remove when net.cpp is cleaned up
 void update_hotbar()
@@ -204,7 +220,7 @@ void update_item_location(LocationUpdateData data)
     else
     {
         node->set_visible(true);
-        node->set_position(Vector3(data.new_.get_world_x(), 1, data.new_.get_world_y()));
+        node->set_position(Vector3(data.new_.get_world_x() / 32.0, 1, data.new_.get_world_y() / 32.0));
     }
 }
 

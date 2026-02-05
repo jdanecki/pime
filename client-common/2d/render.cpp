@@ -390,7 +390,7 @@ void draw()
     Backend_Begin_Drawing();
     ui_updates++;
     bool ret = draw_terrain();
-    //  if (ret && ui_updates > 3)
+    // if (ret && ui_updates > 3 )
     {
 
         // draw_maps();

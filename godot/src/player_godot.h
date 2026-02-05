@@ -14,7 +14,6 @@ namespace godot
 class PlayerGodot : public CharacterBody3D, public Player
 {
     GDCLASS(PlayerGodot, CharacterBody3D)
-    MeshInstance3D * mesh;
 
   public:
     PlayerGodot();
@@ -22,9 +21,10 @@ class PlayerGodot : public CharacterBody3D, public Player
     ~PlayerGodot();
 
     void _ready() override;
-
-  protected:
+    
+protected:
     static void _bind_methods();
+    MeshInstance3D* mesh;
 };
 } // namespace godot
 

@@ -1,6 +1,6 @@
 #include <cstdio>
 #include "base.h"
-#include "alchemist/elements/types.h"
+#include "types.h"
 
 Base::Base(int index, Class_id c, const char * name) : name(name), NetworkObject(c, index)
 {

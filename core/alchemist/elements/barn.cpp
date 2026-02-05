@@ -1,5 +1,5 @@
 #include "barn.h"
-#include "alchemist/elements/types.h"
+#include "types.h"
 
 void Barn::show_state()
 {

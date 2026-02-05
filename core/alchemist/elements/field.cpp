@@ -1,5 +1,5 @@
 #include "field.h"
-#include "alchemist/elements/types.h"
+#include "types.h"
 
 void Field::show_state()
 {
