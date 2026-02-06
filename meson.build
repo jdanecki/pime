@@ -40,20 +40,13 @@ endforeach
 subdir('ogl')
 subdir('SDL')
 subdir('raylib')
+subdir('godot')
 
 subdir('server')
 subdir('tui')
 if get_option('tests')
   subdir('tests')
 endif
-
-custom_target(
-  'godot-client',
-  output : 'godot-client-build-done.txt',
-  command : ['sh', '-c', 'scons -C godot platform=linux && touch $OUT'],
-  capture : true,
-  build_by_default : false
-)
 
 custom_target(
   'format',

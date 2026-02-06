@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 #include "el_list.h"
-#include "alchemist/random_functions.h"
+#include "random_functions.h"
 
 ElementsList base_elements("base elements");
 ElementsList base_plants("base plants");

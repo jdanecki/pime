@@ -3,7 +3,7 @@
 
 #include "base_animal.h"
 #include "../names.h"
-#include "alchemist/random_functions.h"
+#include "../random_functions.h"
 
 BaseAnimal::BaseAnimal(int index) : Base(index, Class_BaseAnimal, create_name(7))
 {

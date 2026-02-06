@@ -3,8 +3,8 @@
 
 #include "plant.h"
 #include "../el_list.h"
-#include "alchemist/elements/dimensions.h"
-#include "alchemist/random_functions.h"
+#include "dimensions.h"
+#include "../random_functions.h"
 
 Plant::Plant(BasePlant * b) : InventoryElement(Class_Plant), base(b)
 {

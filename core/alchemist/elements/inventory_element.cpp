@@ -1,6 +1,6 @@
 #include <cstdio>
 #include "inventory_element.h"
-#include "world.h"
+#include "../../world.h"
 
 InventoryElement::InventoryElement(Class_id c_id, size_t uid, ItemLocation location) : NetworkObject(c_id, uid), location(location), dimensions(0.2, 6.0)
 {

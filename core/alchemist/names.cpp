@@ -1,4 +1,4 @@
-#include "alchemist/random_functions.h"
+#include "random_functions.h"
 #include <cstdlib>
 #include <cstring>
 

@@ -3,7 +3,7 @@
 
 #include "base_plant.h"
 #include "../names.h"
-#include "alchemist/random_functions.h"
+#include "../random_functions.h"
 
 BasePlant::BasePlant(int index) : Base(index, Class_BasePlant, create_name(5))
 {

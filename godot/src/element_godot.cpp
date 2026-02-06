@@ -33,7 +33,7 @@ void ElementGodot::_ready()
     BaseElement * base = get_base();
     mat->set_albedo(Color(base->color.r / 255.0, base->color.g / 255.0, base->color.b / 255.0, 1));
     Ref<BoxMesh> box = memnew(BoxMesh);
-    box->set_size(Vector3(length.value / 32.0, height.value / 32.0, width.value / 32.0));
+    box->set_size(Vector3(dimensions.length.value, dimensions.height.value, dimensions.width.value));
     box->set_material(mat);
     mesh = memnew(MeshInstance3D);
     mesh->set_mesh(box);
@@ -41,7 +41,7 @@ void ElementGodot::_ready()
 
     Ref<BoxShape3D> shape = memnew(BoxShape3D);
     shape->set_size(box->get_size());
-    CollisionShape3D* collision = memnew(CollisionShape3D);
+    CollisionShape3D * collision = memnew(CollisionShape3D);
     collision->set_shape(shape);
     add_child(collision);
 }

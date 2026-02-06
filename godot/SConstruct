@@ -13,9 +13,12 @@ env = SConscript("godot-cpp/SConstruct")
 # - LINKFLAGS are for linking flags
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
+env.Tool('compilation_db')
+cdb = env.CompilationDatabase()
+Alias('cdb', cdb)
 env.Append(CPPPATH=["src/"])
 env.Append(LIBS=['enet'])
-sources = Glob("src/*.cpp") + Glob("../core/*.cpp") + Glob("../core/alchemist/*.cpp") + Glob("../core/alchemist/elements/*.cpp") + ["../client-common/net.cpp", "../client-common/packets.cpp"]
+sources = Glob("src/*.cpp") + Glob("../core/*.cpp") + Glob("../core/alchemist/*.cpp") + Glob("../core/alchemist/elements/*.cpp") + Glob("../net/*.cpp")
 
 if env["platform"] == "macos":
     library = env.SharedLibrary(

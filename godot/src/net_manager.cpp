@@ -72,33 +72,36 @@ void NetManager::update_chunk(int x, int y, const chunk_table * data)
 
 size_t my_id;
 
-void NetManager::create_object(const ObjectData* data_c)
+void NetManager::create_object(const ObjectData * data_c)
 {
     ObjectData * data = (ObjectData *)data_c;
     switch (data->tag)
     {
         case ObjectData::Tag::Element:
         {
-            UtilityFunctions::print(data->element.data.location.chunk.map_x );
-            UtilityFunctions::print(data->element.data.location.chunk.map_y );
-            UtilityFunctions::print(data->element.data.location.chunk.x );
-            UtilityFunctions::print(data->element.data.location.chunk.y );
+            UtilityFunctions::print(data->element.data.location.chunk.map_x);
+            UtilityFunctions::print(data->element.data.location.chunk.map_y);
+            UtilityFunctions::print(data->element.data.location.chunk.x);
+            UtilityFunctions::print(data->element.data.location.chunk.y);
             ElementGodot * el = memnew(ElementGodot(data->element.data));
             add_child(el);
-            el->set_position(Vector3(data->element.data.location.get_world_x() / 32, 1, data->element.data.location.get_world_y() / 32));
+            el->set_position(Vector3(data->element.data.location.get_world_x(), 1, data->element.data.location.get_world_y()));
             register_object(el);
             break;
         }
         case ObjectData::Tag::Player:
+        {
+            PlayerGodot * player = nullptr;
+            if (data->player.data.uid == my_id)
             {
-            PlayerGodot* player = nullptr; 
-            if (data->player.data.uid == my_id) {
                 player = memnew(MainPlayer(data->player.data));
-            } else {
+            }
+            else
+            {
                 player = memnew(PlayerGodot(data->player.data));
             }
             add_child(player);
-            player->set_position(Vector3(data->player.data.location.get_world_x() / 32, 1, data->player.data.location.get_world_y() / 32));
+            player->set_position(Vector3(data->player.data.location.get_world_x(), 1, data->player.data.location.get_world_y()));
             register_object(player);
             break;
         }
@@ -216,20 +219,19 @@ void update_item_location(LocationUpdateData data)
     if (data.old.tag == ItemLocation::Tag::Player)
     {
         node->set_visible(true);
-        Player* p = (Player*)get_object_by_id(NetworkObject(Class_Player, data.old.player.id));
+        Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, data.old.player.id));
         p->drop(el);
-        
     }
     if (data.new_.tag == ItemLocation::Tag::Player)
     {
         node->set_visible(false);
-        Player* p = (Player*)get_object_by_id(NetworkObject(Class_Player, data.new_.player.id));
+        Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, data.new_.player.id));
         p->pickup(el);
         // TODO
     }
     else
     {
-        node->set_position(Vector3(data.new_.get_world_x() / 32.0, 1, data.new_.get_world_y() / 32.0));
+        node->set_position(Vector3(data.new_.get_world_x(), 1, data.new_.get_world_y()));
     }
 }
 
