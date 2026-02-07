@@ -107,13 +107,13 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             p = new PacketChunkUpdate(128, 128);
             p->send(peer);
             delete p;
-            add_object_to_world(new_pl->player, new_pl->player->location);
+            add_object_to_world(new_pl->player);
             break;
         }
         case PACKET_PLAYER_MOVE:
         {
             PacketPlayerMove * move = static_cast<PacketPlayerMove *>(p);
-            pl->player->move(move->get_x(), move->get_y());
+            pl->player->move_by(move->get_x(), move->get_y());
             delete p;
             break;
         }
@@ -369,9 +369,9 @@ void notify_create(const InventoryElement * el)
 
 void update_location(NetworkObject id, ItemLocation old_loc, ItemLocation new_loc)
 {
-  //  CONSOLE_LOG("update location uid=%lx old_tag=%d new_tag=%d\n", id.get_uid(), (int)old_loc.tag, (int)new_loc.tag);
-  //   old_loc.show();
-  //   new_loc.show();
+    //  CONSOLE_LOG("update location uid=%lx old_tag=%d new_tag=%d\n", id.get_uid(), (int)old_loc.tag, (int)new_loc.tag);
+    //   old_loc.show();
+    //   new_loc.show();
     add_packet_to_send(new PacketLocationUpdate(id.uid, old_loc, new_loc));
 }
 void notify_destroy(InventoryElement * el)

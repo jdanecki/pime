@@ -2,7 +2,7 @@
 #include <dirent.h>
 #include <stdio.h>
 
-#include "../core/tiles.h"
+#include "../core/chunk.h"
 #include "../core/alchemist/random_functions.h"
 
 #include "../client-common/ui/window.h"

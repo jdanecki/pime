@@ -4,15 +4,6 @@
 #include "alchemist/el_list.h"
 #include "world_params.h"
 
-enum biomes
-{
-    BIOME_DESERT, // yellow
-    BIOME_FOREST, // green with trees
-    BIOME_PLAINS, // green
-};
-#define BIOMES 3
-#define WORLD_SCALE 100.0
-
 struct tile
 {
     int tile;

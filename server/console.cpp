@@ -38,6 +38,8 @@ void shift_output()
     }
 }
 
+// #define LOG_TO_STDERR
+
 int col = 0;
 int CONSOLE_LOG(const char * fmt, ...)
 {
@@ -47,6 +49,11 @@ int CONSOLE_LOG(const char * fmt, ...)
     memset(buf, 0, MAX_OUTPUT_SIZE + 1);
     vsnprintf(buf, MAX_OUTPUT_SIZE, fmt, args);
     va_end(args);
+
+#ifdef LOG_TO_STDERR
+    fprintf(stderr, "%s", buf);
+    fflush(stderr);
+#endif
 
     int len = strlen(buf);
     if (col + strlen(buf) > MAX_OUTPUT_SIZE)

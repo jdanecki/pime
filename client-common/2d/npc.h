@@ -1,12 +1,8 @@
-#ifndef SDL_NPC_H
-#define SDL_NPC_H
-#include "../core/alchemist/npc_talk.h"
+#ifndef CLIENT_COMMON_NPC_H
+#define CLIENT_COMMON_NPC_H
 #include "../core/npc.h"
 #include "alchemist2d.h"
-#include "../ui/menu/menu.h"
-
-extern int npc(menu_actions a);
-extern int npc_say(Sentence * s, InventoryElement * el);
+#include "backend.inl"
 
 class Npc2d : public Npc, public Renderable
 {

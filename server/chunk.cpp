@@ -42,7 +42,7 @@ void add_animal(chunk * ch, size_t id)
 #define ADD_ROCKS
 #define ADD_PLANTS
 #define ADD_ANIMALS
-//#define CHECK_EMPTY_CHUNK
+// #define CHECK_EMPTY_CHUNK
 
 void load_chunk(int cx, int cy)
 {
@@ -110,9 +110,8 @@ try_again:
                 ch->table[y][x].tile = closest_el->get_id() % TILE_TEXTURES;
             }
 
-             // ch->table[y][x].tile = (x + y) % TILE_TEXTURES;
+            // ch->table[y][x].tile = (x + y) % TILE_TEXTURES;
         }
-
 
     world_table[cy][cx] = ch;
 }
@@ -132,6 +131,22 @@ void show_chunk()
     reg->show();
 }
 
+void show_beings()
+{
+    ListElement * pl_el = players->head;
+    if (!pl_el)
+        return;
+    PlayerServer * pl = ((PlayerServer *)((PlayerClient *)pl_el)->player);
+    int x = pl->location.chunk.map_x;
+    int y = pl->location.chunk.map_y;
+
+    chunk * c = world_table[y][x];
+    for (InventoryElement * el : c->beings)
+    {
+        CONSOLE_LOG("being @ chunk_map:(%d,%d):%f,%f x/y:%d,%d uid=%x cid=%d\n", el->location.chunk.map_x, el->location.chunk.map_y, el->location.chunk.x, el->location.chunk.y, x, y, el->get_uid(),
+            el->get_cid());
+    }
+}
 void show_loaded_chunks();
 
 void load_chunks()
@@ -144,4 +159,9 @@ void load_chunks()
             load_chunk(cy, cx);
     CONSOLE_LOG("Chunks loaded\n");
     show_loaded_chunks();
+}
+
+chunk * get_chunk(ItemLocation location)
+{
+    return world_table[location.chunk.map_y][location.chunk.map_x];
 }

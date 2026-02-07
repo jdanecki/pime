@@ -17,6 +17,12 @@ client_common_2d_sources=[
     'ui/dialog/d_craft.cpp',
     'ui/dialog/d_hotbar.cpp',
     'ui/dialog/dialog.cpp',
-    'ui/menu/menu.cpp'
+    'ui/menu/menu.cpp',
+    'ui/menu/menu_npc.cpp',
+    'ui/menu/menu_action.cpp',
+    'ui/menu/menu_debug.cpp',
+    'ui/menu/menu_help.cpp',
+    'ui/menu/menu_inventory.cpp',
+    'ui/menu/menu_knowledge.cpp',
 ]
 

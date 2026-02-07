@@ -4,7 +4,7 @@ subdir('alchemist')
 core_sources = [
   'world.cpp',
   'player.cpp',
-  'tiles.cpp',
+  'chunk.cpp',
   'npc.cpp',
   'packet_types.cpp',
   'clan.cpp',

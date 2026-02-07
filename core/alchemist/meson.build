@@ -25,6 +25,7 @@ alchemist_sources = [
   'serialization.cpp',
   'object.cpp',
   'random_functions.cpp',
+  'item_location.cpp',
   ]
 
 

@@ -294,7 +294,7 @@ void create_object(const ObjectData * data)
         if (object->c_id != Class_Clan)
         {
             InventoryElement * el = (InventoryElement *)object;
-            add_object_to_world(el, el->location);
+            add_object_to_world(el);
         }
     }
     else

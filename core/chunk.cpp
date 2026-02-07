@@ -1,4 +1,4 @@
-#include "tiles.h"
+#include "chunk.h"
 #include "alchemist/object.h"
 #include "alchemist/random_functions.h"
 
@@ -15,18 +15,14 @@ void chunk::add_object(InventoryElement * object, float x, float y, bool front)
         beings.add(object);
     }
 
-    object->location.tag = ItemLocation::Tag::Chunk;
-    object->location.chunk.map_y = map_y;
-    object->location.chunk.map_x = map_x;
-    object->location.chunk.x = x;
-    object->location.chunk.y = y;
+    object->location.set_chunk(map_x, map_y, x, y);
 }
 
 void chunk::add_object(InventoryElement * object)
 {
     int x = random_range(0, CHUNK_SIZE);
     int y = random_range(0, CHUNK_SIZE);
-    //    CONSOLE_LOG("class %d, %d %d, %ld\n", object->get_cid(), x, y, object->get_uid());
+    if (object->get_cid() == Class_Element && object->location.chunk.map_x==128) CONSOLE_LOG("class %d, %d %d, %x\n", object->get_cid(), x, y, object->get_uid());
     add_object(object, x, y);
 }
 

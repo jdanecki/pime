@@ -1,9 +1,13 @@
 #include <cstdio>
+#include <cmath>
 
 #include "world.h"
+#include "alchemist/elements/inventory_element.h"
 #include "alchemist/item_location.h"
 #include "alchemist/object.h"
 #include "player.h"
+#include "chunk.h"
+#include "world_params.h"
 
 chunk * world_table[WORLD_SIZE][WORLD_SIZE];
 Chunk_state loaded_chunks[WORLD_SIZE][WORLD_SIZE];
@@ -17,18 +21,25 @@ void remove_from_chunks(InventoryElement * object)
 void add_object_to_world(InventoryElement * object, ItemLocation location)
 {
     object->location = location;
-    CONSOLE_LOG("add_object_to_world: %s %ld @ (%f,%f)\n", object->get_name(), object->get_id(), (int)location.tag, location.chunk.x, location.chunk.y);
+    //    CONSOLE_LOG("add_object_to_world: %s %ld @ (%f,%f)\n", object->get_name(), object->get_id(), (int)location.tag, location.chunk.x, location.chunk.y);
     switch (location.tag)
     {
         case ItemLocation::Tag::Chunk:
-            if (world_table[(int)location.chunk.map_y][(int)location.chunk.map_x])
-                world_table[(int)location.chunk.map_y][(int)location.chunk.map_x]->add_object(object, location.chunk.x, location.chunk.y);
+        {
+            chunk * ch = world_table[location.chunk.map_y][location.chunk.map_x];
+            if (ch)
+                ch->add_object(object, location.chunk.x, location.chunk.y);
             break;
+        }
         case ItemLocation::Tag::Player:
             abort();
     }
 }
 
+void add_object_to_world(InventoryElement * object)
+{
+    add_object_to_world(object, object->location);
+}
 void show_chunk(ItemLocation loc)
 {
     switch (loc.tag)
@@ -63,6 +74,42 @@ InventoryElement * find_in_world(ItemLocation * loc, size_t uid)
     }
     abort();
     return nullptr;
+}
+
+InventoryElement * find_closest_item(InventoryElement * from, float * dist, Class_id cid)
+{
+    *dist = -1;
+    if (from->location.tag == ItemLocation::Tag::Player)
+        abort();
+
+    float min_distance_target = 3 * CHUNK_SIZE;
+    InventoryElement * target = nullptr;
+    for (int y = from->location.chunk.map_y - 1; y < from->location.chunk.map_y + 2; y++)
+        for (int x = from->location.chunk.map_x - 1; x < from->location.chunk.map_x + 2; x++)
+        {
+            if (y > -1 && y < WORLD_SIZE && x > -1 && x < WORLD_SIZE)
+            {
+                chunk * ch = world_table[y][x];
+                if (!ch)
+                    continue;
+                for (InventoryElement * o : ch->objects)
+                {
+                    if (o->c_id == cid)
+                    {
+                        float ox = o->location.get_world_x();
+                        float oy = o->location.get_world_y();
+                        float l = distance(ox, oy, from->location.get_world_x(), from->location.get_world_y());
+                        if (l < min_distance_target)
+                        {
+                            min_distance_target = l;
+                            *dist = min_distance_target;
+                            target = o;
+                        }
+                    }
+                }
+            }
+        }
+    return target;
 }
 
 InventoryElement * get_item_at_ppos(Player * player)
@@ -103,56 +150,4 @@ InventoryElement * get_item_at_ppos(Player * player)
         }
     }
     return nullptr;
-}
-
-ItemLocation ItemLocation::center()
-{
-    ItemLocation l;
-    l.tag = ItemLocation::Tag::Chunk;
-    l.chunk = {128, 128, 8.5, 8.5};
-    return l;
-}
-void ItemLocation::show()
-{
-    if (tag == Tag::Chunk)
-    {
-        CONSOLE_LOG("map_x:%d map_y:%d x:%f y:%f\n", chunk.map_x, chunk.map_y, chunk.x, chunk.y);
-    }
-    else
-        CONSOLE_LOG("player: %lu\n", player.id);
-}
-float ItemLocation::get_world_x()
-{
-    return get_world_pos(chunk.map_x, chunk.x);
-}
-float ItemLocation::get_world_y()
-{
-    return get_world_pos(chunk.map_y, chunk.y);
-}
-float ItemLocation::get_tile_x()
-{
-    return chunk.x;
-}
-float ItemLocation::get_tile_y()
-{
-    return chunk.y;
-}
-
-float ItemLocation::get_world_pos(int chunk, float pos)
-{
-    return chunk * CHUNK_SIZE + pos;
-}
-
-bool ItemLocation::operator!=(const ItemLocation & other)
-{
-    if (tag != other.tag)
-        return true;
-    switch (tag)
-    {
-        case Tag::Chunk:
-            return chunk.map_x != other.chunk.map_x || chunk.map_y != other.chunk.map_y || chunk.x != other.chunk.x || chunk.y != other.chunk.y;
-        case Tag::Player:
-            return player.id != other.player.id;
-    }
-    return false;
 }

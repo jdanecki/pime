@@ -27,8 +27,11 @@ tests_server_sources =[
   'tools/fruit.cpp', 'tools/fruit_salad.cpp',
   'tools/seed.cpp', 'tools/seedling.cpp',
   'tools/feed.cpp',
-  
-  'places/places.cpp'
+  #'world_server.cpp',
+
+  'places/places.cpp',
+  #'player_server.cpp',
+  #'chunk.cpp',
 ]
 
 server_elements_sources = [

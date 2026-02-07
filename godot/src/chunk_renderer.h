@@ -5,7 +5,7 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
-#include "../../core/tiles.h"
+#include "../../core/chunk.h"
 #include "godot_cpp/classes/mesh_instance3d.hpp"
 
 namespace godot

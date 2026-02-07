@@ -1,5 +1,5 @@
 #include "../net/net.h"
-#include "../core/tiles.h"
+#include "../core/chunk.h"
 #include "main.h"
 #include "ogl.h"
 #include <cstdio>

@@ -6,7 +6,7 @@
 #include <string.h>
 #include <assert.h>
 #include "packet_types.h"
-#include "tiles.h"
+#include "chunk.h"
 #include "world.h"
 #include "networking.h"
 

@@ -6,6 +6,7 @@
 #include "console.h"
 #include "generator/generator.h"
 #include "key_handlers.h"
+#include "npc_server.h"
 
 void generate()
 {
@@ -63,7 +64,8 @@ int main()
 
     generate();
     create_players();
-
+    create_npcs();
+    
     ENetEvent event;
 
     while (enet_host_service(server, &event, 20) >= 0)

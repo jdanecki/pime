@@ -44,5 +44,9 @@ struct ItemLocation
     float get_tile_y();
     float get_world_pos(int, float); // position in tiles
     bool operator!=(const ItemLocation & other);
+    void set_chunk(int map_x, int map_y, float x, float y);
 };
+
+float distance(float x1, float y1, float x2, float y2);
+
 #endif

@@ -1,5 +1,5 @@
 #pragma once
-#include "../core/tiles.h"
+#include "../core/chunk.h"
 #include "ogl.h"
 extern OGL_World * ogl_world;
 extern chunk * world_table[WORLD_SIZE][WORLD_SIZE];

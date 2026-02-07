@@ -13,10 +13,6 @@ bool handle_events();
 class Npc2d;
 Npc2d * current_npc;
 
-int npc(menu_actions a)
-{
-    return 0;
-}
 void send_packet_item_used_on_object(uintptr_t iid, uintptr_t oid)
 {
 }

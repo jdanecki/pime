@@ -1,8 +1,10 @@
 #include <math.h>
 #include "being_server.h"
+#include "../world_server.h"
 #include "../../core/alchemist/item_location.h"
 #include "../../core/alchemist/random_functions.h"
 #include "../../core/world_params.h"
+#include "../../core/world.h"
 
 void BeingServer::show(bool details)
 {
@@ -30,8 +32,7 @@ bool BeingServer::grow()
 BeingServer::BeingServer()
 {
     delay_for_grow = max_delay_grow;
-    dst_loc_x = random_range(0, CHUNK_SIZE);
-    dst_loc_y = random_range(0, CHUNK_SIZE);
+
     max_age = nullptr;
     age = nullptr;
     alive = true;
@@ -64,53 +65,89 @@ bool BeingServer::check_move()
     return true;
 }
 
-float distance(float x1, float y1, float x2, float y2)
+void BeingServer::discover(InventoryElement * who)
 {
-    float dx = x1 - x2;
-    float dy = y1 - y2;
-    return sqrt(dx * dx + dy * dy);
+    if ((distance(who->location.get_world_x(), who->location.get_world_y(), dst_loc.get_world_x(), dst_loc.get_world_y()) < 2.0))// || (random_range(0, 5) == 1))
+    {
+        int dx = random_range(-1, 2);
+        int dy = random_range(-1, 2);
+        int new_x = who->location.chunk.map_x + dx;
+        if (new_x < 0) new_x=0;
+        if (new_x == WORLD_SIZE) new_x=WORLD_SIZE-1;
+        int new_y = who->location.chunk.map_y + dy;
+        if (new_y < 0) new_y=0;
+        if (new_y == WORLD_SIZE) new_y=WORLD_SIZE-1;
+        dst_loc.set_chunk(new_x, new_y, random_range(0, CHUNK_SIZE), random_range(0, CHUNK_SIZE));
+      //  CONSOLE_LOG("discover @ %d,%d - %f,%f\n", dst_loc.chunk.map_x, dst_loc.chunk.map_y, dst_loc.chunk.x, dst_loc.chunk.y);
+    }
+    move_to(who);
 }
-void being_move(BeingServer * being, ItemLocation * location)
+
+void BeingServer::move_to(InventoryElement * who)
 {
-    float _x = location->chunk.x;
-    float _y = location->chunk.y;
-
-    if ((distance(_x, _y, being->dst_loc_x, being->dst_loc_y) < 2.0) || (random_range(0, 5) == 1))
+    float dx = 0;
+    float dy = 0;
+    //   if (random_range(0, 2))
     {
-        being->dst_loc_x = random_range(0, CHUNK_SIZE);
-        being->dst_loc_y = random_range(0, CHUNK_SIZE);
+        dx = dst_loc.get_world_x() - who->location.get_world_x();
+        if (dx > 0.1)
+            dx = 0.1;
+        else if (dx < -0.1)
+            dx = -0.1;
+        else
+            dx = 0;
     }
-    else
+    //  if (random_range(0, 2))
     {
-        //   if (random_range(0, 2))
-        {
-            if (_x < being->dst_loc_x)
-                _x += 0.1;
-            else
-                _x -= 0.1;
-        }
-        //  if (random_range(0, 2))
-        {
-            if (_y < being->dst_loc_y)
-                _y += 0.1;
-            else
-                _y -= 0.1;
-        }
+        dy = dst_loc.get_world_y() - who->location.get_world_y();
+        if (dy > 0.1)
+            dy = 0.1;
+        else if (dy < -0.1)
+            dy = -0.1;
+        else
+            dy = 0;
+    }
+    move_by(who, dx, dy);
+}
+void BeingServer::move_by(InventoryElement * who, float dx, float dy)
+{
+    // CONSOLE_LOG("SERV: being move dx=%f dy=%f\n", dx, dy);
+    ItemLocation old = who->location;
+
+    float new_x = who->location.chunk.x + dx;
+    float new_y = who->location.chunk.y + dy;
+    int new_map_x = who->location.chunk.map_x;
+    int new_map_y = who->location.chunk.map_y;
+
+    if (new_x < 0)
+    {
+        new_map_x = who->location.chunk.map_x - 1;
+        new_x += CHUNK_SIZE;
+    }
+    if (new_y < 0)
+    {
+        new_map_y = who->location.chunk.map_y - 1;
+        new_y += CHUNK_SIZE;
+    }
+    if (new_x >= CHUNK_SIZE)
+    {
+        new_map_x++;
+        new_x -= CHUNK_SIZE;
+    }
+    if (new_y >= CHUNK_SIZE)
+    {
+        new_map_y++;
+        new_y -= CHUNK_SIZE;
     }
 
-    if (_x >= CHUNK_SIZE)
-        _x = CHUNK_SIZE - 1;
-    if (_y >= CHUNK_SIZE)
-        _y = CHUNK_SIZE - 1;
-    if (_y < 0)
-        _y = 0;
-    if (_y < 0)
-        _y = 0;
-    if (_x < 0)
-        _x = 0;
-    // location->show();
-    //   CONSOLE_LOG("-> dst[%f, %f]\n", being->dst_loc_x, being->dst_loc_y);
-    location->chunk.x = _x;
-    location->chunk.y = _y;
-    // location->show();
+    if (new_map_x != old.chunk.map_x || new_map_y != old.chunk.map_y)
+    {
+        check_and_load_chunk(new_map_x, new_map_y);
+        remove_from_chunks(who);
+        who->location.set_chunk(new_map_x, new_map_y, new_x, new_y);
+        add_object_to_world(who);
+        return;
+    }
+    who->location.chunk.x = new_x;
+    who->location.chunk.y = new_y;
 }

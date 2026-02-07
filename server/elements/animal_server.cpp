@@ -78,12 +78,12 @@ bool AnimalServer::grow()
 }
 
 bool AnimalServer::tick()
-{ 
+{
     if (check_move())
     {
         ItemLocation old_location = location;
-     //   CONSOLE_LOG("AnimalServer::tick: %s\n", get_name());
-        being_move(this, &location);
+        //   CONSOLE_LOG("AnimalServer::tick: %s\n", get_name());
+        discover(this);
         if (old_location != location)
         {
             update_location(NetworkObject(get_cid(), get_uid()), old_location, location);

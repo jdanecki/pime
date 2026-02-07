@@ -21,6 +21,7 @@ int CONSOLE_LOG(const char * fmt, ...)
     return 0;
 }
 
+void check_and_load_chunk(int new_map_x, int new_map_y){}
 
 int main()
 {

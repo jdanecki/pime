@@ -1,6 +1,6 @@
 #include "key_handlers.h"
 #include "elements_server.h"
-#include "player_server.h"
+#include "npc_server.h"
 #include "places/places.h"
 #include "chunk.h"
 #include "generator/generator.h"
@@ -146,6 +146,7 @@ void print_help()
     CONSOLE_LOG("6 - show base plants\n");
     CONSOLE_LOG("7 - show base animals\n");
     CONSOLE_LOG("8 - show loaded chunks\n");
+    CONSOLE_LOG("9 - show beings\n");
     CONSOLE_LOG("# - show keys\n");
 }
 void switch_debug_mode()
@@ -166,7 +167,7 @@ void create_all_base_elements()
         BaseListElement * ble = (BaseListElement *)base_elements.find(&id);
         BaseElement * bel = (BaseElement *)(ble->get_el());
         ElementServer * el = create_element(bel);
-        ch->add_object(el, 3 * (id % 6), 3 * (id / 6));
+        ch->add_object(el, 3 * (id % 6), 3.0 * (id / 6.0));
         notify_create(el);
     }
 }
@@ -179,7 +180,7 @@ void create_all_base_plants()
         BaseListElement * ble = (BaseListElement *)base_plants.find(&id);
         BasePlant * bp = (BasePlant *)(ble->get_el());
         PlantServer * pl = create_plant(bp);
-        ch->add_object(pl, id % CHUNK_SIZE, 10 + 3 * (id / CHUNK_SIZE));
+        ch->add_object(pl, id % CHUNK_SIZE, 10 + 3.0 * (id / CHUNK_SIZE));
         notify_create(pl);
     }
 }
@@ -193,7 +194,7 @@ void create_all_base_animals()
         BaseListElement * ble = (BaseListElement *)base_animals.find(&id);
         BaseAnimal * ba = (BaseAnimal *)(ble->get_el());
         AnimalServer * an = create_animal(ba);
-        ch->add_object(an, id % CHUNK_SIZE, 15 + id / CHUNK_SIZE);
+        ch->add_object(an, id % CHUNK_SIZE, 15.0 + id / CHUNK_SIZE);
         notify_create(an);
     }
 }
@@ -234,6 +235,7 @@ KeyHandler key_handlers[] = {
     {'6', show_base_plants},
     {'7', show_base_animals},
     {'8', show_loaded_chunks},
+    {'9', show_beings},
     {'#', handle_hash},
 };
 

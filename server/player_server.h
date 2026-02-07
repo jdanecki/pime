@@ -1,7 +1,7 @@
 #ifndef SERVER_PLAYER_H
 #define SERVER_PLAYER_H
 
-#include "../core/npc.h"
+#include "../core/player.h"
 #include "elements_server.h"
 
 class PlayerServer : public Player, public BeingServer
@@ -11,7 +11,7 @@ class PlayerServer : public Player, public BeingServer
     int hunger_delay_max;
 
   public:
-    void move(float dx, float dy);
+    void move_by(float dx, float dy);
     bool use_item_on_object(InventoryElement * item, InventoryElement * object);
     bool action_on_object(Player_action a, InventoryElement * object);
     bool server_action_on_object(Server_action a, InventoryElement * object);
@@ -24,19 +24,9 @@ class PlayerServer : public Player, public BeingServer
     void show(bool details = true) override;
 };
 
-class NPCServer : public Npc, public BeingServer
-{
-  public:
-    NPCServer(size_t uid);
-    void show(bool details = true) override;
-    bool tick() override;
-};
 PlayerServer * create_player(size_t id);
 extern ElementsList * players;
 void create_players();
-
-Npc * create_npc();
 void show_players();
-void show_npcs();
 
 #endif

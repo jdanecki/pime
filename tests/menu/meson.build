@@ -10,6 +10,12 @@ test_menu_sdl_sources = [
     '../../client-common/ui/console.cpp',
     '../../client-common/ui/window.cpp',
     '../../client-common/ui/menu/menu.cpp',
+    '../../client-common/ui/menu/menu_npc.cpp',
+    '../../client-common/ui/menu/menu_action.cpp',
+    '../../client-common/ui/menu/menu_debug.cpp',
+    '../../client-common/ui/menu/menu_help.cpp',
+    '../../client-common/ui/menu/menu_inventory.cpp',
+    '../../client-common/ui/menu/menu_knowledge.cpp',
 ]
 
 test_menu_raylib_sources = [
@@ -23,7 +29,13 @@ test_menu_raylib_sources = [
     '../../client-common/2d/texture.cpp',
     '../../client-common/ui/console.cpp',
     '../../client-common/ui/window.cpp',
-    '../../client-common/ui/menu/menu.cpp'
+    '../../client-common/ui/menu/menu.cpp',
+    '../../client-common/ui/menu/menu_npc.cpp',
+    '../../client-common/ui/menu/menu_action.cpp',
+    '../../client-common/ui/menu/menu_debug.cpp',
+    '../../client-common/ui/menu/menu_help.cpp',
+    '../../client-common/ui/menu/menu_inventory.cpp',
+    '../../client-common/ui/menu/menu_knowledge.cpp',
 ]
 
 executable('test_menu_sdl', 

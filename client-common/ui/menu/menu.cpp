@@ -3,16 +3,23 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "backend.inl"
-#include "playerUI.h"
-
-#include "menu.h"
 #include "../core/alchemist/elements.h"
-
-#include "../../2d/npc.h"
+#include "../../client-common/2d/npc.h"
 
 #include "../text.h"
 #include "../../net/net.h"
+
+#include "backend.inl"
+
+#include "menu.h"
+#include "menu_help.h"
+#include "menu_npc.h"
+#include "menu_action.h"
+#include "menu_debug.h"
+#include "menu_inventory.h"
+#include "menu_knowledge.h"
+
+#include "playerUI.h"
 
 extern int active_hotbar;
 extern bool finish_program;
@@ -255,83 +262,20 @@ void create_game_menus()
     // add("Load", MENU_LOAD);
     menu_main->add("Help", MENU_HELP);
     // menu_main->add("Change music volume", MENU_MUSIC);
-    menu_main->add("Cancel", MENU_CANCEL);
 
-    menu_help = new Menu("Help");
-    menu_help->add("ESC - main menu", MENU_CANCEL);
-
-    menu_help->add("1-9,0 - hotbar", MENU_CANCEL);
-    menu_help->add("enter - use item", MENU_CANCEL);
-    menu_help->add("q - drop item", MENU_CANCEL);
-    menu_help->add("e - pickup item", MENU_CANCEL);
-    menu_help->add("` - previous item", MENU_CANCEL);
-    menu_help->add("tab - next item", MENU_CANCEL);
-    menu_help->add("= - select hotbar", MENU_CANCEL);
-    menu_help->add("minus - deselect hotbar", MENU_CANCEL);
-    menu_help->add("shift/control - sneak/run", MENU_CANCEL);
-    menu_help->add("wasd/arrows - move", MENU_CANCEL);
-    menu_help->add("n - NPC", MENU_NPC);
-    menu_help->add("c - Craft", MENU_CRAFT);
-    menu_help->add("z - Action", MENU_ACTION);
-    menu_help->add("i - inventory", MENU_INVENTORY);
-    menu_help->add("k - knowledge", MENU_KNOWLEDGE);
-
-    //   menu_help->add("l - devmenu", MENU_CANCEL);
-    //  menu_help->add("v - clear statusline", MENU_CANCEL);
-    //   menu_help->add("g - terrain break", MENU_CANCEL);
-    //  menu_help->add("r - remove from hotbar", MENU_CANCEL);
-
-    //  menu_help->add("F4 - item info at player", MENU_CANCEL);
-
-    menu_help->add("Debug options", MENU_DEBUG);
-
-    menu_debug = new Menu("Help - debug");
-    menu_debug->add("F1 - show item info", MENU_CANCEL);
-    menu_debug->add("F2 - show item info on server", MENU_CANCEL);
-
-    menu_debug->add("F3 - show chunk info", MENU_CANCEL);
-    menu_debug->add("F4 - show chunk info on server", MENU_CANCEL);
-
-    menu_debug->add("F5 - trace network", MENU_CANCEL);
-    menu_debug->add("F6 - trace network on server", MENU_CANCEL);
-    menu_debug->add("F7 - autoexplore", MENU_CANCEL);
-    menu_debug->add("F11 - resize", MENU_CANCEL);
+    menu_help = create_menu_help();
+    menu_debug = create_menu_debug();
 
     /*  menu_music = new Menu("Music", 3);
       menu_music->add("+5 Volume", MENU_LOUDER);
       menu_music->add("-5 Volume", MENU_QUIETER);
       menu_music->add("Cancel", MENU_CANCEL);
   */
-    menu_inventory_categories = new Menu("Inventory categories");
-    menu_inventory_categories->add("Elements", MENU_INV_ELEMENTS, Class_Element);
-    menu_inventory_categories->add("Ingredients", MENU_INV_INGREDIENTS, Class_Ingredient);
-    menu_inventory_categories->add("Products", MENU_INV_PRODUCT, Class_Product);
-    menu_inventory_categories->add("Plants", MENU_INV_PLANT, Class_Plant);
-    menu_inventory_categories->add("Animals", MENU_INV_ANIMAL, Class_Animal);
-    menu_inventory_categories->add("Scrolls", MENU_INV_SCROLL, Class_Scroll);
-    menu_inventory_categories->add("Cancel", MENU_CANCEL);
-
-    menu_inventory_elements = new Menu("Inventory elements");
-    menu_inventory_elements->add("Solid form", MENU_INV_SOLID, Form_solid);
-    menu_inventory_elements->add("Liquid form", MENU_INV_LIGQUID, Form_liquid);
-    menu_inventory_elements->add("Gas form", MENU_INV_GAS, Form_gas);
-    menu_inventory_elements->add("Cancel", MENU_CANCEL);
-    menu_npc = new Menu("NPC");
-    menu_npc->add("Talk to NPC", MENU_NPC_SAY);
-    menu_npc->add("Ask NPC", MENU_NPC_ASK);
-    menu_npc->add("Cancel", MENU_CANCEL);
-    menu_action = new Menu("Action");
-    menu_action->add("Drink", MENU_DRINK);
-    menu_action->add("Eat", MENU_EAT);
-    menu_action->add("Read", MENU_READ);
-    menu_action->add("Check", MENU_CHECK);
-    menu_action->add("Task/Ask Npc", MENU_NPC);
-    menu_action->add("Cancel", MENU_CANCEL);
-
-    menu_knowledge = new Menu("Knowledge");
-    menu_knowledge->add("Elements", MENU_KNOWLEDGE_ELEMENTS, Class_BaseElement);
-    menu_knowledge->add("Plants", MENU_KNOWLEDGE_PLANTS, Class_BasePlant);
-    menu_knowledge->add("Animals", MENU_KNOWLEDGE_ANIMALS, Class_BaseAnimal);
+    menu_inventory_elements = create_menu_inventory_elements();
+    menu_inventory_categories = create_menu_inventory_categories();
+    menu_npc = create_menu_npc();
+    menu_action = create_menu_action();
+    menu_knowledge = create_menu_knowledge();
 }
 
 // create menu with selected form
