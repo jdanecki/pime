@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <math.h>
 #include "being_server.h"
 #include "../world_server.h"
@@ -67,18 +68,22 @@ bool BeingServer::check_move()
 
 void BeingServer::discover(InventoryElement * who)
 {
-    if ((distance(who->location.get_world_x(), who->location.get_world_y(), dst_loc.get_world_x(), dst_loc.get_world_y()) < 2.0))// || (random_range(0, 5) == 1))
+    if ((distance(who->location.get_world_x(), who->location.get_world_y(), dst_loc.get_world_x(), dst_loc.get_world_y()) < 2.0)) // || (random_range(0, 5) == 1))
     {
         int dx = random_range(-1, 2);
         int dy = random_range(-1, 2);
         int new_x = who->location.chunk.map_x + dx;
-        if (new_x < 0) new_x=0;
-        if (new_x == WORLD_SIZE) new_x=WORLD_SIZE-1;
+        if (new_x < 0)
+            new_x = 0;
+        if (new_x == WORLD_SIZE)
+            new_x = WORLD_SIZE - 1;
         int new_y = who->location.chunk.map_y + dy;
-        if (new_y < 0) new_y=0;
-        if (new_y == WORLD_SIZE) new_y=WORLD_SIZE-1;
+        if (new_y < 0)
+            new_y = 0;
+        if (new_y == WORLD_SIZE)
+            new_y = WORLD_SIZE - 1;
         dst_loc.set_chunk(new_x, new_y, random_range(0, CHUNK_SIZE), random_range(0, CHUNK_SIZE));
-      //  CONSOLE_LOG("discover @ %d,%d - %f,%f\n", dst_loc.chunk.map_x, dst_loc.chunk.map_y, dst_loc.chunk.x, dst_loc.chunk.y);
+        //  CONSOLE_LOG("discover @ %d,%d - %f,%f\n", dst_loc.chunk.map_x, dst_loc.chunk.map_y, dst_loc.chunk.x, dst_loc.chunk.y);
     }
     move_to(who);
 }
@@ -87,26 +92,16 @@ void BeingServer::move_to(InventoryElement * who)
 {
     float dx = 0;
     float dy = 0;
-    //   if (random_range(0, 2))
-    {
-        dx = dst_loc.get_world_x() - who->location.get_world_x();
-        if (dx > 0.1)
-            dx = 0.1;
-        else if (dx < -0.1)
-            dx = -0.1;
-        else
-            dx = 0;
-    }
-    //  if (random_range(0, 2))
-    {
-        dy = dst_loc.get_world_y() - who->location.get_world_y();
-        if (dy > 0.1)
-            dy = 0.1;
-        else if (dy < -0.1)
-            dy = -0.1;
-        else
-            dy = 0;
-    }
+    dx = dst_loc.get_world_x() - who->location.get_world_x();
+    dy = dst_loc.get_world_y() - who->location.get_world_y();
+    float lenght = sqrt((dx * dx) + (dy * dy));
+    dy /= lenght * 8; // normalize and shorten
+    dx /= lenght * 8;
+    // add some randomness 25% of the time (per axis)
+    if (rand() % 100 < 25)
+        dx += (float)(rand() % 3 - 1) / 8;
+    if (rand() % 100 > 25)
+        dy += (float)(rand() % 3 - 1) / 8;
     move_by(who, dx, dy);
 }
 void BeingServer::move_by(InventoryElement * who, float dx, float dy)

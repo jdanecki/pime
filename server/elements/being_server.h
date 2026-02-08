@@ -4,7 +4,7 @@
 #include "../../core/alchemist/properties.h"
 #include "../../core/alchemist/elements/inventory_element.h"
 
-const int max_delay_move = 10;  // 1 sec.
+const int max_delay_move = 1;   // 0.1 sec.
 const int max_delay_grow = 100; // 600; // 600=1 min.
 
 class BeingServer
