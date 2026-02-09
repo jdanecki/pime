@@ -37,7 +37,7 @@ foreach s : client_net_sources
   client_net += ['../net/' + s]
 endforeach
 
-subdir('ogl')
+#subdir('ogl')
 subdir('SDL')
 subdir('raylib')
 if get_option('godot')

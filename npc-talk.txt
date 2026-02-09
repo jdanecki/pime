@@ -1,0 +1,6 @@
+SDL/inputs.cpp  inputs.cpp         net.cpp
+klawisz n    -> handle_menu_npc -> action_tile(start_conversation) -> send_packet_action_on_object
+
+menu.cpp
+interact()  -> npc(npc_say)
+            -> player->conversation(get_sentence())

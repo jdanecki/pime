@@ -484,7 +484,10 @@ int Menu::interact()
             return 0;
         }
         else
+        { // end of conversation
+
             return 1;
+        }
     }
     switch (a)
     {
