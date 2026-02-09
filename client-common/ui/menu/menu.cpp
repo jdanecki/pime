@@ -543,17 +543,6 @@ int Menu::interact()
             return 1; // hide menu
 #endif
 
-        case MENU_NPC:
-        {
-            InventoryElement * object = get_item_at_ppos(player);
-            if (object && object->get_cid() == Class_Npc)
-            {
-                current_menu = menu_npc;
-                return 0;
-            }
-            return 1;
-        }
-
         case MENU_INV_ELEMENTS:
             current_menu = menu_inventory_elements;
             return 0;

@@ -22,6 +22,8 @@ enum Player_action
     PLAYER_EAT,
     PLAYER_READ,
     PLAYER_CHECK,
+    PLAYER_NPC_START_CONVERSATION,
+    PLAYER_NPC_STOP_CONVERSATION,
 };
 
 extern const char * player_action_name[];

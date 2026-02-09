@@ -45,7 +45,6 @@ enum menu_actions
     MENU_ITEMS_GROUP,
     MENU_CLASSES,
 
-    MENU_NPC,
     MENU_NPC_SAY,
     MENU_NPC_ASK,
 

@@ -10,7 +10,8 @@ class NPCServer : public Npc, public BeingServer
     {
         IDLE,
         FINDING_FOOD,
-        DISCOVERING
+        DISCOVERING,
+        CONVERSATION,
     };
     float dst_x;
     float dst_y;
@@ -26,6 +27,7 @@ class NPCServer : public Npc, public BeingServer
     void show(bool details = true) override;
     bool tick() override;
     void pickup(InventoryElement * item);
+    bool player_action(Player_action action, Player * pl) override;
 };
 
 Npc * create_npc();

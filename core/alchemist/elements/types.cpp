@@ -49,7 +49,7 @@ const char * product_action_name[] = {
     "invite",
     "feed",
 };
-const char * player_action_name[] = {"drink", "eat", "read", "check"};
+const char * player_action_name[] = {"drink", "eat", "read", "check", "start converstation", "stop conversation"};
 
 const char * server_action_name[] = {"server show item", "server show chunk", "server trace network"};
 

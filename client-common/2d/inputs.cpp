@@ -169,5 +169,11 @@ void handle_escape()
 
 void handle_menu_npc()
 {
-    show_menu_npc();
+    InventoryElement * object = get_item_at_ppos(player);
+    if (object && object->get_cid() == Class_Npc)
+    {
+        action_tile(PLAYER_NPC_START_CONVERSATION, object);
+        show_menu_npc();
+    }
+
 }

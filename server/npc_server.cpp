@@ -74,6 +74,8 @@ void NPCServer::check_state()
             find_plant();
             break;
         }
+        case CONVERSATION:
+        break;
     }
     if (old_location != location)
     {
@@ -105,6 +107,23 @@ void NPCServer::pickup(InventoryElement * item)
     remove_from_chunks(item);
     Player::pickup(item);
     update_location(NetworkObject(item->get_cid(), item->get_uid()), old_location, item->location);
+}
+
+bool NPCServer::player_action(Player_action action, Player *pl)
+{
+    bool res = false;
+    CONSOLE_LOG("NPC_SERVER: %s %s\n", player_action_name[action], get_name());
+    switch(action)
+    {
+        case PLAYER_NPC_START_CONVERSATION:
+            state = CONVERSATION;
+        break;
+        case PLAYER_NPC_STOP_CONVERSATION:
+            state = IDLE;
+        break;
+    }
+
+    return res;
 }
 
 void show_npcs()
