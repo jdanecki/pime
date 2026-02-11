@@ -1,6 +1,6 @@
 /*
     pime-ogl - an OpenGL implementation of a pime client
-    Copyright (C) 2026 Piotr Danecki <i3riced@mailfence.com
+    Copyright (C) 2026 Piotr Danecki <i3riced@mailfence.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
