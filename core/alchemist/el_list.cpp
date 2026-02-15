@@ -122,7 +122,7 @@ void ElementsList::show(bool details)
     int i = 1;
     while (cur)
     {
-        CONSOLE_LOG("--- %s (%d/%d) ---\n", name, i, nr_elements);
+        if (i == 1) CONSOLE_LOG("--- %s (%d/%d) ---\n", name, i, nr_elements);
         cur->show(details);
         cur = cur->next;
         i++;

@@ -12,7 +12,7 @@ class NetClient
 extern const char * ip;
 extern const char * port;
 
-extern ElementsList objects;
+extern ElementsList all_objects;
 
 extern chunk * check_chunk(int cx, int cy);
 
@@ -48,7 +48,7 @@ BaseAnimal * get_base_animal(size_t id);
 
 Base * get_base(uint32_t c_id, int32_t id);
 
-// Client should implement: (or use net2d.cpp)
+// Client should implement: (or use client-common/net.cpp)
 void got_id(size_t id, int64_t seed);
 void update_chunk(int32_t x, int32_t y, const chunk_table * data);
 void update_object(const ObjectData * data);

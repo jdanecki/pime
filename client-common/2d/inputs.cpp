@@ -173,7 +173,6 @@ void handle_menu_npc()
     if (object && object->get_cid() == Class_Npc)
     {
         action_tile(PLAYER_NPC_START_CONVERSATION, object);
-        show_menu_npc();
     }
 
 }

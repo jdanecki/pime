@@ -5,7 +5,7 @@ cd "$(dirname "$(realpath "$0")")"
 create_inline_file()
 {
   local INPUT_FILE="$1.txt"  
-  awk -F';' '{ print $1"," }' "$INPUT_FILE" > generated/$1.inl
+  awk -F';' '{ print $1"," }' "$INPUT_FILE" > generated/enum_$1.inl
 }
 
 create_enum_file()
@@ -17,7 +17,7 @@ echo "#ifndef _NPC_SAY_ENUM_H
 
 enum Npc_say {" > $ENUM_FILE
 
-for f in generated/*.inl
+for f in generated/enum_*.inl
 do
     local n=`basename $f`
     echo "#include \"$n\"" >> $ENUM_FILE
@@ -33,7 +33,7 @@ do_files()
   local BASENAME="$1"
   local INPUT_FILE="${BASENAME}.txt"  
   local HEADER_FILE="generated/${BASENAME}.h"  
-  local SOURCE_FILE="generated/${BASENAME}.cpp"  
+  local SOURCE_FILE="generated/${BASENAME}.inl"  
   local FUNC_NAME="init_${BASENAME}"
   local VAR_NAME="${BASENAME}"
 

@@ -101,11 +101,12 @@ struct ObjectData
     }
     static void * operator new(size_t size)
     {
+        CONSOLE_LOG("ObjectData: new size=%ld\n", size);
         return ::operator new(size);
     }
     static void * operator new(size_t size_base, size_t extra)
     {
-        CONSOLE_LOG("ObjectData: serial_data: allocating %ld + %ld\n", size_base, extra);
+        CONSOLE_LOG("ObjectData: allocating %ld + %ld\n", size_base, extra);
         return ::operator new(size_base + extra);
     }
 

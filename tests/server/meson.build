@@ -59,10 +59,10 @@ executable('server_ncurses',
   install: false,
 )
 
-
 executable('server_elements', 
   server_elements_sources,
   cpp_args : ['-DTESTS'],
   install: false,
   link_with: [core],
 )
+

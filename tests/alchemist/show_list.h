@@ -1,7 +1,7 @@
 #ifndef SHOW_LIST_H
 #define SHOW_LIST_H
 
-#include "../alchemist/el_list.h"
+#include "../../core/alchemist/el_list.h"
 
 class Show_el : public ListElement
 {
@@ -15,12 +15,9 @@ class Show_el : public ListElement
 
 class Show_list : public ElementsList
 {
-    char prompt;
-
   public:
-    Show_list(char p) : ElementsList("select list")
+    Show_list(const char *p) : ElementsList(p)
     {
-        prompt = p;
     }
     ListElement * select_el();
     bool multi_select();
@@ -43,9 +40,9 @@ extern const char * colorNormal;
 extern const char * clrscr;
 
 int kbhit();
-char wait_key(char prompt);
+char wait_key(const char *prompt);
 ListElement * select_list_element(ElementsList * list);
-InventoryElement * select_element(InvList * list);
+InventoryElement * select_element(ElementsList * list);
 bool select_inventory2(int count, InventoryElement ** el2);
 
 #endif // SHOW_LIST_H

@@ -1,8 +1,8 @@
 #include "npc_talk.h"
 #include "el_list.h" // IWYU pragma: export
-#include "generated/sentences.cpp"
-#include "generated/questions.cpp"
-#include "generated/answers.cpp"
+#include "generated/sentences.inl"
+#include "generated/questions.inl"
+#include "generated/answers.inl"
 
 void SentencesList::disable(Npc_say id)
 {

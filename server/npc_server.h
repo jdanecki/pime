@@ -6,6 +6,14 @@
 
 class NPCServer : public Npc, public BeingServer
 {
+   float dst_x;
+    float dst_y;
+    int dst_map_x;
+    int dst_map_y;
+    InventoryElement * target;
+    void check_state();
+    void find_plant();
+
     enum NpcState
     {
         IDLE,
@@ -13,14 +21,7 @@ class NPCServer : public Npc, public BeingServer
         DISCOVERING,
         CONVERSATION,
     };
-    float dst_x;
-    float dst_y;
-    int dst_map_x;
-    int dst_map_y;
     NpcState state;
-    InventoryElement * target;
-    void check_state();
-    void find_plant();
 
   public:
     NPCServer(size_t uid);

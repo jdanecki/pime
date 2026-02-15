@@ -477,10 +477,10 @@ int Menu::interact()
         return menu_inventory->handle_item(a & ~MENU_ITEM);
     if (a & MENU_NPC_CONV)
     {
-        Player * who = player->conversation(menu_dialog->get_sentence(), menu_dialog->get_el());
-        if (who)
+        bool conv = player->conversation(menu_dialog->get_sentence(), menu_dialog->get_el());
+        if (conv)
         {
-            current_npc = static_cast<Npc2d *>(who);
+            //current_npc = static_cast<Npc2d *>(who);
             return 0;
         }
         else

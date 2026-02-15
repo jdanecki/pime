@@ -52,9 +52,9 @@ int kbhit()
         return -1;
 }
 
-char wait_key(char prompt)
+char wait_key(const char * prompt)
 {
-    printf("\r [%c] > ", prompt);
+    printf("\r [%s] > ", prompt);
     while (!kbhit())
     {
         usleep(1000);
@@ -176,7 +176,7 @@ bool do_key_question_mark(char k)
             break;
         }
         case 'o':
-            objects.show(false);
+            all_objects.show(false);
             break;
     }
     return false;

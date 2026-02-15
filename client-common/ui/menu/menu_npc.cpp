@@ -24,7 +24,6 @@ int npc(menu_actions a)
     else
         list = questions;
 
-    int menu_entries = list->nr_elements;
     list->enable_all();
 
     InventoryElement * item_at = nullptr;
@@ -37,7 +36,6 @@ int npc(menu_actions a)
         else
         {
             list->disable(NPC_Ask_do_you_know_inv_item);
-            menu_entries--;
         }
         item_at = get_item_at_ppos(player);
         if (item_at)
@@ -47,7 +45,6 @@ int npc(menu_actions a)
         else
         {
             list->disable(NPC_Ask_do_you_know_item);
-            menu_entries--;
         }
     }
     else
@@ -55,7 +52,6 @@ int npc(menu_actions a)
         Npc_say sid = NPC_Say_Nothing;
         Sentence * a = dynamic_cast<Sentence *>(sentences->find(&sid));
         a->disable();
-        menu_entries--;
     }
 
     menu_dialog = new Menu("NPC conversation");

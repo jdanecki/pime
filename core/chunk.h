@@ -9,7 +9,7 @@ struct tile
     int tile;
 };
 
-const unsigned int TILE_SIZE = sizeof(struct tile);
+//const unsigned int TILE_SIZE = sizeof(struct tile);
 
 typedef struct tile chunk_table[CHUNK_SIZE][CHUNK_SIZE];
 

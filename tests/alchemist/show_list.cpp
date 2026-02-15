@@ -1,5 +1,7 @@
+#include <stdio.h>
+
 #include "show_list.h"
-#include "../npc.h"
+#include "../../core/npc.h"
 #include "game_time.h"
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -31,9 +33,9 @@ int kbhit()
         return -1;
 }
 
-char wait_key(char prompt)
+char wait_key(const char * prompt)
 {
-    printf("\r%s %s [%c] > ", game_time->get_time(), current_npc ? current_npc->get_name() : " ", prompt);
+    printf("\r%s %s [%s] > ", game_time->get_time(), current_npc ? current_npc->get_name() : " ", prompt);
     while (!kbhit())
     {
         usleep(1000);
@@ -72,7 +74,7 @@ bool Show_list::find_check(ListElement * _el, void * what)
 
 ListElement * Show_list::select_el()
 {
-    char c = wait_key(prompt);
+    char c = wait_key(name);
     Show_el * f = (Show_el *)find(&c);
     if (f)
         return f->l_el;
@@ -86,7 +88,7 @@ bool Show_list::multi_select()
     printf("z - zakończ selekcje\n");
     while (1)
     {
-        c = wait_key(prompt);
+        c = wait_key(name);
         if (c == 'z')
             break;
         Show_el * f = (Show_el *)find(&c);
@@ -115,7 +117,7 @@ void Show_list::unselect_all()
 ListElement * select_list_element(ElementsList * list)
 {
     ListElement * elems = list->head;
-    Show_list * show_cat = new Show_list('e');
+    Show_list * show_cat = new Show_list(list->name);
     char k = 'a';
 
     while (elems)
@@ -135,17 +137,17 @@ ListElement * select_list_element(ElementsList * list)
     return elems;
 }
 
-InventoryElement * select_element(InvList * list)
+InventoryElement * select_element(ElementsList * list)
 {
     ListElement * elems = select_list_element(list);
     if (!elems)
         return nullptr;
-
-    if (elems->el)
+    InventoryElement * el = static_cast<InventoryElement*>(elems->get_el());
+    if (el)
     {
         printf("%s%s", colorNormal, colorGreenBold);
-        printf("selected %s\n", elems->el->get_name());
-        return elems->el;
+        printf("selected %s\n", el->get_name());
+        return el;
     }
 
     return nullptr;
@@ -153,8 +155,8 @@ InventoryElement * select_element(InvList * list)
 
 bool select_inventory2(int count, InventoryElement ** el2)
 {
-    ListElement * inv = player->inventory->head;
-    Show_list * show_cat = new Show_list('i');
+    ListElement * inv = player->inventory.head;
+    Show_list * show_cat = new Show_list("inventory");
     char k = 'a';
 
     while (inv)
@@ -177,9 +179,12 @@ bool select_inventory2(int count, InventoryElement ** el2)
     {
         if (el->selected)
         {
-            printf("%s ", el->l_el->el->get_name());
-            el2[i] = el->l_el->el;
-            i++;
+            InventoryElement * inv_el = static_cast<InventoryElement*>(el->l_el->get_el());
+            if (inv_el) {
+                printf("%s ", inv_el->get_name());
+                el2[i] = inv_el;
+                i++;
+            }
         }
         el = (Show_el *)el->next;
     }

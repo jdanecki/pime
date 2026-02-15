@@ -41,3 +41,23 @@ void send_packet_item_used_on_tile(const NetClient * client, uintptr_t iid, int3
 void send_packet_craft(const NetClient * client, uintptr_t prod_id, uintptr_t ingredients_num, const uintptr_t * iid)
 {
 }
+
+void notify_destroy(size_t id, ItemLocation location)
+{
+}
+
+void update_location(size_t id, ItemLocation old_loc, ItemLocation new_loc)
+{
+}
+
+void notify_knowledge(size_t pl_id, Class_id cid, int id)
+{
+}
+void notify_checked(size_t pl_id, size_t el)
+{
+}
+void notify_update(const InventoryElement * el)
+{
+}
+
+

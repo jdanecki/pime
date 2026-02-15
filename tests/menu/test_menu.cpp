@@ -1,10 +1,10 @@
 #include <stdio.h>
+#include "playerUI.h"
 
 #include "../../core/alchemist/elements.h"
-
+#include "../../core/alchemist/random_functions.h"
 #include "../../client-common/ui/window.h"
 #include "../../client-common/ui/text.h"
-
 #include "../../client-common/ui/menu/menu.h"
 
 int tile_size = 32;
@@ -12,6 +12,15 @@ bool finish_program;
 bool handle_events();
 class Npc2d;
 Npc2d * current_npc;
+
+Renderable::Renderable()
+{}
+void Renderable::render(float el_x, float el_y, float w, float h) {}
+
+Backend_Texture Renderable::get_texture()
+{
+    return Backend_Texture();
+}
 
 void send_packet_item_used_on_object(uintptr_t iid, uintptr_t oid)
 {
@@ -27,6 +36,13 @@ void send_packet_item_used_on_tile(uintptr_t iid, ItemLocation location)
 }
 void action_tile(Player_action a, InventoryElement * object)
 {
+}
+
+void test_menu_handle_enter()
+{
+    printf("handle_enter: action=%d\n", current_menu->menu_pos->action);
+
+    menu_handle_enter();
 }
 void handle_escape()
 {
@@ -61,6 +77,7 @@ int main()
     if (load_font())
         return 1;
     create_game_menus();
+    player = new PlayerUI(Player(0, SerializableCString("player"), ItemLocation::center(), random_range(50, 150), random_range(50, 150), random_range(50, 150)));
     for (;;)
     {
         if (handle_events())

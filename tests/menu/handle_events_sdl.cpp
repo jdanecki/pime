@@ -10,15 +10,19 @@ void handle_mouse(int x, int y, int button);
 void handle_escape();
 void handle_i();
 void quit_program();
+void test_menu_handle_enter();
 
 KeyHandler menu_key_handlers[] = {
     {SDLK_ESCAPE, menu_handle_escape},
-    {SDLK_RETURN, menu_handle_enter},
+    {SDLK_RETURN, test_menu_handle_enter},
+    //enter -> menu_handle_enter->current_menu->interact()
     {SDLK_DOWN, menu_go_down},
     {SDLK_UP, menu_go_up},
 };
 
-KeyHandler key_handlers[] = {{SDLK_ESCAPE, handle_escape}, {SDLK_i, handle_i},
+KeyHandler key_handlers[] = {
+    {SDLK_ESCAPE, handle_escape},
+    {SDLK_i, handle_i},
     //{SDLK_n, handle_n},
     {SDLK_q, quit_program}};
 

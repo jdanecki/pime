@@ -66,7 +66,7 @@ void PacketElementsList::init(ElementsList * list)
     pdata = new (size) serial_data(sizeof(serial_data) + size);
     pdata->t = t;
     pdata->nr_elements = list->nr_elements;
-    strncpy(pdata->name, list->name, strlen(list->name) + 1);
+//    strncpy(pdata->name, list->name, strlen(list->name) + 1);
     pdata->list_c_id = list->head->get_cid();
 
     int i = 0;

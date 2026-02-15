@@ -17,8 +17,8 @@ NPCServer::NPCServer(size_t uid) : Npc(uid, ItemLocation::center())
     dst_loc.chunk.map_y = location.chunk.map_y;
     dst_loc.chunk.x = random_range(0, CHUNK_SIZE);
     dst_loc.chunk.y = random_range(0, CHUNK_SIZE);
-    state = IDLE;
     target = nullptr;
+    state = IDLE;
 }
 
 void NPCServer::find_plant()
@@ -113,16 +113,26 @@ bool NPCServer::player_action(Player_action action, Player *pl)
 {
     bool res = false;
     CONSOLE_LOG("NPC_SERVER: %s %s\n", player_action_name[action], get_name());
+    NpcState cur=state;
     switch(action)
     {
         case PLAYER_NPC_START_CONVERSATION:
+            CONSOLE_LOG("%s start talking to %s\n", pl->get_name(), get_name());
             state = CONVERSATION;
+            start_conversation(pl);
+            pl->start_conversation(this);
         break;
         case PLAYER_NPC_STOP_CONVERSATION:
+            CONSOLE_LOG("%s stopped talking to %s\n", pl->get_name(), get_name());
             state = IDLE;
+            stop_conversation();
+            pl->stop_conversation();
         break;
     }
-
+    if (cur != state) {
+        notify_update(pl);
+        notify_update(this);
+    }
     return res;
 }
 

@@ -1,8 +1,8 @@
 #ifndef GAME_TIME_H
 #define GAME_TIME_H
 
-#include "../alchemist/el_list.h"
-#include "alchemist/random_functions.h"
+#include "../../core/alchemist/el_list.h"
+#include "../../core/alchemist/random_functions.h"
 
 class Game_time
 {

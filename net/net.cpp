@@ -5,7 +5,7 @@
 #include "../core/packets.h"
 #include "net.h"
 
-ElementsList objects("objects");
+ElementsList all_objects("objects");
 
 NetClient * client;
 const char * ip = "127.0.0.1";
@@ -271,7 +271,7 @@ unsigned int network_tick()
 
 InventoryElement * get_object_by_id(NetworkObject obj)
 {
-    ListElement * el = objects.find(&obj.uid);
+    ListElement * el = all_objects.find(&obj.uid);
     return el ? static_cast<InventoryElement *>(el->get_el()) : nullptr;
 }
 
@@ -279,13 +279,13 @@ void register_object(NetworkObject * o)
 {
     ObjectElement * obj = new ObjectElement((InventoryElement *)o);
     // printf("register_object: uid=%lx\n", o->uid);
-    objects.add(obj);
+    all_objects.add(obj);
 }
 
 void deregister_object(NetworkObject * o)
 {
-    ListElement * obj = objects.find(&o->uid);
-    objects.remove(obj);
+    ListElement * obj = all_objects.find(&o->uid);
+    all_objects.remove(obj);
 }
 
 Base * get_base(uint32_t c_id, int32_t id)

@@ -59,14 +59,11 @@ class Player : public InventoryElement
     size_t checked_element;
 
     SerializablePointer<Clan> clan;
-    Clan * get_clan();
     Skill player_skills[SK_NUM];
 
     bool in_conversation;
     bool welcomed;
-    // Player * talking_to;
     SerializablePointer<Player> talking_to;
-    Player * get_talking_to();
     // FIXME change that to list
     // PlayerRelation * relations;
 
@@ -76,18 +73,20 @@ class Player : public InventoryElement
     size_t get_id();
     // Player(int uid);
     Player(size_t uid, SerializableCString && name, ItemLocation location, int thirst, int hunger, int nutrition);
-    Player * conversation(Sentence * s, InventoryElement * el);
+    bool conversation(Sentence * s, InventoryElement * el);
+    void start_conversation(Player * who);
     void stop_conversation();
 
     void show(bool details = true);
-    bool say(Sentence * s);
-    Sentence * get_answer(Sentence * s);
+
+    virtual bool say(Sentence * s);
+    virtual Sentence * get_answer(Sentence * s);
+    virtual void ask(enum Npc_say s, InventoryElement * el);
+
     void ask(Sentence * s, InventoryElement * el);
-    void ask(enum Npc_say s, InventoryElement * el);
+
     char * get_el_description(InventoryElement * el);
-
     virtual bool check_known(InventoryElement * el);
-
     bool set_known(Class_id cid, int el_id);
 
     bool conversation_started();

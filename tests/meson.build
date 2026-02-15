@@ -121,6 +121,19 @@ executable('test_generator_sdl',
   install: false,
 )
 
+test_serialization_sources = [
+    'serialization.cpp',
+    '../client-common/ui/console.cpp',
+    'packets_server.cpp',
+    'packets_client.cpp',
+]
+
+executable('test_serialization',
+  sources: test_serialization_sources,
+  link_with: [core],
+  install: false,
+)
+
 custom_target(
   'textures_link',
   output: 'textures',
@@ -143,4 +156,5 @@ custom_target(
 subdir('dialog')
 subdir('menu')
 subdir('server')
+subdir('alchemist')
 

@@ -41,7 +41,7 @@ size_t Player::get_id()
 
 Player::Player(size_t uid, SerializableCString && name, ItemLocation location, int thirst, int hunger, int nutrition)
     : InventoryElement(Class_Player, uid, location), name(name), thirst(thirst), hunger(hunger), nutrition(nutrition), inventory("inventory"), known_elements("known elements"),
-      clan(get_clan_by_id(Clan_Human)), talking_to(nullptr)
+      clan(get_clan_by_id(Clan_Elf)), talking_to(nullptr)
 {
     CONSOLE_LOG("new player: uid = %ld name=%s\n", uid, get_name());
     // FIXME
@@ -60,48 +60,28 @@ Player::Player(size_t uid, SerializableCString && name, ItemLocation location, i
     dimensions.volume.value = 1;
 }
 
-Player * Player::conversation(Sentence * s, InventoryElement * el)
+bool Player::conversation(Sentence * s, InventoryElement * el)
 {
-    Player * who = nullptr;
-    InventoryElement * item = get_item_at_ppos(this);
-    if (!item || item->get_cid() != Class_Npc)
-    {
-        return nullptr;
-    }
-    who = static_cast<Player *>(item);
-    if (!in_conversation)
-    {
-        in_conversation = true;
-        CONSOLE_LOG("%s start talking to %s\n", get_name(), who->get_name());
-        talking_to = who;
-        who->talking_to = this;
-    }
     if (s->id < NPC_Say_Nothing)
     {
         ask(s, el);
-        return who;
+        return true;
     }
     else
-    {
-        if (say(s))
-        {
-            return nullptr;
-        }
-    }
-    return who;
+        return say(s);
 }
 
+void Player::start_conversation(Player *who)
+{
+    in_conversation = true;
+    talking_to.set(who);
+
+}
 void Player::stop_conversation()
 {
     in_conversation = false;
     welcomed = false;
-    if (talking_to.get())
-    {
-        CONSOLE_LOG("%s stopped talking to %s\n", talking_to.get()->get_name(), get_name());
-        Player * p = talking_to.get();
-        talking_to = nullptr;
-        p->stop_conversation();
-    }
+    talking_to.set(nullptr);
 }
 
 void Player::show(bool details)
@@ -112,10 +92,15 @@ void Player::show(bool details)
     {
         // FIXME
         // player_skills.show(true);
-        if (get_talking_to())
-        {
-            CONSOLE_LOG("%s is talking to %s\n", get_name(), get_talking_to()->get_name());
+        if (in_conversation) {
+            CONSOLE_LOG("in conversation, welcomed=%d\n", welcomed);
+            Player *t= talking_to.get();
+            if (t)
+            {
+                CONSOLE_LOG("%s is talking to %s id=%ld\n", get_name(), t->get_name(), t->get_id());
+            }
         }
+        CONSOLE_LOG("inventory: %d elements\n", inventory.nr_elements);
     }
 }
 
@@ -123,105 +108,42 @@ bool Player::say(Sentence * s)
 {
     if (!s)
         return false;
+    Player * t=talking_to.get();
+
     switch (s->id)
     {
         case NPC_Say_Bye:
         case NPC_Say_See_you_later:
         case NPC_Say_See_you_next_time:
             stop_conversation();
-            return true;
+            return false;
 
         case NPC_Say_Hello:
-            get_talking_to()->welcomed = true;
+            t->welcomed = true;
         // pass through
         default:
-            get_talking_to()->get_answer(s);
+            t->get_answer(s);
             break;
     }
-    return false;
+    return true;
 }
 
 Sentence * Player::get_answer(Sentence * s)
 {
-    Npc_say sid = NPC_Say_Hello;
-    Sentence * a = static_cast<Sentence *>(sentences->find(&sid));
-
-    const char * n;
-    if (get_talking_to()->find_relation(this) == REL_known)
-        n = get_name();
-    else
-        n = get_class_name();
-
-    switch (s->id)
-    {
-        default:
-            print_status(1, "%s answers: %s", n, a->text);
-            break;
-    }
-    return a;
+    CONSOLE_LOG("player: %s can't answer\n", get_name());
+    return nullptr;
 }
 
 void Player::ask(Sentence * s, InventoryElement * el)
 {
-    if (get_talking_to())
-        get_talking_to()->ask(s->id, el);
+    Player * t=talking_to.get();
+    if (t)
+        t->ask(s->id, el);
 }
 
 void Player::ask(enum Npc_say s, InventoryElement * el)
 {
-    Npc_say sid = NPC_Say_Nothing;
-    Sentence * a;
-    const char * n;
-    Relations player_rel = get_talking_to()->find_relation(this);
-    if (player_rel == REL_known)
-        n = get_name();
-    else
-        n = get_class_name();
-
-    if (s == NPC_Ask_do_you_know_inv_item || s == NPC_Ask_do_you_know_item)
-    {
-        char * des = get_el_description(el);
-        if (des)
-            sid = NPC_Answer_I_know_it;
-        else
-            sid = NPC_Answer_I_dont_know_it;
-
-        a = static_cast<Sentence *>(answers->find(&sid));
-        if (des)
-        {
-            print_status(1, "%s says: %s. It's %s", n, a->text, des);
-            get_talking_to()->set_known(el->get_base_cid(), el->get_id());
-        }
-        else
-        {
-            print_status(1, "%s says: %s", n, a->text);
-        }
-    }
-    else
-    {
-        switch (s)
-        {
-            case NPC_Ask_do_we_know_each_other:
-                if (player_rel == REL_known)
-                    sid = NPC_Answer_I_know_you;
-                else
-                    sid = NPC_Answer_I_dont_know_you;
-                break;
-            case NPC_Ask_how_are_you:
-                sid = NPC_Answer_Im_fine;
-                break;
-            case NPC_Ask_where_am_I:
-                sid = NPC_Answer_You_are_in_pime;
-                break;
-            case NPC_Ask_who_are_you:
-                print_status(1, "%s says: I'm %s", n, get_name());
-                get_talking_to()->set_relation(this, REL_known);
-                break;
-        }
-        a = static_cast<Sentence *>(answers->find(&sid));
-        if (a)
-            print_status(1, "%s says: %s", n, a->text);
-    }
+    CONSOLE_LOG("Can't ask player %s\n", get_name());
 }
 
 char * Player::get_el_description(InventoryElement * el)
@@ -325,14 +247,7 @@ ElementsList * Player::get_known_elements()
 {
     return &known_elements;
 }
-Clan * Player::get_clan()
-{
-    return clan.get();
-}
-Player * Player::get_talking_to()
-{
-    return talking_to.get();
-}
+
 bool Player::conversation_started()
 {
     return in_conversation;

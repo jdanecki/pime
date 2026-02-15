@@ -78,12 +78,13 @@ class PacketObjectDestroy : public Packet
 extern void add_packet_to_send1(Packet * p);
 class PacketElementsList : public Packet
 {
+  public:
     struct serial_data
     {
         PacketType t;
         size_t size;
         int nr_elements;
-        char name[60];
+    //    char name[60];
         Class_id c_id;
         Class_id list_c_id;
         int pl_id;
@@ -93,12 +94,14 @@ class PacketElementsList : public Packet
         static void operator delete(void * ptr);
     } * pdata __attribute__((packed));
 
-  public:
     int get_nr_elements();
     Class_id get_c_id();
     Class_id get_list_c_id();
     int get_pl_id();
     unsigned char * get_data();
+    void * get_pdata();
+
+    size_t get_size();
 
     void copy_base_list_element(ListElement * el, serial_data * pdata, int i);
 

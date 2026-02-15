@@ -1,9 +1,9 @@
 #ifndef PLANTS_H
 #define PLANTS_H
 
-#include "../alchemist/el_list.h"
+#include "../../core/alchemist/el_list.h"
 
-extern InvList * plants;
+extern ElementsList * plants;
 
 void sow_plant();
 void harvest_plant();

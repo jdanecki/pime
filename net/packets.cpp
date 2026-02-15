@@ -96,7 +96,7 @@ bool PacketObjectCreate::update(unsigned char * data, size_t s)
         }
         case ObjectData::Tag::Field:
         {
-            size_t * pdata = (size_t *)&obj->data[0];
+//            size_t * pdata = (size_t *)&obj->data[0];
             Field * field = static_cast<Field *>(&obj->field.data);
             //  CONSOLE_LOG("PacketObjectCreate: Field uid=%lx\n", field->get_uid());
             // CONSOLE_LOG("pdata=%lx\n", *pdata);
@@ -106,7 +106,7 @@ bool PacketObjectCreate::update(unsigned char * data, size_t s)
         }
         case ObjectData::Tag::Barn:
         {
-            size_t * pdata = (size_t *)&obj->data[0];
+  //          size_t * pdata = (size_t *)&obj->data[0];
             Barn * barn = static_cast<Barn *>(&obj->barn.data);
             //  CONSOLE_LOG("PacketObjectCreate: Barn uid=%lx\n", barn->get_uid());
             new (&obj->barn.data) Barn((Place_id)obj->id, barn->get_uid());
