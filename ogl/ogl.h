@@ -96,30 +96,41 @@ typedef struct OGL_Vertex
     GLuint tex_id;
 } OGL_Vertex;
 
-typedef struct OGL_Plane
+typedef struct OGL_Position
+{
+    float x, y, z;
+    OGL_Position(float x, float y, float z) : x(x), y(y), z(z) {};
+} OGL_Position;
+
+typedef struct OGL_Dimensions
+{
+    float width, height, depth;
+    OGL_Dimensions(float width, float height, float depth) : width(width), height(height), depth(depth) {};
+} OGL_Dimensions;
+
+typedef struct OGL_Color
+{
+    int r, g, b;
+    OGL_Color(int r, int g, int b) : r(r), g(g), b(b) {};
+} OGL_Color;
+
+typedef struct OGL_Node
 {
     GLuint texture;
-    int r, g, b;
-    OGL_Vertex vertices[6];
-    OGL_Plane(float x, float y, float z, GLuint texture, int r, int g, int b) : texture(texture), r(r), g(g), b(b)
+    OGL_Color color;
+    OGL_Position position;
+    OGL_Dimensions dimensions;
+    OGL_Vertex * vertices;
+    GLsizei vert_num;
+    OGL_Node(OGL_Position position, OGL_Color color, OGL_Dimensions dimensions, GLuint texture, GLsizei vert_num)
+        : position(position), color(color), dimensions(dimensions), texture(texture), vert_num(vert_num)
     {
-        update_vertices(x, y, z);
-    };
-
-    void update_vertices(float _x, float _y, float _z)
-    {
-        int idx = 0;
-        vertices[idx++] = (OGL_Vertex){_x - 0.5f, _y + 0.5f, _z + 0.5f, 0, 1, 0, 0, 0, texture};
-        vertices[idx++] = (OGL_Vertex){_x + 0.5f, _y + 0.5f, _z + 0.5f, 0, 1, 0, 1, 0, texture};
-        vertices[idx++] = (OGL_Vertex){_x + 0.5f, _y + 0.5f, _z - 0.5f, 0, 1, 0, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){_x + 0.5f, _y + 0.5f, _z - 0.5f, 0, 1, 0, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){_x - 0.5f, _y + 0.5f, _z - 0.5f, 0, 1, 0, 0, 1, texture};
-        vertices[idx++] = (OGL_Vertex){_x - 0.5f, _y + 0.5f, _z + 0.5f, 0, 1, 0, 0, 0, texture};
+        vertices = new OGL_Vertex[vert_num];
     }
     void render()
     {
         glBindTexture(GL_TEXTURE_2D, texture);
-        glColor3f((double)r / 255, (double)g / 255, (double)b / 255);
+        glColor3f((double)color.r / 255, (double)color.g / 255, (double)color.b / 255);
 
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_FLOAT, sizeof(OGL_Vertex), &vertices[0].x);
@@ -127,22 +138,52 @@ typedef struct OGL_Plane
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glTexCoordPointer(2, GL_FLOAT, sizeof(OGL_Vertex), &vertices[0].u);
 
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, vert_num);
 
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
+    }
+} OGL_Node;
+
+typedef struct OGL_Plane : public OGL_Node
+{
+    GLuint texture;
+    OGL_Plane(OGL_Position position, OGL_Color color, GLuint texture) : OGL_Node(position, color, OGL_Dimensions(1, 1, 1), texture, 6)
+    {
+        update_vertices();
+    };
+    OGL_Plane(OGL_Position position, OGL_Dimensions dimensions, OGL_Color color, GLuint texture) : OGL_Node(position, color, dimensions, texture, 6)
+    {
+        update_vertices();
+    };
+
+    void update_vertices()
+    {
+        float hw = dimensions.width / 2;
+        float hd = dimensions.depth / 2;
+        int idx = 0;
+        float x = position.x;
+        float y = position.y;
+        float z = position.z;
+        vertices[idx++] = (OGL_Vertex){x - hw, y, z + hd, 0, 1, 0, 0, 0, texture};
+        vertices[idx++] = (OGL_Vertex){x + hw, y, z + hd, 0, 1, 0, 1, 0, texture};
+        vertices[idx++] = (OGL_Vertex){x + hw, y, z - hd, 0, 1, 0, 1, 1, texture};
+        vertices[idx++] = (OGL_Vertex){x + hw, y, z - hd, 0, 1, 0, 1, 1, texture};
+        vertices[idx++] = (OGL_Vertex){x - hw, y, z - hd, 0, 1, 0, 0, 1, texture};
+        vertices[idx++] = (OGL_Vertex){x - hw, y, z + hd, 0, 1, 0, 0, 0, texture};
     }
 } OGL_Plane;
 
 typedef struct OGL_Element : public Element, public OGL_Plane
 {
-    ColorRGB color;
-    OGL_Element(Element element) : Element(element), OGL_Plane(0, 0, 0, 0, get_base()->color.r, get_base()->color.g, get_base()->color.b), color(get_base()->color)
+    OGL_Element(Element element)
+        : Element(element), OGL_Plane(OGL_Position(element.location.get_world_x(), 0.1, element.location.get_world_y()),
+                                OGL_Dimensions(element.dimensions.width.value, 1, element.dimensions.length.value), OGL_Color(get_base()->color.r, get_base()->color.g, get_base()->color.b), 0)
     {
     }
     void set_position(float x, float y)
     {
-        update_vertices(x, 0.1, y);
+        update_vertices();
     }
 } OGL_Element;
 

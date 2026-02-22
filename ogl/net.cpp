@@ -45,7 +45,7 @@ void update_chunk(int32_t x, int32_t y, const chunk_table * data)
             for (int j = 0; j < CHUNK_SIZE; j++)
             {
                 BaseElement * be = get_base_element(ch->table[j][i].tile);
-                ogl_ch->tiles[i * CHUNK_SIZE + j] = new OGL_Plane(i + x * CHUNK_SIZE, 0, j + y * CHUNK_SIZE, ch->table[j][i].tile % 15 + 1, be->color.r, be->color.g, be->color.b);
+                ogl_ch->tiles[i * CHUNK_SIZE + j] = new OGL_Plane(OGL_Position(i + x * CHUNK_SIZE, 0, j + y * CHUNK_SIZE), OGL_Color(be->color.r, be->color.g, be->color.b), ch->table[j][i].tile);
             }
         }
         ogl_ch->update_tiles_display_list();
