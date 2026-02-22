@@ -71,10 +71,10 @@ void update_item_location(LocationUpdateData data)
     OGL_Chunk * old_ch = ogl_world->ogl_chunks[data.old.chunk.map_y][data.old.chunk.map_x];
     OGL_Chunk * new_ch = ogl_world->ogl_chunks[data.new_.chunk.map_y][data.new_.chunk.map_x];
     if (!old_ch | !new_ch)
-        assert("Don't have old_ch or new_ch" == 0);
+        return;
     InventoryElement * el = old_ch->elements[data.id.get_uid()];
     if (!el)
-        assert("el didn't exist" == 0);
+        return;
     old_ch->remove_element(data.id.get_uid());
     if (OGL_Element * oel = dynamic_cast<OGL_Element *>(el))
     {
