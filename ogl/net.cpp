@@ -58,11 +58,35 @@ void update_object(const ObjectData * data)
 
 void update_item_location(LocationUpdateData data)
 {
+    if (data.new_.tag == ItemLocation::Tag::Player)
+    {
+        printf("player location tag\n");
+        return;
+    }
     if (data.id.uid == my_id)
     {
         cam.x = data.new_.get_world_x();
         cam.z = data.new_.get_world_y();
     }
+    OGL_Chunk * old_ch = ogl_world->ogl_chunks[data.old.chunk.map_y][data.old.chunk.map_x];
+    OGL_Chunk * new_ch = ogl_world->ogl_chunks[data.new_.chunk.map_y][data.new_.chunk.map_x];
+    if (!old_ch | !new_ch)
+        assert("Don't have old_ch or new_ch" == 0);
+    InventoryElement * el = old_ch->elements[data.id.get_uid()];
+    if (!el)
+        assert("el didn't exist" == 0);
+    old_ch->remove_element(data.id.get_uid());
+    if (OGL_Element * oel = dynamic_cast<OGL_Element *>(el))
+    {
+        oel->position = OGL_Position(data.new_.get_world_x(), 0, data.new_.get_world_y());
+        oel->update_vertices();
+    }
+    if (OGL_Player * pl = dynamic_cast<OGL_Player *>(el))
+    {
+        pl->position = OGL_Position(data.new_.get_world_x(), 1, data.new_.get_world_y());
+        pl->update_vertices();
+    }
+    new_ch->add_element(el);
 }
 
 void create_object(const ObjectData * data_const)
@@ -73,6 +97,17 @@ void create_object(const ObjectData * data_const)
         case ObjectData::Tag::Element:
         {
             OGL_Element * el = new OGL_Element(data->element.data);
+            el->set_position(el->location.get_world_x(), el->location.get_world_y());
+            register_object(el);
+            if (OGL_Chunk * ch = ogl_world->ogl_chunks[el->location.chunk.map_y][el->location.chunk.map_x])
+            {
+                ch->add_element(el);
+            }
+            break;
+        }
+        case ObjectData::Tag::Player:
+        {
+            OGL_Player * el = new OGL_Player(data->player.data);
             el->set_position(el->location.get_world_x(), el->location.get_world_y());
             register_object(el);
             if (OGL_Chunk * ch = ogl_world->ogl_chunks[el->location.chunk.map_y][el->location.chunk.map_x])

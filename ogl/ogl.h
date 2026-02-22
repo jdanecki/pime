@@ -18,6 +18,7 @@
 #pragma once
 #include "../core/world_params.h"
 #include "../core/alchemist/elements/element.h"
+#include "../core/player.h"
 #include <GL/gl.h>
 #include <SDL3/SDL.h>
 #include <cassert>
@@ -246,16 +247,31 @@ typedef struct OGL_Element : public Element, public OGL_Cube
                                 OGL_Color(get_base()->color.r, get_base()->color.g, get_base()->color.b), 0)
     {
     }
-    void set_position(float x, float y)
+    void set_position(float x, float z)
     {
+        position.x = x;
+        position.z = z;
         update_vertices();
     }
 } OGL_Element;
 
+typedef struct OGL_Player : public Player, public OGL_Plane
+{
+    OGL_Player(Player player) : Player(player), OGL_Plane(OGL_Position(player.location.get_world_x(), 1, player.location.get_world_y()), OGL_Dimensions(1, 1, 1), OGL_Color(255, 255, 255), 0)
+    {
+    }
+    void set_position(float x, float z)
+    {
+        position.x = x;
+        position.z = z;
+        update_vertices();
+    }
+} OGL_Player;
+
 typedef struct OGL_Chunk
 {
     OGL_Plane * tiles[CHUNK_SIZE * CHUNK_SIZE];
-    std::unordered_map<size_t, OGL_Element *> elements;
+    std::unordered_map<size_t, InventoryElement *> elements;
     GLuint tiles_display_list = 0;
     GLuint element_display_list = 0;
 
@@ -267,9 +283,15 @@ typedef struct OGL_Chunk
             glCallList(element_display_list);
     }
 
-    void add_element(OGL_Element * el)
+    void add_element(InventoryElement * el)
     {
         elements[el->uid] = el;
+        update_element_display_list();
+    }
+
+    void remove_element(size_t uid)
+    {
+        elements.erase(uid);
         update_element_display_list();
     }
 
@@ -292,8 +314,13 @@ typedef struct OGL_Chunk
             glDeleteLists(element_display_list, 0);
         element_display_list = glGenLists(1);
         glNewList(element_display_list, GL_COMPILE);
-        for (auto [_, ogl_element] : elements)
-            ogl_element->render();
+        for (auto [_, inv_element] : elements)
+        {
+            if (OGL_Element * el = dynamic_cast<OGL_Element *>(inv_element))
+                el->render();
+            if (OGL_Player * pl = dynamic_cast<OGL_Player *>(inv_element))
+                pl->render();
+        }
         glEndList();
     }
 
