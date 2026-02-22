@@ -1,1 +1,2 @@
 option('tests', type : 'boolean', value : true, description: 'Compile tests')
+option('godot', type : 'boolean', value : true, description: 'Compile godot library')

@@ -40,7 +40,9 @@ endforeach
 subdir('ogl')
 subdir('SDL')
 subdir('raylib')
-subdir('godot')
+if get_option('godot')
+  subdir('godot')
+endif
 
 subdir('server')
 subdir('tui')
