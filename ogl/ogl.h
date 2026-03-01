@@ -29,6 +29,7 @@
 typedef struct OGL_Camera
 {
     float x, y, z;
+    float vy;
     float pitch, yaw;
     // ----- yaw
     //
@@ -255,9 +256,9 @@ typedef struct OGL_Element : public Element, public OGL_Cube
     }
 } OGL_Element;
 
-typedef struct OGL_Player : public Player, public OGL_Plane
+typedef struct OGL_Player : public Player, public OGL_Cube
 {
-    OGL_Player(Player player) : Player(player), OGL_Plane(OGL_Position(player.location.get_world_x(), 1, player.location.get_world_y()), OGL_Dimensions(1, 1, 1), OGL_Color(255, 255, 255), 0)
+    OGL_Player(Player player) : Player(player), OGL_Cube(OGL_Position(player.location.get_world_x(), 1, player.location.get_world_y()), OGL_Dimensions(1, 2, 1), OGL_Color(255, 255, 255), 0)
     {
     }
     void set_position(float x, float z)

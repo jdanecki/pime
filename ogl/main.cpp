@@ -169,6 +169,40 @@ void handle_events()
     }
 }
 
+bool check_step(float dx, float dz)
+{
+    float new_x = cam.x + dx;
+    float new_z = cam.z + dz;
+
+    OGL_Chunk * ch = NULL;
+    if (!(ch = ogl_world->ogl_chunks[(int)floor(new_z / CHUNK_SIZE)][(int)floor(new_x / CHUNK_SIZE)]))
+    {
+        return false;
+    }
+    for (auto [_, inv_element] : ch->elements)
+    {
+        if (inv_element->uid == my_id)
+            continue;
+        printf("%f, %f, %f, %f, %f, %f\n", new_x, new_z, inv_element->location.get_world_x(), inv_element->location.get_world_y(), abs(new_x - inv_element->location.get_world_x()),
+            abs(new_z - inv_element->location.get_world_y()));
+        if (abs(new_x - inv_element->location.get_world_x()) < inv_element->dimensions.width.value / 2 + 0.25)
+            if (abs(new_z - inv_element->location.get_world_y()) < inv_element->dimensions.length.value / 2 + 0.25)
+            {
+                return false;
+            }
+    }
+    return true;
+};
+
+void move_check_step(float dx, float dz)
+{
+    if (check_step(dx, dz))
+    {
+        cam.x += dx;
+        cam.z += dz;
+    }
+}
+
 void handle_keyboard_state(Uint64 dt)
 {
     const bool * keyboard_state = SDL_GetKeyboardState(NULL);
@@ -181,37 +215,38 @@ void handle_keyboard_state(Uint64 dt)
     speed_multi *= dt;
     speed_multi /= 16;
 
-    if (keyboard_state[SDL_SCANCODE_SPACE])
-        cam.y += speed_multi;
-    if (keyboard_state[SDL_SCANCODE_LSHIFT])
-        cam.y -= speed_multi;
+    if (keyboard_state[SDL_SCANCODE_SPACE] && cam.y == 1.5)
+        cam.vy = 0.25;
+    cam.vy -= 0.025;
+    cam.y += cam.vy;
+    if (cam.y < 1.5)
+    {
+        cam.y = 1.5;
+        cam.vy = 0;
+    }
     if (keyboard_state[SDL_SCANCODE_A])
     {
         float x, z;
         get_forward_vector(cam.yaw, &x, &z);
-        cam.x += z * speed_multi;
-        cam.z -= x * speed_multi;
+        move_check_step(z * speed_multi, -x * speed_multi);
     }
     if (keyboard_state[SDL_SCANCODE_D])
     {
         float x, z;
         get_forward_vector(cam.yaw, &x, &z);
-        cam.x -= z * speed_multi;
-        cam.z += x * speed_multi;
+        move_check_step(-z * speed_multi, x * speed_multi);
     }
     if (keyboard_state[SDL_SCANCODE_W])
     {
         float x, z;
         get_forward_vector(cam.yaw, &x, &z);
-        cam.x += x * speed_multi;
-        cam.z += z * speed_multi;
+        move_check_step(x * speed_multi, z * speed_multi);
     }
     if (keyboard_state[SDL_SCANCODE_S])
     {
         float x, z;
         get_forward_vector(cam.yaw, &x, &z);
-        cam.x -= x * speed_multi;
-        cam.z -= z * speed_multi;
+        move_check_step(-x * speed_multi, -z * speed_multi);
     }
 
     if (abs(cam.x - cam_x_lt) || abs(cam.x - cam_x_lt))
