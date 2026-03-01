@@ -12,7 +12,7 @@ class Property
     Property(const char * n, float v);
     Property(const char * n, float min, float max);
     Property();
-    void show();
+    void show(bool new_line=true);
     float decrease(float by);
 };
 

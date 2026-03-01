@@ -14,6 +14,7 @@ class PlayerUI : public Player, public Renderable
     Backend_Texture get_texture() override;
     PlayerUI(Player data);
     void update_item_location(ItemLocation & old_loc, ItemLocation & new_loc) override;
+    bool check_conversation() override;
 };
 
 extern PlayerUI * player;

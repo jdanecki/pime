@@ -87,10 +87,10 @@ class PacketElementsList : public Packet
     //    char name[60];
         Class_id c_id;
         Class_id list_c_id;
-        int pl_id;
+        size_t pl_id;
         unsigned char data[0];
         static void * operator new(size_t size_base, size_t extra);
-        serial_data(size_t s);
+        serial_data(PacketType t, size_t s, int nr_elements);
         static void operator delete(void * ptr);
     } * pdata __attribute__((packed));
 
@@ -144,7 +144,7 @@ class PacketObjectUpdate : public Packet
         size_t size;
         unsigned char data[0];
         static void * operator new(size_t size_base, size_t extra);
-        serial_data(size_t s);
+        serial_data(PacketType t, size_t s);
         static void operator delete(void * ptr);
     } __attribute__((packed));
 

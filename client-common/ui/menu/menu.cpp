@@ -247,6 +247,13 @@ Menu_entry::Menu_entry(const char * e, menu_actions a, InventoryElement * _el, i
     }
 }
 
+void Menu::close_menu()
+{
+	if (player->check_conversation())
+	{
+		action_tile(PLAYER_NPC_STOP_CONVERSATION, player->talking_to.get());
+	}
+}
 Menu_entry::~Menu_entry()
 {
     if (dynamic_entry)
@@ -420,6 +427,7 @@ void Menu::go_up()
 
 void menu_handle_escape()
 {
+	current_menu->close_menu();
     current_menu = nullptr;
 }
 
@@ -427,6 +435,7 @@ void menu_handle_enter()
 {
     if (current_menu->interact())
     {
+    	current_menu->close_menu();
         current_menu = nullptr;
     }
 }

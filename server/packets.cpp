@@ -1,5 +1,112 @@
 #include "../core/packets.h"
 
+ObjectData * convert_to_data(NetworkObject * el)
+{
+    ObjectData * obj = nullptr;
+    //   CONSOLE_LOG("convert_to_data: c_id=%d uid=%lx\n", el->c_id, el->get_uid());
+    switch (el->c_id)
+    {
+        case Class_Element:
+        {
+            Element * element = static_cast<Element *>(el);
+            obj = new ObjectData(ObjectData::Tag::Element);
+            obj->element.data = *element;
+            obj->id = element->get_id();
+            break;
+        }
+        case Class_Field:
+        {
+            Field * field = static_cast<Field *>(el);
+            obj = new ObjectData(ObjectData::Tag::Field);
+            obj->field.data = *field;
+            obj->id = field->get_id();
+            break;
+        }
+        case Class_Barn:
+        {
+            Barn * barn = static_cast<Barn *>(el);
+            obj = new ObjectData(ObjectData::Tag::Barn);
+            obj->barn.data = *barn;
+            //   CONSOLE_LOG("Barn: uid=%lx\n", barn->get_uid());
+            obj->id = barn->get_id();
+            break;
+        }
+        case Class_Player:
+        {
+        	Player * player = static_cast<Player *>(el);
+			if (player->inventory.nr_elements)
+			{
+				PacketElementsList *p_inv = new PacketElementsList(player);
+				CONSOLE_LOG("p_inv: size=%ld\n", p_inv->get_size());
+				obj = new (p_inv->get_size()) ObjectData(ObjectData::Tag::Player, sizeof(ObjectData) + p_inv->get_size());
+				memcpy(&obj->data[0], p_inv->get_pdata(), p_inv->get_size());
+			}
+			else
+				obj = new ObjectData(ObjectData::Tag::Player);
+			obj->player.data = *player;
+			Player *who = player->talking_to.get();
+			CONSOLE_LOG("convert_to_data: Player\n");
+			player->talking_to.show();
+			obj->player.data.talking_to.show();
+            // obj->player.data.clan = nullptr;
+            // obj->player.data.player_skills = nullptr;
+            // obj->player.data.known_elements = nullptr;
+            // obj->player.data.relations = nullptr;
+            break;
+        }
+        case Class_Npc:
+        {
+            Npc * npc = static_cast<Npc *>(el);
+            obj = new ObjectData(ObjectData::Tag::Npc);
+            obj->npc.data = *npc;
+            break;
+        }
+        case Class_Ingredient:
+        {
+            Ingredient * ing = static_cast<Ingredient *>(el);
+            obj = new ObjectData(ObjectData::Tag::Ingredient);
+            obj->ingredient.data = *ing;
+            break;
+        }
+        case Class_Product:
+        {
+            Product * prod = static_cast<Product *>(el);
+            obj = new ObjectData(ObjectData::Tag::Product);
+            obj->product.data = *prod;
+            break;
+        }
+        case Class_Plant:
+        {
+            Plant * plant = static_cast<Plant *>(el);
+            obj = new ObjectData(ObjectData::Tag::Plant);
+            obj->plant.data = *plant;
+            obj->id = plant->get_id();
+            break;
+        }
+        case Class_Animal:
+        {
+            Animal * animal = static_cast<Animal *>(el);
+            obj = new ObjectData(ObjectData::Tag::Animal);
+            obj->animal.data = *animal;
+            obj->id = animal->get_id();
+            break;
+        }
+        case Class_Scroll:
+        {
+            Scroll * scroll = static_cast<Scroll *>(el);
+            obj = new ObjectData(ObjectData::Tag::Scroll);
+            obj->scroll.data = *scroll;
+            break;
+        }
+
+        default:
+            //    CONSOLE_LOG("Unknown class ID=%d in convert_to_data\n", el->c_id);
+            assert(0);
+            break;
+    }
+    return obj;
+}
+
 PacketObjectCreate::PacketObjectCreate(NetworkObject * el) : Packet(PACKET_OBJECT_CREATE)
 {
     obj = convert_to_data(el);
@@ -39,7 +146,8 @@ void * PacketElementsList::serial_data::operator new(size_t size_base, size_t ex
     //     CONSOLE_LOG("PacketElementsList: serial_data: allocating %ld + %ld\n", size_base, extra);
     return ::operator new(size_base + extra);
 }
-PacketElementsList::serial_data::serial_data(size_t s) : size(s)
+PacketElementsList::serial_data::serial_data(PacketType t, size_t s, int nr_elements) :
+		t(t), size(s), nr_elements(nr_elements)
 {
 }
 void PacketElementsList::serial_data::operator delete(void * ptr)
@@ -58,14 +166,12 @@ void PacketElementsList::copy_list_element(ListElement * el, serial_data * pdata
     size_t uid = obj->get_uid();
     size_t * dst = &((size_t *)(&pdata->data))[i];
     *dst = uid;
-    //    CONSOLE_LOG("copy_list_element: [%d/%d]=%lx\n", i, pdata->nr_elements, uid);
+    CONSOLE_LOG("copy_list_element: [%d/%d]=%lx\n", i, pdata->nr_elements, uid);
 }
 void PacketElementsList::init(ElementsList * list)
 {
     int size = list->nr_elements * list->head->get_size();
-    pdata = new (size) serial_data(sizeof(serial_data) + size);
-    pdata->t = t;
-    pdata->nr_elements = list->nr_elements;
+    pdata = new (size) serial_data(t, sizeof(serial_data) + size, list->nr_elements);
 //    strncpy(pdata->name, list->name, strlen(list->name) + 1);
     pdata->list_c_id = list->head->get_cid();
 
@@ -108,6 +214,11 @@ int PacketElementsList::send(ENetPeer * peer)
     return ret;
 }
 
+size_t PacketElementsList::get_size()
+{
+    return pdata->size;
+}
+
 void * PacketObjectCreate::serial_data::operator new(size_t size_base, size_t extra)
 {
     //        CONSOLE_LOG("PacketObjectCreate: serial_data: allocating %ld + %ld\n", size_base, extra);
@@ -147,7 +258,7 @@ void * PacketObjectUpdate::serial_data::operator new(size_t size_base, size_t ex
     //   CONSOLE_LOG("PacketObjectUpdate: serial_data: allocating %ld + %ld\n", size_base, extra);
     return ::operator new(size_base + extra);
 }
-PacketObjectUpdate::serial_data::serial_data(size_t s) : size(s)
+PacketObjectUpdate::serial_data::serial_data(PacketType t, size_t s) : t(t), size(s)
 {
 }
 void PacketObjectUpdate::serial_data::operator delete(void * ptr)
@@ -158,8 +269,7 @@ void PacketObjectUpdate::serial_data::operator delete(void * ptr)
 int PacketObjectUpdate::send(ENetPeer * peer)
 {
     int ret = 0;
-    struct serial_data * d = new (obj->size) serial_data(sizeof(serial_data) + obj->size);
-    d->t = t;
+    struct serial_data * d = new (obj->size) serial_data(t, sizeof(serial_data) + obj->size);
     memcpy(d->data, (void *)obj, obj->size);
 
     /*for (int i=0; i< 100; i++)
@@ -556,101 +666,3 @@ Packet * check_server_packet(char dir, unsigned char * data, size_t s)
     }
 }
 
-ObjectData * convert_to_data(NetworkObject * el)
-{
-    ObjectData * obj = nullptr;
-    //   CONSOLE_LOG("convert_to_data: c_id=%d uid=%lx\n", el->c_id, el->get_uid());
-    switch (el->c_id)
-    {
-        case Class_Element:
-        {
-            Element * element = static_cast<Element *>(el);
-            obj = new ObjectData(ObjectData::Tag::Element);
-            obj->element.data = *element;
-            obj->id = element->get_id();
-            break;
-        }
-        case Class_Field:
-        {
-            Field * field = static_cast<Field *>(el);
-            obj = new ObjectData(ObjectData::Tag::Field);
-            obj->field.data = *field;
-            obj->id = field->get_id();
-            break;
-        }
-        case Class_Barn:
-        {
-            Barn * barn = static_cast<Barn *>(el);
-            obj = new ObjectData(ObjectData::Tag::Barn);
-            obj->barn.data = *barn;
-            //   CONSOLE_LOG("Barn: uid=%lx\n", barn->get_uid());
-            obj->id = barn->get_id();
-            break;
-        }
-        case Class_Player:
-        {
-            Player * player = static_cast<Player *>(el);
-            obj = new ObjectData(ObjectData::Tag::Player);
-            obj->player.data = *player;
-            if (player->inventory.nr_elements)
-                add_packet_to_send1(new PacketElementsList(player));
-            // obj->player.data.clan = nullptr;
-            // obj->player.data.player_skills = nullptr;
-            // obj->player.data.inventory = nullptr;
-            // obj->player.data.known_elements = nullptr;
-            // obj->player.data.talking_to = nullptr;
-            // obj->player.data.relations = nullptr;
-            break;
-        }
-        case Class_Npc:
-        {
-            Npc * npc = static_cast<Npc *>(el);
-            obj = new ObjectData(ObjectData::Tag::Npc);
-            obj->npc.data = *npc;
-            break;
-        }
-        case Class_Ingredient:
-        {
-            Ingredient * ing = static_cast<Ingredient *>(el);
-            obj = new ObjectData(ObjectData::Tag::Ingredient);
-            obj->ingredient.data = *ing;
-            break;
-        }
-        case Class_Product:
-        {
-            Product * prod = static_cast<Product *>(el);
-            obj = new ObjectData(ObjectData::Tag::Product);
-            obj->product.data = *prod;
-            break;
-        }
-        case Class_Plant:
-        {
-            Plant * plant = static_cast<Plant *>(el);
-            obj = new ObjectData(ObjectData::Tag::Plant);
-            obj->plant.data = *plant;
-            obj->id = plant->get_id();
-            break;
-        }
-        case Class_Animal:
-        {
-            Animal * animal = static_cast<Animal *>(el);
-            obj = new ObjectData(ObjectData::Tag::Animal);
-            obj->animal.data = *animal;
-            obj->id = animal->get_id();
-            break;
-        }
-        case Class_Scroll:
-        {
-            Scroll * scroll = static_cast<Scroll *>(el);
-            obj = new ObjectData(ObjectData::Tag::Scroll);
-            obj->scroll.data = *scroll;
-            break;
-        }
-
-        default:
-            //    CONSOLE_LOG("Unknown class ID=%d in convert_to_data\n", el->c_id);
-            assert(0);
-            break;
-    }
-    return obj;
-}

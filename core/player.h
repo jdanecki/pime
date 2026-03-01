@@ -89,7 +89,7 @@ class Player : public InventoryElement
     virtual bool check_known(InventoryElement * el);
     bool set_known(Class_id cid, int el_id);
 
-    bool conversation_started();
+    virtual bool check_conversation();
     enum Relations find_relation(Player * who);
     void set_relation(Player * who, enum Relations rel);
 

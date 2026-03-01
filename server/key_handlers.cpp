@@ -118,6 +118,7 @@ void debug_print_help()
 {
     CONSOLE_LOG("F1 - help\n");
     CONSOLE_LOG("F2 - switch_debug_mode\n");
+    CONSOLE_LOG("F5 - trace network\n");
     CONSOLE_LOG("b - create barn\n");
     CONSOLE_LOG("f - create field\n");
     CONSOLE_LOG("h - create hoe\n");
@@ -159,6 +160,11 @@ void switch_debug_mode()
         print_help();
 }
 
+void debug_network_trace()
+{
+	trace_network++;
+
+}
 void create_all_base_elements()
 {
     chunk * ch = world_table[128][128];
@@ -202,6 +208,7 @@ void create_all_base_animals()
 KeyHandler debug_key_handlers[] = {
     {KEY_F(1), debug_print_help},
     {KEY_F(2), switch_debug_mode},
+	{KEY_F(5), debug_network_trace},
     {'h', debug_create_hoe},
     {'k', debug_create_knife},
     {'f', debug_create_field},

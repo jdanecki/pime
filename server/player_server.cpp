@@ -96,9 +96,6 @@ bool PlayerServer::server_action_on_object(Server_action a, InventoryElement * o
         case SERVER_SHOW_CHUNK:
             show_chunk(location);
             break;
-        case SERVER_TRACE_NETWORK:
-            trace_network += 1;
-            break;
     }
 
     return true;

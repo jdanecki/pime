@@ -40,3 +40,8 @@ unsigned long PacketPlayerId::get_id()
 {
     return pdata->id;
 }
+
+void * PacketElementsList::get_pdata()
+{
+    return (void *) pdata;
+}

@@ -13,6 +13,11 @@
 
 bool finish_program;
 
+void handle_show_player()
+{
+	player->show();
+}
+
 void handle_show_item()
 {
     InventoryElement * item = get_item_at_ppos(player);
@@ -40,10 +45,7 @@ void handle_trace_network()
 {
     trace_network += 1;
 }
-void handle_trace_network_server()
-{
-    server_action_tile(SERVER_TRACE_NETWORK, player);
-}
+
 void handle_auto_explore()
 {
     auto_explore ^= 1;
@@ -148,6 +150,7 @@ void quit_program()
 
 void handle_inventory()
 {
+	player->inventory.show();
     show_menu_inventory_categories();
 }
 
@@ -167,7 +170,7 @@ void handle_escape()
         show_menu();
 }
 
-void handle_menu_npc()
+void handle_start_conversation()
 {
     InventoryElement * object = get_item_at_ppos(player);
     if (object && object->get_cid() == Class_Npc)

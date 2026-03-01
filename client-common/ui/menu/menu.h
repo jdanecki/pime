@@ -88,6 +88,7 @@ class Menu
     Sentence * get_sentence();
     InventoryElement * get_el();
     void show();
+    void close_menu();
     void go_down();
     void go_up();
     int interact();

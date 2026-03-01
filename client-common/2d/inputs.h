@@ -20,14 +20,14 @@ void handle_menu_action();
 void handle_menu_knowledge();
 void handle_escape();
 
-void handle_menu_npc();
+void handle_start_conversation();
 
+void handle_show_player();
 void handle_show_item();
 void handle_show_item_server();
 void handle_show_chunk();
 void handle_show_chunk_server();
 void handle_trace_network();
-void handle_trace_network_server();
 void handle_auto_explore();
 
 void handle_hotbar_0();

@@ -21,6 +21,10 @@ void PlayerUI::update_item_location(ItemLocation & old_loc, ItemLocation & new_l
     flip = old_loc.chunk.x > new_loc.chunk.x;
 }
 
+bool PlayerUI::check_conversation()
+{
+	return Player::check_conversation();
+}
 void update_hotbar()
 {
     // FIXME - remove/add only one element

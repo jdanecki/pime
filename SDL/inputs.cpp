@@ -29,7 +29,7 @@ KeyHandler key_handlers[] = {
     {SDLK_F3, handle_show_chunk, true},
     {SDLK_F4, handle_show_chunk_server, true},
     {SDLK_F5, handle_trace_network, true},
-    {SDLK_F6, handle_trace_network_server, true},
+	{SDLK_F6, handle_show_player, true},
     {SDLK_F7, handle_auto_explore, true},
     {SDLK_RETURN, handle_use_tile, true},
     {SDLK_e, handle_pickup_item, true},
@@ -47,7 +47,7 @@ KeyHandler key_handlers[] = {
     {SDLK_i, handle_inventory, true},
     {SDLK_z, handle_menu_action, true},
     {SDLK_k, handle_menu_knowledge, true},
-    {SDLK_n, handle_menu_npc, true},
+    {SDLK_n, handle_start_conversation, true},
     {SDLK_q, handle_put_item, true},
 
     {SDLK_BACKQUOTE, handle_prev_hotbar, false},

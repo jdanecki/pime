@@ -142,9 +142,12 @@ Property::Property(const char * n, float min, float max) : name(n)
 Property::Property()
 {
 }
-void Property::show()
+void Property::show(bool new_line)
 {
-    CONSOLE_LOG("%s = %f\n", name.str, value);
+	if (new_line)
+		CONSOLE_LOG("%s = %f\n", name.str, value);
+	else
+		CONSOLE_LOG("%s = %f ", name.str, value);
 }
 float Property::decrease(float by)
 {

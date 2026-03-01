@@ -25,7 +25,7 @@ Plant::Plant(int id) : base(get_base_plant(id))
 void Plant::show(bool details)
 {
     InventoryElement::show(details);
-    CONSOLE_LOG("%s\n", get_base()->get_name());
+    CONSOLE_LOG("name: %s\n", get_base()->get_name());
     if (details)
     {
         get_base()->show(details);

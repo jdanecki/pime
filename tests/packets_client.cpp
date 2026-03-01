@@ -100,7 +100,3 @@ unsigned char * PacketElementsList::get_data()
     return pdata->data;
 }
 
-void * PacketElementsList::get_pdata()
-{
-    return (void *) pdata;
-}

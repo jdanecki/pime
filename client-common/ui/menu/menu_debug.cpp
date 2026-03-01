@@ -10,8 +10,8 @@ Menu * create_menu_debug()
     m->add("F4 - show chunk info on server", MENU_CANCEL);
 
     m->add("F5 - trace network", MENU_CANCEL);
-    m->add("F6 - trace network on server", MENU_CANCEL);
+
+    m->add("F6 - show player", MENU_CANCEL);
     m->add("F7 - autoexplore", MENU_CANCEL);
-    m->add("F11 - resize", MENU_CANCEL);
     return m;
 }

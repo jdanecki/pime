@@ -58,7 +58,7 @@ void add_elements_to_inventory(PacketElementsList * list, int i)
     Player * p = (Player *)get_object_by_id(NetworkObject(Class_Player, list->get_pl_id()));
     if (p)
     {
-        InventoryElement * el = get_object_by_id(NetworkObject(Class_Element, uid));
+        InventoryElement * el = static_cast<InventoryElement*>(get_object_by_id(NetworkObject(Class_Element, uid)));
         if (el)
             p->pickup(el);
         //  printf("player=%s [%d]=%lx inv.elements=%d\n", p->get_name(), i, uid, p->inventory.nr_elements);
@@ -269,10 +269,10 @@ unsigned int network_tick()
     return recv;
 }
 
-InventoryElement * get_object_by_id(NetworkObject obj)
+NetworkObject * get_object_by_id(NetworkObject obj)
 {
     ListElement * el = all_objects.find(&obj.uid);
-    return el ? static_cast<InventoryElement *>(el->get_el()) : nullptr;
+    return el ? el->get_el() : nullptr;
 }
 
 void register_object(NetworkObject * o)

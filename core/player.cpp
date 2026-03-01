@@ -12,7 +12,7 @@ const char * relations_names[] = {"unknown", "known"};
 void Player::pickup(InventoryElement * item)
 {
     inventory.add(item);
-    // CONSOLE_LOG("player %p pickup inv=%lx\n", this, item->get_uid());
+    CONSOLE_LOG("player %s pickup inv=%s (%lx)\n", get_name(), item->get_class_name(), item->get_uid());
     ItemLocation location;
     location.tag = ItemLocation::Tag::Player;
     location.player.id = uid;
@@ -40,7 +40,8 @@ size_t Player::get_id()
 }
 
 Player::Player(size_t uid, SerializableCString && name, ItemLocation location, int thirst, int hunger, int nutrition)
-    : InventoryElement(Class_Player, uid, location), name(name), thirst(thirst), hunger(hunger), nutrition(nutrition), inventory("inventory"), known_elements("known elements"),
+    : InventoryElement(Class_Player, uid, location), name(name), thirst(thirst), hunger(hunger), nutrition(nutrition),
+	  inventory("inventory"), known_elements("known elements"),
       clan(get_clan_by_id(Clan_Elf)), talking_to(nullptr)
 {
     CONSOLE_LOG("new player: uid = %ld name=%s\n", uid, get_name());
@@ -75,7 +76,10 @@ void Player::start_conversation(Player *who)
 {
     in_conversation = true;
     talking_to.set(who);
-
+    CONSOLE_LOG("%s (uid=%lx) starts talking to %s (%p uid=%lx)\n", get_name(), get_uid(), who->get_name(), who, who->get_uid());
+ /*   talking_to.show();
+    who->talking_to.show();
+*/
 }
 void Player::stop_conversation()
 {
@@ -86,7 +90,7 @@ void Player::stop_conversation()
 
 void Player::show(bool details)
 {
-    CONSOLE_LOG("%s %s clan=%s id=%ld @ [%d,%d]:[%f,%f] <%c %c>\n", class_name[c_id], get_name(), clan_names[clan.get()->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x,
+    CONSOLE_LOG("%s %s (%p) clan=%s id=%ld @ [%d,%d]:[%f,%f] <%c %c>\n", class_name[c_id], get_name(), this, clan_names[clan.get()->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x,
         location.chunk.y, running ? 'R' : ' ', sneaking ? 'S' : ' ');
     if (details)
     {
@@ -115,7 +119,6 @@ bool Player::say(Sentence * s)
         case NPC_Say_Bye:
         case NPC_Say_See_you_later:
         case NPC_Say_See_you_next_time:
-            stop_conversation();
             return false;
 
         case NPC_Say_Hello:
@@ -248,7 +251,7 @@ ElementsList * Player::get_known_elements()
     return &known_elements;
 }
 
-bool Player::conversation_started()
+bool Player::check_conversation()
 {
     return in_conversation;
 }

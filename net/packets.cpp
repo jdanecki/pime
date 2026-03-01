@@ -1,5 +1,6 @@
-#include "../core/packets.h"
 #include <cstddef>
+#include "../core/packets.h"
+#include "net.h"
 
 PacketObjectCreate::PacketObjectCreate() : Packet(PACKET_OBJECT_CREATE)
 {
@@ -128,7 +129,7 @@ bool PacketObjectCreate::update(unsigned char * data, size_t s)
             new (&obj->npc.data.known_elements) ElementsList("known elements");
             // new (obj->npc.data.player_skills) Skills();
             new (&obj->npc.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
-            // talking_to
+            new (&obj->npc.data.talking_to) SerializablePointer<Player>(nullptr);
             // relations
             break;
         case ObjectData::Tag::Player:
@@ -136,7 +137,7 @@ bool PacketObjectCreate::update(unsigned char * data, size_t s)
             new (&obj->player.data.known_elements) ElementsList("known elements");
             // new (obj->player.data.player_skills) Skills();
             new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
-            // talking_to
+            new (&obj->player.data.talking_to) SerializablePointer<Player>(nullptr);
             // relations
             break;
         default:
@@ -179,15 +180,39 @@ bool PacketObjectUpdate::update(unsigned char * data, size_t s)
             break;
         }
         case ObjectData::Tag::Player:
-            //    CONSOLE_LOG("ObjectUpdate for player inv_elems=%d\n", obj->player.data.inventory.nr_elements);
-            new (&obj->player.data.inventory) ElementsList("inventory");
+        {
+        	int inv_elems = obj->player.data.inventory.nr_elements;
+			CONSOLE_LOG("ObjectUpdate for player %ld inv_elems=%d size=%ld\n", obj->player.data.uid, inv_elems, obj->size);
+			new (&obj->player.data.inventory) ElementsList("inventory");
+			if (inv_elems)
+			{
+				ElementsList * inv = &obj->player.data.inventory;
+				PacketElementsList::serial_data * pdata = (PacketElementsList::serial_data*)(&obj->data[0]);
+				CONSOLE_LOG("nr_elements=%d list_c_id=%d\n", pdata->nr_elements, pdata->list_c_id);
+				if (pdata->list_c_id == Class_ListElement)
+				{
+					for (int i=0; i < inv_elems; i++)
+					{
+						size_t uid=((size_t*)(pdata->data))[i];
+						CONSOLE_LOG("inv[%d]=%lx\n", i, uid);
+
+					    InventoryElement * el = static_cast<InventoryElement*>(get_object_by_id(NetworkObject(Class_Element, uid)));
+					    if (el) {
+					          inv->add(el);
+					    }
+
+					}
+				}
+			}
             //    CONSOLE_LOG("ObjectUpdate for player initialized: inv_elems=%d\n", obj->player.data.inventory.nr_elements);
             new (&obj->player.data.known_elements) ElementsList("known elements");
             // new (&obj->player.data.player_skills) Skills();
             new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
-            // talking_to
+            obj->player.data.talking_to.show();
+            new (&obj->player.data.talking_to) SerializablePointer<Player>();
             // relations
             break;
+        }
         default:
             break;
     }

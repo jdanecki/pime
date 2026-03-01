@@ -115,7 +115,7 @@ void * PacketObjectUpdate::serial_data::operator new(size_t size_base, size_t ex
     CONSOLE_LOG("PacketObjectUpdate: serial_data: allocating %ld + %ld\n", size_base, extra);
     return ::operator new(size_base + extra);
 }
-PacketObjectUpdate::serial_data::serial_data(size_t s) : size(s)
+PacketObjectUpdate::serial_data::serial_data(PacketType t, size_t s) : t(t), size(s)
 {
     CONSOLE_LOG("PacketObjectUpdate::serial_data: size=%ld\n", size);
 }
@@ -127,8 +127,7 @@ void PacketObjectUpdate::serial_data::operator delete(void * ptr)
 int PacketObjectUpdate::send(ENetPeer * peer)
 {
     int ret = 0;
-    struct serial_data * d = new (obj->size) serial_data(sizeof(serial_data) + obj->size);
-    d->t = t;
+    struct serial_data * d = new (obj->size) serial_data(t, sizeof(serial_data) + obj->size);
     memcpy(d->data, (void *)obj, obj->size);
 
     /*for (int i=0; i< 100; i++)
@@ -144,7 +143,8 @@ void * PacketElementsList::serial_data::operator new(size_t size_base, size_t ex
     CONSOLE_LOG("PacketElementsList: serial_data: allocating serial_data=%ld extra=%ld\n", size_base, extra);
     return ::operator new(size_base + extra);
 }
-PacketElementsList::serial_data::serial_data(size_t s) : size(s)
+PacketElementsList::serial_data::serial_data(PacketType t, size_t s, int nr_elements) :
+		t(t), size(s), nr_elements(nr_elements)
 {
 }
 void PacketElementsList::serial_data::operator delete(void * ptr)
@@ -171,10 +171,8 @@ void PacketElementsList::init(ElementsList * list)
     CONSOLE_LOG("PacketElementList:init size=%ld->%d x %d, serial_data size=%d all=%ld\n",
                 size, list->nr_elements, list->head->get_size(), sizeof(serial_data),
                 size+sizeof(serial_data));
-    pdata = new (size) serial_data(sizeof(serial_data) + size);
-    pdata->t = t;
-    pdata->nr_elements = list->nr_elements;
-//    strncpy(pdata->name, list->name, strlen(list->name) + 1);
+    pdata = new (size) serial_data(t, sizeof(serial_data) + size, list->nr_elements);
+//      strncpy(pdata->name, list->name, strlen(list->name) + 1);
     pdata->list_c_id = list->head->get_cid();
 
     int i = 0;

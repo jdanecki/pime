@@ -14,9 +14,9 @@ void Dimensions::show(bool details)
 {
     if (details)
     {
-        length.show();
-        width.show();
-        height.show();
+        length.show(false);
+        width.show(false);
+        height.show(false);
         volume.show();
     }
     else

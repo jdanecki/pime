@@ -217,16 +217,9 @@ void update_chunk(int32_t x, int32_t y, const chunk_table * data)
 
 void update_object(const ObjectData * data)
 {
-    //        size_t uid = data.inv_element.data.uid;
     Class_id c_id = data->inv_element.data.c_id;
+    InventoryElement * el = static_cast<InventoryElement*>(get_object_by_id(data->inv_element.data));
 
-    InventoryElement * el = get_object_by_id(data->inv_element.data);
-    // FIXME why we get el=NULL? -> change this to get_object_by_uid
-    //   CONSOLE_LOG("update_object: el=%p chunk[%d,%d]\n", el, data->inv_element.data.location.chunk.map_x, data->inv_element.data.location.chunk.map_y);
-    if (el)
-    {
-        // CONSOLE_LOG("update_object: el->cid=%x c_id=%x\n", el->c_id, c_id);
-    }
     if (el && el->c_id == c_id)
     {
         // CONSOLE_LOG("update_object: %s %s\n", class_name[c_id], el->get_name());
@@ -266,22 +259,29 @@ void update_object(const ObjectData * data)
             case Class_Player:
             {
                 Player * player = dynamic_cast<Player *>(el);
-                //                CONSOLE_LOG("update_object: player=%s inv.elements=%d\n", player->get_name(), player->inventory.nr_elements);
+                CONSOLE_LOG("update_object: player=%s inv.elements=%d\n", player->get_name(), player->inventory.nr_elements);
                 *player = data->player.data;
-                //              CONSOLE_LOG("update_object: -> update: inv.elements=%d\n", player->inventory.nr_elements);
+                player->check_conversation();
+                CONSOLE_LOG("update_object: -> updated: inv.elements=%d\n", player->inventory.nr_elements);
                 break;
             }
             default:
                 break;
         }
-        //  CONSOLE_LOG("%s updated\n", el->get_name());
+        //CONSOLE_LOG("%s updated\n", el->get_name());
     }
     else
     {
-        /*if (el)
-            print_status(1, "bad data for update object %ld %d real %d", uid, c_id, el->c_id);
-        else
-            print_status(1, "non existing object for update object %ld %d", uid, c_id);*/
+        if (el)
+        {
+            size_t uid = data->inv_element.data.uid;
+            ObjectData::Tag tag=data->tag;
+            size_t id = data->id;
+
+            CONSOLE_LOG("bad data for update object Tag=%d id=%ld uid=%lx c_id=%d el->c_id=%d\n", tag, id, uid, c_id, el->c_id);
+        }
+        /*else
+        	CONSOLE_LOG("not registered object for update object\n");*/
     }
 }
 

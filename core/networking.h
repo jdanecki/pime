@@ -88,7 +88,7 @@ struct ObjectData
 
     ObjectData(Tag tag, size_t s) : tag(tag), size(s)
     {
-        CONSOLE_LOG("ObjectData: set size to %ld\n", size);
+     //   CONSOLE_LOG("ObjectData: set size to %ld\n", size);
     }
     ObjectData(Tag tag) : tag(tag)
     {
@@ -101,12 +101,12 @@ struct ObjectData
     }
     static void * operator new(size_t size)
     {
-        CONSOLE_LOG("ObjectData: new size=%ld\n", size);
+       // CONSOLE_LOG("ObjectData: new size=%ld\n", size);
         return ::operator new(size);
     }
     static void * operator new(size_t size_base, size_t extra)
     {
-        CONSOLE_LOG("ObjectData: allocating %ld + %ld\n", size_base, extra);
+      //  CONSOLE_LOG("ObjectData: allocating %ld + %ld\n", size_base, extra);
         return ::operator new(size_base + extra);
     }
 
@@ -132,7 +132,7 @@ struct ObjectData
         Barn_Body barn;
         Clan_Body clan;
     };
-    int id;
+    size_t id; //element (base), field, barn, plant (base), animal(base)
     unsigned char data[0];
 };
 

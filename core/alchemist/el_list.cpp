@@ -120,6 +120,7 @@ void ElementsList::show(bool details)
 {
     ListElement * cur = head;
     int i = 1;
+    CONSOLE_LOG("--- %s (%d) ---\n", name, nr_elements);
     while (cur)
     {
         if (i == 1) CONSOLE_LOG("--- %s (%d/%d) ---\n", name, i, nr_elements);

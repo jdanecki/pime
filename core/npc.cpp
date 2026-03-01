@@ -40,7 +40,7 @@ void Npc::ask(Npc_say s, InventoryElement *el)
         if (des)
         {
             print_status(1, "%s says: %s. It's %s", n, a->text, des);
-            t->set_known(el->get_base_cid(), el->get_id());
+          //  t->set_known(el->get_base_cid(), el->get_id());
         }
         else
         {
