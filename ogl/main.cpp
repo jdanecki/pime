@@ -19,6 +19,7 @@
 #include <cmath>
 #include <cstdio>
 #include <dirent.h>
+#include <vector>
 #include "../net/net.h"
 #include "ogl.h"
 #include "main.h"
@@ -40,7 +41,7 @@ float fps;
 int render_distance = 4;
 
 bool show_all_chunks = false;
-
+std::vector<size_t> tmp_inventory; // FIXME: once packet changes are pushed, change to server behaviour
 size_t my_id;
 
 void print_status(int, char const *, ...) {};
@@ -60,6 +61,42 @@ void get_forward_vector(float yaw, float * x, float * z)
     float yaw_rad = -yaw * M_PI / 180.0f;
     *x = -sinf(yaw_rad);
     *z = -cosf(yaw_rad);
+}
+
+InventoryElement * raycast()
+{
+    float dx, dy, dz;
+    cam.get_forward_vector(&dx, &dy, &dz);
+    dx *= 0.1;
+    dy *= 0.1;
+    dz *= 0.1;
+    float cx = cam.x;
+    float cy = cam.y;
+    float cz = cam.z;
+    for (int i = 0; i < 50; i++)
+    { // 5 units / 0.1 (max vector length)
+        cx += dx;
+        cy += dy;
+        cz += dz;
+        OGL_Chunk * ch = NULL;
+        if (!(ch = ogl_world->ogl_chunks[(int)floor(cz / CHUNK_SIZE)][(int)floor(cx / CHUNK_SIZE)]))
+        {
+            continue;
+        }
+        for (auto [_, inv_element] : ch->elements)
+        {
+            if (!inv_element || inv_element->uid == my_id || dynamic_cast<Player *>(inv_element))
+                continue;
+            if (abs(cx - inv_element->location.get_world_x()) < inv_element->dimensions.width.value / 2)
+                if (abs(cz - inv_element->location.get_world_y()) < inv_element->dimensions.length.value / 2)
+                    if (OGL_Node * onode = dynamic_cast<OGL_Node *>(inv_element))
+                        if (abs(cy - onode->ogl_position.y) < onode->ogl_dimensions.height / 2)
+                        {
+                            return inv_element;
+                        }
+        }
+    }
+    return NULL;
 }
 
 GLuint load_texture(const char * filename)
@@ -135,6 +172,12 @@ void handle_events()
         {
             SDL_SetWindowRelativeMouseMode(window, true);
             mouse_grabbed = true;
+
+            if (InventoryElement * el = raycast())
+            {
+                send_packet_pickup(el->uid);
+                tmp_inventory.push_back(el->uid);
+            }
         }
         if (e.type == SDL_EVENT_WINDOW_RESIZED)
         {
@@ -164,6 +207,12 @@ void handle_events()
                     if (render_distance < 0)
                         render_distance = 0;
                     break;
+                case SDL_SCANCODE_Q:
+                    if (tmp_inventory.size() == 0)
+                        break;
+                    send_packet_drop(tmp_inventory.back());
+                    tmp_inventory.pop_back();
+                    break;
             }
         }
     }
@@ -181,10 +230,8 @@ bool check_step(float dx, float dz)
     }
     for (auto [_, inv_element] : ch->elements)
     {
-        if (inv_element->uid == my_id)
+        if (!inv_element || inv_element->uid == my_id)
             continue;
-        printf("%f, %f, %f, %f, %f, %f\n", new_x, new_z, inv_element->location.get_world_x(), inv_element->location.get_world_y(), abs(new_x - inv_element->location.get_world_x()),
-            abs(new_z - inv_element->location.get_world_y()));
         if (abs(new_x - inv_element->location.get_world_x()) < inv_element->dimensions.width.value / 2 + 0.25)
             if (abs(new_z - inv_element->location.get_world_y()) < inv_element->dimensions.length.value / 2 + 0.25)
             {
@@ -330,9 +377,25 @@ void draw()
     char buf[512] = {
         0,
     };
-    snprintf(buf, 256, "x: %.2f y: %.2f z: %.2f\nmap_x: %d, map_y: %d\nyaw: %.4f pitch: %.4f\nFacing %s\nRender_distance: %d\nfps: %.2f", cam.x, cam.y, cam.z, (int)(cam.x / CHUNK_SIZE),
-        (int)(cam.z / CHUNK_SIZE), cam.yaw, cam.pitch, cam.get_direction_string(), render_distance, fps);
+    float _x, _y, _z;
+    cam.get_forward_vector(&_x, &_y, &_z);
+    snprintf(buf, 256, "x: %.2f y: %.2f z: %.2f\nmap_x: %d, map_y: %d\nyaw: %.4f pitch: %.4f\nFacing %s\nRender_distance: %d\nfps: %.2f\nforward vec: %f, %f, %f", cam.x, cam.y, cam.z,
+        (int)(cam.x / CHUNK_SIZE), (int)(cam.z / CHUNK_SIZE), cam.yaw, cam.pitch, cam.get_direction_string(), render_distance, fps, _x, _y, _z);
     ogl_text->draw_text(buf, 0, 0, 2, window_width, window_height);
+    ogl_text->setup_2d_projection(window_width, window_height);
+    {
+        int wh2 = window_height / 2;
+        int ww2 = window_width / 2;
+        glColor4f(1, 1, 1, 1);
+        glDisable(GL_TEXTURE_2D);
+        glBegin(GL_QUADS);
+        glVertex2f(ww2 - 2, wh2 - 2);
+        glVertex2f(ww2 + 2, wh2 - 2);
+        glVertex2f(ww2 + 2, wh2 + 2);
+        glVertex2f(ww2 - 2, wh2 + 2);
+        glEnd();
+    }
+    ogl_text->restore_3d_projection();
     glDisable(GL_TEXTURE_2D);
     SDL_GL_SwapWindow(window);
 }

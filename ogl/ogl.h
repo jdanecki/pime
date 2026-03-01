@@ -55,6 +55,15 @@ typedef struct OGL_Camera
         glMultMatrixf(m);
     }
 
+    void get_forward_vector(float * x, float * y, float * z)
+    {
+        float yaw_rad = -yaw * M_PI / 180.0f;
+        float pitch_rad = -pitch * M_PI / 180.0f;
+        *x = -cos(pitch_rad) * sin(yaw_rad);
+        *y = -sin(pitch_rad);
+        *z = -cos(pitch_rad) * cos(yaw_rad);
+    }
+
     void begin_camera(SDL_Window * window)
     {
         int w, h;
@@ -119,20 +128,20 @@ typedef struct OGL_Color
 typedef struct OGL_Node
 {
     GLuint texture;
-    OGL_Color color;
-    OGL_Position position;
-    OGL_Dimensions dimensions;
+    OGL_Color ogl_color;
+    OGL_Position ogl_position;
+    OGL_Dimensions ogl_dimensions;
     OGL_Vertex * vertices;
     GLsizei vert_num;
     OGL_Node(OGL_Position position, OGL_Color color, OGL_Dimensions dimensions, GLuint texture, GLsizei vert_num)
-        : position(position), color(color), dimensions(dimensions), texture(texture), vert_num(vert_num)
+        : ogl_position(position), ogl_color(color), ogl_dimensions(dimensions), texture(texture), vert_num(vert_num)
     {
         vertices = new OGL_Vertex[vert_num];
     }
     void render()
     {
         glBindTexture(GL_TEXTURE_2D, texture);
-        glColor3f((double)color.r / 255, (double)color.g / 255, (double)color.b / 255);
+        glColor3f((double)ogl_color.r / 255, (double)ogl_color.g / 255, (double)ogl_color.b / 255);
 
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_FLOAT, sizeof(OGL_Vertex), &vertices[0].x);
@@ -160,12 +169,12 @@ typedef struct OGL_Plane : public OGL_Node
 
     void update_vertices()
     {
-        float hw = dimensions.width / 2;
-        float hd = dimensions.depth / 2;
+        float hw = ogl_dimensions.width / 2;
+        float hd = ogl_dimensions.depth / 2;
 
-        float x = position.x;
-        float y = position.y;
-        float z = position.z;
+        float x = ogl_position.x;
+        float y = ogl_position.y;
+        float z = ogl_position.z;
 
         int idx = 0;
 
@@ -186,13 +195,13 @@ typedef struct OGL_Cube : public OGL_Node
     };
     void update_vertices()
     {
-        float hw = dimensions.width / 2.0f;
-        float hh = dimensions.height / 2.0f;
-        float hd = dimensions.depth / 2.0f;
+        float hw = ogl_dimensions.width / 2.0f;
+        float hh = ogl_dimensions.height / 2.0f;
+        float hd = ogl_dimensions.depth / 2.0f;
 
-        float x = position.x;
-        float y = position.y;
-        float z = position.z;
+        float x = ogl_position.x;
+        float y = ogl_position.y;
+        float z = ogl_position.z;
 
         int idx = 0;
 
@@ -250,8 +259,8 @@ typedef struct OGL_Element : public Element, public OGL_Cube
     }
     void set_position(float x, float z)
     {
-        position.x = x;
-        position.z = z;
+        ogl_position.x = x;
+        ogl_position.z = z;
         update_vertices();
     }
 } OGL_Element;
@@ -263,8 +272,8 @@ typedef struct OGL_Player : public Player, public OGL_Cube
     }
     void set_position(float x, float z)
     {
-        position.x = x;
-        position.z = z;
+        ogl_position.x = x;
+        ogl_position.z = z;
         update_vertices();
     }
 } OGL_Player;
@@ -317,10 +326,8 @@ typedef struct OGL_Chunk
         glNewList(element_display_list, GL_COMPILE);
         for (auto [_, inv_element] : elements)
         {
-            if (OGL_Element * el = dynamic_cast<OGL_Element *>(inv_element))
-                el->render();
-            if (OGL_Player * pl = dynamic_cast<OGL_Player *>(inv_element))
-                pl->render();
+            if (OGL_Node * node = dynamic_cast<OGL_Node *>(inv_element))
+                node->render();
         }
         glEndList();
     }

@@ -58,34 +58,42 @@ void update_object(const ObjectData * data)
 
 void update_item_location(LocationUpdateData data)
 {
-    if (data.new_.tag == ItemLocation::Tag::Player)
-    {
-        printf("player location tag\n");
-        return;
-    }
     if (data.id.uid == my_id)
     {
         cam.x = data.new_.get_world_x();
         cam.z = data.new_.get_world_y();
     }
+
     OGL_Chunk * old_ch = ogl_world->ogl_chunks[data.old.chunk.map_y][data.old.chunk.map_x];
-    OGL_Chunk * new_ch = ogl_world->ogl_chunks[data.new_.chunk.map_y][data.new_.chunk.map_x];
-    if (!old_ch | !new_ch)
-        return;
-    InventoryElement * el = old_ch->elements[data.id.get_uid()];
+    InventoryElement * el = get_object_by_id(data.id);
+
     if (!el)
+    {
+        printf("el is null in update_item_location\n");
         return;
-    old_ch->remove_element(data.id.get_uid());
+    }
+
+    if (data.old.tag == ItemLocation::Tag::Chunk)
+        old_ch->remove_element(data.id.get_uid());
+
+    if (data.new_.tag == ItemLocation::Tag::Player)
+        return;
+
+    OGL_Chunk * new_ch = ogl_world->ogl_chunks[data.new_.chunk.map_y][data.new_.chunk.map_x];
+    if (!new_ch)
+        return;
+
     if (OGL_Element * oel = dynamic_cast<OGL_Element *>(el))
     {
-        oel->position = OGL_Position(data.new_.get_world_x(), 0, data.new_.get_world_y());
+        oel->ogl_position = OGL_Position(data.new_.get_world_x(), oel->ogl_dimensions.height / 2, data.new_.get_world_y());
         oel->update_vertices();
     }
     if (OGL_Player * pl = dynamic_cast<OGL_Player *>(el))
     {
-        pl->position = OGL_Position(data.new_.get_world_x(), 1, data.new_.get_world_y());
+        pl->ogl_position = OGL_Position(data.new_.get_world_x(), 1, data.new_.get_world_y());
         pl->update_vertices();
     }
+
     new_ch->add_element(el);
 }
 
