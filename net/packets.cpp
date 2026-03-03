@@ -208,7 +208,7 @@ bool PacketObjectUpdate::update(unsigned char * data, size_t s)
             new (&obj->player.data.known_elements) ElementsList("known elements");
             // new (&obj->player.data.player_skills) Skills();
             new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
-            obj->player.data.talking_to.show();
+            //obj->player.data.talking_to.show();
             new (&obj->player.data.talking_to) SerializablePointer<Player>();
             // relations
             break;

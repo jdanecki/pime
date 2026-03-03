@@ -264,7 +264,7 @@ void ask_say(char c)
         InventoryElement * el = nullptr;
         if (c == '@')
         {
-            if (s->id == NPC_Ask_do_you_know_item)
+            if (s->id == NPC_Ask_do_you_know_inv_item)
             {
                 el = select_element(&player->inventory);
                 if (!el) {

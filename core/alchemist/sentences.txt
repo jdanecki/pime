@@ -1,5 +1,3 @@
 NPC_Say_Nothing; " --- nothing --- " 
 NPC_Say_Hello; "Hello" 
 NPC_Say_Bye; "Bye" 
-NPC_Say_See_you_later; "See you later" 
-NPC_Say_See_you_next_time; "See you next time" 

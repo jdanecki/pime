@@ -31,13 +31,12 @@ bool PlayerUI::check_conversation()
 		{
 			show_menu_npc();
 			conversation_started = true;
-			CONSOLE_LOG("check: conversation started\n");
 		}
 	}
 	else {
 		conversation_started = false;
 	}
-	return Player::check_conversation();
+	return in_conversation;
 }
 void update_hotbar()
 {

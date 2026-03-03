@@ -25,6 +25,7 @@ class DialogElement
     int id;
     enum DialogElementType c_id;
     DialogElement(int id, Backend_Rect rect, enum DialogElementType c_id);
+    ~DialogElement() {}
     virtual void draw();
     virtual bool pressed(int x, int y);
     enum DialogElementType get_c_id();
@@ -32,6 +33,7 @@ class DialogElement
     bool in_rect(int x, int y);
     bool check_id(int i, enum DialogElementType c);
     virtual Dialog * get_dialog();
+
 };
 
 class Dialog : public DialogElement
@@ -41,6 +43,7 @@ class Dialog : public DialogElement
 
   public:
     Dialog(Backend_Rect rect, Backend_Color background_color);
+    ~Dialog() {}
     DialogElement * get_element_from_id(int id, enum DialogElementType c_id);
     void add(DialogElement * el);
     void draw();
@@ -53,6 +56,7 @@ class DialogBox : public DialogElement
     Backend_Color color;
     bool fill;
     DialogBox(int id, Backend_Rect rect, Backend_Color color, bool fill);
+    ~DialogBox(){}
     void draw();
 };
 
@@ -66,6 +70,7 @@ class DialogText : public DialogElement
 
   public:
     DialogText(int id, int x, int y, int size, Backend_Color color, std::string text);
+    ~DialogText() {}
     void draw();
     void change_text(std::string text);
 };
@@ -77,6 +82,7 @@ class DialogImage : public DialogElement
     Backend_Texture texture;
     DialogImage(int id, Backend_Rect rect, std::string filename);
     DialogImage(int id, Backend_Rect rect);
+    ~DialogImage() {}
     void draw();
 };
 
@@ -88,6 +94,7 @@ class DialogButton : public DialogElement
     DialogText * d_text;
     DialogButton(
         int id, Backend_Rect rect, int size, Backend_Color bgcolor, Backend_Color fgcolor, std::string text, void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *) = nullptr);
+    ~DialogButton() {}
     void draw();
     bool pressed(int x, int y);
     void (*on_press)(DialogButton *);

@@ -45,9 +45,9 @@ ObjectData * convert_to_data(NetworkObject * el)
 				obj = new ObjectData(ObjectData::Tag::Player);
 			obj->player.data = *player;
 			Player *who = player->talking_to.get();
-			CONSOLE_LOG("convert_to_data: Player\n");
-			player->talking_to.show();
-			obj->player.data.talking_to.show();
+			//CONSOLE_LOG("convert_to_data: Player\n");
+			//player->talking_to.show();
+			//obj->player.data.talking_to.show();
             // obj->player.data.clan = nullptr;
             // obj->player.data.player_skills = nullptr;
             // obj->player.data.known_elements = nullptr;

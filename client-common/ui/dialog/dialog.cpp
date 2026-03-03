@@ -27,8 +27,14 @@ DialogBox::DialogBox(int id, Backend_Rect rect, Backend_Color color, bool fill) 
 
 void DialogBox::draw()
 {
-    if (fill)
+    if (fill) {
         Backend_Draw_Fill_Rectangle(rect, color);
+        Backend_Line(rect.r.x, rect.r.y, rect.r.x + rect.get_w()-1, rect.r.y, (Backend_Color){0, 0, 0, 255});
+        Backend_Line(rect.r.x, rect.r.y, rect.r.x, rect.r.y+rect.get_h()-1, (Backend_Color){0, 0, 0, 255});
+
+        Backend_Line(rect.r.x + rect.get_w()-1, rect.r.y, rect.r.x + rect.get_w()-1, rect.r.y+rect.get_h()-1, (Backend_Color){255, 255, 255, 255});
+        Backend_Line(rect.r.x, rect.r.y + rect.get_h()-1, rect.r.x + rect.get_w()-1, rect.r.y+rect.get_h()-1, (Backend_Color){255, 255, 255, 255});
+    }
     else
         Backend_Draw_Rectangle(rect, color);
 }
@@ -70,7 +76,7 @@ DialogButton::DialogButton(
     : DialogElement(id, rect, DialogElementType::Button), on_press(on_press), on_secondary_press(on_secondary_press)
 {
     d_box = new DialogBox(id, rect, bgcolor, 1);
-    d_text = new DialogText(id, rect.r.x, rect.r.y, size, fgcolor, text);
+    d_text = new DialogText(id, rect.r.x+1, rect.r.y+1, size, fgcolor, text);
 }
 
 void DialogButton::draw()

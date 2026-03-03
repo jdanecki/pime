@@ -33,6 +33,7 @@ void Element::show(bool details)
         mass.show();
     }
     get_base()->show(details);
+    CONSOLE_LOG("^^^ Element ^^^\n");
 }
 
 BaseElement * Element::get_base()

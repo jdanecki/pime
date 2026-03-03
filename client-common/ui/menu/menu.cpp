@@ -590,6 +590,11 @@ int Menu::interact()
         case MENU_NPC_ASK:
             return npc(a);
 
+        case MENU_NPC:
+        	CONSOLE_LOG("show menu_npc\n");
+        	current_menu = menu_npc;
+        	return 0;
+
         case MENU_ACTION:
             current_menu = menu_action;
             return 0;

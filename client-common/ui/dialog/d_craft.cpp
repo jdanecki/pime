@@ -85,17 +85,17 @@ void button_switch(DialogButton * button)
 }
 
 DCraft::DCraft()
-    : Dialog(Backend_Rect(50, 50, 500, 500), {125, 125, 125, 255}), ingredients(Backend_Rect(190, 170, 500 - 140, 500 - 120), {125, 125, 125, 10}),
+    : Dialog(Backend_Rect(60, 60, 500, 500), {125, 125, 125, 255}), ingredients(Backend_Rect(190, 170, 500 - 140, 500 - 120), {125, 125, 125, 10}),
       products(Backend_Rect(190, 170, 500 - 140, 500 - 120), {125, 125, 125, 10})
 {
     show = false;
     in_products = false;
-    add(new DialogButton(0, Backend_Rect(0, 0, 250, 100), 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Ingredients", button_switch));
-    add(new DialogButton(1, Backend_Rect(250, 0, 250, 100), 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Products", button_switch));
+    add(new DialogButton(0, Backend_Rect(1, 1, 250, 100), 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Ingredients", button_switch));
+    add(new DialogButton(1, Backend_Rect(250, 1, 250, 100), 15, {0, 0, 0, 125}, {255, 255, 255, 255}, "Products", button_switch));
     add(new DialogBox(0, Backend_Rect(20, 120, 100, 100), {0, 0, 0, 125}, true));
     add(new DialogBox(1, Backend_Rect(20, 240, 100, 100), {0, 0, 0, 125}, true));
-    add(new DialogImage(0, Backend_Rect(20, 120, 100, 100)));
-    add(new DialogImage(1, Backend_Rect(20, 240, 100, 100)));
+    add(new DialogImage(0, Backend_Rect(21, 121, 98, 98)));
+    add(new DialogImage(1, Backend_Rect(21, 241, 98, 98)));
     for (int i = 0; i < ING_COUNT; i++)
     {
         int x = i % 6 * 54;

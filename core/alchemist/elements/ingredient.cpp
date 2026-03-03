@@ -16,7 +16,7 @@ void Ingredient::show(bool details)
     resilience.show();
     usage.show();
     CONSOLE_LOG("form = %s\n", Form_name[req_form]);
-    CONSOLE_LOG("^^^ INGREDIENT ^^^\n");
+    CONSOLE_LOG("^^^ Ingredient ^^^\n");
 }
 
 Property ** Ingredient::get_properties(int * count)

@@ -28,7 +28,7 @@ void Npc::ask(Npc_say s, InventoryElement *el)
     else
         n = get_class_name();
 
-    if (s == NPC_Ask_do_you_know_inv_item || s == NPC_Ask_do_you_know_item)
+    if (s == NPC_Ask_do_you_know_inv_item)
     {
         char * des = get_el_description(el);
         if (des)
@@ -67,6 +67,10 @@ void Npc::ask(Npc_say s, InventoryElement *el)
                 print_status(1, "%s says: I'm %s", n, get_name());
                 t->set_relation(this, REL_known);
                 break;
+            case NPC_Ask_what_do_you_have:
+            	print_status(1, "%s says: I've %d items", n, inventory.nr_elements);
+            	break;
+
         }
         a = static_cast<Sentence *>(answers->find(&sid));
         if (a)

@@ -36,7 +36,7 @@ template <typename T> class SerializablePointer
 template <typename T> SerializablePointer<T>::SerializablePointer()
 {
 	ptr = (T*)(get_object_by_id(id));
-	CONSOLE_LOG("SerializablePointer: ptr=%p uid=%lx\n", ptr, id.get_uid());
+	//CONSOLE_LOG("SerializablePointer: ptr=%p uid=%lx\n", ptr, id.get_uid());
 }
 
 template <typename T> SerializablePointer<T>::SerializablePointer(T * p)

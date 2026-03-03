@@ -8,7 +8,7 @@
 #include "../../client-common/2d/texture.h"
 #include "playerUI.h"
 
-Dialog * dialog;
+Dialog * dialog1;
 DAction * actions;
 
 extern int tile_size;
@@ -54,7 +54,7 @@ void handle_mouse(int x, int y, int button)
     if (show_craft)
         craft->press(x, y, button);
     else
-        dialog->press(x, y, button);
+        dialog1->press(x, y, button);
     actions->press(x, y, button);
 }
 
@@ -73,18 +73,18 @@ int main()
     player->hotbar[0] = new Element2d(*el1);
     player->hotbar[1] = new Element2d(*el2);
 
-    dialog = new Dialog({50, 200, 550, 350}, {125, 125, 125, 125});
-    dialog->add(new DialogButton(0, {0, 0, 150, 100}, 15, {125, 0, 0, 125}, // bg
+    dialog1 = new Dialog({50, 200, 550, 350}, {85, 125, 85, 125});
+    dialog1->add(new DialogButton(0, {1, 1, 150, 100}, 15, {125, 0, 0, 125}, // bg
         {255, 255, 255, 255},                                               // fg
         "Button 0", button_left, button_right));
-    dialog->add(new DialogButton(1, {170, 0, 150, 100}, 15, {0, 125, 0, 125}, {255, 255, 255, 255}, "Button 1", button_left, button_right));
-    dialog->add(new DialogButton(2, {340, 0, 150, 100}, 15, {0, 0, 125, 125}, {255, 255, 255, 255}, "Button 2", button_left, button_right));
+    dialog1->add(new DialogButton(1, {170, 1, 150, 100}, 15, {0, 125, 0, 125}, {255, 255, 255, 255}, "Button 1", button_left, button_right));
+    dialog1->add(new DialogButton(2, {340, 1, 150, 100}, 15, {0, 0, 125, 125}, {255, 255, 255, 255}, "Button 2", button_left, button_right));
 
-    dialog->add(new DialogBox(0, {20, 140, 100, 100}, {0, 0, 0, 125}, true));
-    dialog->add(new DialogBox(1, {150, 140, 100, 100}, {0, 0, 0, 125}, true));
+    dialog1->add(new DialogBox(0, {20, 140, 100, 100}, {0, 0, 0, 125}, true));
+    dialog1->add(new DialogBox(1, {150, 140, 100, 100}, {0, 0, 0, 125}, true));
 
-    dialog->add(new DialogImage(0, {150, 23, 75, 75}, "textures/npc.png"));
-    dialog->add(new DialogImage(1, {0, 250, 100, 100}, "textures/player.png"));
+    dialog1->add(new DialogImage(0, {150, 23, 75, 75}, "textures/npc.png"));
+    dialog1->add(new DialogImage(1, {0, 250, 100, 100}, "textures/player.png"));
 
     craft = new DCraft();
 
@@ -99,7 +99,7 @@ int main()
         Backend_Begin_Drawing();
         clear_window();
 
-        dialog->draw();
+        dialog1->draw();
         if (show_craft)
         {
             craft->update();

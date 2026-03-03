@@ -117,8 +117,6 @@ bool Player::say(Sentence * s)
     switch (s->id)
     {
         case NPC_Say_Bye:
-        case NPC_Say_See_you_later:
-        case NPC_Say_See_you_next_time:
             return false;
 
         case NPC_Say_Hello:
