@@ -17,7 +17,6 @@
 
 #include <math.h>
 #include <stdlib.h>
-#include <SDL2_gfxPrimitives.h>
 #include "backend.inl" // IWYU pragma: keep for renderer
 
 extern int window_width;
@@ -181,30 +180,69 @@ extern SDL_Texture * palette_texture;
 
 void show_hsv_palette()
 {
-    int r, g, b;
+	unsigned char * pixels;
+    int r, g, b, pitch;
+    SDL_LockTexture(palette_texture, NULL, (void **)&pixels, &pitch);
+    memset(pixels, 0, pitch * window_height);
+
     for (int s = 0; s < 100; s++)
     {
+    	int nx, ny;
         for (int h = 0; h < 360; h++)
         {
-            hsv2rgb(h, s, 100, &r, &g, &b);
-            pixelRGBA(renderer, h, s, r, g, b, 255);
+        	hsv2rgb(h, s, 100, &r, &g, &b);
+            nx = h << 2;
+            ny = pitch * s;
+            pixels[ny + nx]= r;
+            pixels[ny + nx+1]= g;
+            pixels[ny + nx+2]= b;
+            pixels[ny + nx+3]= 255;
 
             hsv2rgb(h, 100, s, &r, &g, &b);
-            pixelRGBA(renderer, h + 370, s, r, g, b, 255);
+            nx = (h + 370) << 2;
+            pixels[ny + nx]= r;
+            pixels[ny + nx+1]= g;
+            pixels[ny + nx+2]= b;
+            pixels[ny + nx+3]= 255;
+
             hsv2rgb(h - 360, 100, 100, &r, &g, &b);
-            pixelRGBA(renderer, h, 300 + s, r, g, b, 255);
+            nx = h << 2;
+            ny = pitch * (300+s);
+			pixels[ny + nx]= r;
+			pixels[ny + nx+1]= g;
+			pixels[ny + nx+2]= b;
+			pixels[ny + nx+3]= 255;
+
             hsv2rgb(h, 100, 100, &r, &g, &b);
-            pixelRGBA(renderer, h + 360, 300 + s, r, g, b, 255);
+            nx = (h + 370) << 2;
+			ny = pitch * (300+s);
+			pixels[ny + nx]= r;
+			pixels[ny + nx+1]= g;
+			pixels[ny + nx+2]= b;
+			pixels[ny + nx+3]= 255;
         }
         if (mx < 360)
         {
             for (int y = 0; y < 100; y++)
             {
                 hsv2rgb(mx, y, s, &r, &g, &b);
-                pixelRGBA(renderer, s, 110 + y, r, g, b, 255);
+                nx = s << 2;
+				ny = pitch * (110 + y);
+				pixels[ny + nx]= r;
+				pixels[ny + nx+1]= g;
+				pixels[ny + nx+2]= b;
+				pixels[ny + nx+3]= 255;
             }
         }
     }
+    SDL_Rect window_rec;
+	window_rec.w = window_width;
+	window_rec.h = window_height;
+	window_rec.x = 0;
+	window_rec.y = 0;
+
+    SDL_UnlockTexture(palette_texture);
+    SDL_RenderCopy(renderer, palette_texture, NULL, &window_rec);
 }
 
 void show_rgb_palette1()
@@ -213,9 +251,9 @@ void show_rgb_palette1()
     int pitch, x, y;
     int nx, ny;
 
-    SDL_Rect window_rec;
-    SDL_LockTexture(palette_texture, NULL, (void **)&pixels, &pitch);
 
+    SDL_LockTexture(palette_texture, NULL, (void **)&pixels, &pitch);
+    SDL_Rect window_rec;
     window_rec.w = window_width;
     window_rec.h = window_height;
     window_rec.x = 0;

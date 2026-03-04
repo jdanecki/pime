@@ -1,9 +1,8 @@
 sdl_dep = dependency('sdl2', method: 'pkg-config', required: true)
 sdl_image_dep = dependency('SDL2_image', method: 'pkg-config', required: true)
 sdl_mixer_dep = dependency('SDL2_mixer', method: 'pkg-config', required: true)
-sdl_gfx_dep = dependency('SDL2_gfx', method: 'pkg-config', required: true)
 
-sdl_deps = [sdl_dep, sdl_image_dep, sdl_mixer_dep, sdl_gfx_dep, enet_dep]
+sdl_deps = [sdl_dep, sdl_image_dep, sdl_mixer_dep, enet_dep]
 
 sdl_sources = [
     'net.cpp',

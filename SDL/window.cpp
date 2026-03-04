@@ -1,6 +1,5 @@
 #include <SDL.h>
 #include <SDL_image.h>
-#include <SDL2_gfxPrimitives.h>
 
 #include <unistd.h>
 #include <sys/stat.h>
