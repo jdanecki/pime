@@ -5,7 +5,7 @@
 class DAction : public Dialog
 {
   public:
-    DAction(int count);
+    DAction(int x, int y, int count);
 };
 
 #endif

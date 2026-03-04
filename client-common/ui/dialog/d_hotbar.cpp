@@ -34,7 +34,7 @@ void DHotbar::update()
     for (int i = 0; i < 10; i++)
     {
         // IMAGES
-        DialogImage * img = static_cast<DialogImage *>(get_element_from_id(i, DialogElementType::Image));
+    	auto img = get<DialogImage>(i);
         img->texture_loaded = false;
         if (player->hotbar[i])
         {
@@ -43,7 +43,7 @@ void DHotbar::update()
             img->texture_loaded = true;
         }
         // SELECTION
-        DialogBox * b = static_cast<DialogBox *>(get_element_from_id(i, DialogElementType::Box));
+        auto b = get<DialogBox>(i);
         if (i == active_hotbar)
         {
             b->color = {150, 150, 80, 255};

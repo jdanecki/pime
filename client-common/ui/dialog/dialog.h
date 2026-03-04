@@ -20,7 +20,7 @@ class DialogElement
 {
   public:
     Backend_Rect rect;
-
+    bool visible;
     Dialog * dialog;
     int id;
     enum DialogElementType c_id;
@@ -31,7 +31,7 @@ class DialogElement
     enum DialogElementType get_c_id();
     virtual void move(int x, int y);
     bool in_rect(int x, int y);
-    bool check_id(int i, enum DialogElementType c);
+    bool check_id(int id, enum DialogElementType c_id);
     virtual Dialog * get_dialog();
 
 };
@@ -40,15 +40,24 @@ class Dialog : public DialogElement
 {
     std::list<DialogElement *> elements;
     Backend_Color background_color;
-
+    DialogElement * get_element_from_id(int id, enum DialogElementType c_id);
   public:
     Dialog(Backend_Rect rect, Backend_Color background_color);
     ~Dialog() {}
-    DialogElement * get_element_from_id(int id, enum DialogElementType c_id);
+    template<typename T>
+    T * get(int id);
+
     void add(DialogElement * el);
     void draw();
     bool press(int x, int y, int button);
+    static constexpr DialogElementType t = DialogElementType::Dialog;
 };
+
+template<typename T>
+T * Dialog::get(int id)
+{
+	return static_cast<T*>(get_element_from_id(id, T::t));
+}
 
 class DialogBox : public DialogElement
 {
@@ -58,6 +67,7 @@ class DialogBox : public DialogElement
     DialogBox(int id, Backend_Rect rect, Backend_Color color, bool fill);
     ~DialogBox(){}
     void draw();
+    static constexpr DialogElementType t = DialogElementType::Box;
 };
 
 class DialogText : public DialogElement
@@ -73,6 +83,7 @@ class DialogText : public DialogElement
     ~DialogText() {}
     void draw();
     void change_text(std::string text);
+    static constexpr DialogElementType t = DialogElementType::Text;
 };
 
 class DialogImage : public DialogElement
@@ -84,6 +95,7 @@ class DialogImage : public DialogElement
     DialogImage(int id, Backend_Rect rect);
     ~DialogImage() {}
     void draw();
+    static constexpr DialogElementType t = DialogElementType::Image;
 };
 
 class DialogButton : public DialogElement
@@ -100,6 +112,7 @@ class DialogButton : public DialogElement
     void (*on_press)(DialogButton *);
     void (*on_secondary_press)(DialogButton *);
     void move(int x, int y);
+    static constexpr DialogElementType t = DialogElementType::Button;
 };
 
 #endif

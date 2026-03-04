@@ -11,7 +11,6 @@
 Dialog * dialog1;
 DAction * actions;
 
-extern int tile_size;
 DCraft * craft;
 PlayerUI * player;
 bool show_craft;
@@ -74,9 +73,7 @@ int main()
     player->hotbar[1] = new Element2d(*el2);
 
     dialog1 = new Dialog({50, 200, 550, 350}, {85, 125, 85, 125});
-    dialog1->add(new DialogButton(0, {1, 1, 150, 100}, 15, {125, 0, 0, 125}, // bg
-        {255, 255, 255, 255},                                               // fg
-        "Button 0", button_left, button_right));
+    dialog1->add(new DialogButton(0, {  1, 1, 150, 100}, 15, {125, 0, 0, 125}, {255, 255, 255, 255}, "Button 0", button_left, button_right));
     dialog1->add(new DialogButton(1, {170, 1, 150, 100}, 15, {0, 125, 0, 125}, {255, 255, 255, 255}, "Button 1", button_left, button_right));
     dialog1->add(new DialogButton(2, {340, 1, 150, 100}, 15, {0, 0, 125, 125}, {255, 255, 255, 255}, "Button 2", button_left, button_right));
 
@@ -88,7 +85,7 @@ int main()
 
     craft = new DCraft();
 
-    actions = new DAction(10);
+    actions = new DAction(50, 570, 10);
 
     for (;;)
     {

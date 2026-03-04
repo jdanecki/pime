@@ -6,7 +6,7 @@ void change_active_action(DialogButton * button)
     printf("action id=%d\n", button->id);
 }
 
-DAction::DAction(int count) : Dialog({650, 540, 320, 32}, {0, 0, 0, 0})
+DAction::DAction(int x, int y, int count) : Dialog({(Backend_Rect_Field)x, (Backend_Rect_Field)y, 320, 32}, {0, 0, 0, 0})
 {
     for (int i = 0; i < count; i++)
     {

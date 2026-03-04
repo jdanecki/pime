@@ -5,6 +5,7 @@
 DialogElement::DialogElement(int id, Backend_Rect rect, enum DialogElementType c_id) : rect(rect), id(id), c_id(c_id)
 {
     dialog = nullptr;
+    visible = true;
 }
 
 void DialogElement::draw()
@@ -21,14 +22,16 @@ bool DialogElement::in_rect(int x, int y)
     return rect.r.x < x && rect.r.y < y && rect.r.x + rect.get_w() > x && rect.r.y + rect.get_h() > y;
 }
 
-DialogBox::DialogBox(int id, Backend_Rect rect, Backend_Color color, bool fill) : DialogElement(id, rect, DialogElementType::Box), color(color), fill(fill)
+DialogBox::DialogBox(int id, Backend_Rect rect, Backend_Color color, bool fill) :
+		DialogElement(id, rect, t), color(color), fill(fill)
 {
 }
 
 void DialogBox::draw()
 {
+	if (!visible) return;
     if (fill) {
-        Backend_Draw_Fill_Rectangle(rect, color);
+    	Backend_Draw_Fill_Rectangle(rect, color);
         Backend_Line(rect.r.x, rect.r.y, rect.r.x + rect.get_w()-1, rect.r.y, (Backend_Color){0, 0, 0, 255});
         Backend_Line(rect.r.x, rect.r.y, rect.r.x, rect.r.y+rect.get_h()-1, (Backend_Color){0, 0, 0, 255});
 
@@ -40,12 +43,13 @@ void DialogBox::draw()
 }
 
 DialogText::DialogText(int id, int x, int y, int size, Backend_Color color, std::string text)
-    : DialogElement(id, Backend_Rect(x, y, 0, 0), DialogElementType::Text), size(size), color(color), text(text)
+    : DialogElement(id, Backend_Rect(x, y, 0, 0), t), size(size), color(color), text(text)
 {
 }
 
 void DialogText::draw()
 {
+	if (!visible) return;
     write_text(rect.r.x, rect.r.y, text.c_str(), color, size, size * 1.5);
 }
 
@@ -54,26 +58,27 @@ void DialogText::change_text(std::string text)
     this->text = text;
 }
 
-DialogImage::DialogImage(int id, Backend_Rect rect, std::string filename) : DialogElement(id, rect, DialogElementType::Image)
+DialogImage::DialogImage(int id, Backend_Rect rect, std::string filename) : DialogElement(id, rect, t)
 {
     texture = load_texture(filename.c_str());
     texture_loaded = true;
 }
 
-DialogImage::DialogImage(int id, Backend_Rect rect) : DialogElement(id, rect, DialogElementType::Image)
+DialogImage::DialogImage(int id, Backend_Rect rect) : DialogElement(id, rect, t)
 {
     texture_loaded = false;
 }
 
 void DialogImage::draw()
 {
+	if (!visible) return;
     if (texture_loaded)
         Backend_Texture_Copy(texture, nullptr, &rect);
 }
 
 DialogButton::DialogButton(
     int id, Backend_Rect rect, int size, Backend_Color bgcolor, Backend_Color fgcolor, std::string text, void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *))
-    : DialogElement(id, rect, DialogElementType::Button), on_press(on_press), on_secondary_press(on_secondary_press)
+    : DialogElement(id, rect, t), on_press(on_press), on_secondary_press(on_secondary_press)
 {
     d_box = new DialogBox(id, rect, bgcolor, 1);
     d_text = new DialogText(id, rect.r.x+1, rect.r.y+1, size, fgcolor, text);
@@ -81,6 +86,7 @@ DialogButton::DialogButton(
 
 void DialogButton::draw()
 {
+	if (!visible) return;
     d_box->draw();
     d_text->draw();
 }
@@ -90,7 +96,7 @@ bool DialogButton::pressed(int x, int y)
     return d_box->in_rect(x, y);
 }
 
-Dialog::Dialog(Backend_Rect rect, Backend_Color background_color) : DialogElement(0, rect, DialogElementType::Dialog), background_color(background_color)
+Dialog::Dialog(Backend_Rect rect, Backend_Color background_color) : DialogElement(0, rect, t), background_color(background_color)
 {
 }
 
@@ -104,6 +110,7 @@ DialogElement * Dialog::get_element_from_id(int id, enum DialogElementType c_id)
     return nullptr;
 }
 
+
 void Dialog::add(DialogElement * el)
 {
     elements.push_back(el);
@@ -113,6 +120,7 @@ void Dialog::add(DialogElement * el)
 
 void Dialog::draw()
 {
+	if (!visible) return;
     Backend_Draw_Fill_Rectangle(rect, background_color);
     for (DialogElement * de : elements)
     {
@@ -142,9 +150,9 @@ bool Dialog::press(int x, int y, int button)
     }
     return false;
 }
-bool DialogElement::check_id(int i, enum DialogElementType c)
+bool DialogElement::check_id(int id, enum DialogElementType c_id)
 {
-    return id == i && c_id == c;
+    return this->id == id && this->c_id == c_id;
 }
 void DialogElement::move(int x, int y)
 {
