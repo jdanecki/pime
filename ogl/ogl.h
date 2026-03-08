@@ -64,6 +64,22 @@ typedef struct OGL_Camera
         *z = -cos(pitch_rad) * cos(yaw_rad);
     }
 
+    void rotate_by(float yaw, float pitch)
+    {
+        this->yaw += yaw;
+        this->pitch += pitch;
+
+        if (this->pitch > 90)
+            this->pitch = 90;
+        if (this->pitch < -90)
+            this->pitch = -90;
+
+        if (this->yaw < 0)
+            this->yaw += 360;
+        if (this->yaw >= 360)
+            this->yaw -= 360;
+    }
+
     void begin_camera(SDL_Window * window)
     {
         int w, h;

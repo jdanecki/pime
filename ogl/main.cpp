@@ -47,6 +47,50 @@ typedef struct PIME_gamepad
     double y1, y2;
     double rt;
     bool a;
+
+    bool * get_button_by_id(Uint8 id)
+    {
+        switch (id)
+        {
+            case 0:
+                return &this->a;
+        }
+        return NULL;
+    }
+
+    void button_down(Uint8 id)
+    {
+        if (bool * button = get_button_by_id(id))
+        {
+            *button = 1;
+        }
+    }
+
+    void button_up(Uint8 id)
+    {
+        if (bool * button = get_button_by_id(id))
+        {
+            *button = 0;
+        }
+    }
+
+    double * get_axis_by_id(Uint8 id)
+    {
+        switch (id)
+        {
+            case 0:
+                return &this->x1;
+            case 1:
+                return &this->y1;
+            case 2:
+                return &this->x2;
+            case 3:
+                return &this->y2;
+            case 5:
+                return &this->rt;
+        }
+        return NULL;
+    }
 } PIME_gamepad;
 PIME_gamepad gp;
 
@@ -178,40 +222,18 @@ void drop_item()
     tmp_inventory.pop_back();
 }
 
-void after_rotate() // FIXME: add function in camera instead of this
-{
-    if (cam.pitch > 90)
-        cam.pitch = 90;
-    if (cam.pitch < -90)
-        cam.pitch = -90;
-
-    if (cam.yaw < 0)
-        cam.yaw += 360;
-    if (cam.yaw >= 360)
-        cam.yaw -= 360;
-}
-
 void handle_events()
 {
     SDL_Event e;
     while (SDL_PollEvent(&e))
     {
         if ((e.type == SDL_EVENT_MOUSE_MOTION && mouse_grabbed))
-        {
-            cam.yaw += e.motion.xrel * 0.5f;
-            cam.pitch -= e.motion.yrel * 0.5f;
-            after_rotate();
-        }
+            cam.rotate_by(e.motion.xrel * 0.5f, -e.motion.yrel * 0.5f);
 
-        if (e.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN) // FIXME: cleanup
+        if (e.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN)
         {
             // printf("%d pressed\n", e.gbutton.button);
-            switch (e.gbutton.button)
-            {
-                case 0:
-                    gp.a = 1;
-                    break;
-            }
+            gp.button_down(e.gbutton.button);
             if (e.gbutton.button == 2) // x
             {
                 drop_item();
@@ -219,37 +241,13 @@ void handle_events()
         }
         if (e.type == SDL_EVENT_GAMEPAD_BUTTON_UP)
         {
-            switch (e.gbutton.button)
-            {
-                case 0:
-                    gp.a = 0;
-                    break;
-            }
+            gp.button_up(e.gbutton.button);
         }
 
         if (e.type == SDL_EVENT_GAMEPAD_AXIS_MOTION)
         {
             // printf("%d %d\n", e.gaxis.axis, e.gaxis.value);
-            double * to_modify = NULL;
-            switch (e.gaxis.axis) // FIXME: use some lookup table instead of match/case
-            {
-                case 0:
-                    to_modify = &gp.x1;
-                    break;
-                case 1:
-                    to_modify = &gp.y1;
-                    break;
-                case 2:
-                    to_modify = &gp.x2;
-                    break;
-                case 3:
-                    to_modify = &gp.y2;
-                    break;
-                case 5:
-                    to_modify = &gp.rt;
-                    break;
-            }
-            if (to_modify != NULL)
+            if (double * to_modify = gp.get_axis_by_id(e.gaxis.axis))
             {
                 *to_modify = (double)e.gaxis.value;
             }
@@ -524,14 +522,12 @@ void handle_gp_state()
     cam_z_lt = cam.z;
     if (abs(gp.x2) > 500) // deadzone
     {
-        cam.yaw += gp.x2 * 4 / 32768;
-        after_rotate();
+        cam.rotate_by(gp.x2 * 4 / 32768, 0);
     }
 
     if (abs(gp.y2) > 500) // deadzone
     {
-        cam.pitch -= gp.y2 * 4 / 32768;
-        after_rotate();
+        cam.rotate_by(0, -gp.y2 * 4 / 32768);
     }
 
     if (abs(gp.x1) > 500 || abs(gp.y1) > 500) // deadzone
