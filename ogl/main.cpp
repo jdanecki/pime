@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <dirent.h>
 #include <vector>
+#include <algorithm>
 #include "../net/net.h"
 #include "ogl.h"
 #include "main.h"
@@ -40,9 +41,20 @@ int window_height;
 float fps;
 int render_distance = 4;
 
+typedef struct PIME_gamepad
+{
+    double x1, x2;
+    double y1, y2;
+    double rt;
+    bool a;
+} PIME_gamepad;
+PIME_gamepad gp;
+
 bool show_all_chunks = false;
 std::vector<size_t> tmp_inventory; // FIXME: once packet changes are pushed, change to server behaviour
 size_t my_id;
+
+std::vector<SDL_JoystickID> joystick_ids;
 
 void print_status(int, char const *, ...) {};
 int CONSOLE_LOG(const char * fmt, ...)
@@ -149,36 +161,106 @@ chunk * check_chunk(int cx, int cy)
     return ch;
 }
 
+void pickup_pointing()
+{
+    if (InventoryElement * el = raycast())
+    {
+        send_packet_pickup(el->uid);
+        tmp_inventory.push_back(el->uid);
+    }
+}
+
+void drop_item()
+{
+    if (tmp_inventory.size() == 0)
+        return;
+    send_packet_drop(tmp_inventory.back());
+    tmp_inventory.pop_back();
+}
+
+void after_rotate() // FIXME: add function in camera instead of this
+{
+    if (cam.pitch > 90)
+        cam.pitch = 90;
+    if (cam.pitch < -90)
+        cam.pitch = -90;
+
+    if (cam.yaw < 0)
+        cam.yaw += 360;
+    if (cam.yaw >= 360)
+        cam.yaw -= 360;
+}
+
 void handle_events()
 {
     SDL_Event e;
     while (SDL_PollEvent(&e))
     {
-        if (e.type == SDL_EVENT_MOUSE_MOTION && mouse_grabbed)
+        if ((e.type == SDL_EVENT_MOUSE_MOTION && mouse_grabbed))
         {
             cam.yaw += e.motion.xrel * 0.5f;
             cam.pitch -= e.motion.yrel * 0.5f;
-            if (cam.pitch > 90)
-                cam.pitch = 90;
-            if (cam.pitch < -90)
-                cam.pitch = -90;
+            after_rotate();
+        }
 
-            if (cam.yaw < 0)
-                cam.yaw += 360;
-            if (cam.yaw >= 360)
-                cam.yaw -= 360;
+        if (e.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN) // FIXME: cleanup
+        {
+            // printf("%d pressed\n", e.gbutton.button);
+            switch (e.gbutton.button)
+            {
+                case 0:
+                    gp.a = 1;
+                    break;
+            }
+            if (e.gbutton.button == 2) // x
+            {
+                drop_item();
+            }
+        }
+        if (e.type == SDL_EVENT_GAMEPAD_BUTTON_UP)
+        {
+            switch (e.gbutton.button)
+            {
+                case 0:
+                    gp.a = 0;
+                    break;
+            }
+        }
+
+        if (e.type == SDL_EVENT_GAMEPAD_AXIS_MOTION)
+        {
+            // printf("%d %d\n", e.gaxis.axis, e.gaxis.value);
+            double * to_modify = NULL;
+            switch (e.gaxis.axis) // FIXME: use some lookup table instead of match/case
+            {
+                case 0:
+                    to_modify = &gp.x1;
+                    break;
+                case 1:
+                    to_modify = &gp.y1;
+                    break;
+                case 2:
+                    to_modify = &gp.x2;
+                    break;
+                case 3:
+                    to_modify = &gp.y2;
+                    break;
+                case 5:
+                    to_modify = &gp.rt;
+                    break;
+            }
+            if (to_modify != NULL)
+            {
+                *to_modify = (double)e.gaxis.value;
+            }
         }
         if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.button == 1)
         {
             SDL_SetWindowRelativeMouseMode(window, true);
             mouse_grabbed = true;
-
-            if (InventoryElement * el = raycast())
-            {
-                send_packet_pickup(el->uid);
-                tmp_inventory.push_back(el->uid);
-            }
+            pickup_pointing();
         }
+
         if (e.type == SDL_EVENT_WINDOW_RESIZED)
         {
             SDL_GetWindowSize(window, &window_width, &window_height);
@@ -208,10 +290,7 @@ void handle_events()
                         render_distance = 0;
                     break;
                 case SDL_SCANCODE_Q:
-                    if (tmp_inventory.size() == 0)
-                        break;
-                    send_packet_drop(tmp_inventory.back());
-                    tmp_inventory.pop_back();
+                    drop_item();
                     break;
             }
         }
@@ -257,8 +336,6 @@ void handle_keyboard_state(Uint64 dt)
     if (keyboard_state[SDL_SCANCODE_LCTRL])
         speed_multi = 1.0f;
 
-    cam_x_lt = cam.x;
-    cam_z_lt = cam.z;
     speed_multi *= dt;
     speed_multi /= 16;
 
@@ -441,9 +518,64 @@ void init_world()
             world_table[i][j] = NULL;
 }
 
+void handle_gp_state()
+{
+    cam_x_lt = cam.x;
+    cam_z_lt = cam.z;
+    if (abs(gp.x2) > 500) // deadzone
+    {
+        cam.yaw += gp.x2 * 4 / 32768;
+        after_rotate();
+    }
+
+    if (abs(gp.y2) > 500) // deadzone
+    {
+        cam.pitch -= gp.y2 * 4 / 32768;
+        after_rotate();
+    }
+
+    if (abs(gp.x1) > 500 || abs(gp.y1) > 500) // deadzone
+    {
+        float yaw_rad = cam.yaw * M_PI / 180.0f;
+        double c = cos(yaw_rad);
+        double s = sin(yaw_rad);
+        // Rotating a vector
+        // new x = old x * cos(rotation) - old y * sin(rotation)
+        // new y = old x * sin(rotation) + old y * cos(rotation)
+        double mx = gp.x1 * c / 32768 - gp.y1 * s / 32768;
+        double my = gp.x1 * s / 32768 + gp.y1 * c / 32768;
+        move_check_step(mx / 4, my / 4);
+    }
+
+    if (gp.a && cam.y == 1.5)
+        cam.vy = 0.25;
+
+    if (gp.rt > 16384)
+    {
+        pickup_pointing();
+    }
+}
+
+void handle_gamepads()
+{
+    int count = 0;
+    SDL_JoystickID * ids = SDL_GetGamepads(&count);
+
+    for (int i = 0; i < count; i++)
+    {
+        if (std::find(joystick_ids.begin(), joystick_ids.end(), ids[i]) != joystick_ids.end())
+        {
+            continue;
+        }
+        SDL_OpenGamepad(ids[i]);
+        // printf("Opening new gamepad %d!\n", ids[i]);
+        joystick_ids.push_back(ids[i]);
+    }
+}
+
 int main(int argc, char * argv[])
 {
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD);
     handle_arguments(argc, argv);
     if (!init_networking())
     {
@@ -461,7 +593,9 @@ int main(int argc, char * argv[])
     for (;;)
     {
         t = SDL_GetTicks();
+        handle_gamepads();
         handle_events();
+        handle_gp_state();
         handle_keyboard_state(dt);
         network_tick();
         draw();
