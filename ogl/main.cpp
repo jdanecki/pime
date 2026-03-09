@@ -353,6 +353,12 @@ void move_check_step(float dx, float dz)
     }
 }
 
+void move_without_check_step(float dx, float dz)
+{
+    cam.x += dx;
+    cam.z += dz;
+}
+
 void handle_keyboard_state(Uint64 dt)
 {
     const bool * keyboard_state = SDL_GetKeyboardState(NULL);
@@ -372,29 +378,34 @@ void handle_keyboard_state(Uint64 dt)
         cam.y = 1.5;
         cam.vy = 0;
     }
+    void (*move_func)(float, float) = move_check_step;
+    if (keyboard_state[SDL_SCANCODE_LSHIFT])
+    {
+        move_func = move_without_check_step;
+    }
     if (keyboard_state[SDL_SCANCODE_A])
     {
         float x, z;
         get_forward_vector(cam.yaw, &x, &z);
-        move_check_step(z * speed_multi, -x * speed_multi);
+        move_func(z * speed_multi, -x * speed_multi);
     }
     if (keyboard_state[SDL_SCANCODE_D])
     {
         float x, z;
         get_forward_vector(cam.yaw, &x, &z);
-        move_check_step(-z * speed_multi, x * speed_multi);
+        move_func(-z * speed_multi, x * speed_multi);
     }
     if (keyboard_state[SDL_SCANCODE_W])
     {
         float x, z;
         get_forward_vector(cam.yaw, &x, &z);
-        move_check_step(x * speed_multi, z * speed_multi);
+        move_func(x * speed_multi, z * speed_multi);
     }
     if (keyboard_state[SDL_SCANCODE_S])
     {
         float x, z;
         get_forward_vector(cam.yaw, &x, &z);
-        move_check_step(-x * speed_multi, -z * speed_multi);
+        move_func(-x * speed_multi, -z * speed_multi);
     }
 
     if (abs(cam.x - cam_x_lt) || abs(cam.x - cam_x_lt))
