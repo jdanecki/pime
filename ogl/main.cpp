@@ -129,6 +129,7 @@ InventoryElement * raycast()
     float cx = cam.x;
     float cy = cam.y;
     float cz = cam.z;
+    printf("dx: %f dy: %f dz: %f\n", dx, dy, dz);
     for (int i = 0; i < 50; i++)
     { // 5 units / 0.1 (max vector length)
         cx += dx;
@@ -137,19 +138,41 @@ InventoryElement * raycast()
         OGL_Chunk * ch = NULL;
         if (!(ch = ogl_world->ogl_chunks[(int)floor(cz / CHUNK_SIZE)][(int)floor(cx / CHUNK_SIZE)]))
         {
+            printf("Chunk is null in raycast\n");
             continue;
         }
         for (auto [_, inv_element] : ch->elements)
         {
             if (!inv_element || inv_element->uid == my_id || dynamic_cast<Player *>(inv_element))
+            {
+                if (!inv_element)
+                    printf("continuing, inv_element is null\n");
+
+                if (inv_element->uid == my_id)
+                    printf("continuing, inv_element->uid (%zu) == my_id (%zu)\n", inv_element->uid, my_id);
+
+                if (dynamic_cast<Player *>(inv_element))
+                    printf("continuing, cannot pickup player\n");
                 continue;
+            }
+            ItemLocation * il = &inv_element->location;
+            printf("loc %f, %f\n", il->get_world_x(), il->get_world_y());
+            printf("cx: %f cy: %f cz: %f\n", cx, cy, cz);
             if (abs(cx - inv_element->location.get_world_x()) < inv_element->dimensions.width.value / 2)
                 if (abs(cz - inv_element->location.get_world_y()) < inv_element->dimensions.length.value / 2)
+                {
                     if (OGL_Node * onode = dynamic_cast<OGL_Node *>(inv_element))
+                    {
                         if (abs(cy - onode->ogl_position.y) < onode->ogl_dimensions.height / 2)
                         {
                             return inv_element;
                         }
+                    }
+                    else
+                    {
+                        printf("Couldn't cast to OGL_Node\n");
+                    }
+                }
         }
     }
     return NULL;
@@ -207,8 +230,10 @@ chunk * check_chunk(int cx, int cy)
 
 void pickup_pointing()
 {
+    printf("Pickup called\n");
     if (InventoryElement * el = raycast())
     {
+        printf("Sending packet\n");
         send_packet_pickup(el->uid);
         tmp_inventory.push_back(el->uid);
     }
@@ -219,6 +244,7 @@ void drop_item()
     if (tmp_inventory.size() == 0)
         return;
     send_packet_drop(tmp_inventory.back());
+    printf("Dropping %lu\n", tmp_inventory.back());
     tmp_inventory.pop_back();
 }
 

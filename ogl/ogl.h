@@ -311,12 +311,14 @@ typedef struct OGL_Chunk
 
     void add_element(InventoryElement * el)
     {
+        printf("Adding element %zu\n", el->uid);
         elements[el->uid] = el;
         update_element_display_list();
     }
 
     void remove_element(size_t uid)
     {
+        printf("Removing element %zu\n", uid);
         elements.erase(uid);
         update_element_display_list();
     }

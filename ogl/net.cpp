@@ -58,6 +58,7 @@ void update_object(const ObjectData * data)
 
 void update_item_location(LocationUpdateData data)
 {
+    printf("update_item_location\n");
     if (data.id.uid == my_id)
     {
         cam.x = data.new_.get_world_x();
@@ -77,14 +78,22 @@ void update_item_location(LocationUpdateData data)
         old_ch->remove_element(data.id.get_uid());
 
     if (data.new_.tag == ItemLocation::Tag::Player)
+    {
+        printf("UNIMPLEMENTED! ItemLocation::Tag::Player\n");
         return;
+    }
 
     OGL_Chunk * new_ch = ogl_world->ogl_chunks[data.new_.chunk.map_y][data.new_.chunk.map_x];
     if (!new_ch)
+    {
+        printf("update_item_location new_ch is null!\n");
         return;
+    }
 
     if (OGL_Element * oel = dynamic_cast<OGL_Element *>(el))
     {
+        printf("The new get_world_x is %f\n", data.new_.get_world_x());
+        printf("The new get_world_y is %f\n", data.new_.get_world_y());
         oel->ogl_position = OGL_Position(data.new_.get_world_x(), oel->ogl_dimensions.height / 2, data.new_.get_world_y());
         oel->update_vertices();
     }
@@ -93,7 +102,9 @@ void update_item_location(LocationUpdateData data)
         pl->ogl_position = OGL_Position(data.new_.get_world_x(), 1, data.new_.get_world_y());
         pl->update_vertices();
     }
+    el->location.chunk = data.new_.chunk;
 
+    printf("Adding element to chunk\n");
     new_ch->add_element(el);
 }
 
