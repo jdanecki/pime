@@ -584,7 +584,7 @@ int main(int argc, char * argv[])
     load_textures();
     ogl_text = new OGL_Text("font.png", 8, 12, 16, 32);
 
-    Uint64 dt;
+    Uint64 dt = 0;
     Uint64 t;
     for (;;)
     {
