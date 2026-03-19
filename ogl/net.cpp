@@ -102,6 +102,12 @@ void update_item_location(LocationUpdateData data)
         pl->ogl_position = OGL_Position(data.new_.get_world_x(), 1, data.new_.get_world_y());
         pl->update_vertices();
     }
+
+    if (OGL_Plant * pl = dynamic_cast<OGL_Plant *>(el))
+    {
+        pl->ogl_position = OGL_Position(data.new_.get_world_x(), 1, data.new_.get_world_y());
+        pl->update_vertices();
+    }
     el->location.chunk = data.new_.chunk;
 
     printf("Adding element to chunk\n");
@@ -116,7 +122,8 @@ void create_object(const ObjectData * data_const)
         case ObjectData::Tag::Element:
         {
             OGL_Element * el = new OGL_Element(data->element.data);
-            el->set_position(el->location.get_world_x(), el->location.get_world_y());
+            el->ogl_position.x = el->location.get_world_x();
+            el->ogl_position.z = el->location.get_world_y();
             register_object(el);
             if (OGL_Chunk * ch = ogl_world->ogl_chunks[el->location.chunk.map_y][el->location.chunk.map_x])
             {
@@ -127,7 +134,20 @@ void create_object(const ObjectData * data_const)
         case ObjectData::Tag::Player:
         {
             OGL_Player * el = new OGL_Player(data->player.data);
-            el->set_position(el->location.get_world_x(), el->location.get_world_y());
+            el->ogl_position.x = el->location.get_world_x();
+            el->ogl_position.z = el->location.get_world_y();
+            register_object(el);
+            if (OGL_Chunk * ch = ogl_world->ogl_chunks[el->location.chunk.map_y][el->location.chunk.map_x])
+            {
+                ch->add_element(el);
+            }
+            break;
+        }
+        case ObjectData::Tag::Plant:
+        {
+            OGL_Plant * el = new OGL_Plant(data->plant.data);
+            el->ogl_position.x = el->location.get_world_x();
+            el->ogl_position.z = el->location.get_world_y();
             register_object(el);
             if (OGL_Chunk * ch = ogl_world->ogl_chunks[el->location.chunk.map_y][el->location.chunk.map_x])
             {

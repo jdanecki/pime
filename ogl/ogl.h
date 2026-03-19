@@ -19,11 +19,13 @@
 #include "../core/world_params.h"
 #include "../core/alchemist/elements/element.h"
 #include "../core/player.h"
+#include "../core/alchemist/elements/plant.h"
 #include <GL/gl.h>
 #include <SDL3/SDL.h>
 #include <cassert>
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
 #include <unordered_map>
 
 typedef struct OGL_Camera
@@ -149,13 +151,16 @@ typedef struct OGL_Node
     OGL_Dimensions ogl_dimensions;
     OGL_Vertex * vertices;
     GLsizei vert_num;
+    int drawtype;
     OGL_Node(OGL_Position position, OGL_Color color, OGL_Dimensions dimensions, GLuint texture, GLsizei vert_num)
-        : ogl_position(position), ogl_color(color), ogl_dimensions(dimensions), texture(texture), vert_num(vert_num)
+        : ogl_position(position), ogl_color(color), ogl_dimensions(dimensions), texture(texture), vert_num(vert_num), drawtype(GL_TRIANGLES)
     {
         vertices = new OGL_Vertex[vert_num];
     }
     void render()
     {
+        glPushMatrix();
+        glTranslatef(ogl_position.x, ogl_position.y, ogl_position.z);
         glBindTexture(GL_TEXTURE_2D, texture);
         glColor3f((double)ogl_color.r / 255, (double)ogl_color.g / 255, (double)ogl_color.b / 255);
 
@@ -165,10 +170,11 @@ typedef struct OGL_Node
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glTexCoordPointer(2, GL_FLOAT, sizeof(OGL_Vertex), &vertices[0].u);
 
-        glDrawArrays(GL_TRIANGLES, 0, vert_num);
+        glDrawArrays(drawtype, 0, vert_num);
 
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
+        glPopMatrix();
     }
 } OGL_Node;
 
@@ -188,9 +194,9 @@ typedef struct OGL_Plane : public OGL_Node
         float hw = ogl_dimensions.width / 2;
         float hd = ogl_dimensions.depth / 2;
 
-        float x = ogl_position.x;
-        float y = ogl_position.y;
-        float z = ogl_position.z;
+        float x = 0;
+        float y = 0;
+        float z = 0;
 
         int idx = 0;
 
@@ -215,9 +221,9 @@ typedef struct OGL_Cube : public OGL_Node
         float hh = ogl_dimensions.height / 2.0f;
         float hd = ogl_dimensions.depth / 2.0f;
 
-        float x = ogl_position.x;
-        float y = ogl_position.y;
-        float z = ogl_position.z;
+        float x = 0;
+        float y = 0;
+        float z = 0;
 
         int idx = 0;
 
@@ -273,24 +279,82 @@ typedef struct OGL_Element : public Element, public OGL_Cube
                                 OGL_Color(get_base()->color.r, get_base()->color.g, get_base()->color.b), 0)
     {
     }
-    void set_position(float x, float z)
-    {
-        ogl_position.x = x;
-        ogl_position.z = z;
-        update_vertices();
-    }
 } OGL_Element;
+
+typedef struct OGL_Plant : public Plant, public OGL_Node
+{
+    OGL_Plant(Plant plant)
+        : Plant(plant), OGL_Node(OGL_Position(plant.location.get_world_x(), plant.dimensions.height.value / 2, plant.location.get_world_y()), OGL_Color(10, 200, 10),
+                            OGL_Dimensions(plant.dimensions.width.value, plant.dimensions.height.value, plant.dimensions.length.value), 0, 100)
+    {
+        update_vertices();
+        drawtype = GL_LINES;
+    }
+
+    OGL_Vertex return_modified(OGL_Vertex * original, OGL_Vertex * size_halfed, int i, int line_vert_num)
+    {
+        float max_x_size = size_halfed->x;
+        float max_y_size = size_halfed->y * 2;
+        float max_z_size = size_halfed->z;
+        float mod_x = ((float)(rand() % 8) - 4) / 4 * max_z_size;
+        float mod_y = ((float)(rand() % 8) / 8) * max_y_size;
+        float mod_z = ((float)(rand() % 8) - 4) / 4 * max_x_size;
+        return {original->x + mod_x, original->y + mod_y, original->z + mod_z};
+    }
+
+    void generative_iter(OGL_Vertex * v, OGL_Vertex v_in, int * i, int line_vert_num, OGL_Vertex * size_halfed)
+    {
+        if (*i >= line_vert_num)
+            return;
+
+        if (*i != 0)
+        {
+            (*i)++;
+            if (*i >= line_vert_num)
+                return;
+            v[*i] = v_in;
+        }
+        (*i)++;
+        if (*i >= line_vert_num)
+            return;
+        v[*i] = return_modified(&v_in, size_halfed, *i, line_vert_num);
+
+        if (rand() % 4)
+            generative_iter(v, v[(*i) - 1], i, line_vert_num, size_halfed);
+        if (rand() % 4)
+            generative_iter(v, v[(*i) - 1], i, line_vert_num, size_halfed);
+        if (rand() % 4)
+            generative_iter(v, v[(*i) - 2], i, line_vert_num, size_halfed);
+        if (rand() % 4)
+            generative_iter(v, v[(*i)], i, line_vert_num, size_halfed);
+        if (rand() % 4)
+            generative_iter(v, v[(*i) - 2], i, line_vert_num, size_halfed);
+    }
+
+    void update_vertices()
+    {
+        float hw = ogl_dimensions.width / 2.0f;
+        float hh = ogl_dimensions.height / 2.0f;
+        float hd = ogl_dimensions.depth / 2.0f;
+
+        float x = ogl_position.x;
+        float y = ogl_position.y;
+        float z = ogl_position.z;
+
+        float cx = ogl_position.x + hw;
+        float cy = ogl_position.y + hh;
+        float cz = ogl_position.z + hd;
+        int i = 0;
+        OGL_Vertex size_halfed = (OGL_Vertex){hw, hh, hd, 0, 0, 0, 0, 0, 0};
+        vertices[0] = (OGL_Vertex){0, 0, 0, 0, 0, 0, 0, 0, 0};
+        generative_iter(vertices, vertices[0], &i, vert_num, &size_halfed);
+    }
+} OGL_Plant;
 
 typedef struct OGL_Player : public Player, public OGL_Cube
 {
     OGL_Player(Player player) : Player(player), OGL_Cube(OGL_Position(player.location.get_world_x(), 1, player.location.get_world_y()), OGL_Dimensions(1, 2, 1), OGL_Color(255, 255, 255), 0)
     {
-    }
-    void set_position(float x, float z)
-    {
-        ogl_position.x = x;
-        ogl_position.z = z;
-        update_vertices();
     }
 } OGL_Player;
 
