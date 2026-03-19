@@ -401,7 +401,7 @@ void handle_keyboard_state(Uint64 dt)
         move_func(-x * speed_multi, -z * speed_multi);
     }
 
-    if (abs(cam.x - cam_x_lt) || abs(cam.x - cam_x_lt))
+    if ((abs(cam.x - cam_x_lt) || abs(cam.z - cam_z_lt)))
         send_packet_move(cam.x - cam_x_lt, cam.z - cam_z_lt);
 }
 
@@ -487,13 +487,13 @@ void draw()
 
     // clang-format off
     snprintf(buf, 256,
-        "x: %.2f y: %.2f z: %.2f"
-        "map_x: %d, map_y: %d"
-        "tile_x: %d, tile_y: %d"
-        "yaw: %.4f pitch: %.4f"
-        "Facing %s"
-        "Render_distance: %d"
-        "fps: %.2f"
+        "x: %.2f y: %.2f z: %.2f\n"
+        "map_x: %d, map_y: %d\n"
+        "tile_x: %d, tile_y: %d\n"
+        "yaw: %.4f pitch: %.4f\n"
+        "Facing %s\n"
+        "Render_distance: %d\n"
+        "fps: %.2f\n"
         "forward vec: %f, %f, %f",
         cam.x, cam.y, cam.z,
         (int)(cam.x / CHUNK_SIZE), (int)(cam.z / CHUNK_SIZE),

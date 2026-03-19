@@ -193,9 +193,10 @@ typedef struct OGL_Plane : public OGL_Node
 
 typedef struct OGL_Cube : public OGL_Node
 {
-    OGL_Cube(OGL_Color color, GLuint texture) : OGL_Node(color, texture, 36)
+    OGL_Cube(OGL_Color color, GLuint texture) : OGL_Node(color, texture, 24)
     {
         update_vertices();
+        drawtype = GL_QUADS;
     };
     void update_vertices()
     {
@@ -209,45 +210,39 @@ typedef struct OGL_Cube : public OGL_Node
 
         int idx = 0;
 
-        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z + hd, 1, 0, 0, 0, 1, texture};
+        // +X face (right)
+        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z - hd, 1, 0, 0, 1, 1, texture};
         vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z - hd, 1, 0, 0, 1, 0, texture};
         vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z + hd, 1, 0, 0, 0, 0, texture};
         vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z + hd, 1, 0, 0, 0, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z - hd, 1, 0, 0, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z - hd, 1, 0, 0, 1, 0, texture};
 
-        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z - hd, -1, 0, 0, 0, 1, texture};
+        // -X face (left)
+        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z + hd, -1, 0, 0, 1, 1, texture};
         vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z + hd, -1, 0, 0, 1, 0, texture};
         vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z - hd, -1, 0, 0, 0, 0, texture};
         vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z - hd, -1, 0, 0, 0, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z + hd, -1, 0, 0, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z + hd, -1, 0, 0, 1, 0, texture};
 
+        // +Y face (top)
         vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z + hd, 0, 1, 0, 0, 1, texture};
         vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z + hd, 0, 1, 0, 1, 1, texture};
         vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z - hd, 0, 1, 0, 1, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z + hd, 0, 1, 0, 0, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z - hd, 0, 1, 0, 1, 0, texture};
         vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z - hd, 0, 1, 0, 0, 0, texture};
 
+        // -Y face (bottom)
         vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z - hd, 0, -1, 0, 0, 1, texture};
         vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z - hd, 0, -1, 0, 1, 1, texture};
         vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z + hd, 0, -1, 0, 1, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z - hd, 0, -1, 0, 0, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z + hd, 0, -1, 0, 1, 0, texture};
         vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z + hd, 0, -1, 0, 0, 0, texture};
 
+        // +Z face (front)
         vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z + hd, 0, 0, 1, 0, 1, texture};
         vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z + hd, 0, 0, 1, 1, 1, texture};
         vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z + hd, 0, 0, 1, 1, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z + hd, 0, 0, 1, 0, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z + hd, 0, 0, 1, 1, 0, texture};
         vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z + hd, 0, 0, 1, 0, 0, texture};
 
+        // -Z face (back)
         vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z - hd, 0, 0, -1, 0, 1, texture};
         vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z - hd, 0, 0, -1, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z - hd, 0, 0, -1, 1, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z - hd, 0, 0, -1, 0, 1, texture};
         vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z - hd, 0, 0, -1, 1, 0, texture};
         vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z - hd, 0, 0, -1, 0, 0, texture};
     }
