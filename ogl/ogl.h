@@ -125,18 +125,6 @@ typedef struct OGL_Vertex
     GLuint tex_id;
 } OGL_Vertex;
 
-typedef struct OGL_Position
-{
-    float x, y, z;
-    OGL_Position(float x, float y, float z) : x(x), y(y), z(z) {};
-} OGL_Position;
-
-typedef struct OGL_Dimensions
-{
-    float width, height, depth;
-    OGL_Dimensions(float width, float height, float depth) : width(width), height(height), depth(depth) {};
-} OGL_Dimensions;
-
 typedef struct OGL_Color
 {
     int r, g, b;
@@ -147,20 +135,18 @@ typedef struct OGL_Node
 {
     GLuint texture;
     OGL_Color ogl_color;
-    OGL_Position ogl_position;
-    OGL_Dimensions ogl_dimensions;
     OGL_Vertex * vertices;
     GLsizei vert_num;
     int drawtype;
-    OGL_Node(OGL_Position position, OGL_Color color, OGL_Dimensions dimensions, GLuint texture, GLsizei vert_num)
-        : ogl_position(position), ogl_color(color), ogl_dimensions(dimensions), texture(texture), vert_num(vert_num), drawtype(GL_TRIANGLES)
+    OGL_Node(OGL_Color color, GLuint texture, GLsizei vert_num) : ogl_color(color), texture(texture), vert_num(vert_num), drawtype(GL_TRIANGLES)
     {
         vertices = new OGL_Vertex[vert_num];
     }
-    void render()
+    void render(float x, float y, float z, float xs, float ys, float zs)
     {
         glPushMatrix();
-        glTranslatef(ogl_position.x, ogl_position.y, ogl_position.z);
+        glTranslatef(x, y, z);
+        glScalef(xs, ys, zs);
         glBindTexture(GL_TEXTURE_2D, texture);
         glColor3f((double)ogl_color.r / 255, (double)ogl_color.g / 255, (double)ogl_color.b / 255);
 
@@ -180,23 +166,19 @@ typedef struct OGL_Node
 
 typedef struct OGL_Plane : public OGL_Node
 {
-    OGL_Plane(OGL_Position position, OGL_Color color, GLuint texture) : OGL_Node(position, color, OGL_Dimensions(1, 1, 1), texture, 6)
-    {
-        update_vertices();
-    };
-    OGL_Plane(OGL_Position position, OGL_Dimensions dimensions, OGL_Color color, GLuint texture) : OGL_Node(position, color, dimensions, texture, 6)
+    OGL_Plane(OGL_Color color, GLuint texture) : OGL_Node(color, texture, 6)
     {
         update_vertices();
     };
 
     void update_vertices()
     {
-        float hw = ogl_dimensions.width / 2;
-        float hd = ogl_dimensions.depth / 2;
+        const float hw = 0.5;
+        const float hd = 0.5;
 
-        float x = 0;
-        float y = 0;
-        float z = 0;
+        const float x = 0;
+        const float y = 0;
+        const float z = 0;
 
         int idx = 0;
 
@@ -211,19 +193,19 @@ typedef struct OGL_Plane : public OGL_Node
 
 typedef struct OGL_Cube : public OGL_Node
 {
-    OGL_Cube(OGL_Position position, OGL_Dimensions dimensions, OGL_Color color, GLuint texture) : OGL_Node(position, color, dimensions, texture, 36)
+    OGL_Cube(OGL_Color color, GLuint texture) : OGL_Node(color, texture, 36)
     {
         update_vertices();
     };
     void update_vertices()
     {
-        float hw = ogl_dimensions.width / 2.0f;
-        float hh = ogl_dimensions.height / 2.0f;
-        float hd = ogl_dimensions.depth / 2.0f;
+        const float hw = 0.5;
+        const float hh = 0.5;
+        const float hd = 0.5;
 
-        float x = 0;
-        float y = 0;
-        float z = 0;
+        const float x = 0;
+        const float y = 0;
+        const float z = 0;
 
         int idx = 0;
 
@@ -273,19 +255,14 @@ typedef struct OGL_Cube : public OGL_Node
 
 typedef struct OGL_Element : public Element, public OGL_Cube
 {
-    OGL_Element(Element element)
-        : Element(element), OGL_Cube(OGL_Position(element.location.get_world_x(), element.dimensions.height.value / 2, element.location.get_world_y()),
-                                OGL_Dimensions(element.dimensions.width.value, element.dimensions.height.value, element.dimensions.length.value),
-                                OGL_Color(get_base()->color.r, get_base()->color.g, get_base()->color.b), 0)
+    OGL_Element(Element element) : Element(element), OGL_Cube(OGL_Color(get_base()->color.r, get_base()->color.g, get_base()->color.b), 0)
     {
     }
 } OGL_Element;
 
 typedef struct OGL_Plant : public Plant, public OGL_Node
 {
-    OGL_Plant(Plant plant)
-        : Plant(plant), OGL_Node(OGL_Position(plant.location.get_world_x(), plant.dimensions.height.value / 2, plant.location.get_world_y()), OGL_Color(10, 200, 10),
-                            OGL_Dimensions(plant.dimensions.width.value, plant.dimensions.height.value, plant.dimensions.length.value), 0, 100)
+    OGL_Plant(Plant plant) : Plant(plant), OGL_Node(OGL_Color(10, 200, 10), 0, 100)
     {
         update_vertices();
         drawtype = GL_LINES;
@@ -333,17 +310,9 @@ typedef struct OGL_Plant : public Plant, public OGL_Node
 
     void update_vertices()
     {
-        float hw = ogl_dimensions.width / 2.0f;
-        float hh = ogl_dimensions.height / 2.0f;
-        float hd = ogl_dimensions.depth / 2.0f;
-
-        float x = ogl_position.x;
-        float y = ogl_position.y;
-        float z = ogl_position.z;
-
-        float cx = ogl_position.x + hw;
-        float cy = ogl_position.y + hh;
-        float cz = ogl_position.z + hd;
+        const float hw = 0.5f;
+        const float hh = 0.5f;
+        const float hd = 0.5f;
         int i = 0;
         OGL_Vertex size_halfed = (OGL_Vertex){hw, hh, hd, 0, 0, 0, 0, 0, 0};
         vertices[0] = (OGL_Vertex){0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -353,7 +322,7 @@ typedef struct OGL_Plant : public Plant, public OGL_Node
 
 typedef struct OGL_Player : public Player, public OGL_Cube
 {
-    OGL_Player(Player player) : Player(player), OGL_Cube(OGL_Position(player.location.get_world_x(), 1, player.location.get_world_y()), OGL_Dimensions(1, 2, 1), OGL_Color(255, 255, 255), 0)
+    OGL_Player(Player player) : Player(player), OGL_Cube(OGL_Color(255, 255, 255), 0)
     {
     }
 } OGL_Player;
@@ -389,19 +358,20 @@ typedef struct OGL_Chunk
 
     void update_tiles_display_list()
     {
+        printf("update_tiles_display_list called\n");
         if (tiles_display_list != 0)
             glDeleteLists(tiles_display_list, 1);
         tiles_display_list = glGenLists(1);
         glNewList(tiles_display_list, GL_COMPILE);
-        for (int i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++)
-        {
-            tiles[i]->render();
-        }
+        for (int x = 0; x < CHUNK_SIZE; x++)
+            for (int y = 0; y < CHUNK_SIZE; y++)
+                tiles[x + y * CHUNK_SIZE]->render(x, 0, y, 1, 1, 1);
         glEndList();
     }
 
     void update_element_display_list()
     {
+        printf("update_element_display_list called\n");
         if (element_display_list != 0)
             glDeleteLists(element_display_list, 0);
         element_display_list = glGenLists(1);
@@ -409,7 +379,11 @@ typedef struct OGL_Chunk
         for (auto [_, inv_element] : elements)
         {
             if (OGL_Node * node = dynamic_cast<OGL_Node *>(inv_element))
-                node->render();
+            {
+                ItemLocation * loc = &inv_element->location;
+                Dimensions * dim = &inv_element->dimensions;
+                node->render(loc->get_tile_x(), dim->height.value / 2, loc->get_tile_y(), dim->width.value, dim->height.value, dim->length.value);
+            }
         }
         glEndList();
     }
@@ -432,7 +406,10 @@ typedef struct OGL_World
             {
                 if (OGL_Chunk * ch = ogl_chunks[chj][chi])
                 {
+                    glPushMatrix();
+                    glTranslatef(chi * CHUNK_SIZE, 0, chj * CHUNK_SIZE);
                     ch->render();
+                    glPopMatrix();
                 }
             }
         }

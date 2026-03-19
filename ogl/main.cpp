@@ -161,16 +161,9 @@ InventoryElement * raycast()
             if (abs(cx - inv_element->location.get_world_x()) < inv_element->dimensions.width.value / 2)
                 if (abs(cz - inv_element->location.get_world_y()) < inv_element->dimensions.length.value / 2)
                 {
-                    if (OGL_Node * onode = dynamic_cast<OGL_Node *>(inv_element))
+                    if (abs(cy) < inv_element->dimensions.height.value)
                     {
-                        if (abs(cy - onode->ogl_position.y) < onode->ogl_dimensions.height / 2)
-                        {
-                            return inv_element;
-                        }
-                    }
-                    else
-                    {
-                        printf("Couldn't cast to OGL_Node\n");
+                        return inv_element;
                     }
                 }
         }
@@ -491,8 +484,9 @@ void draw()
     };
     float _x, _y, _z;
     cam.get_forward_vector(&_x, &_y, &_z);
-    snprintf(buf, 256, "x: %.2f y: %.2f z: %.2f\nmap_x: %d, map_y: %d\nyaw: %.4f pitch: %.4f\nFacing %s\nRender_distance: %d\nfps: %.2f\nforward vec: %f, %f, %f", cam.x, cam.y, cam.z,
-        (int)(cam.x / CHUNK_SIZE), (int)(cam.z / CHUNK_SIZE), cam.yaw, cam.pitch, cam.get_direction_string(), render_distance, fps, _x, _y, _z);
+    snprintf(buf, 256, "x: %.2f y: %.2f z: %.2f\nmap_x: %d, map_y: %d\ntile_x: %d, tile_y: %d\nyaw: %.4f pitch: %.4f\nFacing %s\nRender_distance: %d\nfps: %.2f\nforward vec: %f, %f, %f", cam.x, cam.y,
+        cam.z, (int)(cam.x / CHUNK_SIZE), (int)(cam.z / CHUNK_SIZE), (int)cam.x % CHUNK_SIZE, (int)cam.z % CHUNK_SIZE, cam.yaw, cam.pitch, cam.get_direction_string(), render_distance, fps, _x, _y,
+        _z);
     ogl_text->draw_text(buf, 0, 0, 2, window_width, window_height);
     ogl_text->setup_2d_projection(window_width, window_height);
     {

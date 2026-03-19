@@ -45,7 +45,7 @@ void update_chunk(int32_t x, int32_t y, const chunk_table * data)
             for (int j = 0; j < CHUNK_SIZE; j++)
             {
                 BaseElement * be = get_base_element(ch->table[j][i].tile);
-                ogl_ch->tiles[i * CHUNK_SIZE + j] = new OGL_Plane(OGL_Position(i + x * CHUNK_SIZE, 0, j + y * CHUNK_SIZE), OGL_Color(be->color.r, be->color.g, be->color.b), ch->table[j][i].tile);
+                ogl_ch->tiles[i * CHUNK_SIZE + j] = new OGL_Plane(OGL_Color(be->color.r, be->color.g, be->color.b), ch->table[j][i].tile);
             }
         }
         ogl_ch->update_tiles_display_list();
@@ -90,24 +90,6 @@ void update_item_location(LocationUpdateData data)
         return;
     }
 
-    if (OGL_Element * oel = dynamic_cast<OGL_Element *>(el))
-    {
-        printf("The new get_world_x is %f\n", data.new_.get_world_x());
-        printf("The new get_world_y is %f\n", data.new_.get_world_y());
-        oel->ogl_position = OGL_Position(data.new_.get_world_x(), oel->ogl_dimensions.height / 2, data.new_.get_world_y());
-        oel->update_vertices();
-    }
-    if (OGL_Player * pl = dynamic_cast<OGL_Player *>(el))
-    {
-        pl->ogl_position = OGL_Position(data.new_.get_world_x(), 1, data.new_.get_world_y());
-        pl->update_vertices();
-    }
-
-    if (OGL_Plant * pl = dynamic_cast<OGL_Plant *>(el))
-    {
-        pl->ogl_position = OGL_Position(data.new_.get_world_x(), 1, data.new_.get_world_y());
-        pl->update_vertices();
-    }
     el->location.chunk = data.new_.chunk;
 
     printf("Adding element to chunk\n");
@@ -122,8 +104,6 @@ void create_object(const ObjectData * data_const)
         case ObjectData::Tag::Element:
         {
             OGL_Element * el = new OGL_Element(data->element.data);
-            el->ogl_position.x = el->location.get_world_x();
-            el->ogl_position.z = el->location.get_world_y();
             register_object(el);
             if (OGL_Chunk * ch = ogl_world->ogl_chunks[el->location.chunk.map_y][el->location.chunk.map_x])
             {
@@ -134,8 +114,6 @@ void create_object(const ObjectData * data_const)
         case ObjectData::Tag::Player:
         {
             OGL_Player * el = new OGL_Player(data->player.data);
-            el->ogl_position.x = el->location.get_world_x();
-            el->ogl_position.z = el->location.get_world_y();
             register_object(el);
             if (OGL_Chunk * ch = ogl_world->ogl_chunks[el->location.chunk.map_y][el->location.chunk.map_x])
             {
@@ -146,8 +124,6 @@ void create_object(const ObjectData * data_const)
         case ObjectData::Tag::Plant:
         {
             OGL_Plant * el = new OGL_Plant(data->plant.data);
-            el->ogl_position.x = el->location.get_world_x();
-            el->ogl_position.z = el->location.get_world_y();
             register_object(el);
             if (OGL_Chunk * ch = ogl_world->ogl_chunks[el->location.chunk.map_y][el->location.chunk.map_x])
             {
