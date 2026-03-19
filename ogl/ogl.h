@@ -329,7 +329,7 @@ typedef struct OGL_Player : public Player, public OGL_Cube
 
 typedef struct OGL_Chunk
 {
-    OGL_Plane * tiles[CHUNK_SIZE * CHUNK_SIZE];
+    OGL_Plane * tiles[CHUNK_SIZE][CHUNK_SIZE];
     std::unordered_map<size_t, InventoryElement *> elements;
     GLuint tiles_display_list = 0;
     GLuint element_display_list = 0;
@@ -365,7 +365,7 @@ typedef struct OGL_Chunk
         glNewList(tiles_display_list, GL_COMPILE);
         for (int x = 0; x < CHUNK_SIZE; x++)
             for (int y = 0; y < CHUNK_SIZE; y++)
-                tiles[x + y * CHUNK_SIZE]->render(x, 0, y, 1, 1, 1);
+                tiles[y][x]->render(x, 0, y, 1, 1, 1);
         glEndList();
     }
 
