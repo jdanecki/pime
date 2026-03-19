@@ -482,11 +482,30 @@ void draw()
     char buf[512] = {
         0,
     };
-    float _x, _y, _z;
-    cam.get_forward_vector(&_x, &_y, &_z);
-    snprintf(buf, 256, "x: %.2f y: %.2f z: %.2f\nmap_x: %d, map_y: %d\ntile_x: %d, tile_y: %d\nyaw: %.4f pitch: %.4f\nFacing %s\nRender_distance: %d\nfps: %.2f\nforward vec: %f, %f, %f", cam.x, cam.y,
-        cam.z, (int)(cam.x / CHUNK_SIZE), (int)(cam.z / CHUNK_SIZE), (int)cam.x % CHUNK_SIZE, (int)cam.z % CHUNK_SIZE, cam.yaw, cam.pitch, cam.get_direction_string(), render_distance, fps, _x, _y,
-        _z);
+    float x_forward, y_forward, z_forward;
+    cam.get_forward_vector(&x_forward, &y_forward, &z_forward);
+
+    // clang-format off
+    snprintf(buf, 256,
+        "x: %.2f y: %.2f z: %.2f"
+        "map_x: %d, map_y: %d"
+        "tile_x: %d, tile_y: %d"
+        "yaw: %.4f pitch: %.4f"
+        "Facing %s"
+        "Render_distance: %d"
+        "fps: %.2f"
+        "forward vec: %f, %f, %f",
+        cam.x, cam.y, cam.z,
+        (int)(cam.x / CHUNK_SIZE), (int)(cam.z / CHUNK_SIZE),
+        (int)cam.x % CHUNK_SIZE, (int)cam.z % CHUNK_SIZE,
+        cam.yaw, cam.pitch
+        , cam.get_direction_string(),
+        render_distance,
+        fps,
+        x_forward, y_forward, z_forward
+    );
+    // clang-format on
+
     ogl_text->draw_text(buf, 0, 0, 2, window_width, window_height);
     ogl_text->setup_2d_projection(window_width, window_height);
     {
