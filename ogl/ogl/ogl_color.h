@@ -16,10 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #pragma once
-#include "../core/chunk.h"
-#include "ogl/ogl_world.h"
-#include "ogl/ogl_camera.h"
-extern OGL_World * ogl_world;
-extern chunk * world_table[WORLD_SIZE][WORLD_SIZE];
-extern size_t my_id;
-extern OGL_Camera cam;
+
+typedef struct OGL_Color
+{
+    int r, g, b;
+    OGL_Color(int r, int g, int b) : r(r), g(g), b(b) {};
+} OGL_Color;

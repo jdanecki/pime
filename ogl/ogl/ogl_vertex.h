@@ -16,10 +16,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #pragma once
-#include "../core/chunk.h"
-#include "ogl/ogl_world.h"
-#include "ogl/ogl_camera.h"
-extern OGL_World * ogl_world;
-extern chunk * world_table[WORLD_SIZE][WORLD_SIZE];
-extern size_t my_id;
-extern OGL_Camera cam;
+#include <GL/gl.h>
+
+typedef struct OGL_Vertex
+{
+    float x, y, z;
+    float nx, ny, nz;
+    float u, v;
+    GLuint tex_id;
+} OGL_Vertex;

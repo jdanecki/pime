@@ -16,10 +16,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #pragma once
-#include "../core/chunk.h"
-#include "ogl/ogl_world.h"
-#include "ogl/ogl_camera.h"
-extern OGL_World * ogl_world;
-extern chunk * world_table[WORLD_SIZE][WORLD_SIZE];
-extern size_t my_id;
-extern OGL_Camera cam;
+#include "../core/player.h"
+#include "ogl/ogl_cube.h"
+
+class OGL_Player : public Player, public OGL_Cube
+{
+  public:
+    OGL_Player(Player player) : Player(player), OGL_Cube(OGL_Color(255, 255, 255), 0)
+    {
+    }
+};

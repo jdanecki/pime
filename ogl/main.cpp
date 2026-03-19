@@ -22,7 +22,7 @@
 #include <vector>
 #include <algorithm>
 #include "../net/net.h"
-#include "ogl.h"
+#include "ogl/ogl_text.h"
 #include "main.h"
 
 OGL_World * ogl_world;
@@ -141,31 +141,23 @@ InventoryElement * raycast()
             printf("Chunk is null in raycast\n");
             continue;
         }
-        for (auto [_, inv_element] : ch->elements)
+        std::list<InventoryElement *> l = ch->get_elements_from_position(cx, cy, cz);
+        for (InventoryElement * inv_element : l)
         {
             if (!inv_element || inv_element->uid == my_id || dynamic_cast<Player *>(inv_element))
             {
-                if (!inv_element)
-                    printf("continuing, inv_element is null\n");
-
                 if (inv_element->uid == my_id)
                     printf("continuing, inv_element->uid (%zu) == my_id (%zu)\n", inv_element->uid, my_id);
 
                 if (dynamic_cast<Player *>(inv_element))
                     printf("continuing, cannot pickup player\n");
+
                 continue;
             }
             ItemLocation * il = &inv_element->location;
             printf("loc %f, %f\n", il->get_world_x(), il->get_world_y());
             printf("cx: %f cy: %f cz: %f\n", cx, cy, cz);
-            if (abs(cx - inv_element->location.get_world_x()) < inv_element->dimensions.width.value / 2)
-                if (abs(cz - inv_element->location.get_world_y()) < inv_element->dimensions.length.value / 2)
-                {
-                    if (abs(cy) < inv_element->dimensions.height.value)
-                    {
-                        return inv_element;
-                    }
-                }
+            return inv_element;
         }
     }
     return NULL;
@@ -314,39 +306,7 @@ void handle_events()
     }
 }
 
-bool check_step(float dx, float dz)
-{
-    float new_x = cam.x + dx;
-    float new_z = cam.z + dz;
-
-    OGL_Chunk * ch = NULL;
-    if (!(ch = ogl_world->ogl_chunks[(int)floor(new_z / CHUNK_SIZE)][(int)floor(new_x / CHUNK_SIZE)]))
-    {
-        return false;
-    }
-    for (auto [_, inv_element] : ch->elements)
-    {
-        if (!inv_element || inv_element->uid == my_id)
-            continue;
-        if (abs(new_x - inv_element->location.get_world_x()) < inv_element->dimensions.width.value / 2 + 0.25)
-            if (abs(new_z - inv_element->location.get_world_y()) < inv_element->dimensions.length.value / 2 + 0.25)
-            {
-                return false;
-            }
-    }
-    return true;
-};
-
-void move_check_step(float dx, float dz)
-{
-    if (check_step(dx, dz))
-    {
-        cam.x += dx;
-        cam.z += dz;
-    }
-}
-
-void move_without_check_step(float dx, float dz)
+void move(float dx, float dz)
 {
     cam.x += dx;
     cam.z += dz;
@@ -371,34 +331,30 @@ void handle_keyboard_state(Uint64 dt)
         cam.y = 1.5;
         cam.vy = 0;
     }
-    void (*move_func)(float, float) = move_check_step;
-    if (keyboard_state[SDL_SCANCODE_LSHIFT])
-    {
-        move_func = move_without_check_step;
-    }
+
     if (keyboard_state[SDL_SCANCODE_A])
     {
         float x, z;
         get_forward_vector(cam.yaw, &x, &z);
-        move_func(z * speed_multi, -x * speed_multi);
+        move(z * speed_multi, -x * speed_multi);
     }
     if (keyboard_state[SDL_SCANCODE_D])
     {
         float x, z;
         get_forward_vector(cam.yaw, &x, &z);
-        move_func(-z * speed_multi, x * speed_multi);
+        move(-z * speed_multi, x * speed_multi);
     }
     if (keyboard_state[SDL_SCANCODE_W])
     {
         float x, z;
         get_forward_vector(cam.yaw, &x, &z);
-        move_func(x * speed_multi, z * speed_multi);
+        move(x * speed_multi, z * speed_multi);
     }
     if (keyboard_state[SDL_SCANCODE_S])
     {
         float x, z;
         get_forward_vector(cam.yaw, &x, &z);
-        move_func(-x * speed_multi, -z * speed_multi);
+        move(-x * speed_multi, -z * speed_multi);
     }
 
     if ((abs(cam.x - cam_x_lt) || abs(cam.z - cam_z_lt)))
@@ -590,7 +546,7 @@ void handle_gp_state()
         // new y = old x * sin(rotation) + old y * cos(rotation)
         double mx = gp.x1 * c / 32768 - gp.y1 * s / 32768;
         double my = gp.x1 * s / 32768 + gp.y1 * c / 32768;
-        move_check_step(mx / 4, my / 4);
+        move(mx / 4, my / 4);
     }
 
     if (gp.a && cam.y == 1.5)

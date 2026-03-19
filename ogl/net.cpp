@@ -18,8 +18,10 @@
 #include "../net/net.h"
 #include "../core/chunk.h"
 #include "main.h"
-#include "ogl.h"
 #include <cstdio>
+#include "ogl/ogl_element.h"
+#include "ogl/ogl_player.h"
+#include "ogl/ogl_plant.h"
 #include <cstdlib>
 #include <string.h>
 
@@ -58,7 +60,6 @@ void update_object(const ObjectData * data)
 
 void update_item_location(LocationUpdateData data)
 {
-    printf("update_item_location\n");
     if (data.id.uid == my_id)
     {
         cam.x = data.new_.get_world_x();
@@ -92,7 +93,6 @@ void update_item_location(LocationUpdateData data)
 
     el->location.chunk = data.new_.chunk;
 
-    printf("Adding element to chunk\n");
     new_ch->add_element(el);
 }
 

@@ -16,10 +16,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #pragma once
-#include "../core/chunk.h"
-#include "ogl/ogl_world.h"
-#include "ogl/ogl_camera.h"
-extern OGL_World * ogl_world;
-extern chunk * world_table[WORLD_SIZE][WORLD_SIZE];
-extern size_t my_id;
-extern OGL_Camera cam;
+#include "../core/alchemist/elements/element.h"
+#include "ogl_cube.h"
+
+class OGL_Element : public Element, public OGL_Cube
+{
+  public:
+    OGL_Element(Element element) : Element(element), OGL_Cube(OGL_Color(get_base()->color.r, get_base()->color.g, get_base()->color.b), 0)
+    {
+    }
+};
