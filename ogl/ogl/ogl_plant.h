@@ -32,6 +32,11 @@ class OGL_Plant : public Plant, public OGL_Node
         return {original->x + mod_x, original->y + mod_y, original->z + mod_z};
     }
 
+    void render(float x, float y, float z, float xs, float ys, float zs) override
+    {
+        OGL_Node::render(x, 0, z, xs, ys, zs);
+    }
+
     void generative_iter(OGL_Vertex * v, OGL_Vertex v_in, int * i, int line_vert_num, OGL_Vertex * size_halfed)
     {
         if (*i >= line_vert_num)

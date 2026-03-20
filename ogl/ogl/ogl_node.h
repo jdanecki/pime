@@ -34,7 +34,7 @@ class OGL_Node
     {
         vertices = new OGL_Vertex[vert_num];
     }
-    void render(float x, float y, float z, float xs, float ys, float zs)
+    virtual void render(float x, float y, float z, float xs, float ys, float zs)
     {
         glPushMatrix();
         glTranslatef(x, y, z);
