@@ -18,27 +18,35 @@
 #pragma once
 
 #include <GL/gl.h>
+#include <vector>
 #include <SDL3/SDL.h>
-#include <cassert>
+#include "ogl_shaders.h"
+#include "ogl_loader.h"
+#include "ogl_vertex.h"
 
 class OGL_Text
 {
+    static OGL_Text * instance;
+
     GLuint texture;
+    GLuint vao = 0;
+    GLuint vbo = 0;
+    GLuint ebo = 0;
+
     int char_width;
     int char_height;
     int chars_per_row;
     int first_char;
     int texture_width;
     int texture_height;
-
-    void draw_char(char c, float x, float y, float scale)
+    void push_char(char c, float x, float y, float scale, std::vector<OGL_Vertex> & verts, std::vector<GLushort> & idx)
     {
-        int char_index = c - first_char;
-        if (char_index < 0)
+        int ci = (unsigned char)c - first_char;
+        if (ci < 0)
             return;
 
-        int col = char_index % chars_per_row;
-        int row = char_index / chars_per_row;
+        int col = ci % chars_per_row;
+        int row = ci / chars_per_row;
 
         float u1 = (float)(col * char_width) / texture_width;
         float v1 = (float)(row * char_height) / texture_height;
@@ -48,87 +56,146 @@ class OGL_Text
         float w = char_width * scale;
         float h = char_height * scale;
 
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glBegin(GL_QUADS);
-        glTexCoord2f(u1, v1);
-        glVertex2f(x, y);
-        glTexCoord2f(u2, v1);
-        glVertex2f(x + w, y);
-        glTexCoord2f(u2, v2);
-        glVertex2f(x + w, y + h);
-        glTexCoord2f(u1, v2);
-        glVertex2f(x, y + h);
-        glEnd();
+        GLushort base = (GLushort)verts.size();
+        verts.push_back({x, y, 0.f, 0.f, 0.f, 1.f, u1, v1, texture});
+        verts.push_back({x + w, y, 0.f, 0.f, 0.f, 1.f, u2, v1, texture});
+        verts.push_back({x + w, y + h, 0.f, 0.f, 0.f, 1.f, u2, v2, texture});
+        verts.push_back({x, y + h, 0.f, 0.f, 0.f, 1.f, u1, v2, texture});
+
+        idx.insert(idx.end(), {base, (GLushort)(base + 1), (GLushort)(base + 2), base, (GLushort)(base + 2), (GLushort)(base + 3)});
     }
 
-  public:
+    static void make_ortho(float out[16], float l, float r, float b, float t)
+    {
+        memset(out, 0, 64);
+        out[0] = 2.f / (r - l);
+        out[5] = 2.f / (t - b);
+        out[10] = -1.f;
+        out[12] = -(r + l) / (r - l);
+        out[13] = -(t + b) / (t - b);
+        out[15] = 1.f;
+    }
+
     OGL_Text(const char * image_path, int char_width, int char_height, int chars_per_row, int first_char)
         : char_width(char_width), char_height(char_height), chars_per_row(chars_per_row), first_char(first_char)
     {
-        SDL_Surface * surface = SDL_LoadPNG(image_path);
-        if (!surface)
-            assert("Couldn't open font file" == 0);
+        OGL_Loader * gl = OGL_Loader::get_instance();
+
+        SDL_Surface * surf = SDL_LoadPNG(image_path);
+        SDL_assert(surf && "couldn't open font file");
+
+        SDL_Surface * rgba = SDL_ConvertSurface(surf, SDL_PIXELFORMAT_RGBA32);
+        SDL_DestroySurface(surf);
+        SDL_assert(rgba);
 
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        GLenum format = (SDL_BYTESPERPIXEL(surface->format) == 4) ? GL_RGBA : GL_RGB;
-        glTexImage2D(GL_TEXTURE_2D, 0, format, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, rgba->w, rgba->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba->pixels);
+        texture_width = rgba->w;
+        texture_height = rgba->h;
+        SDL_DestroySurface(rgba);
 
-        texture_width = surface->w;
-        texture_height = surface->h;
+        gl->glGenVertexArrays(1, &vao);
+        gl->glGenBuffers(1, &vbo);
+        gl->glGenBuffers(1, &ebo);
 
-        SDL_DestroySurface(surface);
+        gl->glBindVertexArray(vao);
+        gl->glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+        gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(OGL_Vertex), (void *)offsetof(OGL_Vertex, x));
+        gl->glEnableVertexAttribArray(0);
+
+        gl->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(OGL_Vertex), (void *)offsetof(OGL_Vertex, nx));
+        gl->glEnableVertexAttribArray(1);
+
+        gl->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(OGL_Vertex), (void *)offsetof(OGL_Vertex, u));
+        gl->glEnableVertexAttribArray(2);
+
+        gl->glVertexAttribIPointer(3, 1, GL_UNSIGNED_INT, sizeof(OGL_Vertex), (void *)offsetof(OGL_Vertex, tex_id));
+        gl->glEnableVertexAttribArray(3);
+
+        gl->glBindVertexArray(0);
     }
 
-    void setup_2d_projection(int screen_width, int screen_height)
+  public:
+    void draw_text(const char * text, float x, float y, float scale, int screen_width, int screen_height, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f)
     {
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-        glOrtho(0, screen_width, screen_height, 0, -1, 1);
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
-    }
+        OGL_Loader * gl = OGL_Loader::get_instance();
+        OGL_Shaders * sh = OGL_Shaders::get_instance();
 
-    void restore_3d_projection()
-    {
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-    }
+        std::vector<OGL_Vertex> verts;
+        std::vector<GLushort> indices;
+        verts.reserve(128 * 4);
+        indices.reserve(128 * 6);
 
-    void draw_text(const char * text, float x, float y, float scale, int screen_width, int screen_height)
-    {
-        setup_2d_projection(screen_width, screen_height);
-        float cursor_x = x;
-
-        glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_CURRENT_BIT);
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-        for (int i = 0; text[i] != '\0'; i++)
+        float cx = x, cy = y;
+        for (int i = 0; text[i]; ++i)
         {
             if (text[i] == '\n')
             {
-                cursor_x = x;
-                y += char_height * scale;
+                cx = x;
+                cy += char_height * scale;
                 continue;
             }
-            draw_char(text[i], cursor_x, y, scale);
-            cursor_x += char_width * scale;
+            push_char(text[i], cx, cy, scale, verts, indices);
+            cx += char_width * scale;
         }
+        if (indices.empty())
+            return;
 
-        glPopAttrib();
-        restore_3d_projection();
+        gl->glBindVertexArray(vao);
+        gl->glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        gl->glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(OGL_Vertex), verts.data(), GL_DYNAMIC_DRAW);
+        gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_DYNAMIC_DRAW);
+
+        GLboolean depth_was = glIsEnabled(GL_DEPTH_TEST);
+        GLboolean cull_was = glIsEnabled(GL_CULL_FACE);
+        GLboolean blend_was = glIsEnabled(GL_BLEND);
+        GLint prev_program;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &prev_program);
+
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        gl->glUseProgram(sh->get_program_2d());
+
+        float proj[16];
+        make_ortho(proj, 0.f, (float)screen_width, (float)screen_height, 0.f);
+        gl->glUniformMatrix4fv(sh->get_proj_location_2d(), 1, GL_FALSE, proj);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        gl->glUniform1i(sh->get_tex_location_2d(), 0);
+        gl->glUniform4f(sh->get_color_location_2d(), r, g, b, a);
+
+        glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_SHORT, nullptr);
+
+        gl->glUseProgram(prev_program);
+        gl->glBindVertexArray(0);
+        if (!blend_was)
+            glDisable(GL_BLEND);
+        if (depth_was)
+            glEnable(GL_DEPTH_TEST);
+        if (cull_was)
+            glEnable(GL_CULL_FACE);
+        gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+        gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glActiveTexture(GL_TEXTURE0);
+    }
+
+    static OGL_Text * get_instance()
+    {
+        if (!instance)
+            instance = new OGL_Text("font.png", 8, 12, 16, 32);
+        return instance;
     }
 };

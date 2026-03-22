@@ -18,7 +18,7 @@
 #pragma once
 #include "../core/alchemist/elements/inventory_element.h"
 #include "../core/world_params.h"
-#include <cassert>
+#include <SDL3/SDL.h>
 #include <list>
 #include <unordered_map>
 #include "ogl/ogl_node.h"
@@ -82,7 +82,7 @@ class OGL_Chunk
         std::list<InventoryElement *> retval;
         for (auto [_, inv_element] : elements)
         {
-            assert(inv_element != NULL);
+            SDL_assert(inv_element != NULL);
             if (abs(x - inv_element->location.get_world_x()) < inv_element->dimensions.width.value / 2)
                 if (abs(z - inv_element->location.get_world_y()) < inv_element->dimensions.length.value / 2)
                 {

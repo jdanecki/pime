@@ -26,7 +26,6 @@
 #include "main.h"
 
 OGL_World * ogl_world;
-OGL_Text * ogl_text;
 
 OGL_Camera cam;
 
@@ -462,8 +461,7 @@ void draw()
     );
     // clang-format on
 
-    ogl_text->draw_text(buf, 0, 0, 2, window_width, window_height);
-    ogl_text->setup_2d_projection(window_width, window_height);
+    OGL_Text::get_instance()->draw_text(buf, 0, 0, 2, window_width, window_height);
     {
         int wh2 = window_height / 2;
         int ww2 = window_width / 2;
@@ -476,7 +474,7 @@ void draw()
         glVertex2f(ww2 - 2, wh2 + 2);
         glEnd();
     }
-    ogl_text->restore_3d_projection();
+
     glDisable(GL_TEXTURE_2D);
     SDL_GL_SwapWindow(window);
 }
@@ -588,7 +586,6 @@ int main(int argc, char * argv[])
     init_sdl();
     init_ogl();
     load_textures();
-    ogl_text = new OGL_Text("font.png", 8, 12, 16, 32);
 
     Uint64 dt = 0;
     Uint64 t;
