@@ -1,4 +1,4 @@
-ncurses_dep = dependency('ncurses', method: 'pkg-config', required: true)
+ncurses_dep = dependency('ncursesw', method: 'pkg-config', required: true)
 
 server_sources = [
   'console.cpp',
