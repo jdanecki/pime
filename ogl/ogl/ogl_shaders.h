@@ -27,10 +27,19 @@
 class OGL_Shaders
 {
     static OGL_Shaders * instance;
+
     GLint proj_location_2d;
     GLint tex_location_2d;
     GLint color_location_2d;
     GLuint program_2d;
+
+    GLint proj_location_3d;
+    GLint tex_location_3d;
+    GLint model_location_3d;
+    GLint view_location_3d;
+    GLint color_location_3d;
+    GLuint program_3d;
+
     GLuint compile_shader(GLenum type, std::string src)
     {
         GLuint shader = OGL_Loader::get_instance()->glCreateShader(type);
@@ -44,32 +53,44 @@ class OGL_Shaders
         return shader;
     }
 
-    OGL_Shaders(std::string vert_shader_filename_2d, std::string frag_shader_filename_2d)
+    GLuint load_shader_pair(std::string vert, std::string frag)
     {
-        std::fstream vert_src_f_2d(vert_shader_filename_2d);
-        if (!vert_src_f_2d)
+        std::fstream vert_src_f(vert);
+        if (!vert_src_f)
             SDL_assert("Couldn't open vertex shader src" == 0);
-        std::string vert_src_str = std::string(std::istreambuf_iterator<char>(vert_src_f_2d), std::istreambuf_iterator<char>());
-        GLuint vert_shader_2d = compile_shader(GL_VERTEX_SHADER, vert_src_str);
+        std::string vert_src_str = std::string(std::istreambuf_iterator<char>(vert_src_f), std::istreambuf_iterator<char>());
+        GLuint vert_shader = compile_shader(GL_VERTEX_SHADER, vert_src_str);
 
-        std::fstream frag_src_f(frag_shader_filename_2d);
+        std::fstream frag_src_f(frag);
         if (!frag_src_f)
             SDL_assert("Couldn't open fragment shader src" == 0);
         std::string frag_src_str = std::string(std::istreambuf_iterator<char>(frag_src_f), std::istreambuf_iterator<char>());
-        GLuint frag_shader_2d = compile_shader(GL_FRAGMENT_SHADER, frag_src_str);
+        GLuint frag_shader = compile_shader(GL_FRAGMENT_SHADER, frag_src_str);
 
-        program_2d = OGL_Loader::get_instance()->glCreateProgram();
-        OGL_Loader::get_instance()->glAttachShader(program_2d, vert_shader_2d);
-        OGL_Loader::get_instance()->glAttachShader(program_2d, frag_shader_2d);
-        OGL_Loader::get_instance()->glLinkProgram(program_2d);
+        GLuint program = OGL_Loader::get_instance()->glCreateProgram();
+        OGL_Loader::get_instance()->glAttachShader(program, vert_shader);
+        OGL_Loader::get_instance()->glAttachShader(program, frag_shader);
+        OGL_Loader::get_instance()->glLinkProgram(program);
         GLint is_ok;
-        OGL_Loader::get_instance()->glGetProgramiv(program_2d, GL_LINK_STATUS, &is_ok);
+        OGL_Loader::get_instance()->glGetProgramiv(program, GL_LINK_STATUS, &is_ok);
         SDL_assert(is_ok && "could not link program");
-        OGL_Loader::get_instance()->glDeleteShader(vert_shader_2d);
-        OGL_Loader::get_instance()->glDeleteShader(frag_shader_2d);
+        OGL_Loader::get_instance()->glDeleteShader(vert_shader);
+        OGL_Loader::get_instance()->glDeleteShader(frag_shader);
+        return program;
+    }
+
+    OGL_Shaders(std::string vert_shader_filename_2d, std::string frag_shader_filename_2d, std::string vert_shader_filename_3d, std::string frag_shader_filename_3d)
+    {
+        program_2d = load_shader_pair(vert_shader_filename_2d, frag_shader_filename_2d);
         proj_location_2d = OGL_Loader::get_instance()->glGetUniformLocation(program_2d, "uProj");
         color_location_2d = OGL_Loader::get_instance()->glGetUniformLocation(program_2d, "uColor");
         tex_location_2d = OGL_Loader::get_instance()->glGetUniformLocation(program_2d, "uTex");
+        program_3d = load_shader_pair(vert_shader_filename_3d, frag_shader_filename_3d);
+        proj_location_3d = OGL_Loader::get_instance()->glGetUniformLocation(program_3d, "uProjection");
+        tex_location_3d = OGL_Loader::get_instance()->glGetUniformLocation(program_3d, "uTexture");
+        model_location_3d = OGL_Loader::get_instance()->glGetUniformLocation(program_3d, "uModel");
+        view_location_3d = OGL_Loader::get_instance()->glGetUniformLocation(program_3d, "uView");
+        color_location_3d = OGL_Loader::get_instance()->glGetUniformLocation(program_3d, "uColor");
     }
 
   public:
@@ -77,26 +98,31 @@ class OGL_Shaders
     {
         return program_2d;
     }
-
-    GLint get_proj_location_2d()
+    GLuint get_program_3d()
     {
-        return proj_location_2d;
+        return program_3d;
     }
 
-    GLint get_color_location_2d()
-    {
-        return color_location_2d;
+#define GENERATE_GETTER(x)                                                                                                                                                                             \
+    GLint get_##x()                                                                                                                                                                                    \
+    {                                                                                                                                                                                                  \
+        return x;                                                                                                                                                                                      \
     }
 
-    GLint get_tex_location_2d()
-    {
-        return tex_location_2d;
-    }
+    GENERATE_GETTER(proj_location_2d)
+    GENERATE_GETTER(tex_location_2d)
+    GENERATE_GETTER(color_location_2d)
+
+    GENERATE_GETTER(proj_location_3d)
+    GENERATE_GETTER(tex_location_3d)
+    GENERATE_GETTER(model_location_3d)
+    GENERATE_GETTER(view_location_3d)
+    GENERATE_GETTER(color_location_3d)
 
     static OGL_Shaders * get_instance()
     {
         if (!instance)
-            instance = new OGL_Shaders("shaders/2d.vert", "shaders/2d.frag");
+            instance = new OGL_Shaders("shaders/2d.vert", "shaders/2d.frag", "shaders/3d.vert", "shaders/3d.frag");
         return instance;
     }
 };

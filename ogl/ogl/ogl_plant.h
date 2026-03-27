@@ -60,8 +60,8 @@ class OGL_Plant : public Plant, public OGL_Node
             generative_iter(v, v[(*i) - 1], i, line_vert_num, size_halfed);
         if (rand() % 4)
             generative_iter(v, v[(*i) - 2], i, line_vert_num, size_halfed);
-        if (rand() % 4)
-            generative_iter(v, v[(*i)], i, line_vert_num, size_halfed);
+        // if (rand() % 4)
+        // generative_iter(v, v[(*i)], i, line_vert_num, size_halfed);
         if (rand() % 4)
             generative_iter(v, v[(*i) - 2], i, line_vert_num, size_halfed);
     }
@@ -75,6 +75,7 @@ class OGL_Plant : public Plant, public OGL_Node
         OGL_Vertex size_halfed = (OGL_Vertex){hw, hh, hd, 0, 0, 0, 0, 0, 0};
         vertices[0] = (OGL_Vertex){0, 0, 0, 0, 0, 0, 0, 0, 0};
         generative_iter(vertices, vertices[0], &i, vert_num, &size_halfed);
+        update_vbo_vao();
     }
 
   public:

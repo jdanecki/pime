@@ -20,22 +20,40 @@
 #include <SDL3/SDL.h>
 #include <GL/gl.h>
 #include <cmath>
+#include "ogl_shaders.h"
+#include "ogl_loader.h"
 
 class OGL_Camera
 {
     float fov;
     float znear, zfar;
 
-    static void load_perspective(float fovy_deg, float aspect, float znear, float zfar)
+    float * load_perspective(float fovy_deg, float aspect, float znear, float zfar)
     {
         float fovy = fovy_deg * (float)M_PI / 180.0f;
         float f = 1.0f / tanf(fovy * 0.5f);
         float nf = 1.0f / (znear - zfar);
 
         // Column-major order for glMultMatrixf (OpenGL expects column-major)
-        float m[16] = {f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (zfar + znear) * nf, -1, 0, 0, (2.0f * zfar * znear) * nf, 0};
-
-        glMultMatrixf(m);
+        float * m = new float[16];
+        m[0] = f / aspect;
+        m[1] = 0;
+        m[2] = 0;
+        m[3] = 0;
+        m[4] = 0;
+        m[5] = f;
+        m[6] = 0;
+        m[7] = 0;
+        m[8] = 0;
+        m[9] = 0;
+        m[10] = (zfar + znear) * nf;
+        m[11] = -1;
+        m[12] = 0;
+        m[13] = 0;
+        m[14] = (2.0f * zfar * znear) * nf;
+        m[15] = 0;
+        return m;
+        // FIXME: do not leak memory
     }
 
   public:
@@ -47,12 +65,15 @@ class OGL_Camera
         *y = -sin(pitch_rad);
         *z = -cos(pitch_rad) * cos(yaw_rad);
     }
+
     OGL_Camera() : x(128 * CHUNK_SIZE + 8.5), y(2), z(128 * CHUNK_SIZE + 8.5), pitch(0), yaw(0), fov(90), znear(0.1), zfar(1000)
     {
     }
+
     float x, y, z;
     float vy;
     float pitch, yaw;
+
     void rotate_by(float yaw, float pitch)
     {
         this->yaw += yaw;
@@ -68,21 +89,31 @@ class OGL_Camera
         if (this->yaw >= 360)
             this->yaw -= 360;
     }
+
     void begin_camera(SDL_Window * window)
     {
         int w, h;
+        OGL_Loader * gl = OGL_Loader::get_instance();
+        GLuint program = OGL_Shaders::get_instance()->get_program_3d();
+        gl->glUseProgram(program);
+
         SDL_GetWindowSize(window, &w, &h);
         glViewport(0, 0, w, (h > 0 ? h : 1));
 
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        load_perspective(90.0f, (float)w / (float)(h > 0 ? h : 1), 0.1f, 2000.0f);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
+        GLint loc_transform = gl->glGetUniformLocation(program, "uTransform");
+        gl->glUniform3f(loc_transform, -x, -y, -z);
 
-        glRotatef(-pitch, 1.0f, 0.0f, 0.0f);
-        glRotatef(yaw, 0.0f, 1.0f, 0.0f);
-        glTranslatef(-x, -y, -z);
+        GLint loc_proj = gl->glGetUniformLocation(program, "uProjection");
+        gl->glUniformMatrix4fv(loc_proj, 1, GL_FALSE, load_perspective(90, (float)w / (float)(h > 0 ? h : 1), 0.1f, 2000.0f));
+
+        float cos_yaw = cosf(-yaw * M_PI / 180);
+        float sin_yaw = sinf(-yaw * M_PI / 180);
+        float cos_pitch = cosf(pitch * M_PI / 180);
+        float sin_pitch = sinf(pitch * M_PI / 180);
+
+        float view[16] = {cos_yaw, sin_yaw * sin_pitch, sin_yaw * cos_pitch, 0, 0, cos_pitch, -sin_pitch, 0, -sin_yaw, cos_yaw * sin_pitch, cos_yaw * cos_pitch, 0, 0, 0, 0, 1};
+        GLint loc_view = gl->glGetUniformLocation(program, "uView");
+        gl->glUniformMatrix4fv(loc_view, 1, GL_FALSE, view);
     }
 
     const char * get_direction_string()

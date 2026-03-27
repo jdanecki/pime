@@ -50,7 +50,6 @@ void update_chunk(int32_t x, int32_t y, const chunk_table * data)
                 ogl_ch->tiles[j][i] = new OGL_Plane(OGL_Color(be->color.r, be->color.g, be->color.b), ch->table[j][i].tile);
             }
         }
-        ogl_ch->update_tiles_display_list();
     }
 }
 

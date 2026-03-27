@@ -365,6 +365,7 @@ void init_ogl()
     SDL_GL_LoadLibrary(NULL);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     ctx = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, ctx);
@@ -432,7 +433,6 @@ void draw()
         ogl_world->render(0, 0, WORLD_SIZE, WORLD_SIZE);
     else
         ogl_world->render(chunk_x - render_distance, chunk_z - render_distance, chunk_x + render_distance, chunk_z + render_distance);
-
     glColor4f(1, 1, 1, 1);
     char buf[512] = {
         0,
@@ -462,18 +462,6 @@ void draw()
     // clang-format on
 
     OGL_Text::get_instance()->draw_text(buf, 0, 0, 2, window_width, window_height);
-    {
-        int wh2 = window_height / 2;
-        int ww2 = window_width / 2;
-        glColor4f(1, 1, 1, 1);
-        glDisable(GL_TEXTURE_2D);
-        glBegin(GL_QUADS);
-        glVertex2f(ww2 - 2, wh2 - 2);
-        glVertex2f(ww2 + 2, wh2 - 2);
-        glVertex2f(ww2 + 2, wh2 + 2);
-        glVertex2f(ww2 - 2, wh2 + 2);
-        glEnd();
-    }
 
     glDisable(GL_TEXTURE_2D);
     SDL_GL_SwapWindow(window);

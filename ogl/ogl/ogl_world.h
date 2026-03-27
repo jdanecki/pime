@@ -45,10 +45,7 @@ class OGL_World
             {
                 if (OGL_Chunk * ch = ogl_chunks[chj][chi])
                 {
-                    glPushMatrix();
-                    glTranslatef(chi * CHUNK_SIZE, 0, chj * CHUNK_SIZE);
-                    ch->render();
-                    glPopMatrix();
+                    ch->render(chi, chj);
                 }
             }
         }

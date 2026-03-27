@@ -27,50 +27,18 @@
 class OGL_Chunk
 {
     std::unordered_map<size_t, InventoryElement *> elements;
-    GLuint tiles_display_list = 0;
-    GLuint element_display_list = 0;
 
   public:
     void add_element(InventoryElement * el)
     {
         elements[el->uid] = el;
-        update_element_display_list();
     }
 
     void remove_element(size_t uid)
     {
         elements.erase(uid);
-        update_element_display_list();
-    }
-    void update_tiles_display_list()
-    {
-        if (tiles_display_list != 0)
-            glDeleteLists(tiles_display_list, 1);
-        tiles_display_list = glGenLists(1);
-        glNewList(tiles_display_list, GL_COMPILE);
-        for (int x = 0; x < CHUNK_SIZE; x++)
-            for (int y = 0; y < CHUNK_SIZE; y++)
-                tiles[y][x]->render(x, 0, y, 1, 1, 1);
-        glEndList();
     }
 
-    void update_element_display_list()
-    {
-        if (element_display_list != 0)
-            glDeleteLists(element_display_list, 0);
-        element_display_list = glGenLists(1);
-        glNewList(element_display_list, GL_COMPILE);
-        for (auto [_, inv_element] : elements)
-        {
-            if (OGL_Node * node = dynamic_cast<OGL_Node *>(inv_element))
-            {
-                ItemLocation * loc = &inv_element->location;
-                Dimensions * dim = &inv_element->dimensions;
-                node->render(loc->get_tile_x(), dim->height.value / 2, loc->get_tile_y(), dim->width.value, dim->height.value, dim->length.value);
-            }
-        }
-        glEndList();
-    }
     OGL_Plane * tiles[CHUNK_SIZE][CHUNK_SIZE];
 
     OGL_Chunk()
@@ -95,11 +63,19 @@ class OGL_Chunk
         return retval;
     }
 
-    void render()
+    void render(int cx, int cy)
     {
-        if (tiles_display_list != 0)
-            glCallList(tiles_display_list);
-        if (element_display_list != 0)
-            glCallList(element_display_list);
+        for (auto [_, inv_element] : elements)
+        {
+            if (OGL_Node * node = dynamic_cast<OGL_Node *>(inv_element))
+            {
+                ItemLocation * loc = &inv_element->location;
+                Dimensions * dim = &inv_element->dimensions;
+                node->render(loc->get_world_x(), dim->height.value / 2, loc->get_world_y(), dim->width.value, dim->height.value, dim->length.value);
+            }
+        }
+        for (int x = 0; x < CHUNK_SIZE; x++)
+            for (int y = 0; y < CHUNK_SIZE; y++)
+                tiles[y][x]->render(x + cx * CHUNK_SIZE, 0, y + cy * CHUNK_SIZE, 1, 1, 1);
     }
 };
