@@ -35,9 +35,11 @@ class OGL_Shaders
 
     GLint proj_location_3d;
     GLint tex_location_3d;
-    GLint model_location_3d;
     GLint view_location_3d;
     GLint color_location_3d;
+    GLint model_transform_location_3d;
+    GLint scale_location_3d;
+    GLint transform_location_3d;
     GLuint program_3d;
 
     GLuint compile_shader(GLenum type, std::string src)
@@ -81,16 +83,19 @@ class OGL_Shaders
 
     OGL_Shaders(std::string vert_shader_filename_2d, std::string frag_shader_filename_2d, std::string vert_shader_filename_3d, std::string frag_shader_filename_3d)
     {
+        OGL_Loader * gl = OGL_Loader::get_instance();
         program_2d = load_shader_pair(vert_shader_filename_2d, frag_shader_filename_2d);
-        proj_location_2d = OGL_Loader::get_instance()->glGetUniformLocation(program_2d, "uProj");
-        color_location_2d = OGL_Loader::get_instance()->glGetUniformLocation(program_2d, "uColor");
-        tex_location_2d = OGL_Loader::get_instance()->glGetUniformLocation(program_2d, "uTex");
+        proj_location_2d = gl->glGetUniformLocation(program_2d, "uProj");
+        color_location_2d = gl->glGetUniformLocation(program_2d, "uColor");
+        tex_location_2d = gl->glGetUniformLocation(program_2d, "uTex");
         program_3d = load_shader_pair(vert_shader_filename_3d, frag_shader_filename_3d);
-        proj_location_3d = OGL_Loader::get_instance()->glGetUniformLocation(program_3d, "uProjection");
-        tex_location_3d = OGL_Loader::get_instance()->glGetUniformLocation(program_3d, "uTexture");
-        model_location_3d = OGL_Loader::get_instance()->glGetUniformLocation(program_3d, "uModel");
-        view_location_3d = OGL_Loader::get_instance()->glGetUniformLocation(program_3d, "uView");
-        color_location_3d = OGL_Loader::get_instance()->glGetUniformLocation(program_3d, "uColor");
+        proj_location_3d = gl->glGetUniformLocation(program_3d, "uProjection");
+        tex_location_3d = gl->glGetUniformLocation(program_3d, "uTexture");
+        view_location_3d = gl->glGetUniformLocation(program_3d, "uView");
+        color_location_3d = gl->glGetUniformLocation(program_3d, "uColor");
+        model_transform_location_3d = gl->glGetUniformLocation(program_3d, "uModelTransform");
+        scale_location_3d = gl->glGetUniformLocation(program_3d, "uScale");
+        transform_location_3d = gl->glGetUniformLocation(program_3d, "uTransform");
     }
 
   public:
@@ -115,9 +120,11 @@ class OGL_Shaders
 
     GENERATE_GETTER(proj_location_3d)
     GENERATE_GETTER(tex_location_3d)
-    GENERATE_GETTER(model_location_3d)
     GENERATE_GETTER(view_location_3d)
     GENERATE_GETTER(color_location_3d)
+    GENERATE_GETTER(model_transform_location_3d)
+    GENERATE_GETTER(scale_location_3d)
+    GENERATE_GETTER(transform_location_3d)
 
     static OGL_Shaders * get_instance()
     {

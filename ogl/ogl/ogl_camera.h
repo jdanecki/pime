@@ -94,17 +94,15 @@ class OGL_Camera
     {
         int w, h;
         OGL_Loader * gl = OGL_Loader::get_instance();
-        GLuint program = OGL_Shaders::get_instance()->get_program_3d();
-        gl->glUseProgram(program);
+        OGL_Shaders * sh = OGL_Shaders::get_instance();
+        gl->glUseProgram(sh->get_program_3d());
 
         SDL_GetWindowSize(window, &w, &h);
         glViewport(0, 0, w, (h > 0 ? h : 1));
 
-        GLint loc_transform = gl->glGetUniformLocation(program, "uTransform");
-        gl->glUniform3f(loc_transform, -x, -y, -z);
+        gl->glUniform3f(sh->get_transform_location_3d(), -x, -y, -z);
 
-        GLint loc_proj = gl->glGetUniformLocation(program, "uProjection");
-        gl->glUniformMatrix4fv(loc_proj, 1, GL_FALSE, load_perspective(90, (float)w / (float)(h > 0 ? h : 1), 0.1f, 2000.0f));
+        gl->glUniformMatrix4fv(sh->get_proj_location_3d(), 1, GL_FALSE, load_perspective(90, (float)w / (float)(h > 0 ? h : 1), 0.1f, 2000.0f));
 
         float cos_yaw = cosf(-yaw * M_PI / 180);
         float sin_yaw = sinf(-yaw * M_PI / 180);
@@ -112,8 +110,7 @@ class OGL_Camera
         float sin_pitch = sinf(pitch * M_PI / 180);
 
         float view[16] = {cos_yaw, sin_yaw * sin_pitch, sin_yaw * cos_pitch, 0, 0, cos_pitch, -sin_pitch, 0, -sin_yaw, cos_yaw * sin_pitch, cos_yaw * cos_pitch, 0, 0, 0, 0, 1};
-        GLint loc_view = gl->glGetUniformLocation(program, "uView");
-        gl->glUniformMatrix4fv(loc_view, 1, GL_FALSE, view);
+        gl->glUniformMatrix4fv(sh->get_view_location_3d(), 1, GL_FALSE, view);
     }
 
     const char * get_direction_string()

@@ -71,22 +71,15 @@ class OGL_Node
     {
         OGL_Loader * gl = OGL_Loader::get_instance();
         GLuint program = OGL_Shaders::get_instance()->get_program_3d();
+        OGL_Shaders * sh = OGL_Shaders::get_instance();
 
-        GLint loc_transform = gl->glGetUniformLocation(program, "uModelTransform");
-        gl->glUniform3f(loc_transform, x, y, z);
-
-        GLint loc_scale = gl->glGetUniformLocation(program, "uScale");
-        gl->glUniform3f(loc_scale, xs, ys, zs);
-
-        GLint loc_color = gl->glGetUniformLocation(program, "uColor");
-        gl->glUniform4f(loc_color, (float)ogl_color.r / 255.0f, (float)ogl_color.g / 255.0f, (float)ogl_color.b / 255.0f, 1.0); // FIXME: support transparency
-                                                                                                                                // FIXME: use core variables once implemented
-
+        gl->glUniform3f(sh->get_model_transform_location_3d(), x, y, z);
+        gl->glUniform3f(sh->get_scale_location_3d(), xs, ys, zs);
+        gl->glUniform4f(sh->get_color_location_3d(), (float)ogl_color.r / 255.0f, (float)ogl_color.g / 255.0f, (float)ogl_color.b / 255.0f, 1.0); // FIXME: support transparency
+                                                                                                                                                  // FIXME: use core variables once implemented
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
-
-        GLint loc_tex = gl->glGetUniformLocation(program, "uTexture");
-        gl->glUniform1i(loc_tex, 0);
+        gl->glUniform1i(sh->get_tex_location_3d(), 0);
 
         gl->glBindVertexArray(vao);
         glDrawArrays(drawtype, 0, vert_num);
