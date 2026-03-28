@@ -24,4 +24,5 @@ typedef struct OGL_Vertex
     float nx, ny, nz;
     float u, v;
     GLuint tex_id;
+    float r, g, b;
 } OGL_Vertex;

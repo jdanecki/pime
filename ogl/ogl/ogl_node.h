@@ -64,6 +64,9 @@ class OGL_Node
         gl->glEnableVertexAttribArray(3);
         gl->glVertexAttribIPointer(3, 1, GL_UNSIGNED_INT, sizeof(OGL_Vertex), (void *)offsetof(OGL_Vertex, tex_id));
 
+        gl->glEnableVertexAttribArray(4);
+        gl->glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(OGL_Vertex), (void *)offsetof(OGL_Vertex, r));
+
         gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
         gl->glBindVertexArray(0);
     }

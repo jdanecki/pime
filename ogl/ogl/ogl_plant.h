@@ -78,6 +78,9 @@ class OGL_Plant : public Plant, public OGL_Node
         for (int j = 0; j < i; j++)
         {
             vertices[j].tex_id = texture;
+            vertices[j].r = (float)ogl_color.r / 255;
+            vertices[j].g = (float)ogl_color.g / 255;
+            vertices[j].b = (float)ogl_color.b / 255;
         }
         update_vbo_vao();
     }

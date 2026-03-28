@@ -31,12 +31,15 @@ class OGL_Plane : public OGL_Node
 
         int idx = 0;
 
-        vertices[idx++] = (OGL_Vertex){x - hw, y, z + hd, 0, 1, 0, 0, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y, z + hd, 0, 1, 0, 1, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y, z - hd, 0, 1, 0, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y, z - hd, 0, 1, 0, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y, z - hd, 0, 1, 0, 0, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y, z + hd, 0, 1, 0, 0, 0, texture};
+        float r = (float)ogl_color.r / 255;
+        float g = (float)ogl_color.g / 255;
+        float b = (float)ogl_color.b / 255;
+        vertices[idx++] = (OGL_Vertex){x - hw, y, z + hd, 0, 1, 0, 0, 0, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x + hw, y, z + hd, 0, 1, 0, 1, 0, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x + hw, y, z - hd, 0, 1, 0, 1, 1, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x + hw, y, z - hd, 0, 1, 0, 1, 1, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x - hw, y, z - hd, 0, 1, 0, 0, 1, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x - hw, y, z + hd, 0, 1, 0, 0, 0, texture, r, g, b};
         update_vbo_vao();
     }
 

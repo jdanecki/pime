@@ -31,42 +31,45 @@ class OGL_Cube : public OGL_Node
         const float z = 0;
 
         int idx = 0;
+        float r = (float)ogl_color.r / 255;
+        float g = (float)ogl_color.g / 255;
+        float b = (float)ogl_color.b / 255;
 
         // +X face (right)
-        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z - hd, 1, 0, 0, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z - hd, 1, 0, 0, 1, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z + hd, 1, 0, 0, 0, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z + hd, 1, 0, 0, 0, 1, texture};
+        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z - hd, 1, 0, 0, 1, 1, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z - hd, 1, 0, 0, 1, 0, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z + hd, 1, 0, 0, 0, 0, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z + hd, 1, 0, 0, 0, 1, texture, r, g, b};
 
         // -X face (left)
-        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z + hd, -1, 0, 0, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z + hd, -1, 0, 0, 1, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z - hd, -1, 0, 0, 0, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z - hd, -1, 0, 0, 0, 1, texture};
+        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z + hd, -1, 0, 0, 1, 1, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z + hd, -1, 0, 0, 1, 0, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z - hd, -1, 0, 0, 0, 0, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z - hd, -1, 0, 0, 0, 1, texture, r, g, b};
 
         // +Y face (top)
-        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z + hd, 0, 1, 0, 0, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z + hd, 0, 1, 0, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z - hd, 0, 1, 0, 1, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z - hd, 0, 1, 0, 0, 0, texture};
+        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z + hd, 0, 1, 0, 0, 1, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z + hd, 0, 1, 0, 1, 1, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z - hd, 0, 1, 0, 1, 0, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z - hd, 0, 1, 0, 0, 0, texture, r, g, b};
 
         // -Y face (bottom)
-        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z - hd, 0, -1, 0, 0, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z - hd, 0, -1, 0, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z + hd, 0, -1, 0, 1, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z + hd, 0, -1, 0, 0, 0, texture};
+        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z - hd, 0, -1, 0, 0, 1, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z - hd, 0, -1, 0, 1, 1, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z + hd, 0, -1, 0, 1, 0, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z + hd, 0, -1, 0, 0, 0, texture, r, g, b};
 
         // +Z face (front)
-        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z + hd, 0, 0, 1, 0, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z + hd, 0, 0, 1, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z + hd, 0, 0, 1, 1, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z + hd, 0, 0, 1, 0, 0, texture};
+        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z + hd, 0, 0, 1, 0, 1, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z + hd, 0, 0, 1, 1, 1, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z + hd, 0, 0, 1, 1, 0, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z + hd, 0, 0, 1, 0, 0, texture, r, g, b};
 
         // -Z face (back)
-        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z - hd, 0, 0, -1, 0, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z - hd, 0, 0, -1, 1, 1, texture};
-        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z - hd, 0, 0, -1, 1, 0, texture};
-        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z - hd, 0, 0, -1, 0, 0, texture};
+        vertices[idx++] = (OGL_Vertex){x + hw, y - hh, z - hd, 0, 0, -1, 0, 1, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x - hw, y - hh, z - hd, 0, 0, -1, 1, 1, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x - hw, y + hh, z - hd, 0, 0, -1, 1, 0, texture, r, g, b};
+        vertices[idx++] = (OGL_Vertex){x + hw, y + hh, z - hd, 0, 0, -1, 0, 0, texture, r, g, b};
         update_vbo_vao();
     }
 
