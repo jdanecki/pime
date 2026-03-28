@@ -294,8 +294,8 @@ void handle_keyboard_state(Uint64 dt)
 
     if (keyboard_state[SDL_SCANCODE_SPACE] && cam.y == 1.5)
         cam.vy = 0.25;
-    cam.vy -= 0.025;
-    cam.y += cam.vy;
+    cam.vy -= 0.025 * dt / 30;
+    cam.y += cam.vy * dt / 30;
     if (cam.y < 1.5)
     {
         cam.y = 1.5;
