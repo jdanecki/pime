@@ -40,7 +40,7 @@ class OGL_Plane : public OGL_Node
         vertices[idx++] = (OGL_Vertex){x + hw, y, z - hd, 0, 1, 0, 1, 1, texture, r, g, b};
         vertices[idx++] = (OGL_Vertex){x - hw, y, z - hd, 0, 1, 0, 0, 1, texture, r, g, b};
         vertices[idx++] = (OGL_Vertex){x - hw, y, z + hd, 0, 1, 0, 0, 0, texture, r, g, b};
-        update_vbo_vao();
+        // update_vbo_vao(); FIXME: use some 'managed' variable, rn only chunks use tiles
     }
 
   public:

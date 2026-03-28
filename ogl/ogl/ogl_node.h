@@ -23,6 +23,8 @@
 #include "ogl_color.h"
 #include "ogl_vertex.h"
 
+// TODO/FIXME: unload chunks to prevent OOM errors
+
 class OGL_Node
 {
   protected:
