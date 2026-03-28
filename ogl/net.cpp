@@ -48,6 +48,8 @@ void update_chunk(int32_t x, int32_t y, const chunk_table * data)
             {
                 BaseElement * be = get_base_element(ch->table[j][i].tile);
                 ogl_ch->tiles[j][i] = new OGL_Plane(OGL_Color(be->color.r, be->color.g, be->color.b), ch->table[j][i].tile);
+                if (x == 128 && y == 128)
+                    CONSOLE_LOG("tile [%d][%d] = tile_id %d\n", j, i, ch->table[j][i].tile);
             }
         }
     }

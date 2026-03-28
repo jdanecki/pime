@@ -26,16 +26,16 @@
 class OGL_Node
 {
   protected:
-    OGL_Vertex * vertices;
     GLuint texture;
     int drawtype;
     OGL_Color ogl_color;
-    GLsizei vert_num;
 
     GLuint vao = 0;
     GLuint vbo = 0;
 
   public:
+    GLsizei vert_num;      // FIXME: should be protected
+    OGL_Vertex * vertices; // FIXME: should be protected
     OGL_Node(OGL_Color color, GLuint texture, GLsizei vert_num) : ogl_color(color), texture(texture), vert_num(vert_num), drawtype(GL_TRIANGLES)
     {
         vertices = new OGL_Vertex[vert_num];

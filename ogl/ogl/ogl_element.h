@@ -22,7 +22,7 @@
 class OGL_Element : public Element, public OGL_Cube
 {
   public:
-    OGL_Element(Element element) : Element(element), OGL_Cube(OGL_Color(get_base()->color.r, get_base()->color.g, get_base()->color.b), 0)
+    OGL_Element(Element element) : Element(element), OGL_Cube(OGL_Color(get_base()->color.r, get_base()->color.g, get_base()->color.b), -1)
     {
     }
 };

@@ -54,6 +54,7 @@ class OGL_Loader
         GL_LOAD_FUNCTION(PFNGLUNIFORM4FPROC, glUniform4f)
         GL_LOAD_FUNCTION(PFNGLGETUNIFORMLOCATIONPROC, glGetUniformLocation)
         GL_LOAD_FUNCTION(PFNGLUNIFORM3FPROC, glUniform3f);
+        GL_LOAD_FUNCTION(PFNGLTEXSTORAGE3DPROC, glTexStorage3D);
     }
 
   public:
@@ -80,6 +81,7 @@ class OGL_Loader
     PFNGLUNIFORM4FPROC glUniform4f;
     PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
     PFNGLUNIFORM3FPROC glUniform3f;
+    PFNGLTEXSTORAGE3DPROC glTexStorage3D;
 
     static OGL_Loader * get_instance()
     {

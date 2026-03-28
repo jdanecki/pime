@@ -22,7 +22,7 @@
 class OGL_Player : public Player, public OGL_Cube
 {
   public:
-    OGL_Player(Player player) : Player(player), OGL_Cube(OGL_Color(255, 255, 255), 0)
+    OGL_Player(Player player) : Player(player), OGL_Cube(OGL_Color(255, 255, 255), -1)
     {
     }
 };

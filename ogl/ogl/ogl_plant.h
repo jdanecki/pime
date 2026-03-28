@@ -73,13 +73,17 @@ class OGL_Plant : public Plant, public OGL_Node
         const float hd = 0.5f;
         int i = 0;
         OGL_Vertex size_halfed = (OGL_Vertex){hw, hh, hd, 0, 0, 0, 0, 0, 0};
-        vertices[0] = (OGL_Vertex){0, 0, 0, 0, 0, 0, 0, 0, 0};
+        vertices[0] = (OGL_Vertex){0, 0, 0, 0, 0, 0, 0, 0, texture};
         generative_iter(vertices, vertices[0], &i, vert_num, &size_halfed);
+        for (int j = 0; j < i; j++)
+        {
+            vertices[j].tex_id = texture;
+        }
         update_vbo_vao();
     }
 
   public:
-    OGL_Plant(Plant plant) : Plant(plant), OGL_Node(OGL_Color(10, 200, 10), 0, 100)
+    OGL_Plant(Plant plant) : Plant(plant), OGL_Node(OGL_Color(10, 200, 10), -1, 100)
     {
         update_vertices();
         drawtype = GL_LINES;

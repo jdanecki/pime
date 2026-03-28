@@ -22,10 +22,12 @@
 #include <vector>
 #include <algorithm>
 #include "../net/net.h"
+#include "ogl/ogl_loader.h"
 #include "ogl/ogl_text.h"
 #include "main.h"
 
 OGL_World * ogl_world;
+GLuint texture_array_id;
 
 OGL_Camera cam;
 
@@ -160,37 +162,6 @@ InventoryElement * raycast()
         }
     }
     return NULL;
-}
-
-GLuint load_texture(const char * filename)
-{
-    glEnable(GL_TEXTURE_2D);
-    SDL_Surface * surface = SDL_LoadPNG(filename);
-    surface = SDL_ConvertSurface(surface, SDL_PIXELFORMAT_RGBA32);
-    SDL_FlipSurface(surface, SDL_FLIP_VERTICAL);
-
-    unsigned int texture;
-
-    glActiveTexture(GL_TEXTURE0);
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-
-    PFNGLGENERATETEXTUREMIPMAPPROC glGenerateMipmap = (PFNGLGENERATETEXTUREMIPMAPPROC)SDL_GL_GetProcAddress("glGenerateMipmap");
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glDisable(GL_TEXTURE_2D);
-    SDL_DestroySurface(surface);
-    return texture;
 }
 
 chunk * check_chunk(int cx, int cy)
@@ -393,23 +364,50 @@ void load_textures()
     struct dirent ** namelist;
     int n = scandir("./textures/game_tiles", &namelist, NULL, alphasort);
     if (n < 0)
-        perror("scandir");
-    else
     {
-        char path[300];
-        while (n--)
-        {
-            if (namelist[n]->d_name[0] == '.' && (namelist[n]->d_name[1] == '\0' || (namelist[n]->d_name[1] == '.' && namelist[n]->d_name[2] == '\0')))
-            {
-                continue;
-            }
-            sprintf(path, "%s/%s", "./textures/game_tiles", namelist[n]->d_name);
-            CONSOLE_LOG("adding texture: %s\n", path);
-            load_texture(path);
-            free(namelist[n]);
-        }
-        free(namelist);
+        perror("scandir");
+        return;
     }
+    int file_count = 0;
+    for (int i = 0; i < n; i++)
+    {
+        const char * name = namelist[i]->d_name;
+        if (!(name[0] == '.' && (name[1] == '\0' || (name[1] == '.' && name[2] == '\0'))))
+            file_count++;
+    }
+    char path[300];
+
+    glGenTextures(1, &texture_array_id);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, texture_array_id);
+    OGL_Loader::get_instance()->glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, 32, 32, file_count);
+
+    int zoffset = 0;
+    for (int i = n - 1; i >= 0; i--)
+    {
+        if (namelist[i]->d_name[0] == '.' && (namelist[i]->d_name[1] == '\0' || (namelist[i]->d_name[1] == '.' && namelist[i]->d_name[2] == '\0')))
+        {
+            free(namelist[i]);
+            continue;
+        }
+        CONSOLE_LOG("layer %d: %s\n", zoffset + 1, namelist[i]->d_name);
+        sprintf(path, "%s/%s", "./textures/game_tiles", namelist[i]->d_name);
+        CONSOLE_LOG("adding texture: %s\n", path);
+        SDL_Surface * surf = SDL_LoadPNG(path);
+        surf = SDL_ConvertSurface(surf, SDL_PIXELFORMAT_RGBA32);
+
+        SDL_FlipSurface(surf, SDL_FLIP_VERTICAL);
+        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, zoffset, surf->w, surf->h, 1, GL_RGBA, GL_UNSIGNED_BYTE, surf->pixels);
+        SDL_DestroySurface(surf);
+        free(namelist[i]);
+        zoffset++;
+    }
+    free(namelist);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 }
 
 void draw()
