@@ -2,11 +2,11 @@
 
 #include "clan.h"
 #include "alchemist/object.h"
-#include "alchemist/random_functions.h"
+
 
 const char * clan_names[] = {"Animal", "Human", "Dwarf", "Elf", "Niziolek"};
 
-Clan::Clan(ClanId id) : NetworkObject(Class_Clan), id(id)
+Clan::Clan(ClanId id) : id(id)
 {
 }
 
@@ -62,23 +62,23 @@ Niziolek_clan::Niziolek_clan() : Clan(Clan_Niziolek)
     skills[SK_ZDUNSTWO].experience = 1;
 }
 
+Human_clan HumanClan;
+Dwarf_clan DwarfClan;
+Elf_clan ElfClan;
+Niziolek_clan NiziolekClan;
+
 Clan * get_clan_by_id(ClanId id)
 {
     switch ((int)id)
     {
         case 1:
-            return new Human_clan();
+            return &HumanClan;
         case 2:
-            return new Dwarf_clan();
+            return &DwarfClan;
         case 3:
-            return new Elf_clan();
+            return &ElfClan;
         case 4:
-            return new Niziolek_clan();
+            return &NiziolekClan;
     }
     return nullptr;
-}
-Clan * get_random_clan()
-{
-    int c = random_range(1, 5);
-    return get_clan_by_id((ClanId)c);
 }

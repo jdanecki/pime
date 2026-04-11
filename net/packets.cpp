@@ -128,7 +128,6 @@ bool PacketObjectCreate::update(unsigned char * data, size_t s)
             new (&obj->npc.data.inventory) ElementsList("inventory");
             new (&obj->npc.data.known_elements) ElementsList("known elements");
             // new (obj->npc.data.player_skills) Skills();
-            new (&obj->npc.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
             new (&obj->npc.data.talking_to) SerializablePointer<Player>(nullptr);
             // relations
             break;
@@ -136,7 +135,6 @@ bool PacketObjectCreate::update(unsigned char * data, size_t s)
             new (&obj->player.data.inventory) ElementsList("inventory");
             new (&obj->player.data.known_elements) ElementsList("known elements");
             // new (obj->player.data.player_skills) Skills();
-            new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
             new (&obj->player.data.talking_to) SerializablePointer<Player>(nullptr);
             // relations
             break;
@@ -207,7 +205,6 @@ bool PacketObjectUpdate::update(unsigned char * data, size_t s)
             //    CONSOLE_LOG("ObjectUpdate for player initialized: inv_elems=%d\n", obj->player.data.inventory.nr_elements);
             new (&obj->player.data.known_elements) ElementsList("known elements");
             // new (&obj->player.data.player_skills) Skills();
-            new (&obj->player.data.clan) SerializablePointer<Clan>(get_clan_by_id(Clan_Human));
             //obj->player.data.talking_to.show();
             new (&obj->player.data.talking_to) SerializablePointer<Player>();
             // relations

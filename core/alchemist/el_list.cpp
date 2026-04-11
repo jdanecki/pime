@@ -211,7 +211,7 @@ ListElement * ElementsList::add_front(ListElement * entry)
 
 void ElementsList::remove(ListElement * el)
 {
-    assert(head);
+    if (!head) return;
 
     ListElement * cur = head;
     ListElement * tmp;

@@ -58,7 +58,7 @@ class Player : public InventoryElement
     ElementsList * get_known_elements();
     size_t checked_element;
 
-    SerializablePointer<Clan> clan;
+    ClanId clan_id;
     Skill player_skills[SK_NUM];
 
     bool in_conversation;

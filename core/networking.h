@@ -26,7 +26,6 @@ struct ObjectData
         Npc,
         Field,
         Barn,
-        Clan,
     };
 
     struct InvElement_Body
@@ -81,10 +80,6 @@ struct ObjectData
     {
         Barn data;
     };
-    struct Clan_Body
-    {
-        Clan data;
-    };
 
     ObjectData(Tag tag, size_t s) : tag(tag), size(s)
     {
@@ -130,7 +125,6 @@ struct ObjectData
         Npc_Body npc;
         Field_Body field;
         Barn_Body barn;
-        Clan_Body clan;
     };
     size_t id; //element (base), field, barn, plant (base), animal(base)
     unsigned char data[0];

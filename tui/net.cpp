@@ -58,9 +58,6 @@ NetworkObject * el_from_data(const ObjectData * data)
             CONSOLE_LOG("creating NPC\n");
             break;
 
-        case ObjectData::Tag::Clan:
-            el = new Clan(data->clan.data);
-            break;
         default:
             CONSOLE_LOG("UNKNOWN Tag: %d\n", (int)data->tag);
             abort();

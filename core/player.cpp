@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include "alchemist/object.h"
+#include "alchemist/random_functions.h"
 #include "clan.h"
 #include "player.h"
 #include "world.h"
@@ -42,7 +43,7 @@ size_t Player::get_id()
 Player::Player(size_t uid, SerializableCString && name, ItemLocation location, int thirst, int hunger, int nutrition)
     : InventoryElement(Class_Player, uid, location), name(name), thirst(thirst), hunger(hunger), nutrition(nutrition),
 	  inventory("inventory"), known_elements("known elements"),
-      clan(get_clan_by_id(Clan_Elf)), talking_to(nullptr)
+      clan_id((ClanId)random_range(1, 5)), talking_to(nullptr)
 {
     CONSOLE_LOG("new player: uid = %ld name=%s\n", uid, get_name());
     // FIXME
@@ -52,7 +53,8 @@ Player::Player(size_t uid, SerializableCString && name, ItemLocation location, i
     welcomed = false;
 
     checked_element = 0;
-    memcpy(player_skills, clan.get()->skills, sizeof(player_skills));
+    Clan * clan = get_clan_by_id(clan_id);
+    memcpy(player_skills, clan->skills, sizeof(player_skills));
     running = 0;
     sneaking = 0;
     dimensions.length.value = 1;
@@ -90,7 +92,7 @@ void Player::stop_conversation()
 
 void Player::show(bool details)
 {
-    CONSOLE_LOG("%s %s (%p) clan=%s id=%ld @ [%d,%d]:[%f,%f] <%c %c>\n", class_name[c_id], get_name(), this, clan_names[clan.get()->id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x,
+    CONSOLE_LOG("%s %s (%p) clan=%s id=%ld @ [%d,%d]:[%f,%f] <%c %c>\n", class_name[c_id], get_name(), this, clan_names[clan_id], get_id(), location.chunk.map_x, location.chunk.map_y, location.chunk.x,
         location.chunk.y, running ? 'R' : ' ', sneaking ? 'S' : ' ');
     if (details)
     {
