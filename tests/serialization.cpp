@@ -25,6 +25,8 @@ ENetPacket * enet_packet_create(const void * d, size_t s, enet_uint32)
 void enet_host_flush (ENetHost *)
 {}
 
+void register_object(NetworkObject * o);
+
 int main(int argc, char *argv[])
 {
     //server side
@@ -37,9 +39,13 @@ int main(int argc, char *argv[])
     Element * el2 = new Element(new BaseElement(Form_solid, 4));
     pl->pickup(el2);
 
+    register_object(el1);
+    register_object(el2);
+
+    printf("player->show\n");
     pl->show();
     pl->inventory.show(false);
-
+    printf("--- end of inventory ---\n");
     PacketObjectUpdate *pu = new PacketObjectUpdate(pl);
     ENetPeer peer;
     pu->send(&peer);
@@ -65,6 +71,7 @@ int main(int argc, char *argv[])
         NetworkObject nobj = obj_data->inv_element.data;
         Player *player = new Player(obj_data->player.data);
         player->show();
+        player->inventory.show(false);
     }
     else
     {

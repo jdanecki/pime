@@ -44,12 +44,10 @@ ObjectData * convert_to_data(NetworkObject * el)
 			else
 				obj = new ObjectData(ObjectData::Tag::Player);
 			obj->player.data = *player;
-			Player *who = player->talking_to.get();
-			//CONSOLE_LOG("convert_to_data: Player\n");
+			//Player *who = player->talking_to.get();
+
 			//player->talking_to.show();
 			//obj->player.data.talking_to.show();
-            // obj->player.data.clan = nullptr;
-            // obj->player.data.player_skills = nullptr;
             // obj->player.data.known_elements = nullptr;
             // obj->player.data.relations = nullptr;
             break;
@@ -57,7 +55,15 @@ ObjectData * convert_to_data(NetworkObject * el)
         case Class_Npc:
         {
             Npc * npc = static_cast<Npc *>(el);
-            obj = new ObjectData(ObjectData::Tag::Npc);
+        	if (npc->inventory.nr_elements)
+			{
+				PacketElementsList *npc_inv = new PacketElementsList(npc);
+				CONSOLE_LOG("npc_inv: size=%ld\n", npc_inv->get_size());
+				obj = new (npc_inv->get_size()) ObjectData(ObjectData::Tag::Npc, sizeof(ObjectData) + npc_inv->get_size());
+				memcpy(&obj->data[0], npc_inv->get_pdata(), npc_inv->get_size());
+			}
+			else
+				obj = new ObjectData(ObjectData::Tag::Npc);
             obj->npc.data = *npc;
             break;
         }

@@ -1,5 +1,34 @@
 #include "../core/packets.h"
 
+
+ElementsList all_objects("objects");
+
+class ObjectElement : public ListElement
+{
+  public:
+    ObjectElement(InventoryElement * el) : ListElement(el)
+    {
+    }
+    bool check(void * what)
+    {
+        uintptr_t * uid = (uintptr_t *)what;
+        return *uid == get_el()->uid;
+    }
+};
+
+void register_object(NetworkObject * o)
+{
+    ObjectElement * obj = new ObjectElement((InventoryElement *)o);
+    // printf("register_object: uid=%lx\n", o->uid);
+    all_objects.add(obj);
+}
+
+NetworkObject * get_object_by_id(NetworkObject obj)
+{
+    ListElement * el = all_objects.find(&obj.uid);
+    return el ? el->get_el() : nullptr;
+}
+
 PacketObjectUpdate::PacketObjectUpdate() : Packet(PACKET_OBJECT_UPDATE)
 { // called by client
     obj = nullptr;
@@ -39,6 +68,7 @@ bool PacketObjectUpdate::update(unsigned char * data, size_t s)
             new (&obj->player.data.inventory) ElementsList("inventory");
             if (inv_elems)
             {
+            	ElementsList * inv = &obj->player.data.inventory;
                 PacketElementsList::serial_data * pdata = (PacketElementsList::serial_data*)(&obj->data[0]);
                 CONSOLE_LOG("nr_elements=%d list_c_id=%d\n", pdata->nr_elements, pdata->list_c_id);
                 if (pdata->list_c_id == Class_ListElement)
@@ -47,14 +77,22 @@ bool PacketObjectUpdate::update(unsigned char * data, size_t s)
                     {
                         size_t uid=((size_t*)(pdata->data))[i];
                         CONSOLE_LOG("inv[%d]=%lx\n", i, uid);
+                        InventoryElement * el = static_cast<InventoryElement*>(get_object_by_id(NetworkObject(Class_Element, uid)));
+						if (el) {
+							  inv->add(el);
+						}
                     }
                 }
             }
             new (&obj->player.data.known_elements) ElementsList("known elements");
-            // new (&obj->player.data.player_skills) Skills();
-            // talking_to
+            new (&obj->player.data.talking_to) SerializablePointer<Player>();
             // relations
             break;
+        }
+        case ObjectData::Tag::Npc:
+        {
+
+        	break;
         }
         default:
             break;

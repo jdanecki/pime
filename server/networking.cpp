@@ -205,15 +205,12 @@ bool handle_packet(ENetPacket * packet, ENetPeer * peer)
             uintptr_t oid = req->get_oid();
             delete p;
             InventoryElement * obj = find_in_world(&pl->player->location, oid);
-            if (obj)
-            {
-                if (!pl->player->server_action_on_object(a, obj))
-                {
-                    p = new PacketActionFailed();
-                    p->send(peer);
-                    delete p;
-                }
-            }
+			if (!pl->player->server_action_on_object(a, obj))
+			{
+				p = new PacketActionFailed();
+				p->send(peer);
+				delete p;
+			}
             break;
         }
         case PACKET_PLAYER_ACTION_USE_ITEM_ON_TILE:
