@@ -25,7 +25,7 @@ class DialogElement
     int id;
     enum DialogElementType c_id;
     DialogElement(int id, Backend_Rect rect, enum DialogElementType c_id);
-    ~DialogElement() {}
+    virtual ~DialogElement() {}
     virtual void draw();
     virtual bool pressed(int x, int y);
     enum DialogElementType get_c_id();
@@ -48,8 +48,10 @@ class Dialog : public DialogElement
     T * get(int id);
 
     void add(DialogElement * el);
+    void clear_elements();
     void draw();
     bool press(int x, int y, int button);
+    virtual void update() {}
     static constexpr DialogElementType t = DialogElementType::Dialog;
 };
 
@@ -89,12 +91,12 @@ class DialogText : public DialogElement
 class DialogImage : public DialogElement
 {
   public:
-    bool texture_loaded;
     Backend_Texture texture;
     DialogImage(int id, Backend_Rect rect, std::string filename);
     DialogImage(int id, Backend_Rect rect);
     ~DialogImage() {}
     void draw();
+    void set_texture(Backend_Texture texture);
     static constexpr DialogElementType t = DialogElementType::Image;
 };
 
@@ -104,8 +106,13 @@ class DialogButton : public DialogElement
   public:
     DialogBox * d_box;
     DialogText * d_text;
+    DialogImage * d_image;
     DialogButton(
-        int id, Backend_Rect rect, int size, Backend_Color bgcolor, Backend_Color fgcolor, std::string text, void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *) = nullptr);
+        int id, Backend_Rect rect, int size, Backend_Color bgcolor, Backend_Color fgcolor, std::string text,
+		void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *) = nullptr);
+    DialogButton(
+    int id, Backend_Rect rect, int size, Backend_Color bgcolor, Backend_Color fgcolor, Backend_Texture texture,
+    		void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *) = nullptr);
     ~DialogButton() {}
     void draw();
     bool pressed(int x, int y);

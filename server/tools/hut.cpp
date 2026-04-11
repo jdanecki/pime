@@ -25,15 +25,19 @@ bool Hut::can_pickup()
 
 bool Hut::use_on(InventoryElement * object, Player * pl)
 {
-    CONSOLE_LOG("%s: use on %s\n", get_name(), object->get_name());
+    CONSOLE_LOG("%s: use_on %s\n", get_name(), object->get_name());
     switch (object->get_cid())
     {
         case Class_Animal:
         {
-            CONSOLE_LOG("creating barn\n");
+            CONSOLE_LOG("creating barn with id=%ld\n", object->get_id());
             chunk * ch = world_table[pl->location.chunk.map_y][pl->location.chunk.map_x];
             ch->add_object(create_place(PLACE_BARN), pl->location.chunk.x, pl->location.chunk.y);
             destroy(this);
+            ItemLocation location = object->location;
+            add_object_to_world(object, pl->location);
+            pl->drop(object);
+            update_location(*object, location, object->location);
             destroy(object);
             return true;
         }

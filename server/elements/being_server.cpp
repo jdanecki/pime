@@ -13,6 +13,8 @@ void BeingServer::show(bool details)
         age->show();
     if (max_age)
         max_age->show();
+    CONSOLE_LOG("dst_loc: ");
+    dst_loc.show();
 }
 
 bool BeingServer::grow()
@@ -33,7 +35,6 @@ bool BeingServer::grow()
 BeingServer::BeingServer()
 {
     delay_for_grow = max_delay_grow;
-
     max_age = nullptr;
     age = nullptr;
     alive = true;

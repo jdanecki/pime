@@ -24,9 +24,27 @@ bool BarnServer::can_pickup()
     return false;
 }
 
+bool BarnServer::use_on(InventoryElement * object, Player * pl)
+{
+	 CONSOLE_LOG("%s: use_on %s\n", get_name(), object->get_name());
+	    switch (object->get_cid())
+	    {
+	        case Class_Animal:
+	        {
+	            CONSOLE_LOG("adding %s id=%ld to %s\n", object->get_name(), object->get_id(), get_name());
+	            animals++;
+	            notify_update(this);
+	            return true;
+	        }
+	        default:
+	            CONSOLE_LOG("Can't use %s with %s\n", get_name(), object->get_name());
+	            return false;
+	    }
+}
+
 BarnServer::BarnServer(Place_id id) : Barn(id)
 {
-    state = BARN_ANIMAL;
+
 }
 
 void BarnServer::show_state()

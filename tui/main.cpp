@@ -22,6 +22,10 @@ void create_game_menus()
 {
 }
 
+void create_dialogs()
+{
+}
+
 int init_window(const char * title, int wx, int wy, bool resizable)
 {
     setbuf(stdout, nullptr);

@@ -6,7 +6,6 @@
 class ProductServer : public Product
 {
   public:
-    void * padding;
     int ing_count;
     size_t ings[2];
 

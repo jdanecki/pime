@@ -53,9 +53,9 @@ void mouse_pressed(int x, int y, int button)
 {
     CONSOLE_LOG("mouse %d,%d %d \n", x, y, button);
     hotbar.press(x, y, button);
-    if (d_craft.show)
+    if (d_craft->show)
     {
-        d_craft.press(x, y, button);
+        d_craft->press(x, y, button);
     }
 }
 

@@ -67,7 +67,7 @@ void handle_put_item()
 
 void handle_craft_show()
 {
-    d_craft.show = 1;
+    d_craft->show = true;
 }
 void handle_hotbar_0()
 {

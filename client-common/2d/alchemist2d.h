@@ -13,6 +13,7 @@ class Renderable
 
   public:
     Renderable();
+    virtual ~Renderable() {};
     virtual Backend_Texture get_texture();
     virtual void render(float el_x, float el_y, float w, float h);
 };

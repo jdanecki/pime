@@ -11,6 +11,7 @@
 #include "game.h"
 #include "playerUI.h"
 #include "2d/texture.h"
+#include "ui/dialog/d_craft.h"
 
 #include "../net/net.h"
 
@@ -120,6 +121,7 @@ int init_graphics()
     load_textures();
 #endif
     create_game_menus();
+    create_dialogs();
 
     return 0;
 }

@@ -35,12 +35,12 @@ void DHotbar::update()
     {
         // IMAGES
     	auto img = get<DialogImage>(i);
-        img->texture_loaded = false;
+        img->visible = false;
         if (player->hotbar[i])
         {
             Renderable * r = dynamic_cast<Renderable *>(player->hotbar[i]);
             img->texture = r->get_texture();
-            img->texture_loaded = true;
+            img->visible = true;
         }
         // SELECTION
         auto b = get<DialogBox>(i);

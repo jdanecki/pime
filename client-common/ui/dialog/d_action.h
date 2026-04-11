@@ -6,6 +6,7 @@ class DAction : public Dialog
 {
   public:
     DAction(int x, int y, int count);
+    virtual ~DAction() {}
 };
 
 #endif

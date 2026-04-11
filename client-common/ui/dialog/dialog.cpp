@@ -50,6 +50,7 @@ DialogText::DialogText(int id, int x, int y, int size, Backend_Color color, std:
 void DialogText::draw()
 {
 	if (!visible) return;
+	if (!text.size()) return;
     write_text(rect.r.x, rect.r.y, text.c_str(), color, size, size * 1.5);
 }
 
@@ -60,35 +61,52 @@ void DialogText::change_text(std::string text)
 
 DialogImage::DialogImage(int id, Backend_Rect rect, std::string filename) : DialogElement(id, rect, t)
 {
-    texture = load_texture(filename.c_str());
-    texture_loaded = true;
+    set_texture(load_texture(filename.c_str()));
 }
 
 DialogImage::DialogImage(int id, Backend_Rect rect) : DialogElement(id, rect, t)
 {
-    texture_loaded = false;
+	visible = false;
 }
 
+void DialogImage::set_texture(Backend_Texture texture)
+{
+	this->texture = texture;
+	visible = true;
+}
 void DialogImage::draw()
 {
 	if (!visible) return;
-    if (texture_loaded)
         Backend_Texture_Copy(texture, nullptr, &rect);
 }
 
 DialogButton::DialogButton(
-    int id, Backend_Rect rect, int size, Backend_Color bgcolor, Backend_Color fgcolor, std::string text, void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *))
+    int id, Backend_Rect rect, int size, Backend_Color bgcolor, Backend_Color fgcolor, std::string text,
+	void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *))
     : DialogElement(id, rect, t), on_press(on_press), on_secondary_press(on_secondary_press)
 {
     d_box = new DialogBox(id, rect, bgcolor, 1);
     d_text = new DialogText(id, rect.r.x+1, rect.r.y+1, size, fgcolor, text);
+    d_image = nullptr;
+}
+
+DialogButton::DialogButton(
+    int id, Backend_Rect rect, int size, Backend_Color bgcolor, Backend_Color fgcolor, Backend_Texture texture,
+	void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *))
+    : DialogElement(id, rect, t), on_press(on_press), on_secondary_press(on_secondary_press)
+{
+    d_box = new DialogBox(id, rect, bgcolor, 1);
+    d_text = nullptr;
+    d_image = new DialogImage(id, Backend_Rect(rect.r.x + 2, rect.r.y + 2, rect.get_w()-4, rect.get_h()-4));
+    d_image->set_texture(texture);
 }
 
 void DialogButton::draw()
 {
 	if (!visible) return;
     d_box->draw();
-    d_text->draw();
+    if (d_text) d_text->draw();
+    if (d_image) d_image->draw();
 }
 
 bool DialogButton::pressed(int x, int y)
@@ -110,7 +128,10 @@ DialogElement * Dialog::get_element_from_id(int id, enum DialogElementType c_id)
     return nullptr;
 }
 
-
+void Dialog::clear_elements()
+{
+	elements.clear();
+}
 void Dialog::add(DialogElement * el)
 {
     elements.push_back(el);
@@ -170,5 +191,6 @@ bool DialogElement::pressed(int x, int y)
 void DialogButton::move(int x, int y)
 {
     d_box->move(x, y);
-    d_text->move(x, y);
+    if (d_text) d_text->move(x, y);
+    if (d_image) d_image->move(x, y);
 }

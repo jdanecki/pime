@@ -24,6 +24,7 @@ class BarnServer : public Barn, public Networked
     void show_state() override;
     bool action(Product_action, Player *) override;
     bool can_pickup() override;
+    bool use_on(InventoryElement * object, Player * pl);
 };
 
 InventoryElement * create_place(Place_id id);

@@ -326,10 +326,10 @@ void draw_run_icons()
 
 void draw_dialogs()
 {
-    if (d_craft.show)
+    if (d_craft->show)
     {
-        d_craft.update();
-        d_craft.draw();
+        d_craft->update();
+        d_craft->draw();
     }
     hotbar.update();
     hotbar.draw();

@@ -201,6 +201,7 @@ void create_all_base_animals()
         BaseAnimal * ba = (BaseAnimal *)(ble->get_el());
         AnimalServer * an = create_animal(ba);
         ch->add_object(an, id % CHUNK_SIZE, 15.0 + id / CHUNK_SIZE);
+        an->dst_loc.set_chunk(128, 128, id % CHUNK_SIZE, 15.0 + id / CHUNK_SIZE);
         notify_create(an);
     }
 }

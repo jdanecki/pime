@@ -6,6 +6,7 @@
 #include "../core/alchemist/random_functions.h"
 #include "networking.h"
 #include "../core/packet_types.h"
+#include "places/places.h"
 
 ElementsList * players;
 
@@ -28,24 +29,40 @@ bool PlayerServer::use_item_on_object(InventoryElement * item, InventoryElement 
     ProductServer * prod = dynamic_cast<ProductServer *>(item);
     if (prod)
     {
-        CONSOLE_LOG("%s: using %s on %s\n", get_name(), prod->get_name(), object->get_name());
+        CONSOLE_LOG("%s: using product: %s on object: %s\n", get_name(), prod->get_name(), object->get_name());
         if (prod->use_on(object, this))
         {
             return true;
         }
     }
-    else if (object->get_cid() == Class_Product)
-    {
-        ProductServer * obj_prod = dynamic_cast<ProductServer *>(object);
-        if (obj_prod)
-        {
-            CONSOLE_LOG("%s: using %s on %s\n", get_name(), item->get_name(), obj_prod->get_name());
-            if (obj_prod->use_on(item, this))
-            {
-                return true;
-            }
-        }
-    }
+    else
+    	switch(object->get_cid())
+    	{
+			case Class_Product:
+			{
+				ProductServer * obj_prod = dynamic_cast<ProductServer *>(object);
+				if (obj_prod)
+				{
+					CONSOLE_LOG("%s: using item: %s on product: %s\n", get_name(), item->get_name(), obj_prod->get_name());
+					if (obj_prod->use_on(item, this))
+					{
+						return true;
+					}
+				}
+				break;
+			}
+
+			case Class_Barn:
+			{
+				BarnServer * obj_barn = dynamic_cast<BarnServer *>(object);
+				CONSOLE_LOG("%s: using item: %s on %s\n", get_name(), item->get_name(), obj_barn->get_name());
+				if (obj_barn->use_on(item, this))
+				{
+					return true;
+				}
+				break;
+			}
+    	}
     return false;
 }
 

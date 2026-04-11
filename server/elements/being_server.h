@@ -13,7 +13,6 @@ class BeingServer
     Property * age;
     Property * max_age;
     bool alive;
-    int padding;
     int delay_for_move;
     int delay_for_grow;
     ItemLocation dst_loc;
@@ -21,7 +20,7 @@ class BeingServer
     BeingServer();
     void show(bool details = true);
     Property ** get_properties(int * count);
-    ~BeingServer();
+    virtual ~BeingServer();
     virtual bool grow();
     virtual bool tick();
     bool check_move();

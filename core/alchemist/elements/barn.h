@@ -6,6 +6,8 @@
 
 class Barn : public InventoryElement, public Place
 {
+protected:
+	int animals;
   public:
     Barn_states state;
     Barn(Place_id id);

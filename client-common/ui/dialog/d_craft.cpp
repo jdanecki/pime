@@ -2,13 +2,12 @@
 #include "d_craft.h"
 #include "dialog.h"
 #include "../../../net/net.h"
-#include "../../2d/texture.h"
 #include "playerUI.h"
 
 extern int active_hotbar;
 extern NetClient * client;
 
-DCraft d_craft;
+DCraft *d_craft;
 
 bool craft2elements(Product_id what)
 {
@@ -83,6 +82,50 @@ void button_switch(DialogButton * button)
         cr->in_products = button->id;
 }
 
+DElements::DElements(Backend_Rect r, ElementsList *list, void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *)):
+		Dialog(r, {125, 125, 125, 10})
+{
+	el_list=list;
+	button1_press=on_press;
+	button2_press=on_secondary_press;
+	add_elems();
+}
+
+void DElements::add_elems()
+{
+	int i=0;
+	for (InventoryElement * el : *el_list)
+	{
+		int x = i % 6 * 54;
+		int y = i / 6 * 54;
+
+		Renderable * r = dynamic_cast<Renderable *>(el);
+		Backend_Texture texture = r->get_texture();
+		add(new DialogButton(i, Backend_Rect(x, y, 50, 50), 10, {0, 0, 0, 125}, {0, 0, 0, 0}, texture, button1_press, button2_press));
+		i++;
+	}
+}
+void DElements::update()
+{
+	printf("DElements::update\n");
+	clear_elements();
+	add_elems();
+}
+
+DElements::DElements(Backend_Rect r, int count, Backend_Texture *textures, void (*on_press)(DialogButton *), void (*on_secondary_press)(DialogButton *)):
+		Dialog(r, {125, 125, 125, 10})
+{
+	button1_press=on_press;
+	button2_press=on_secondary_press;
+
+	for (int i = 0; i < count; i++)
+	{
+		int x = i % 6 * 54;
+		int y = i / 6 * 54;
+		add(new DialogButton(i, Backend_Rect(x, y, 50, 50), 10, {0, 0, 0, 125}, {0, 0, 0, 0}, textures[i], button1_press, button2_press));
+	}
+	el_list=nullptr;
+}
 DCraft::DCraft()
     : Dialog(Backend_Rect(60, 60, 500, 500), {125, 125, 125, 255}),
 	  ingredients(Backend_Rect(190, 170, 500 - 140, 500 - 120), {125, 125, 125, 10}),
@@ -100,8 +143,7 @@ DCraft::DCraft()
     {
         int x = i % 6 * 54;
         int y = i / 6 * 54;
-        ingredients.add(new DialogButton(i, Backend_Rect(x, y, 50, 50), 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", button_craft_ing, show_craft_ing));
-        ingredients.add(new DialogImage(i, Backend_Rect(x + 2, y + 2, 46, 46)));
+        ingredients.add(new DialogButton(i, Backend_Rect(x, y, 50, 50), 10, {0, 0, 0, 125}, {0, 0, 0, 0}, ing_textures[i], button_craft_ing, show_craft_ing));
     }
     ingredients.add(new DialogText(0, 0, (1 + ING_COUNT / 6) * 54, 20, {0, 0, 0, 255}, "Ingredient element"));
 
@@ -109,8 +151,9 @@ DCraft::DCraft()
     {
         int x = i % 6 * 54;
         int y = i / 6 * 54;
-        products.add(new DialogButton(i, Backend_Rect(x, y, 50, 50), 10, {0, 0, 0, 125}, {0, 0, 0, 0}, "", button_craft_prod, show_prod_ing));
-        products.add(new DialogImage(i, Backend_Rect(x + 2, y + 2, 46, 46)));
+        products.add(new DialogButton(i, Backend_Rect(x, y, 50, 50), 10, {0, 0, 0, 125}, {0, 0, 0, 0}, prod_textures[i], button_craft_prod, show_prod_ing));
+
+
     }
     products.add(new DialogText(0, 0, (1 + PROD_COUNT / 6) * 54, 20, {0, 0, 0, 255}, "Product element"));
 }
@@ -145,6 +188,14 @@ bool DCraft::press(int x, int y, int button)
 
 void DCraft::update()
 {
+	auto ing_button = get<DialogButton>(0);
+	auto prod_button = get<DialogButton>(1);
+	auto box = get<DialogBox>(1);
+	auto img0 = get<DialogImage>(0);
+	auto img1 = get<DialogImage>(1);
+	img0->visible = false;
+	img1->visible = false;
+
     if (in_products)
     {
         InventoryElement *el1 = nullptr, *el2 = nullptr;
@@ -163,79 +214,45 @@ void DCraft::update()
                 }
             }
         }
-        auto img = get<DialogImage>(0);
-        img->texture_loaded = false;
         if (el1)
         {
             Renderable * r = dynamic_cast<Renderable *>(el1);
-            img->texture = r->get_texture();
-            img->texture_loaded = true;
+            img0->set_texture(r->get_texture());
         }
-        img = get<DialogImage>(1);
-
-        img->texture_loaded = false;
         if (el2)
         {
             Renderable * r = dynamic_cast<Renderable *>(el2);
-            img->texture = r->get_texture();
-            img->texture_loaded = true;
+            img1->set_texture(r->get_texture());
         }
+        ing_button->d_box->color = {125, 125, 125, 5};
+  	    prod_button->d_box->color = {125, 255, 125, 125};
+ 	    box->visible = true;
     }
     else
     {
-    	auto img = get<DialogImage>(0);
-        img->texture_loaded = false;
         if (player->hotbar[active_hotbar])
         {
             Renderable * r = dynamic_cast<Renderable *>(player->hotbar[active_hotbar]);
-            img->texture = r->get_texture();
-            img->texture_loaded = true;
+            img0->set_texture(r->get_texture());
         }
-        img = get<DialogImage>(1);
-        img->texture_loaded = false;
-    }
 
-    auto ing_button = get<DialogButton>(0);
-    auto prod_button = get<DialogButton>(1);
-    auto box = get<DialogBox>(1);
-    if (in_products)
-    {
-        ing_button->d_box->color = {125, 125, 125, 5};
-        prod_button->d_box->color = {125, 255, 125, 125};
-        box->color.a = 125;
-    }
-    else
-    {
         ing_button->d_box->color = {125, 255, 125, 125};
-        prod_button->d_box->color = {125, 125, 125, 5};
-        box->color.a = 0;
-    }
-
-    auto img = ingredients.get<DialogImage>(0);
-    if (img && img->texture_loaded)
-        return;
-
-    for (int i = 0; i < ING_COUNT; i++)
-    {
-    	auto img = ingredients.get<DialogImage>(i);
-        img->texture = ing_textures[i];
-        img->texture_loaded = true;
-    }
-
-    for (int i = 0; i < PROD_COUNT; i++)
-    {
-    	auto img = products.get<DialogImage>(i);
-        img->texture = prod_textures[i];
-        img->texture_loaded = true;
+	    prod_button->d_box->color = {125, 125, 125, 5};
+	    box->visible = false;
     }
 }
 
 bool hide_craft_window()
 {
-    if (d_craft.show)
+    if (d_craft->show)
     {
-        d_craft.show = false;
+        d_craft->show = false;
         return true;
     }
     return false;
+}
+
+void create_dialogs()
+{
+	d_craft = new DCraft();
 }
